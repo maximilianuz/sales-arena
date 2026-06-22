@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shuffle, Copy } from 'lucide-react';
+import { Shuffle, Copy, TrendingUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 
@@ -45,9 +45,27 @@ export default function Lobby() {
       <Header title={t('lobby.title')} />
       
       <div className="glass-panel" style={{ maxWidth: '500px', width: '100%', marginTop: '2rem', animation: 'modalIn 0.3s ease-out' }}>
-        <h2 style={{ textAlign: 'center', color: 'var(--primary)', marginBottom: '2rem', fontSize: '2rem' }}>
-          {t('lobby.whoWillYouPlay')}
-        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
+          <div style={{ background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '1rem', borderRadius: '1rem', marginBottom: '1rem', boxShadow: '0 10px 25px rgba(79, 70, 229, 0.4)' }}>
+            <TrendingUp size={48} color="white" strokeWidth={1.5} />
+          </div>
+          <h2 style={{ 
+            textAlign: 'center', 
+            fontSize: '3rem', 
+            fontWeight: '800',
+            background: 'linear-gradient(to right, #ffffff, #a5b4fc)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            margin: 0,
+            letterSpacing: '-0.02em',
+            lineHeight: '1.2'
+          }}>
+            Sales Arena
+          </h2>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.85rem', fontWeight: '600' }}>
+            AI-Powered Simulator
+          </p>
+        </div>
         
         <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div>
