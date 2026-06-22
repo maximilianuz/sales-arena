@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Arena - Dossier del Participante</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            color: #1e293b;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+
+        .page {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 60px 80px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-top: 10px solid #4F46E5;
+        }
+
+        h1 {
+            color: #4F46E5;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            color: #EC4899;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #0f172a;
+            font-size: 1.3rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #64748b;
+            font-weight: 300;
+            margin-bottom: 40px;
+        }
+
+        .role-box {
+            background: #f8fafc;
+            border-left: 5px solid;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .role-seller { border-color: #4F46E5; }
+        .role-client { border-color: #EC4899; }
+        .role-observer { border-color: #F59E0B; }
+
+        .role-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .role-seller .role-title { color: #4F46E5; }
+        .role-client .role-title { color: #EC4899; }
+        .role-observer .role-title { color: #F59E0B; }
+
+        .step {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: #4F46E5;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .alert {
+            background: #FEF2F2;
+            color: #991B1B;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #FCA5A5;
+            font-weight: 600;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        @media print {
+            body { background: white; }
+            .page { box-shadow: none; margin: 0; padding: 20px; max-width: 100%; border-top: none; }
+            .no-print { display: none; }
+        }
+
+        .btn-print {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            background: #4F46E5;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+        .btn-print:hover { background: #4338CA; }
+    </style>
+</head>
+<body>
+
+    <button class="btn-print no-print" onclick="window.print()">📥 Guardar como PDF</button>
+
+    <div class="page">
+        <h1>Sales Arena</h1>
+        <div class="subtitle">Dossier del Participante: Simulador High Ticket Closer</div>
+
+        <p>Bienvenido a <strong>Sales Arena</strong>, no estás en una clase teórica, estás en un simulador de vuelo para cerradores de ventas. Este documento te explicará las reglas del juego, los roles y cómo debes comportarte para sacar el máximo provecho de las sesiones de <em>sparring comercial</em> en vivo.</p>
+
+        <h2>🎭 Los 3 Roles del Juego</h2>
+        <p>En cada ronda, la ruleta asignará uno de estos tres roles a los participantes. Debes actuar tu rol con compromiso total.</p>
+
+        <div class="role-box role-seller">
+            <div class="role-title">1. El Vendedor (El Closer)</div>
+            <p><strong>Tu Misión:</strong> Guiar al cliente a través del <em>Pipeline</em>, descubrir su dolor profundo y cerrar la venta.</p>
+            <ul>
+                <li>Eres el profesional. Debes mantener el control y el marco de la llamada.</li>
+                <li>Sigue el Pipeline en pantalla: Rapport, Cualificación, Transición, Presentación, Cierre.</li>
+                <li>Si aparece un <strong>Evento Sorpresa</strong> (ej. "Tengo 2 minutos"), no entres en pánico, adáptate sin perder postura.</li>
+            </ul>
+        </div>
+
+        <div class="role-box role-client">
+            <div class="role-title">2. El Cliente (El Prospecto)</div>
+            <p><strong>Tu Misión:</strong> Actuar la situación descrita en el <em>Buyer Persona</em> de forma realista. No se lo pongas fácil, pero tampoco seas imposible.</p>
+            <ul>
+                <li>El facilitador te enviará por mensaje privado tu <strong>Objeción Oculta</strong>. ¡Es un secreto! El vendedor debe usar sus preguntas para descubrirla.</li>
+                <li>Actúa las emociones y frustraciones que el tablero indica. Si tu nivel de dificultad es "Avanzado", pon a prueba el marco del vendedor.</li>
+            </ul>
+        </div>
+
+        <div class="role-box role-observer">
+            <div class="role-title">3. El Observador (El Analista)</div>
+            <p><strong>Tu Misión:</strong> Tomar notas en silencio e identificar puntos ciegos que el vendedor no esté viendo.</p>
+            <ul>
+                <li>Evalúa: ¿El vendedor escuchó más de lo que habló? ¿Descubrió la objeción real?</li>
+                <li>Prepárate para participar en la <strong>Votación Grupal</strong> al final de la ronda.</li>
+            </ul>
+        </div>
+
+        <h2>🕹️ ¿Cómo funciona una ronda?</h2>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div>
+                <strong>Asignación y Briefing:</strong> El facilitador comparte pantalla. Verás el título del caso, la industria y los datos del Buyer Persona. Se giran los roles. El Cliente recibe su información privada.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <div>
+                <strong>¡Acción!:</strong> El cronómetro arranca (usualmente 5 a 10 minutos). El Vendedor inicia la llamada. El facilitador irá avanzando la barra superior del <em>Pipeline</em> a medida que el Vendedor progrese por las etapas.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <div>
+                <strong>Curvas Peligrosas:</strong> En cualquier momento, la pantalla puede parpadear con un <em>Evento Sorpresa</em>. Ambos deben incorporar esa nueva realidad al instante.
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">4</div>
+            <div>
+                <strong>¡Tiempo!:</strong> Cuando el reloj llega a cero, el role-play se detiene inmediatamente (incluso si estaban a mitad de una frase).
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">5</div>
+            <div>
+                <strong>Votación y Debriefing:</strong> Todo el grupo vota en pantalla sobre el desempeño. Analizamos el tablero: ¿Qué etapas se completaron? ¿Se descubrió la objeción oculta? Se definen puntos a <em>Mantener</em>, <em>Mejorar</em> y <em>Repetir</em>.
+            </div>
+        </div>
+
+        <div class="alert">
+            Regla de Oro: El aprendizaje está en el error.<br>No intentes ser perfecto, intenta ser corregido.
+        </div>
+    </div>
+</body>
+</html>
