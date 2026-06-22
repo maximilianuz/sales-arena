@@ -167,6 +167,19 @@ export default function Room() {
                 />
               )}
             </div>
+
+            {/* DEBRIEF PANEL MOVIDO AL CENTRO PARA MÁS ESPACIO */}
+            {showColumn3 && (
+              <div style={{ marginTop: '1.5rem', display: 'flex', flex: 1 }}>
+                <DebriefPanel 
+                  activeStageIndex={activeStageIndex || 0} 
+                  stages={stages}
+                  roomNotes={roomData.debriefNotes}
+                  updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
+                  isFacilitator={isFacilitator}
+                />
+              </div>
+            )}
           </div>
 
           {showColumn3 && (
@@ -177,13 +190,6 @@ export default function Room() {
                 questions={roomData.questions}
                 updateQuestions={isObserver || isFacilitator ? updateQuestions : undefined}
                 activeStage={stages[activeStageIndex || 0]}
-              />
-              <DebriefPanel 
-                activeStageIndex={activeStageIndex || 0} 
-                stages={stages}
-                roomNotes={roomData.debriefNotes}
-                updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
-                isFacilitator={isFacilitator}
               />
             </div>
           )}

@@ -73,14 +73,14 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
               </label>
               <select 
                 onChange={(e) => handleProviderChange(e.target.value)}
-                style={{ width: '100%', padding: '0.5rem', borderRadius: '0.25rem', border: '1px solid var(--glass-border)', background: 'var(--glass-bg)', color: 'white', marginBottom: '1rem' }}
+                style={{ width: '100%', padding: '0.5rem', borderRadius: '0.25rem', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.5)', color: 'white', marginBottom: '1rem' }}
               >
-                <option value="custom">Personalizado...</option>
-                <option value="nvidia">NVIDIA NIM (Recomendado)</option>
-                <option value="openai">OpenAI (ChatGPT)</option>
-                <option value="groq">Groq (Ultra-Rápido)</option>
-                <option value="openrouter">OpenRouter (Múltiples Modelos)</option>
-                <option value="ollama">Ollama (100% Local y Privado)</option>
+                <option value="custom" style={{background: '#1e1e2f', color: 'white'}}>Personalizado...</option>
+                <option value="nvidia" style={{background: '#1e1e2f', color: 'white'}}>NVIDIA NIM (Recomendado)</option>
+                <option value="openai" style={{background: '#1e1e2f', color: 'white'}}>OpenAI (ChatGPT)</option>
+                <option value="groq" style={{background: '#1e1e2f', color: 'white'}}>Groq (Ultra-Rápido)</option>
+                <option value="openrouter" style={{background: '#1e1e2f', color: 'white'}}>OpenRouter (Múltiples Modelos)</option>
+                <option value="ollama" style={{background: '#1e1e2f', color: 'white'}}>Ollama (100% Local y Privado)</option>
               </select>
             </div>
             
