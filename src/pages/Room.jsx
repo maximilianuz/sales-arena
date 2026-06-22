@@ -55,9 +55,18 @@ export default function Room() {
     const savedTitle = localStorage.getItem('session_title');
     if (savedTitle) setSessionTitle(savedTitle);
     
-    const savedStages = localStorage.getItem('salesArenaStages');
+    const savedStages = localStorage.getItem('pipeline_stages');
     if (savedStages) {
-      setStages(JSON.parse(savedStages));
+      try {
+        const parsed = JSON.parse(savedStages);
+        if (Array.isArray(parsed)) {
+          setStages(parsed);
+        } else {
+          setStages(getDefaultStages(i18n.language));
+        }
+      } catch (e) {
+        setStages(getDefaultStages(i18n.language));
+      }
     } else {
       setStages(getDefaultStages(i18n.language));
     }

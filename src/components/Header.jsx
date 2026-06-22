@@ -28,7 +28,7 @@ export default function Header({ title, onTitleChange, onOpenSettings }) {
       <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <select 
           onChange={changeLanguage} 
-          value={i18n.language.split('-')[0]} 
+          value={(i18n.language || 'es').split('-')[0]} 
           style={{ 
             background: 'rgba(0,0,0,0.5)', 
             color: 'white', 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Save, Plus, Trash2, Key, Settings, Layers } from 'lucide-react';
+import { X, Save, Key, Settings, Layers } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import StagesEditor from './StagesEditor';
 
@@ -8,7 +8,7 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
   const [keyInput, setKeyInput] = useState(apiKey || '');
   const [urlInput, setUrlInput] = useState(apiUrl || '/api/nvidia/v1/chat/completions');
   const [modelInput, setModelInput] = useState(apiModel || 'meta/llama-3.1-70b-instruct');
-  const [localStages, setLocalStages] = useState(stages || []);
+  const [localStages, setLocalStages] = useState(Array.isArray(stages) ? stages : []);
   const [activeTab, setActiveTab] = useState('general');
 
   const handleProviderChange = (provider) => {
@@ -37,6 +37,10 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
       default:
         break;
     }
+  };
+
+  const handleSave = () => {
+    onSave(keyInput, urlInput, modelInput, localStages);
   };
 
   return (
