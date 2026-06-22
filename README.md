@@ -1,70 +1,65 @@
-# 💼 Sales Arena: Simulador High Ticket Closer
+# Sales Arena Sandbox AI 🚀
 
-Una aplicación interactiva para hacer Role-Plays de ventas B2B y High Ticket. Diseñada con una arquitectura de "Venta Consultiva Avanzada", permite simular escenarios reales, aislar objeciones y evaluar el desempeño de los "Closers" en vivo.
-
-## ✨ Características Principales
-
-- **Pipeline Personalizable:** Define tus propias etapas del embudo de ventas (Rapport, Calificación, Presentación, Cierre) con objetivos claros y tiempos estimados.
-- **Generador de Buyer Persona (con IA):** Genera escenarios aleatorios con dolores, urgencias y objeciones ocultas basados en la industria que elijas.
-- **Temporizador Interactivo:** Incluye una guía de tiempos sugerida basada en las etapas de tu pipeline.
-- **Paneles de Observación:** Asigna roles (Closer, Lead, Observadores), lleva un "Debrief" en vivo y habilita votaciones grupales para dar feedback.
-- **Motor de IA Flexible:** Puedes conectar la aplicación con el proveedor de IA de tu preferencia (Nvidia NIM, OpenAI, OpenRouter, o modelos locales con Ollama). Toda la configuración se guarda de forma segura y local en tu navegador.
+[🇺🇸 Read in English](#english) | [🇪🇸 Leer en Español](#español)
 
 ---
 
-## 🚀 Instalación y Uso Local
+<a name="english"></a>
+## 🇺🇸 English
 
-Para correr este proyecto en tu computadora, necesitas tener instalado [Node.js](https://nodejs.org/).
+**Sales Arena Sandbox AI** is a real-time multiplayer web application designed to simulate High Ticket Sales scenarios. It leverages advanced AI models (NVIDIA NIM, OpenAI, Groq, OpenRouter, or local Ollama) to generate dynamic "Buyer Personas" and objections on the fly. 
 
-1. **Clona el repositorio** o descarga los archivos.
-2. Abre una terminal en la carpeta del proyecto y ejecuta:
-   ```bash
-   npm install
-   ```
-3. Inicia el servidor de desarrollo local:
-   ```bash
-   npm run dev
-   ```
-4. Abre tu navegador en la URL que aparece en la terminal (por defecto `http://localhost:5173`).
+Built with **React, Vite, and Firebase**, it allows multiple participants to join the same room with different roles:
+- **Closer (Salesperson):** Tries to close the deal with a minimalist UI.
+- **Lead (Client):** Plays the role of the buyer, receiving dynamic AI instructions on what objections to raise.
+- **Observer:** Evaluates the Closer's performance using a real-time voting system.
+- **Facilitator:** Controls the simulation, changes pipeline stages, manages the AI generation, and triggers "Surprise Events" to test the Closer's adaptability.
 
----
+### Key Features
+- **Real-Time Multiplayer:** Synchronized state across all clients using Firebase Realtime Database.
+- **Dynamic AI Generation:** Generates comprehensive Buyer Personas including demographics, current situation, psychological profiles, and hidden objections.
+- **Role-Based UI:** The interface adapts seamlessly hiding or showing sensitive information depending on the user's selected role.
+- **Synchronized Timer:** A global server-timestamp-based countdown timer.
+- **Collaborative Debriefing:** A shared workspace for Observers and Facilitators to type evaluation notes that sync in real time.
+- **Surprise Events:** Facilitators can throw random, unexpected curveballs to the Closer (e.g., "Budget frozen!") that pop up instantly on everyone's screen.
+- **BYOK (Bring Your Own Key):** Connect directly to your preferred AI provider without vendor lock-in.
 
-## 🧠 Configuración del Motor de Inteligencia Artificial
+### Local Development
+```bash
+# Install dependencies
+npm install
 
-Sales Arena utiliza IA para generar perfiles detallados de "Leads" o prospectos. Para proteger la privacidad, **la aplicación no tiene claves maestras codificadas**; cada usuario debe colocar su propia API Key desde la interfaz (botón ⚙️ Ajustes).
-
-La aplicación es 100% compatible con el formato estándar de OpenAI, lo que te permite conectarte a casi cualquier proveedor:
-
-### Opción 1: NVIDIA NIM (Recomendada / Por defecto)
-Los modelos gratuitos y ultra rápidos de Nvidia (como Llama 3.1 70B).
-- **API Base URL:** `/api/nvidia/v1/chat/completions` (Utilizamos un proxy local incluido en Vite para evitar bloqueos de CORS).
-- **Modelo:** `meta/llama-3.1-70b-instruct`
-- **API Key:** Consigue una clave gratuita en [build.nvidia.com](https://build.nvidia.com/).
-
-### Opción 2: OpenAI (ChatGPT)
-- **API Base URL:** `https://api.openai.com/v1/chat/completions`
-- **Modelo:** `gpt-4o-mini` o `gpt-3.5-turbo`
-- **API Key:** Tu clave privada de OpenAI.
-
-### Opción 3: OpenRouter
-Ideal si quieres usar modelos como Claude, Llama o Gemini con una sola cuenta.
-- **API Base URL:** `https://openrouter.ai/api/v1/chat/completions`
-- **Modelo:** `anthropic/claude-3.5-sonnet` (o el que prefieras del catálogo).
-- **API Key:** Tu token de OpenRouter.
-
-### Opción 4: Ollama (100% Local y Privado)
-Si tienes [Ollama](https://ollama.com/) corriendo en tu computadora, puedes usarlo sin necesidad de internet ni claves.
-- **Importante:** Debes habilitar CORS en Ollama. Antes de iniciarlo, abre tu terminal y ejecuta `set OLLAMA_ORIGINS="*"`, y luego corre `ollama serve`.
-- **API Base URL:** `http://localhost:11434/v1/chat/completions`
-- **Modelo:** `llama3.1`, `phi3`, etc. (Asegúrate de haberlo descargado con `ollama run <modelo>`).
-- **API Key:** (Puedes dejar el campo vacío o escribir cualquier cosa como "local").
+# Run development server
+npm run dev
+```
 
 ---
 
-## 🛠 Tecnologías Utilizadas
-- **React 18** (Vite)
-- **CSS Vanilla** (Estilos "Glassmorphism")
-- **Lucide React** (Iconografía)
-- Estado persistente local (sin base de datos requerida).
+<a name="español"></a>
+## 🇪🇸 Español
 
-Hecho con ❤️ por [Maximiliano C.](https://maximilianoc.netlify.app/)
+**Sales Arena Sandbox AI** es una aplicación web multijugador en tiempo real diseñada para simular escenarios de Ventas High Ticket. Utiliza modelos de IA avanzados (NVIDIA NIM, OpenAI, Groq, OpenRouter o Ollama local) para generar "Buyer Personas" y objeciones dinámicas sobre la marcha.
+
+Construida con **React, Vite y Firebase**, permite que múltiples participantes se unan a la misma sala con diferentes roles:
+- **Closer (Vendedor):** Intenta cerrar el trato con una interfaz minimalista.
+- **Lead (Cliente):** Interpreta al comprador, recibiendo instrucciones dinámicas de la IA sobre qué objeciones plantear.
+- **Observador:** Evalúa el desempeño del Closer mediante un sistema de votación en tiempo real.
+- **Facilitador:** Controla la simulación, cambia las etapas del embudo, administra la generación de IA y desencadena "Eventos Sorpresa" para probar la adaptabilidad del Closer.
+
+### Características Principales
+- **Multijugador en Tiempo Real:** Estado sincronizado en todos los clientes usando Firebase Realtime Database.
+- **Generación Dinámica por IA:** Genera perfiles completos de Buyer Persona incluyendo demografía, situación actual, perfil psicológico y objeciones ocultas.
+- **Interfaz Basada en Roles:** La interfaz se adapta dinámicamente ocultando o mostrando información sensible dependiendo del rol seleccionado por el usuario.
+- **Cronómetro Sincronizado:** Un temporizador global basado en la marca de tiempo del servidor.
+- **Debriefing Colaborativo:** Un espacio de trabajo compartido para que Observadores y Facilitadores escriban notas de evaluación que se sincronizan en tiempo real.
+- **Eventos Sorpresa:** Los Facilitadores pueden lanzar eventos aleatorios e inesperados al Closer (ej. "¡Presupuesto congelado!") que aparecen instantáneamente en la pantalla de todos.
+- **BYOK (Trae tu propia clave):** Conéctate directamente a tu proveedor de IA preferido.
+
+### Desarrollo Local
+```bash
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo
+npm run dev
+```
