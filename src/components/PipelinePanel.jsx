@@ -28,7 +28,7 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
           return (
             <div key={stage.id} style={{ display: 'flex', alignItems: 'center', minWidth: 'max-content' }}>
               <div 
-                onClick={() => setActiveStageIndex(index)}
+                onClick={() => setActiveStageIndex && setActiveStageIndex(index)}
                 style={{ 
                   padding: '0.25rem 0.75rem', 
                   borderRadius: '1rem',

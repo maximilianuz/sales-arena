@@ -1,44 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, CheckSquare, Target, Save, RotateCcw } from 'lucide-react';
 
-export default function DebriefPanel({ activeStageIndex, stages }) {
-  const [debriefData, setDebriefData] = useState({
-    completedStages: [],
-    infoDiscovered: '',
-    unexploredObjections: ''
-  });
+export default function DebriefPanel({ activeStageIndex, stages, roomNotes, updateNotes, isFacilitator }) {
+  // Use local state for text areas to avoid losing focus/cursor jumping on remote updates
+  const [localInfo, setLocalInfo] = useState('');
+  const [localUnexplored, setLocalUnexplored] = useState('');
 
+  // Sync from remote when roomNotes changes, but only if not currently typing
   useEffect(() => {
-    const savedDebrief = localStorage.getItem('debrief_data_v2');
-    if (savedDebrief) {
-      try {
-        setDebriefData(JSON.parse(savedDebrief));
-      } catch (e) {}
+    if (roomNotes) {
+      if (document.activeElement.id !== 'infoDiscoveredInput') {
+        setLocalInfo(roomNotes.infoDiscovered || '');
+      }
+      if (document.activeElement.id !== 'unexploredObjectionsInput') {
+        setLocalUnexplored(roomNotes.unexploredObjections || '');
+      }
+    } else {
+      setLocalInfo('');
+      setLocalUnexplored('');
     }
-  }, []);
-
-  // Update completed stages based on max activeStageIndex reached if desired, or manually.
-  // We'll let them click to toggle.
-
-  const handleChange = (key, value) => {
-    const newData = { ...debriefData, [key]: value };
-    setDebriefData(newData);
-    localStorage.setItem('debrief_data_v2', JSON.stringify(newData));
-  };
+  }, [roomNotes]);
 
   const toggleStage = (stageId) => {
-    const current = debriefData.completedStages || [];
-    const updated = current.includes(stageId) 
-      ? current.filter(id => id !== stageId) 
-      : [...current, stageId];
-    handleChange('completedStages', updated);
+    if (!updateNotes) return;
+    const currentStages = roomNotes?.completedStages || [];
+    const updated = currentStages.includes(stageId) 
+      ? currentStages.filter(id => id !== stageId) 
+      : [...currentStages, stageId];
+    
+    updateNotes({
+      ...roomNotes,
+      completedStages: updated
+    });
+  };
+
+  const handleBlurInfo = () => {
+    if (!updateNotes) return;
+    updateNotes({
+      ...roomNotes,
+      infoDiscovered: localInfo
+    });
+  };
+
+  const handleBlurUnexplored = () => {
+    if (!updateNotes) return;
+    updateNotes({
+      ...roomNotes,
+      unexploredObjections: localUnexplored
+    });
   };
 
   const clearDebrief = () => {
-    const emptyData = { completedStages: [], infoDiscovered: '', unexploredObjections: '' };
-    setDebriefData(emptyData);
-    localStorage.removeItem('debrief_data_v2');
+    if (!updateNotes) return;
+    updateNotes({ 
+      completedStages: [], 
+      infoDiscovered: '', 
+      unexploredObjections: '' 
+    });
   };
+
+  const completedStages = roomNotes?.completedStages || [];
 
   return (
     <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -47,9 +68,11 @@ export default function DebriefPanel({ activeStageIndex, stages }) {
           <MessageSquare size={20} />
           Debriefing / Análisis
         </div>
-        <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={clearDebrief}>
-          <RotateCcw size={14} /> Limpiar
-        </button>
+        {isFacilitator && (
+          <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={clearDebrief}>
+            <RotateCcw size={14} /> Limpiar
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, overflowY: 'auto', paddingRight: '0.5rem' }}>
@@ -61,7 +84,7 @@ export default function DebriefPanel({ activeStageIndex, stages }) {
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             {stages.map(stage => {
-              const isChecked = debriefData.completedStages.includes(stage.id);
+              const isChecked = completedStages.includes(stage.id);
               return (
                 <div 
                   key={stage.id} 
@@ -70,7 +93,7 @@ export default function DebriefPanel({ activeStageIndex, stages }) {
                     padding: '0.25rem 0.5rem', 
                     borderRadius: '0.25rem', 
                     fontSize: '0.8rem', 
-                    cursor: 'pointer',
+                    cursor: updateNotes ? 'pointer' : 'default',
                     background: isChecked ? 'var(--success)' : 'rgba(255,255,255,0.1)',
                     color: isChecked ? 'white' : 'var(--text-muted)'
                   }}
@@ -88,10 +111,13 @@ export default function DebriefPanel({ activeStageIndex, stages }) {
             <Target size={16} /> ¿Qué información clave se descubrió?
           </div>
           <textarea 
-            value={debriefData.infoDiscovered}
-            onChange={(e) => handleChange('infoDiscovered', e.target.value)}
-            placeholder="Ej. El cliente confesó que pierden $10k al mes..."
-            style={{ flex: 1, minHeight: '60px', resize: 'none' }}
+            id="infoDiscoveredInput"
+            value={localInfo}
+            onChange={(e) => setLocalInfo(e.target.value)}
+            onBlur={handleBlurInfo}
+            readOnly={!updateNotes}
+            placeholder={updateNotes ? "Ej. El cliente confesó que pierden $10k al mes..." : "Esperando anotaciones..."}
+            style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : undefined }}
           />
         </div>
 
@@ -101,10 +127,13 @@ export default function DebriefPanel({ activeStageIndex, stages }) {
             <Save size={16} /> ¿Qué objeciones quedaron sin explorar?
           </div>
           <textarea 
-            value={debriefData.unexploredObjections}
-            onChange={(e) => handleChange('unexploredObjections', e.target.value)}
-            placeholder="Ej. No se profundizó en la falta de presupuesto..."
-            style={{ flex: 1, minHeight: '60px', resize: 'none' }}
+            id="unexploredObjectionsInput"
+            value={localUnexplored}
+            onChange={(e) => setLocalUnexplored(e.target.value)}
+            onBlur={handleBlurUnexplored}
+            readOnly={!updateNotes}
+            placeholder={updateNotes ? "Ej. No se profundizó en la falta de presupuesto..." : "Esperando anotaciones..."}
+            style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : undefined }}
           />
         </div>
 

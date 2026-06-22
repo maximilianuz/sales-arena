@@ -3,14 +3,15 @@ import { Target, Wand2, User, Activity, AlertTriangle, MessageCircle } from 'luc
 import { generateAIScenario } from '../utils/ai';
 import { OBJECTION_OPTIONS } from '../utils/objectionsKnowledgeBase';
 
-export default function BuyerPersonaPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages }) {
+export default function BuyerPersonaPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
   const [aiForm, setAiForm] = useState({ 
     level: 'Intermedio', 
-    theme: 'SaaS B2B', 
+    theme: '', 
     saleType: 'Llamada de Descubrimiento (Discovery)',
-    targetObjection: 'Aleatoria (Sorpréndeme)'
+    targetObjection: 'Aleatoria (Sorpréndeme)',
+    leadTemperature: 'Templado'
   });
   const [activeTab, setActiveTab] = useState('perfil');
 
@@ -37,14 +38,21 @@ export default function BuyerPersonaPanel({ currentScenario, setCurrentScenario,
   };
 
   const handleRandomGenerate = () => {
-    const randomIndustries = ["SaaS B2B", "High Ticket Coaching / Consultoría", "Real Estate / Inmobiliaria", "Servicios Financieros y Seguros", "Venta de Maquinaria Industrial"];
+    const randomIndustries = [
+      "SaaS B2B (Software as a Service)", "Consultoría Estratégica / Negocios B2B", "Ciberseguridad y TI Corporativa", 
+      "Logística y Supply Chain", "Maquinaria Industrial y Manufactura", "High Ticket Coaching de Negocios / Ventas",
+      "Coaching de Vida / Mindset / Desarrollo Personal", "Coaching de Relaciones / Terapia de Pareja",
+      "Coaching de Salud / Biohacking / Fitness Premium", "Asesoría Financiera Personal / Wealth Management",
+      "Real Estate Residencial / Inversiones", "Cirugía Plástica / Medicina Estética High Ticket"
+    ];
     const randomIndustry = randomIndustries[Math.floor(Math.random() * randomIndustries.length)];
     
     const randomForm = {
       level: 'Intermedio',
       theme: randomIndustry,
       saleType: 'Llamada de Cierre (High Ticket Closer)',
-      targetObjection: 'Aleatoria (Sorpréndeme)'
+      targetObjection: 'Aleatoria (Sorpréndeme)',
+      leadTemperature: 'Aleatoria'
     };
     
     setAiForm(randomForm);
@@ -133,7 +141,7 @@ No reveles tu "verdadera objeción" o tu dolor más profundo a menos que el Clos
           Perfil del Lead
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {currentScenario && (
+          {currentScenario && !isReadOnly && (
             <>
               <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', borderColor: 'var(--danger)', color: 'var(--danger)' }} onClick={() => setCurrentScenario(null)} title="Limpiar Escenario">
                 Limpiar
@@ -143,12 +151,16 @@ No reveles tu "verdadera objeción" o tu dolor más profundo a menos que el Clos
               </button>
             </>
           )}
-          <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={handleRandomGenerate} disabled={isGenerating}>
-            🎲 Aleatorio
-          </button>
-          <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={() => setShowAiModal(true)} disabled={isGenerating}>
-            <Wand2 size={14} /> Nuevo
-          </button>
+          {!isReadOnly && (
+            <>
+              <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={handleRandomGenerate} disabled={isGenerating}>
+                🎲 Aleatorio
+              </button>
+              <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={() => setShowAiModal(true)} disabled={isGenerating}>
+                <Wand2 size={14} /> Nuevo
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -206,15 +218,42 @@ No reveles tu "verdadera objeción" o tu dolor más profundo a menos que el Clos
                 <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Tema / Industria</label>
                 <input type="text" value={aiForm.theme} onChange={e => setAiForm({...aiForm, theme: e.target.value})} placeholder="Ej. SaaS, Seguros, Real Estate" list="industries" />
                 <datalist id="industries">
-                  <option value="High Ticket Coaching / Consultoría" />
-                  <option value="SaaS B2B" />
-                  <option value="Real Estate / Inmobiliaria" />
-                  <option value="Servicios de Agencia (Marketing/Desarrollo)" />
-                  <option value="Servicios Financieros y Seguros" />
-                  <option value="Salud y Bienestar (B2C High Ticket)" />
-                  <option value="Venta de Maquinaria Industrial" />
-                  <option value="EdTech / Cursos Premium" />
+                  {/* B2B Niches */}
+                  <option value="SaaS B2B (Software as a Service)" />
+                  <option value="Consultoría Estratégica / Negocios B2B" />
+                  <option value="Agencia de Marketing Digital / SEO B2B" />
+                  <option value="Desarrollo de Software a Medida" />
+                  <option value="Ciberseguridad y TI Corporativa" />
+                  <option value="Servicios de Headhunting / Reclutamiento" />
+                  <option value="Servicios Legales y Fiscales Corporativos" />
+                  <option value="Logística y Supply Chain" />
+                  <option value="Maquinaria Industrial y Manufactura" />
+                  <option value="Real Estate Comercial / Oficinas" />
+                  <option value="Automatización e IA para Empresas" />
+                  <option value="Venta de Franquicias" />
+
+                  {/* B2C High Ticket / Coaching */}
+                  <option value="High Ticket Coaching de Negocios / Ventas" />
+                  <option value="Coaching de Vida / Mindset / Desarrollo Personal" />
+                  <option value="Coaching de Relaciones / Terapia de Pareja" />
+                  <option value="Coaching de Salud / Biohacking / Fitness Premium" />
+                  <option value="Asesoría Financiera Personal / Wealth Management" />
+                  <option value="Mentoría en Inversiones (Crypto, Bolsa, Real Estate)" />
+                  <option value="EdTech / Bootcamps / Cursos Premium" />
+                  <option value="Real Estate Residencial / Inversiones" />
+                  <option value="Cirugía Plástica / Medicina Estética High Ticket" />
+                  <option value="Servicios de Inmigración / Visas" />
+                  <option value="Programas de Empleabilidad / Transición de Carrera" />
                 </datalist>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Temperatura del Lead</label>
+                <select value={aiForm.leadTemperature} onChange={e => setAiForm({...aiForm, leadTemperature: e.target.value})}>
+                  <option value="Aleatoria">Aleatoria (Sorpréndeme)</option>
+                  <option value="Frío">Frío (No te conoce, escéptico, Outbound)</option>
+                  <option value="Templado">Templado (Vio un anuncio/webinar, tiene algo de interés)</option>
+                  <option value="Caliente">Caliente (Viene recomendado o con urgencia alta)</option>
+                </select>
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Tipo de Venta</label>

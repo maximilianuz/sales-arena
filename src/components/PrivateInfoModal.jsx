@@ -26,9 +26,7 @@ export default function PrivateInfoModal({ info, onClose }) {
           {info || "No hay información privada disponible para este escenario."}
         </div>
 
-        <div style={{ marginTop: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          * Lee esto en voz baja o envíaselo por mensaje privado al participante que juega de Cliente.
-        </div>
+
 
         <button className="btn btn-primary" style={{ marginTop: '1.5rem', width: '100%' }} onClick={onClose}>
           Cerrar

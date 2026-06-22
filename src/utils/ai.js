@@ -1,6 +1,6 @@
 import { OBJECTIONS_THEORY_GENERAL, OBJECTIONS_DICTIONARY } from './objectionsKnowledgeBase';
 
-export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, theme, saleType, targetObjection }, stages = []) {
+export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, theme, saleType, targetObjection, leadTemperature }, stages = []) {
   // If no stages provided somehow, fallback to basic structure
   const activeStages = stages && stages.length > 0 ? stages : [
     { id: 'apertura', label: 'Apertura', baseQuestions: 'Romper hielo', baseObjections: '' }
@@ -25,6 +25,13 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
 
   const specificObjectionFramework = OBJECTIONS_DICTIONARY[selectedObjectionKey] || '';
 
+  let tempInstruction = '';
+  if (leadTemperature && leadTemperature !== 'Aleatoria') {
+    tempInstruction = `- TEMPERATURA DEL LEAD: El lead es "${leadTemperature}". Ajusta drásticamente su "Estado Emocional", "Situación Actual" y "Probabilidad de Compra Inicial" acorde a esto. Un lead FRÍO es altamente escéptico, defensivo y su probabilidad es muy baja (<15%). Un lead CALIENTE viene urgido, recomendado o listo para comprar y su probabilidad es alta (>60%). Un lead TEMPLADO tiene curiosidad pero dudas.`;
+  } else {
+    tempInstruction = `- TEMPERATURA DEL LEAD: Define aleatoriamente si es un lead Frío, Templado o Caliente, y ajusta su estado emocional y probabilidad de compra en consecuencia.`;
+  }
+
   const prompt = `
     Eres un experto entrenador de ventas y un Master High Ticket Closer.
     Genera un Buyer Persona profundo y un pipeline de simulación con los siguientes parámetros:
@@ -38,6 +45,11 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
 
     FRAMEWORK ESPECÍFICO PARA ESTA SIMULACIÓN (DEBE APLICARSE):
     ${specificObjectionFramework}
+
+    INSTRUCCIONES DE PERFILADO (BUYER PERSONA SIMULATION SCHEMA v3):
+    - DIVERSIDAD DEMOGRÁFICA: Adapta el perfil drásticamente según la Industria/Tema. NO asumas que todos son ejecutivos, CEOs o dueños de negocio. Pueden ser jóvenes estudiantes indecisos, empleados insatisfechos buscando un cambio, personas sin rumbo claro, etc.
+    - PROFUNDIDAD PSICOLÓGICA: El perfil debe tener conflictos de metas internos (ej. deseo de cambio vs. miedo al riesgo), un perfil económico específico (con estrés financiero o presupuestos limitados) y narrativas internas (creencias sobre el dinero y el éxito).
+    ${tempInstruction}
 
     RECURSOS BASE PARA LAS ETAPAS DEL EMBUDO:
     ${stagesPromptContext}
@@ -85,8 +97,13 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error en la API de NVIDIA");
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        throw new Error(`HTTP Error ${response.status}: Asegúrate de que la API soporte conexiones desde el navegador (CORS).`);
+      }
+      throw new Error(errorData?.error?.message || errorData?.message || "Error en la API");
     }
 
     const data = await response.json();
@@ -100,6 +117,9 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     }
   } catch (error) {
     console.error("AI Generation error:", error);
+    if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+      throw new Error("Error de conexión. Si usas Ollama local, asegúrate de haberlo iniciado con OLLAMA_ORIGINS='*'. Si usas otra API, podría estar bloqueando conexiones desde el navegador (CORS).");
+    }
     throw error;
   }
 }
