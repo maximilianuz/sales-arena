@@ -121,9 +121,14 @@ export default function Room() {
           stages={stages}
         />
 
-        <div className="dashboard-grid" style={{ gridTemplateColumns: gridColumns }}>
+        <div className="dashboard-grid" style={{ 
+          gridTemplateColumns: gridColumns, 
+          display: 'grid', 
+          gridAutoRows: 'min-content 1fr',
+          alignItems: 'start'
+        }}>
           {showColumn1 && (
-            <div className="grid-column">
+            <div className="grid-column" style={{ gridColumn: '1', gridRow: '1 / span 2' }}>
               <BuyerPersonaPanel 
                 currentScenario={currentScenario} 
                 setCurrentScenario={isFacilitator ? handleSetScenario : undefined}
@@ -140,7 +145,7 @@ export default function Room() {
             </div>
           )}
 
-          <div className="grid-column center-column">
+          <div className="grid-column center-column" style={{ gridColumn: showColumn1 ? '2' : '1', gridRow: '1' }}>
             <Timer 
               stages={stages} 
               timerState={timerState} 
@@ -167,29 +172,28 @@ export default function Room() {
                 />
               )}
             </div>
-
-            {/* DEBRIEF PANEL MOVIDO AL CENTRO PARA MÁS ESPACIO */}
-            {showColumn3 && (
-              <div style={{ marginTop: '1.5rem', display: 'flex', flex: 1 }}>
-                <DebriefPanel 
-                  activeStageIndex={activeStageIndex || 0} 
-                  stages={stages}
-                  roomNotes={roomData.debriefNotes}
-                  updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
-                  isFacilitator={isFacilitator}
-                />
-              </div>
-            )}
           </div>
 
           {showColumn3 && (
-            <div className="grid-column">
+            <div className="grid-column" style={{ gridColumn: '3', gridRow: '1' }}>
               <VotingPanel 
                 isObserver={isObserver} 
                 isFacilitator={isFacilitator}
                 questions={roomData.questions}
                 updateQuestions={isObserver || isFacilitator ? updateQuestions : undefined}
                 activeStage={stages[activeStageIndex || 0]}
+              />
+            </div>
+          )}
+
+          {showColumn3 && (
+            <div style={{ gridColumn: '2 / span 2', gridRow: '2', display: 'flex', minHeight: '300px' }}>
+              <DebriefPanel 
+                activeStageIndex={activeStageIndex || 0} 
+                stages={stages}
+                roomNotes={roomData.debriefNotes}
+                updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
+                isFacilitator={isFacilitator}
               />
             </div>
           )}
