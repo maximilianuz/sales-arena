@@ -17,8 +17,10 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
     }
   };
 
-  const activeStage = stages[activeStageIndex];
-  const currentQuestions = pipelineQuestions ? pipelineQuestions[activeStage.id] : [];
+  const activeStage = stages && stages.length > 0 ? stages[Math.min(activeStageIndex || 0, stages.length - 1)] : null;
+  const currentQuestions = pipelineQuestions && activeStage ? pipelineQuestions[activeStage.id] : [];
+
+  if (!activeStage) return null;
 
   return (
     <div className="glass-panel" style={{ padding: '1rem', marginBottom: '1rem' }}>

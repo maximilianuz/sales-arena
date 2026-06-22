@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, RotateCcw } from 'lucide-react';
+import { Users, RotateCcw, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function VotingPanel({ isObserver, isFacilitator, questions = [], updateQuestions, activeStage }) {
