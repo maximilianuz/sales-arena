@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Shuffle, Copy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 
@@ -28,6 +29,17 @@ export default function Lobby() {
     navigate(`/room/${roomId}`);
   };
 
+  const generateRoomId = () => {
+    const newId = `sala-${Math.floor(Math.random() * 90000) + 10000}`;
+    setRoomId(newId);
+  };
+
+  const copyRoomId = () => {
+    if (!roomId) return;
+    navigator.clipboard.writeText(roomId);
+    alert(t('lobby.idCopied') || 'ID copiado al portapapeles');
+  };
+
   return (
     <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Header title={t('lobby.title')} />
@@ -52,14 +64,36 @@ export default function Lobby() {
 
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>ID de Sala</label>
-            <input 
-              type="text" 
-              required
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
-              className="form-input"
-              placeholder="Ej. sala-secreta-123"
-            />
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <input 
+                type="text" 
+                required
+                value={roomId}
+                onChange={(e) => setRoomId(e.target.value)}
+                className="form-input"
+                placeholder="Ej. sala-secreta-123"
+                style={{ flex: 1 }}
+              />
+              <button 
+                type="button" 
+                className="btn btn-outline" 
+                onClick={generateRoomId} 
+                title="Generar ID al azar"
+                style={{ padding: '0.5rem' }}
+              >
+                <Shuffle size={20} />
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-outline" 
+                onClick={copyRoomId} 
+                title="Copiar ID"
+                style={{ padding: '0.5rem' }}
+                disabled={!roomId}
+              >
+                <Copy size={20} />
+              </button>
+            </div>
           </div>
 
           <div>

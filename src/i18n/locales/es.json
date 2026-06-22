@@ -1,8 +1,9 @@
 {
   "lobby": {
     "title": "Sales Arena Sandbox",
-    "chooseRole": "Elige tu Rol",
-    "whoWillYouPlay": "¿Con quién jugarás hoy?",
+    "chooseRole": "Elige tu rol en el simulador",
+    "whoWillYouPlay": "¿Quién vas a jugar hoy?",
+    "idCopied": "ID de sala copiado al portapapeles",
     "roles": {
       "Facilitador": "Facilitador",
       "FacilitadorDesc": "El que controla la IA y las etapas",
