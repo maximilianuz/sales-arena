@@ -1,5 +1,5 @@
 export const getDefaultStages = (lng = 'es') => {
-  if (lng.startsWith('en')) {
+  if (typeof lng === 'string' && lng.startsWith('en')) {
     return [
       { 
         id: 'apertura_rapport', 
