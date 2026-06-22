@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useRoomSync } from '../hooks/useRoomSync';
 import Header from '../components/Header';
 import PipelinePanel from '../components/PipelinePanel';
@@ -12,21 +13,22 @@ import VotingPanel from '../components/VotingPanel';
 import DebriefPanel from '../components/DebriefPanel';
 import SettingsModal from '../components/SettingsModal';
 import { Dices, X } from 'lucide-react';
-import { DEFAULT_STAGES } from '../utils/defaultStages';
+import { getDefaultStages } from '../utils/defaultStages';
 import '../App.css';
 
 export default function Room() {
+  const { t, i18n } = useTranslation();
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent } = useRoomSync(roomId);
 
-  const [sessionTitle, setSessionTitle] = useState('Simulador High Ticket Closer');
+  const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [apiUrl, setApiUrl] = useState('/api/nvidia/v1/chat/completions');
   const [apiModel, setApiModel] = useState('meta/llama-3.1-70b-instruct');
   const [participants, setParticipants] = useState([]);
-  const [stages, setStages] = useState(DEFAULT_STAGES);
+  const [stages, setStages] = useState(() => getDefaultStages(i18n.language));
   
   const [showPrivateInfo, setShowPrivateInfo] = useState(false);
   
@@ -40,7 +42,6 @@ export default function Room() {
 
   useEffect(() => {
     if (!localStorage.getItem('sales_arena_userName')) {
-      // Si entra por link directo sin pasar por Lobby
       navigate('/');
       return;
     }
@@ -54,10 +55,13 @@ export default function Room() {
     const savedTitle = localStorage.getItem('session_title');
     if (savedTitle) setSessionTitle(savedTitle);
     
-    // Las etapas podrían bajarse del roomData también en un refactor mayor, pero por ahora local
-    const savedStages = localStorage.getItem('pipeline_stages');
-    if (savedStages) setStages(JSON.parse(savedStages));
-  }, [navigate]);
+    const savedStages = localStorage.getItem('salesArenaStages');
+    if (savedStages) {
+      setStages(JSON.parse(savedStages));
+    } else {
+      setStages(getDefaultStages(i18n.language));
+    }
+  }, [i18n.language, navigate]);
 
   useEffect(() => {
     if (roomData?.surpriseEvent && roomData.surpriseEvent.id !== seenSurpriseEventId) {
@@ -86,7 +90,7 @@ export default function Room() {
   };
 
   if (loading || !roomData) {
-    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>Sincronizando Sala {roomId}...</div>;
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>{t('room.syncing', {roomId})}</div>;
   }
 
   const { currentScenario, activeStageIndex, timerState } = roomData;
@@ -101,6 +105,7 @@ export default function Room() {
   let gridColumns = '1fr 1fr 1fr';
   if (isCloser) gridColumns = '1fr';
   else if (isLead) gridColumns = '1fr 1fr';
+  else if (isObserver) gridColumns = '1fr 2fr'; // Wide center/right column
 
   return (
     <div className="app-container">
@@ -159,7 +164,7 @@ export default function Room() {
                   onClick={() => setShowPrivateInfo(true)}
                   disabled={!currentScenario}
                 >
-                  Mostrar Info Oculta del Cliente
+                  {t('room.showHiddenInfo')}
                 </button>
               )}
               {isFacilitator && <SurpriseEventButton triggerEvent={triggerSurpriseEvent} />}
@@ -201,7 +206,7 @@ export default function Room() {
       </main>
 
       <footer style={{ textAlign: 'center', padding: '2rem 1rem', marginTop: 'auto', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-        Hecho con <span className="heart-beat">❤️</span> por <a href="https://maximilianoc.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>Maximiliano C.</a>
+        {t('room.madeWith')} <span className="heart-beat">❤️</span> {t('room.by')} <a href="https://maximilianoc.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>Maximiliano C.</a>
       </footer>
 
       {showPrivateInfo && currentScenario && (
@@ -224,7 +229,7 @@ export default function Room() {
             </div>
             
             <Dices size={64} color="var(--secondary)" style={{ margin: '0 auto 1.5rem auto' }} />
-            <h2 style={{ color: 'var(--secondary)', marginBottom: '1rem', fontSize: '2rem' }}>¡EVENTO SORPRESA!</h2>
+            <h2 style={{ color: 'var(--secondary)', marginBottom: '1rem', fontSize: '2rem' }}>{t('surprise.title')}</h2>
             <p style={{ fontSize: '1.5rem', fontWeight: '600', lineHeight: '1.4' }}>
               {roomData.surpriseEvent.text}
             </p>
@@ -233,7 +238,7 @@ export default function Room() {
               setSeenSurpriseEventId(roomData.surpriseEvent.id);
               setShowSurpriseEvent(false);
             }}>
-              ¡Entendido!
+              {t('surprise.understood')}
             </button>
           </div>
         </div>

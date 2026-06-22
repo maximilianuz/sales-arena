@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, CheckSquare, Target, Save, RotateCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function DebriefPanel({ activeStageIndex, stages, roomNotes, updateNotes, isFacilitator }) {
+  const { t } = useTranslation();
   // Use local state for text areas to avoid losing focus/cursor jumping on remote updates
   const [localInfo, setLocalInfo] = useState('');
   const [localUnexplored, setLocalUnexplored] = useState('');
@@ -66,11 +68,11 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       <div className="panel-title" style={{ justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <MessageSquare size={20} />
-          Debriefing / Análisis
+          {t('debrief.title')}
         </div>
         {isFacilitator && (
           <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={clearDebrief}>
-            <RotateCcw size={14} /> Limpiar
+            <RotateCcw size={14} /> {t('debrief.clear')}
           </button>
         )}
       </div>
@@ -80,7 +82,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
         {/* Etapas Completadas */}
         <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '0.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--success)', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            <CheckSquare size={16} /> Etapas Completadas Exitosamente
+            <CheckSquare size={16} /> {t('debrief.completedStages')}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             {stages.map(stage => {
@@ -108,7 +110,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
         {/* Información Descubierta */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            <Target size={16} /> ¿Qué información clave se descubrió?
+            <Target size={16} /> {t('debrief.infoDiscovered')}
           </div>
           <textarea 
             id="infoDiscoveredInput"
@@ -116,7 +118,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
             onChange={(e) => setLocalInfo(e.target.value)}
             onBlur={handleBlurInfo}
             readOnly={!updateNotes}
-            placeholder={updateNotes ? "Ej. El cliente confesó que pierden $10k al mes..." : "Esperando anotaciones..."}
+            placeholder={updateNotes ? t('debrief.infoPlaceholder') : t('debrief.waitingNotes')}
             style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : undefined }}
           />
         </div>
@@ -124,7 +126,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
         {/* Objeciones sin explorar */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent)', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            <Save size={16} /> ¿Qué objeciones quedaron sin explorar?
+            <Save size={16} /> {t('debrief.unexploredObjections')}
           </div>
           <textarea 
             id="unexploredObjectionsInput"
@@ -132,7 +134,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
             onChange={(e) => setLocalUnexplored(e.target.value)}
             onBlur={handleBlurUnexplored}
             readOnly={!updateNotes}
-            placeholder={updateNotes ? "Ej. No se profundizó en la falta de presupuesto..." : "Esperando anotaciones..."}
+            placeholder={updateNotes ? t('debrief.unexploredPlaceholder') : t('debrief.waitingNotes')}
             style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : undefined }}
           />
         </div>

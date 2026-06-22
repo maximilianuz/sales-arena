@@ -1,0 +1,120 @@
+{
+  "lobby": {
+    "title": "Sales Arena Sandbox",
+    "chooseRole": "Elige tu Rol",
+    "whoWillYouPlay": "¿Con quién jugarás hoy?",
+    "roles": {
+      "Facilitador": "Facilitador",
+      "FacilitadorDesc": "El que controla la IA y las etapas",
+      "Closer": "Closer",
+      "CloserDesc": "El que vende",
+      "Lead": "Lead",
+      "LeadDesc": "El cliente que lee la IA",
+      "Observador": "Observador",
+      "ObservadorDesc": "El juez"
+    },
+    "continue": "Continuar"
+  },
+  "header": {
+    "generateAI": "Generar Escenario IA",
+    "aiSettings": "Ajustes de IA"
+  },
+  "pipeline": {
+    "suggestedTime": "Tiempo sugerido",
+    "minutes": "minutos",
+    "objective": "Objetivo",
+    "success": "Éxito",
+    "suggestedQuestions": "Preguntas Sugeridas (High Ticket Closer)",
+    "generatePrompt": "Genera un escenario IA para ver las preguntas dinámicas.",
+    "prev": "Anterior",
+    "next": "Siguiente"
+  },
+  "scenario": {
+    "title": "Información del Cliente",
+    "tabs": {
+      "demographics": "Demografía",
+      "psychology": "Perfil Psicológico",
+      "situation": "Situación Actual",
+      "objections": "Objeciones"
+    },
+    "visibleObjection": "Objeción Visible (Lo que dirá)",
+    "hiddenObjectionNote": "* La objeción oculta está protegida en el panel central (Información del cliente).",
+    "waiting": "Esperando a que el Facilitador genere el escenario con IA...",
+    "generating": "Generando escenario con IA..."
+  },
+  "roles": {
+    "title": "Participantes en la Sala",
+    "min_participants": "Se necesitan al menos 2 participantes para asignar roles.",
+    "clear": "Limpiar",
+    "placeholder": "Nombre del participante...",
+    "empty": "No hay participantes.",
+    "random": "Asignar Roles Al Azar",
+    "seller": "Vendedor",
+    "client": "Cliente",
+    "observers": "Observadores (Jueces)",
+    "copyChecklist": "Copiar Checklist",
+    "checklistCopied": "Checklist copiada. Envíasela a los observadores por chat.",
+    "checklistContent": "=== CHECKLIST DE EVALUACIÓN PARA OBSERVADORES ===\nPor favor presta atención a estos 5 puntos durante el Role-Play:\n\n1. Nivel de Rapport: ¿El Closer logró sintonía antes de empezar a interrogar? ¿Validó lo que el Lead decía?\n2. Dolor Real vs Superficial: ¿Se quedó en el síntoma o indagó hasta la verdadera causa de frustración?\n3. Brecha de Valor: ¿Hizo que el Lead exprese su 'Costo de Oportunidad' o lo que pierde si no actúa hoy?\n4. Recapitulación: ¿El Closer ordenó el caos del Lead y resumió su situación antes de presentar la solución?\n5. Aislamiento de Objeción: Cuando apareció la excusa inicial, ¿el Closer intentó convencer con lógica, o indagó hasta la objeción oculta?"
+  },
+  "timer": {
+    "title": "Cronómetro",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "reset": "Reiniciar",
+    "warning": "¡Tiempo de Etapa Agotado!"
+  },
+  "voting": {
+    "title": "Votación Grupal",
+    "reset": "Resetear",
+    "focus": "Foco de Evaluación (Etapa: {{stage}})"
+  },
+  "debrief": {
+    "title": "Debriefing / Análisis",
+    "clear": "Limpiar",
+    "completedStages": "Etapas Completadas Exitosamente",
+    "infoDiscovered": "¿Qué información clave se descubrió?",
+    "infoPlaceholder": "Ej. El cliente confesó que pierden $10k al mes...",
+    "unexploredObjections": "¿Qué objeciones quedaron sin explorar?",
+    "unexploredPlaceholder": "Ej. No se profundizó en la falta de presupuesto...",
+    "waitingNotes": "Esperando anotaciones..."
+  },
+  "surprise": {
+    "button": "EVENTO SORPRESA",
+    "title": "¡EVENTO SORPRESA!",
+    "understood": "¡Entendido!"
+  },
+  "event": {
+    "crossed_arms": "El cliente se cruza de brazos: 'Acabo de recordar que mi socio debe estar en esta decisión.'",
+    "competitor": "El cliente menciona de pasada que está evaluando a [Competidor Directo] también.",
+    "budget_frozen": "El presupuesto inicial del cliente acaba de ser congelado por la junta directiva.",
+    "two_minutes": "El cliente te interrumpe: 'Solo me quedan 2 minutos, dime cuánto cuesta y qué incluye.'",
+    "ghost_objection": "Surge una objeción fantasma: 'La verdad es que tuvimos una mala experiencia con algo similar hace años y no quiero repetirlo.'"
+  },
+  "privateInfo": {
+    "title": "Información Privada del Cliente",
+    "close": "Cerrar",
+    "empty": "No hay información privada disponible para este escenario."
+  },
+  "settings": {
+    "title": "Ajustes de la Simulación",
+    "tabs": {
+      "general": "Ajustes Generales de IA",
+      "stages": "Etapas del Pipeline"
+    },
+    "presets": "Plantillas de Proveedores (Presets)",
+    "custom": "Personalizado...",
+    "apiKey": "API Key",
+    "apiUrl": "API URL",
+    "apiModel": "Modelo de IA (ID exacto)",
+    "save": "Guardar Ajustes",
+    "close": "Cancelar",
+    "helpText": "Los datos se guardan localmente en tu navegador. Puedes conectarte a cualquier API que soporte el formato de OpenAI. Para usar Ollama, asegúrate de que esté corriendo en tu PC.",
+    "stagesHelp": "Configura las etapas de tu proceso de ventas. La Inteligencia Artificial utilizará la 'Información Base' que proporciones aquí para generar objeciones y patrones de preguntas realistas para tu escenario."
+  },
+  "room": {
+    "syncing": "Sincronizando Sala {{roomId}}...",
+    "showHiddenInfo": "Mostrar Info Oculta del Cliente",
+    "madeWith": "Hecho con",
+    "by": "por"
+  }
+}

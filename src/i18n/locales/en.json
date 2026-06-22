@@ -1,0 +1,120 @@
+{
+  "lobby": {
+    "title": "Sales Arena Sandbox",
+    "chooseRole": "Choose your Role",
+    "whoWillYouPlay": "Who will you play today?",
+    "roles": {
+      "Facilitador": "Facilitator",
+      "FacilitadorDesc": "Controls the AI and simulation stages",
+      "Closer": "Closer",
+      "CloserDesc": "The salesperson",
+      "Lead": "Lead",
+      "LeadDesc": "The client reading AI instructions",
+      "Observador": "Observer",
+      "ObservadorDesc": "The judge"
+    },
+    "continue": "Continue"
+  },
+  "header": {
+    "generateAI": "Generate AI Scenario",
+    "aiSettings": "AI Settings"
+  },
+  "pipeline": {
+    "suggestedTime": "Suggested time",
+    "minutes": "minutes",
+    "objective": "Objective",
+    "success": "Success",
+    "suggestedQuestions": "Suggested Questions (High Ticket Closer)",
+    "generatePrompt": "Generate an AI scenario to see dynamic questions.",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "scenario": {
+    "title": "Client Information",
+    "tabs": {
+      "demographics": "Demographics",
+      "psychology": "Psychological Profile",
+      "situation": "Current Situation",
+      "objections": "Objections"
+    },
+    "visibleObjection": "Visible Objection (What they will say)",
+    "hiddenObjectionNote": "* The hidden objection is protected in the center panel (Client Info).",
+    "waiting": "Waiting for the Facilitator to generate the AI scenario...",
+    "generating": "Generating AI scenario..."
+  },
+  "roles": {
+    "title": "Room Participants",
+    "min_participants": "At least 2 participants are needed to assign roles.",
+    "clear": "Clear",
+    "placeholder": "Participant name...",
+    "empty": "No participants.",
+    "random": "Assign Random Roles",
+    "seller": "Salesperson",
+    "client": "Client",
+    "observers": "Observers (Judges)",
+    "copyChecklist": "Copy Checklist",
+    "checklistCopied": "Checklist copied. Send it to the observers via chat.",
+    "checklistContent": "=== EVALUATION CHECKLIST FOR OBSERVERS ===\nPlease pay attention to these 5 points during the Role-Play:\n\n1. Rapport Level: Did the Closer build rapport before interrogating? Did they validate what the Lead said?\n2. Real vs Superficial Pain: Did they stay on the symptom or dig into the real cause of frustration?\n3. Value Gap: Did they make the Lead express their 'Opportunity Cost' or what they lose if they don't act today?\n4. Recapitulation: Did the Closer organize the Lead's chaos and summarize their situation before presenting the solution?\n5. Objection Isolation: When the initial excuse appeared, did the Closer try to convince with logic, or did they dig into the hidden objection?"
+  },
+  "timer": {
+    "title": "Timer",
+    "start": "Start",
+    "pause": "Pause",
+    "reset": "Reset",
+    "warning": "Stage Time is Up!"
+  },
+  "voting": {
+    "title": "Group Voting",
+    "reset": "Reset",
+    "focus": "Evaluation Focus (Stage: {{stage}})"
+  },
+  "debrief": {
+    "title": "Debriefing / Analysis",
+    "clear": "Clear",
+    "completedStages": "Successfully Completed Stages",
+    "infoDiscovered": "What key information was discovered?",
+    "infoPlaceholder": "E.g. The client confessed they lose $10k a month...",
+    "unexploredObjections": "What objections remained unexplored?",
+    "unexploredPlaceholder": "E.g. The lack of budget was not explored deeply...",
+    "waitingNotes": "Waiting for notes..."
+  },
+  "surprise": {
+    "button": "SURPRISE EVENT",
+    "title": "SURPRISE EVENT!",
+    "understood": "Got it!"
+  },
+  "event": {
+    "crossed_arms": "The client crosses their arms: 'I just remembered my partner needs to be in this decision.'",
+    "competitor": "The client casually mentions they are evaluating [Direct Competitor] as well.",
+    "budget_frozen": "The client's initial budget was just frozen by the board of directors.",
+    "two_minutes": "The client interrupts you: 'I only have 2 minutes left, just tell me how much it costs and what's included.'",
+    "ghost_objection": "A ghost objection appears: 'Honestly, we had a bad experience with something similar years ago and I don't want to repeat it.'"
+  },
+  "privateInfo": {
+    "title": "Private Client Information",
+    "close": "Close",
+    "empty": "No private information available for this scenario."
+  },
+  "settings": {
+    "title": "Simulation Settings",
+    "tabs": {
+      "general": "General AI Settings",
+      "stages": "Pipeline Stages"
+    },
+    "presets": "Provider Templates (Presets)",
+    "custom": "Custom...",
+    "apiKey": "API Key",
+    "apiUrl": "API URL",
+    "apiModel": "AI Model (Exact ID)",
+    "save": "Save Settings",
+    "close": "Cancel",
+    "helpText": "Data is saved locally in your browser. You can connect to any API supporting the OpenAI format. To use Ollama, ensure it is running on your PC.",
+    "stagesHelp": "Configure the stages of your sales process. The AI will use the 'Base Information' provided here to generate realistic objections and question patterns for your scenario."
+  },
+  "room": {
+    "syncing": "Syncing Room {{roomId}}...",
+    "showHiddenInfo": "Show Hidden Client Info",
+    "madeWith": "Made with",
+    "by": "by"
+  }
+}

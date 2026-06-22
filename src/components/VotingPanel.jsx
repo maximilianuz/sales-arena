@@ -1,7 +1,9 @@
 import React from 'react';
-import { BarChart2, Plus, RefreshCw } from 'lucide-react';
+import { Users, RotateCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function VotingPanel({ isObserver, isFacilitator, questions = [], updateQuestions, activeStage }) {
+  const { t } = useTranslation();
   
   const INITIAL_QUESTIONS = [
     { id: 1, question: "¿Encontró la objeción real?", options: [{ text: "Sí", votes: 0, color: "var(--success)" }, { text: "No", votes: 0, color: "var(--danger)" }] },
@@ -16,7 +18,7 @@ export default function VotingPanel({ isObserver, isFacilitator, questions = [],
     updateQuestions(newQuestions);
   };
 
-  const resetVotes = () => {
+  const handleReset = () => {
     if (!updateQuestions) return;
     updateQuestions(INITIAL_QUESTIONS);
   };
@@ -25,20 +27,20 @@ export default function VotingPanel({ isObserver, isFacilitator, questions = [],
     <div className="glass-panel" style={{ flex: 1 }}>
       <div className="panel-title" style={{ justifyContent: 'space-between', marginBottom: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <BarChart2 size={20} />
-          Votación Grupal
+          <Users size={20} />
+          {t('voting.title')}
         </div>
         {isFacilitator && (
-          <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={resetVotes}>
-            <RefreshCw size={14} /> Resetear
+          <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={handleReset}>
+            <RotateCcw size={14} /> {t('voting.reset')}
           </button>
         )}
       </div>
 
       {activeStage && (
-        <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '0.5rem', padding: '0.75rem', marginBottom: '1.5rem', fontSize: '0.85rem' }}>
-          <strong style={{ color: 'var(--accent)', display: 'block', marginBottom: '0.25rem' }}>Foco de Evaluación (Etapa: {activeStage.label})</strong>
-          <span style={{ color: 'var(--text-main)' }}>{activeStage.indicator}</span>
+        <div style={{ background: 'rgba(79, 70, 229, 0.1)', border: '1px solid rgba(79, 70, 229, 0.3)', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '1.5rem', fontSize: '0.9rem', color: 'var(--primary)' }}>
+          <strong>{t('voting.focus', { stage: activeStage.label })}</strong><br />
+          {activeStage.indicator}
         </div>
       )}
 

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Users, UserPlus, Trash2, Shuffle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function RolesPanel({ participants, setParticipants }) {
+  const { t } = useTranslation();
   const [newName, setNewName] = useState('');
   const [roles, setRoles] = useState({ seller: null, client: null, observers: [] });
 
@@ -19,7 +21,7 @@ export default function RolesPanel({ participants, setParticipants }) {
 
   const assignRoles = () => {
     if (participants.length < 2) {
-      alert('Se necesitan al menos 2 participantes para asignar roles.');
+      alert(t('roles.min_participants'));
       return;
     }
 
@@ -36,7 +38,7 @@ export default function RolesPanel({ participants, setParticipants }) {
       <div className="panel-title" style={{ justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Users size={20} />
-          Participantes y Roles
+          {t('roles.title')}
         </div>
         {participants.length > 0 && (
           <button 
@@ -44,7 +46,7 @@ export default function RolesPanel({ participants, setParticipants }) {
             style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}
             onClick={() => { setParticipants([]); setRoles({ seller: null, client: null, observers: [] }); }}
           >
-            <Trash2 size={14} /> Limpiar
+            <Trash2 size={14} /> {t('roles.clear')}
           </button>
         )}
       </div>
@@ -52,7 +54,7 @@ export default function RolesPanel({ participants, setParticipants }) {
       <form onSubmit={addParticipant} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
         <input 
           type="text" 
-          placeholder="Nombre del participante..." 
+          placeholder={t('roles.placeholder')}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
         />
@@ -81,27 +83,27 @@ export default function RolesPanel({ participants, setParticipants }) {
             </button>
           </div>
         ))}
-        {participants.length === 0 && <span style={{ color: 'var(--text-muted)' }}>No hay participantes.</span>}
+        {participants.length === 0 && <span style={{ color: 'var(--text-muted)' }}>{t('roles.empty')}</span>}
       </div>
 
       <button className="btn btn-secondary" style={{ width: '100%', marginBottom: '1.5rem' }} onClick={assignRoles}>
         <Shuffle size={18} />
-        Asignar Roles Al Azar
+        {t('roles.random')}
       </button>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <div style={{ background: 'rgba(79, 70, 229, 0.2)', padding: '1rem', borderRadius: '0.5rem', borderLeft: '4px solid var(--primary)' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Vendedor</div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('roles.seller')}</div>
           <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{roles.seller || '-'}</div>
         </div>
         <div style={{ background: 'rgba(236, 72, 153, 0.2)', padding: '1rem', borderRadius: '0.5rem', borderLeft: '4px solid var(--secondary)' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Cliente</div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('roles.client')}</div>
           <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{roles.client || '-'}</div>
         </div>
         <div style={{ background: 'rgba(245, 158, 11, 0.2)', padding: '1rem', borderRadius: '0.5rem', borderLeft: '4px solid var(--accent)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Observadores (Jueces)</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('roles.observers')}</div>
               <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
                 {roles.observers && roles.observers.length > 0 ? roles.observers.join(', ') : '-'}
               </div>
@@ -111,22 +113,12 @@ export default function RolesPanel({ participants, setParticipants }) {
                 className="btn btn-outline" 
                 style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', borderColor: 'var(--accent)', color: 'var(--accent)' }}
                 onClick={() => {
-                  const text = `
-=== CHECKLIST DE EVALUACIÓN PARA OBSERVADORES ===
-Por favor presta atención a estos 5 puntos durante el Role-Play:
-
-1. Nivel de Rapport: ¿El Closer logró sintonía antes de empezar a interrogar? ¿Validó lo que el Lead decía?
-2. Dolor Real vs Superficial: ¿Se quedó en el síntoma o indagó hasta la verdadera causa de frustración?
-3. Brecha de Valor: ¿Hizo que el Lead exprese su "Costo de Oportunidad" o lo que pierde si no actúa hoy?
-4. Recapitulación: ¿El Closer ordenó el caos del Lead y resumió su situación antes de presentar la solución?
-5. Aislamiento de Objeción: Cuando apareció la excusa inicial, ¿el Closer intentó convencer con lógica, o indagó hasta la objeción oculta?
-                  `.trim();
-                  navigator.clipboard.writeText(text);
-                  alert('Checklist copiada. Envíasela a los observadores por chat.');
+                  navigator.clipboard.writeText(t('roles.checklistContent'));
+                  alert(t('roles.checklistCopied'));
                 }}
-                title="Copiar guía de evaluación para los jueces"
+                title={t('roles.copyChecklist')}
               >
-                Copiar Checklist
+                {t('roles.copyChecklist')}
               </button>
             )}
           </div>

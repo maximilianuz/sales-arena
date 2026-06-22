@@ -1,167 +1,81 @@
 import React, { useState, useEffect } from 'react';
-import { Timer as TimerIcon, Play, Pause, RotateCcw, Hand } from 'lucide-react';
+import { Play, Square, RefreshCcw, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-export default function Timer({ stages = [], timerState, updateTimer }) {
-  const [localTimeLeft, setLocalTimeLeft] = useState(300);
-
-  const defaultTimerState = {
-    isRunning: false,
-    startTimestamp: 0,
-    accumulatedTime: 0,
-    initialTime: 300
-  };
-
-  const currentTimer = timerState || defaultTimerState;
+export default function Timer({ stages, timerState, updateTimer }) {
+  const { t } = useTranslation();
+  const [localTimeLeft, setLocalTimeLeft] = useState(0);
 
   useEffect(() => {
-    let interval = null;
-    
-    const calculateTimeLeft = () => {
-      let elapsed = currentTimer.accumulatedTime;
-      if (currentTimer.isRunning && currentTimer.startTimestamp) {
-        elapsed += (Date.now() - currentTimer.startTimestamp) / 1000;
-      }
-      const remaining = Math.max(0, currentTimer.initialTime - elapsed);
-      return Math.floor(remaining);
-    };
-
-    setLocalTimeLeft(calculateTimeLeft());
-
-    if (currentTimer.isRunning) {
+    let interval;
+    if (timerState?.isRunning && timerState?.endTimestamp) {
       interval = setInterval(() => {
-        const remaining = calculateTimeLeft();
+        const now = Date.now();
+        const remaining = Math.max(0, Math.floor((timerState.endTimestamp - now) / 1000));
         setLocalTimeLeft(remaining);
         
-        // Auto-stop if reached 0
-        if (remaining <= 0 && updateTimer) {
-          updateTimer({
-            ...currentTimer,
-            isRunning: false,
-            accumulatedTime: currentTimer.initialTime
-          });
+        if (remaining === 0) {
+          clearInterval(interval);
         }
-      }, 500); // 500ms for responsiveness
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [currentTimer, updateTimer]);
-
-  const toggle = () => {
-    if (!updateTimer) return; // Only Facilitator can trigger this
-    
-    if (currentTimer.isRunning) {
-      // Pause
-      const elapsedSinceStart = (Date.now() - currentTimer.startTimestamp) / 1000;
-      updateTimer({
-        ...currentTimer,
-        isRunning: false,
-        accumulatedTime: currentTimer.accumulatedTime + elapsedSinceStart
-      });
+      }, 1000);
     } else {
-      // Play
-      if (localTimeLeft <= 0) return; // Can't play if 0
-      updateTimer({
-        ...currentTimer,
-        isRunning: true,
-        startTimestamp: Date.now()
-      });
+      setLocalTimeLeft(timerState?.timeLeft || 0);
     }
-  };
-  
-  const reset = () => {
+    return () => clearInterval(interval);
+  }, [timerState]);
+
+  const handleStart = () => {
     if (!updateTimer) return;
-    updateTimer({
-      isRunning: false,
-      startTimestamp: 0,
-      accumulatedTime: 0,
-      initialTime: currentTimer.initialTime
-    });
+    const now = Date.now();
+    const endTimestamp = now + (localTimeLeft * 1000);
+    updateTimer({ isRunning: true, endTimestamp, timeLeft: localTimeLeft });
   };
 
-  const setTime = (minutes) => {
+  const handlePause = () => {
     if (!updateTimer) return;
-    updateTimer({
-      isRunning: false,
-      startTimestamp: 0,
-      accumulatedTime: 0,
-      initialTime: minutes * 60
-    });
+    updateTimer({ isRunning: false, endTimestamp: null, timeLeft: localTimeLeft });
   };
 
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  const handleReset = () => {
+    if (!updateTimer) return;
+    const initialTime = (stages[0]?.estimatedTime || 5) * 60;
+    updateTimer({ isRunning: false, endTimestamp: null, timeLeft: initialTime });
   };
 
-  const isLowTime = localTimeLeft > 0 && localTimeLeft <= 60; // Less than 1 minute red
-  const isTimeUp = localTimeLeft <= 0;
+  const minutes = Math.floor(localTimeLeft / 60);
+  const seconds = localTimeLeft % 60;
+  const isDanger = localTimeLeft < 60 && localTimeLeft > 0;
 
   return (
-    <div className="glass-panel" style={{ width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-      <div className="panel-title" style={{ justifyContent: 'center' }}>
-        <TimerIcon size={20} />
-        Cronómetro
+    <div className="glass-panel" style={{ textAlign: 'center', marginBottom: '1.5rem', borderColor: isDanger ? 'var(--danger)' : 'var(--glass-border)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.85rem' }}>
+        <Clock size={16} /> {t('timer.title')}
+      </div>
+      <div style={{ fontSize: '3.5rem', fontWeight: 'bold', fontFamily: 'monospace', color: isDanger ? 'var(--danger)' : 'white', textShadow: isDanger ? '0 0 10px rgba(239, 68, 68, 0.5)' : 'none', lineHeight: '1' }}>
+        {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
       </div>
       
-      <div style={{ 
-        fontSize: '6rem', 
-        fontWeight: '800', 
-        lineHeight: '1',
-        margin: '1rem 0',
-        color: isTimeUp ? 'var(--danger)' : (isLowTime ? 'var(--accent)' : 'var(--text-main)'),
-        textShadow: isTimeUp ? '0 0 20px var(--danger)' : 'none',
-        fontVariantNumeric: 'tabular-nums'
-      }}>
-        {formatTime(localTimeLeft)}
-      </div>
-
       {updateTimer && (
-        <>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-            <button className={`btn ${currentTimer.isRunning ? 'btn-secondary' : 'btn-primary'}`} onClick={toggle} style={{ width: 'auto', padding: '0.5rem 1rem' }}>
-              {currentTimer.isRunning ? <><Hand size={18} /> Parada Técnica (Feedback)</> : <><Play size={18} /> Iniciar Roleplay</>}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+          {!timerState?.isRunning ? (
+            <button className="btn btn-primary" onClick={handleStart}>
+              <Play size={18} /> {t('timer.start')}
             </button>
-            <button className="btn btn-outline" onClick={reset}>
-              <RotateCcw size={18} />
+          ) : (
+            <button className="btn btn-secondary" onClick={handlePause}>
+              <Square size={18} /> {t('timer.pause')}
             </button>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-            {[5, 10].map(min => (
-              <button 
-                key={min} 
-                className="btn btn-outline" 
-                style={{ padding: '0.25rem 0.75rem', fontSize: '0.9rem', borderColor: currentTimer.initialTime === min*60 ? 'var(--primary)' : '' }}
-                onClick={() => setTime(min)}
-              >
-                {min}m
-              </button>
-            ))}
-            <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: '0.25rem', border: '1px solid var(--glass-border)', padding: '2px' }}>
-              <input 
-                type="number" 
-                min="1" max="120"
-                defaultValue="45"
-                id="customTimeInput"
-                style={{ width: '50px', background: 'transparent', border: 'none', color: 'white', textAlign: 'center', padding: '0.25rem', outline: 'none' }}
-              />
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginRight: '0.5rem' }}>m</span>
-              <button 
-                className="btn btn-outline"
-                style={{ padding: '0.15rem 0.5rem', fontSize: '0.8rem', border: 'none', borderLeft: '1px solid var(--glass-border)', borderRadius: 0 }}
-                onClick={() => {
-                  const val = parseInt(document.getElementById('customTimeInput').value);
-                  if (val > 0) setTime(val);
-                }}
-              >
-                Fijar
-              </button>
-            </div>
-          </div>
-        </>
+          )}
+          <button className="btn btn-outline" onClick={handleReset}>
+            <RefreshCcw size={18} /> {t('timer.reset')}
+          </button>
+        </div>
+      )}
+      
+      {localTimeLeft === 0 && (
+        <div style={{ color: 'var(--danger)', marginTop: '0.5rem', fontWeight: 'bold', animation: 'pulse 1s infinite' }}>
+          {t('timer.warning')}
+        </div>
       )}
     </div>
   );

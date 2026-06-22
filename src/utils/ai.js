@@ -1,6 +1,6 @@
 import { OBJECTIONS_THEORY_GENERAL, OBJECTIONS_DICTIONARY } from './objectionsKnowledgeBase';
 
-export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, theme, saleType, targetObjection, leadTemperature }, stages = []) {
+export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, theme, saleType, targetObjection, leadTemperature }, stages = [], language = 'es') {
   // If no stages provided somehow, fallback to basic structure
   const activeStages = stages && stages.length > 0 ? stages : [
     { id: 'apertura', label: 'Apertura', baseQuestions: 'Romper hielo', baseObjections: '' }
@@ -36,6 +36,7 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     Eres un experto entrenador de ventas y un Master High Ticket Closer.
     Genera un Buyer Persona profundo y un pipeline de simulación con los siguientes parámetros:
     - Nivel de dificultad: ${level}
+    - Idioma de respuesta: ${language === 'es' ? 'Español' : 'Inglés'}
     - Industria/Tema: ${theme}
     - Tipo de venta: ${saleType}
     - Objeción Principal Esperada: "${selectedObjectionKey}"

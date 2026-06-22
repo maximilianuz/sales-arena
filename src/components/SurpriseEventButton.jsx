@@ -1,19 +1,22 @@
 import React from 'react';
 import { Dices } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const EVENTS = [
-  "El cliente se cruza de brazos: 'Acabo de recordar que mi socio debe estar en esta decisión.'",
-  "El cliente menciona de pasada que está evaluando a [Competidor Directo] también.",
-  "El presupuesto inicial del cliente acaba de ser congelado por la junta directiva.",
-  "El cliente te interrumpe: 'Solo me quedan 2 minutos, dime cuánto cuesta y qué incluye.'",
-  "Surge una objeción fantasma: 'La verdad es que tuvimos una mala experiencia con algo similar hace años y no quiero repetirlo.'"
+  "event.crossed_arms",
+  "event.competitor",
+  "event.budget_frozen",
+  "event.two_minutes",
+  "event.ghost_objection"
 ];
 
 export default function SurpriseEventButton({ triggerEvent }) {
+  const { t } = useTranslation();
+
   const handleClick = () => {
     if (!triggerEvent) return;
     const randomEvent = EVENTS[Math.floor(Math.random() * EVENTS.length)];
-    triggerEvent(randomEvent);
+    triggerEvent(t(randomEvent));
   };
 
   return (
@@ -23,7 +26,7 @@ export default function SurpriseEventButton({ triggerEvent }) {
       style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '1.5rem', background: 'linear-gradient(135deg, var(--secondary), var(--primary))' }}
     >
       <Dices size={48} />
-      <span>EVENTO SORPRESA</span>
+      <span>{t('surprise.button')}</span>
     </button>
   );
 }

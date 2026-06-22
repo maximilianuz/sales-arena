@@ -1,107 +1,101 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Target, Shield, Eye, Play } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import Header from '../components/Header';
 
 export default function Lobby() {
-  const [roomId, setRoomId] = useState('');
-  const [userName, setUserName] = useState('');
-  const [role, setRole] = useState('Observador');
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('');
+  const [roomId, setRoomId] = useState('');
+
+  const roles = [
+    { id: 'Facilitador', label: t('lobby.roles.Facilitador'), desc: t('lobby.roles.FacilitadorDesc') },
+    { id: 'Closer', label: t('lobby.roles.Closer'), desc: t('lobby.roles.CloserDesc') },
+    { id: 'Lead', label: t('lobby.roles.Lead'), desc: t('lobby.roles.LeadDesc') },
+    { id: 'Observador', label: t('lobby.roles.Observador'), desc: t('lobby.roles.ObservadorDesc') }
+  ];
 
   const handleJoin = (e) => {
     e.preventDefault();
-    if (!roomId.trim() || !userName.trim()) return;
+    if (!name || !role || !roomId) return;
     
-    let userId = localStorage.getItem('sales_arena_userId');
-    if (!userId) {
-      userId = 'user_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('sales_arena_userId', userId);
-    }
-
-    localStorage.setItem('sales_arena_userName', userName);
+    localStorage.setItem('sales_arena_userName', name);
     localStorage.setItem('sales_arena_role', role);
+    localStorage.setItem('sales_arena_roomId', roomId);
 
-    navigate(`/room/${roomId.toUpperCase()}`);
+    navigate(`/room/${roomId}`);
   };
-
-  const generateRoomId = () => {
-    setRoomId(Math.random().toString(36).substring(2, 8).toUpperCase());
-  };
-
-  const roles = [
-    { id: 'Facilitador', icon: <Shield size={20} />, color: 'var(--danger)', desc: 'Controla el reloj y genera escenarios.' },
-    { id: 'Closer', icon: <Target size={20} />, color: 'var(--primary)', desc: 'Vende. No puede ver el perfil del Lead.' },
-    { id: 'Lead', icon: <Users size={20} />, color: 'var(--secondary)', desc: 'Actúa como el cliente. Ve todo su perfil.' },
-    { id: 'Observador', icon: <Eye size={20} />, color: 'var(--success)', desc: 'Observa y puntúa al Closer en vivo.' }
-  ];
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-main)' }}>
-      <div className="glass-panel" style={{ maxWidth: '500px', width: '100%', padding: '2rem', animation: 'modalIn 0.3s' }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '0.5rem', color: 'var(--primary)' }}>Sales Arena</h1>
-        <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '2rem' }}>Multijugador en Tiempo Real</p>
-
+    <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <Header title={t('lobby.title')} />
+      
+      <div className="glass-panel" style={{ maxWidth: '500px', width: '100%', marginTop: '2rem', animation: 'modalIn 0.3s ease-out' }}>
+        <h2 style={{ textAlign: 'center', color: 'var(--primary)', marginBottom: '2rem', fontSize: '2rem' }}>
+          {t('lobby.whoWillYouPlay')}
+        </h2>
+        
         <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Tu Nombre</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Tu Nombre</label>
             <input 
               type="text" 
               required
-              value={userName} 
-              onChange={e => setUserName(e.target.value)} 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="form-input"
               placeholder="Ej. Juan Pérez"
-              style={{ width: '100%', padding: '0.75rem', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: '8px' }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>ID de la Sala</label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <input 
-                type="text" 
-                required
-                value={roomId} 
-                onChange={e => setRoomId(e.target.value.toUpperCase())} 
-                placeholder="Ej. ABCD12"
-                style={{ flex: 1, padding: '0.75rem', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: '8px', textTransform: 'uppercase' }}
-              />
-              <button type="button" className="btn btn-outline" onClick={generateRoomId}>
-                Generar
-              </button>
-            </div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>ID de Sala</label>
+            <input 
+              type="text" 
+              required
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
+              className="form-input"
+              placeholder="Ej. sala-secreta-123"
+            />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Elige tu Rol</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '1rem', color: 'var(--text-muted)' }}>{t('lobby.chooseRole')}</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               {roles.map(r => (
                 <div 
                   key={r.id}
                   onClick={() => setRole(r.id)}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
                     padding: '1rem',
-                    background: role === r.id ? 'rgba(255,255,255,0.05)' : 'transparent',
-                    border: role === r.id ? `1px solid ${r.color}` : '1px solid var(--glass-border)',
-                    borderRadius: '8px',
+                    borderRadius: '0.5rem',
                     cursor: 'pointer',
+                    border: `2px solid ${role === r.id ? 'var(--primary)' : 'var(--glass-border)'}`,
+                    background: role === r.id ? 'rgba(79, 70, 229, 0.1)' : 'rgba(0,0,0,0.2)',
                     transition: 'all 0.2s'
                   }}
                 >
-                  <div style={{ color: r.color }}>{r.icon}</div>
-                  <div>
-                    <strong style={{ display: 'block', color: 'white' }}>{r.id}</strong>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{r.desc}</span>
-                  </div>
+                  <strong style={{ display: 'block', color: role === r.id ? 'white' : 'var(--text-main)', marginBottom: '0.25rem' }}>
+                    {r.label}
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {r.desc}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem', padding: '1rem', fontSize: '1.1rem', justifyContent: 'center' }}>
-            <Play size={20} /> Unirse a la Sala
+          <button 
+            type="submit" 
+            className="btn btn-primary btn-large" 
+            style={{ marginTop: '1rem' }}
+            disabled={!name || !role || !roomId}
+          >
+            {t('lobby.continue')}
           </button>
         </form>
       </div>
