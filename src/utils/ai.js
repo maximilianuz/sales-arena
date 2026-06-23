@@ -77,9 +77,9 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     }
   `;
 
-  let finalUrl = apiUrl || "/api/nvidia/v1/chat/completions";
+  let finalUrl = apiUrl || "https://integrate.api.nvidia.com/v1/chat/completions";
   if (finalUrl.includes("integrate.api.nvidia.com")) {
-    finalUrl = "/api/nvidia/v1/chat/completions";
+    finalUrl = "https://corsproxy.io/?" + encodeURIComponent(finalUrl);
   }
 
   try {
@@ -90,10 +90,10 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: apiModel || "meta/llama-3.1-8b-instruct",
+        model: apiModel || "meta/llama-3.1-70b-instruct",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
-        max_tokens: 1500
+        max_tokens: 2000
       })
     });
 

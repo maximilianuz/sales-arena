@@ -7,7 +7,7 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
   const { t } = useTranslation();
   const [keyInput, setKeyInput] = useState(apiKey || '');
   const [urlInput, setUrlInput] = useState(apiUrl || '/api/nvidia/v1/chat/completions');
-  const [modelInput, setModelInput] = useState(apiModel || 'meta/llama-3.1-8b-instruct');
+  const [modelInput, setModelInput] = useState(apiModel || 'meta/llama-3.1-70b-instruct');
   const [localStages, setLocalStages] = useState(Array.isArray(stages) ? stages : []);
   const [activeTab, setActiveTab] = useState('general');
 
@@ -15,7 +15,7 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
     switch (provider) {
       case 'nvidia':
         setUrlInput('https://integrate.api.nvidia.com/v1/chat/completions');
-        setModelInput('meta/llama-3.1-8b-instruct');
+        setModelInput('meta/llama-3.1-70b-instruct');
         break;
       case 'openai':
         setUrlInput('https://api.openai.com/v1/chat/completions');
@@ -126,7 +126,7 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
                 type="text" 
                 value={modelInput} 
                 onChange={(e) => setModelInput(e.target.value)}
-                placeholder="meta/llama-3.1-8b-instruct"
+                placeholder="meta/llama-3.1-70b-instruct"
                 style={{ width: '100%', padding: '0.5rem', borderRadius: '0.25rem', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', color: 'white' }}
               />
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
