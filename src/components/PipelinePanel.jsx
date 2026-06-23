@@ -25,63 +25,69 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
   return (
     <div className="glass-panel" style={{ padding: '1rem', marginBottom: '1rem' }}>
       {/* Barra de Progreso */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflowX: 'auto', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', overflowX: 'auto', paddingBottom: '1rem', marginBottom: '1.5rem', position: 'relative' }}>
+        {/* Línea conectora de fondo */}
+        <div style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '2px', background: 'var(--glass-border)', zIndex: 0, transform: 'translateY(-50%)' }} />
+        
         {stages.map((stage, index) => {
           const isActive = index === activeStageIndex;
           const isPast = index < activeStageIndex;
           return (
-            <div key={stage.id} style={{ display: 'flex', alignItems: 'center', minWidth: 'max-content' }}>
+            <div key={stage.id} style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
               <div 
                 onClick={() => setActiveStageIndex && setActiveStageIndex(index)}
                 style={{ 
-                  padding: '0.25rem 0.75rem', 
-                  borderRadius: '1rem',
-                  fontSize: '0.8rem',
-                  fontWeight: isActive ? 'bold' : 'normal',
+                  padding: '0.4rem 1rem', 
+                  borderRadius: '2rem',
+                  fontSize: '0.85rem',
+                  fontWeight: isActive ? '700' : '600',
                   cursor: setActiveStageIndex ? 'pointer' : 'default',
-                  background: isActive ? 'var(--primary)' : (isPast ? 'rgba(16, 185, 129, 0.2)' : 'transparent'),
+                  background: isActive ? 'linear-gradient(135deg, var(--primary), #818cf8)' : (isPast ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-dark)'),
                   color: isActive ? 'white' : (isPast ? 'var(--success)' : 'var(--text-muted)'),
-                  border: isActive ? 'none' : `1px solid ${isPast ? 'var(--success)' : 'var(--glass-border)'}`
+                  border: isActive ? '1px solid rgba(255,255,255,0.2)' : `1px solid ${isPast ? 'var(--success)' : 'var(--glass-border)'}`,
+                  boxShadow: isActive ? '0 0 20px rgba(99, 102, 241, 0.4)' : 'none',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  whiteSpace: 'nowrap'
                 }}>
-                {stage.label} <span style={{ opacity: 0.7, fontSize: '0.85em', marginLeft: '4px' }}>({stage.estimatedTime || 5}m)</span>
+                {stage.label} <span style={{ opacity: isActive ? 0.9 : 0.6, fontSize: '0.85em', marginLeft: '6px' }}>({stage.estimatedTime || 5}m)</span>
               </div>
-              {index < stages.length - 1 && (
-                <div style={{ width: '20px', height: '2px', background: isPast ? 'var(--success)' : 'var(--glass-border)', margin: '0 5px' }} />
-              )}
             </div>
           );
         })}
       </div>
 
       {/* Detalles de la Etapa Activa */}
-      <div style={{ display: 'flex', gap: '1rem' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '1rem', border: '1px solid var(--glass-border)' }}>
         <div style={{ flex: 1 }}>
-          <h3 style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            {activeStageIndex + 1}. {activeStage.label}
+          <h3 style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', fontSize: '1.4rem' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)', boxShadow: '0 0 10px var(--accent)' }} />
+            {activeStage.label}
           </h3>
-          <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--accent)', padding: '0.25rem 0.75rem', borderRadius: '0.5rem', fontSize: '0.85rem', display: 'inline-block', marginBottom: '1rem', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-            ⏱️ {t('pipeline.suggestedTime')}: <strong>{activeStage.estimatedTime || 5} {t('pipeline.minutes')}</strong>
+          <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--accent)', padding: '0.35rem 0.85rem', borderRadius: '2rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', border: '1px solid rgba(245, 158, 11, 0.3)', fontWeight: '600' }}>
+            ⏱️ {t('pipeline.suggestedTime')}: {activeStage.estimatedTime || 5} {t('pipeline.minutes')}
           </div>
-          <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', marginBottom: '1rem' }}>
-            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '0.5rem', flex: 1 }}>
-              <strong style={{ color: 'var(--primary)' }}><Target size={14} style={{display:'inline'}}/> {t('pipeline.objective')}:</strong> {activeStage.objective}
+          <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', marginBottom: '1rem' }}>
+            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '0.75rem', flex: 1, border: '1px solid var(--glass-border)', borderTop: '1px solid var(--glass-border-highlight)' }}>
+              <strong style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}><Target size={14} /> {t('pipeline.objective')}</strong> 
+              <span style={{ color: 'var(--text-muted)' }}>{activeStage.objective}</span>
             </div>
-            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '0.5rem', flex: 1 }}>
-              <strong style={{ color: 'var(--success)' }}><CheckCircle2 size={14} style={{display:'inline'}}/> {t('pipeline.success')}:</strong> {activeStage.indicator}
+            <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: '1rem', borderRadius: '0.75rem', flex: 1, border: '1px solid rgba(16, 185, 129, 0.2)', borderTop: '1px solid rgba(16, 185, 129, 0.3)' }}>
+              <strong style={{ color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}><CheckCircle2 size={14} /> {t('pipeline.success')}</strong> 
+              <span style={{ color: 'var(--text-muted)' }}>{activeStage.indicator}</span>
             </div>
           </div>
         </div>
 
-        <div style={{ flex: 1, borderLeft: '1px solid var(--glass-border)', paddingLeft: '1rem' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t('pipeline.suggestedQuestions')}</div>
+        <div style={{ flex: 1, borderLeft: '1px solid var(--glass-border)', paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-main)', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: '700', letterSpacing: '0.05em' }}>{t('pipeline.suggestedQuestions')}</div>
           {currentQuestions && currentQuestions.length > 0 ? (
-            <ul style={{ paddingLeft: '1.2rem', margin: 0, fontSize: '0.95rem' }}>
+            <ul style={{ paddingLeft: '1.2rem', margin: 0, fontSize: '0.95rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {currentQuestions.map((q, i) => (
-                <li key={i} style={{ marginBottom: '0.25rem' }}>{q}</li>
+                <li key={i}>{q}</li>
               ))}
             </ul>
           ) : (
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '0.5rem', border: '1px dashed var(--glass-border)' }}>
               {t('pipeline.generatePrompt')}
             </div>
           )}

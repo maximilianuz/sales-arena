@@ -123,11 +123,13 @@ export default function Lobby() {
                   onClick={() => setRole(r.id)}
                   style={{
                     padding: '1rem',
-                    borderRadius: '0.5rem',
+                    borderRadius: '0.75rem',
                     cursor: 'pointer',
-                    border: `2px solid ${role === r.id ? 'var(--primary)' : 'var(--glass-border)'}`,
-                    background: role === r.id ? 'rgba(79, 70, 229, 0.1)' : 'rgba(0,0,0,0.2)',
-                    transition: 'all 0.2s'
+                    border: `1px solid ${role === r.id ? 'var(--primary)' : 'var(--glass-border)'}`,
+                    background: role === r.id ? 'rgba(99, 102, 241, 0.15)' : 'rgba(0,0,0,0.25)',
+                    boxShadow: role === r.id ? '0 0 15px rgba(99, 102, 241, 0.2)' : 'none',
+                    transform: role === r.id ? 'translateY(-2px)' : 'none',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                 >
                   <strong style={{ display: 'block', color: role === r.id ? 'white' : 'var(--text-main)', marginBottom: '0.25rem' }}>

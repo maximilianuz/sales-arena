@@ -80,9 +80,9 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, overflowY: 'auto', paddingRight: '0.5rem' }}>
         
         {/* Etapas Completadas */}
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '0.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--success)', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            <CheckSquare size={16} /> {t('debrief.completedStages')}
+        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '0.75rem', border: '1px solid var(--glass-border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '1rem', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <CheckSquare size={16} color="var(--success)" /> {t('debrief.completedStages')}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             {stages.map(stage => {
@@ -92,12 +92,16 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
                   key={stage.id} 
                   onClick={() => toggleStage(stage.id)}
                   style={{ 
-                    padding: '0.25rem 0.5rem', 
-                    borderRadius: '0.25rem', 
-                    fontSize: '0.8rem', 
+                    padding: '0.35rem 0.85rem', 
+                    borderRadius: '2rem', 
+                    fontSize: '0.85rem', 
                     cursor: updateNotes ? 'pointer' : 'default',
-                    background: isChecked ? 'var(--success)' : 'rgba(255,255,255,0.1)',
-                    color: isChecked ? 'white' : 'var(--text-muted)'
+                    background: isChecked ? 'var(--success)' : 'rgba(0,0,0,0.2)',
+                    color: isChecked ? 'white' : 'var(--text-muted)',
+                    border: isChecked ? 'none' : '1px solid var(--glass-border)',
+                    boxShadow: isChecked ? '0 0 10px rgba(16, 185, 129, 0.3)' : 'none',
+                    transition: 'all 0.2s',
+                    fontWeight: isChecked ? '600' : 'normal'
                   }}
                 >
                   {stage.label}
@@ -109,8 +113,8 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
 
         {/* Información Descubierta */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            <Target size={16} /> {t('debrief.infoDiscovered')}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <Target size={16} color="var(--primary)" /> {t('debrief.infoDiscovered')}
           </div>
           <textarea 
             id="infoDiscoveredInput"
@@ -119,14 +123,14 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
             onBlur={handleBlurInfo}
             readOnly={!updateNotes}
             placeholder={updateNotes ? t('debrief.infoPlaceholder') : t('debrief.waitingNotes')}
-            style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : undefined }}
+            style={{ flex: 1, minHeight: '80px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : undefined }}
           />
         </div>
 
         {/* Objeciones sin explorar */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent)', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            <Save size={16} /> {t('debrief.unexploredObjections')}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <Save size={16} color="var(--accent)" /> {t('debrief.unexploredObjections')}
           </div>
           <textarea 
             id="unexploredObjectionsInput"
@@ -135,7 +139,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
             onBlur={handleBlurUnexplored}
             readOnly={!updateNotes}
             placeholder={updateNotes ? t('debrief.unexploredPlaceholder') : t('debrief.waitingNotes')}
-            style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : undefined }}
+            style={{ flex: 1, minHeight: '80px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : undefined }}
           />
         </div>
 
