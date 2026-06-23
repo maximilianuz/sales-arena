@@ -132,9 +132,9 @@ export default function Room() {
     gridColumns = 'minmax(300px, 600px)'; // Center focus
     showRoles = true;
   } else if (isLead) {
-    gridColumns = '1fr 1fr';
+    gridColumns = '1fr 300px';
     showPersona = true;
-    showRoles = true;
+    showRoles = false;
     showHiddenInfoBtn = true;
   } else if (isObserver) {
     gridColumns = '1fr 1.5fr'; // Wide center for debrief
@@ -192,6 +192,7 @@ export default function Room() {
                   apiModel={apiModel}
                   stages={stages}
                   isReadOnly={!isFacilitator}
+                  isLeadRole={isLead}
                 />
               )}
               {showRoles && !isCloser && (

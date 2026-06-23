@@ -3,7 +3,7 @@ import { UserCircle, HeartPulse, Target, ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { generateAIScenario } from '../utils/ai';
 
-export default function ScenarioPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly }) {
+export default function ScenarioPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly, isLeadRole }) {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('situacion');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -237,18 +237,70 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
     }
   };
 
+  const renderExpandedLeadScript = () => {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', animation: 'fadeIn 0.5s', paddingBottom: '2rem' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.15))', padding: '1.5rem', borderRadius: '1rem', border: '1px solid rgba(139, 92, 246, 0.4)', boxShadow: '0 0 30px rgba(139, 92, 246, 0.1)' }}>
+          <div style={{ color: '#a78bfa', fontSize: '1.2rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', letterSpacing: '0.05em' }}>
+            🎭 Actuación Principal
+          </div>
+          <p style={{ margin: 0, fontSize: '1.25rem', fontStyle: 'italic', lineHeight: '1.6', color: 'white' }}>"{currentScenario.roleplayGuide?.actorAdvice}"</p>
+        </div>
+
+        <section>
+          <h3 style={{ color: 'var(--success)', borderBottom: '1px solid var(--glass-border-highlight)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Target size={20} /> Situación y Problema</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: '1.2rem', borderRadius: '0.75rem', borderLeft: '3px solid var(--success)' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Problema Actual</div>
+              <p style={{ margin: 0, fontSize: '1.1rem' }}>{currentScenario.currentSituation.problem}</p>
+            </div>
+            <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: '1.2rem', borderRadius: '0.75rem', borderLeft: '3px solid var(--success)' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Impacto Financiero/Emocional</div>
+              <p style={{ margin: 0, fontSize: '1.1rem' }}>{currentScenario.currentSituation.impact}</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 style={{ color: 'var(--accent)', borderBottom: '1px solid var(--glass-border-highlight)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><HeartPulse size={20} /> Psicología Oculta</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ background: 'rgba(245, 158, 11, 0.05)', padding: '1.2rem', borderRadius: '0.75rem', borderLeft: '3px solid var(--accent)' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Miedo y Deseo Principal</div>
+              <p style={{ margin: 0, fontSize: '1.1rem' }}><strong>Miedo:</strong> {currentScenario.psychology.primaryFear}</p>
+              <p style={{ margin: '0.5rem 0 0 0', fontSize: '1.1rem' }}><strong>Deseo:</strong> {currentScenario.psychology.primaryDesire}</p>
+            </div>
+            <div style={{ background: 'rgba(139, 92, 246, 0.05)', padding: '1.2rem', borderRadius: '0.75rem', borderLeft: '3px solid #8b5cf6' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Fatiga de Mercado</div>
+              <p style={{ margin: 0, fontSize: '1.1rem' }}>{currentScenario.roleplayGuide?.vendorFatigue}</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 style={{ color: 'var(--secondary)', borderBottom: '1px solid var(--glass-border-highlight)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ShieldAlert size={20} /> Tus Objeciones</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ background: 'rgba(236, 72, 153, 0.05)', padding: '1.5rem', borderRadius: '0.75rem', borderLeft: '4px solid var(--secondary)' }}>
+              <h4 style={{ color: 'var(--secondary)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Lo que le dirás al Closer (Objeción de Cortina):</h4>
+              <p style={{ margin: 0, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 'bold' }}>"{currentScenario.visibleObjection}"</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  };
+
   return (
     <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <div className="panel-title" style={{ justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <UserCircle size={20} />
-          {t('scenario.title')}
+          {isLeadRole ? "Tu Personaje" : t('scenario.title')}
         </div>
         {!isReadOnly && (
           <button 
             className="btn btn-outline" 
             style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}
-            onClick={handleGenerate}
+            onClick={() => handleGenerate(null)}
             disabled={isGenerating}
           >
             {isGenerating ? "..." : "Regenerar IA"}
@@ -256,47 +308,55 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem', borderBottom: '1px solid var(--glass-border-highlight)' }}>
-        <button 
-          className={`btn ${activeTab === 'situacion' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('situacion')}
-          style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'situacion' ? 'none' : '1px solid transparent' }}
-        >
-          <Target size={16} /> {t('scenario.tabs.situation')}
-        </button>
-        <button 
-          className={`btn ${activeTab === 'demografia' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('demografia')}
-          style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'demografia' ? 'none' : '1px solid transparent' }}
-        >
-          <UserCircle size={16} /> {t('scenario.tabs.demographics')}
-        </button>
-        <button 
-          className={`btn ${activeTab === 'psicologia' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('psicologia')}
-          style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'psicologia' ? 'none' : '1px solid transparent' }}
-        >
-          <HeartPulse size={16} /> {t('scenario.tabs.psychology')}
-        </button>
-        <button 
-          className={`btn ${activeTab === 'objeciones' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('objeciones')}
-          style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'objeciones' ? 'none' : '1px solid transparent' }}
-        >
-          <ShieldAlert size={16} /> {t('scenario.tabs.objections')}
-        </button>
-        <button 
-          className={`btn ${activeTab === 'guion' ? 'btn-primary' : 'btn-outline'}`}
-          onClick={() => setActiveTab('guion')}
-          style={{ flex: 1, minWidth: 'max-content', padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'guion' ? 'none' : '1px solid transparent' }}
-        >
-          🎭 Guion (Actor)
-        </button>
-      </div>
+      {!isLeadRole ? (
+        <>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem', borderBottom: '1px solid var(--glass-border-highlight)' }}>
+            <button 
+              className={`btn ${activeTab === 'situacion' ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => setActiveTab('situacion')}
+              style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'situacion' ? 'none' : '1px solid transparent' }}
+            >
+              <Target size={16} /> {t('scenario.tabs.situation')}
+            </button>
+            <button 
+              className={`btn ${activeTab === 'demografia' ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => setActiveTab('demografia')}
+              style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'demografia' ? 'none' : '1px solid transparent' }}
+            >
+              <UserCircle size={16} /> {t('scenario.tabs.demographics')}
+            </button>
+            <button 
+              className={`btn ${activeTab === 'psicologia' ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => setActiveTab('psicologia')}
+              style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'psicologia' ? 'none' : '1px solid transparent' }}
+            >
+              <HeartPulse size={16} /> {t('scenario.tabs.psychology')}
+            </button>
+            <button 
+              className={`btn ${activeTab === 'objeciones' ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => setActiveTab('objeciones')}
+              style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'objeciones' ? 'none' : '1px solid transparent' }}
+            >
+              <ShieldAlert size={16} /> {t('scenario.tabs.objections')}
+            </button>
+            <button 
+              className={`btn ${activeTab === 'guion' ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => setActiveTab('guion')}
+              style={{ flex: 1, minWidth: 'max-content', padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'guion' ? 'none' : '1px solid transparent' }}
+            >
+              🎭 Guion (Actor)
+            </button>
+          </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', lineHeight: '1.6' }}>
-        {renderTabContent()}
-      </div>
+          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', lineHeight: '1.6' }}>
+            {renderTabContent()}
+          </div>
+        </>
+      ) : (
+        <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', lineHeight: '1.6' }}>
+          {renderExpandedLeadScript()}
+        </div>
+      )}
     </div>
   );
 }
