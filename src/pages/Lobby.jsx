@@ -54,7 +54,7 @@ export default function Lobby() {
   };
 
   return (
-    <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '2rem 1rem' }}>
       
       <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}>
         <select 
@@ -76,7 +76,7 @@ export default function Lobby() {
         </select>
       </div>
 
-      <div className="glass-panel" style={{ maxWidth: '500px', width: '100%', marginTop: '2rem', animation: 'modalIn 0.3s ease-out' }}>
+      <div className="glass-panel" style={{ margin: 'auto', maxWidth: '500px', width: '100%', animation: 'modalIn 0.3s ease-out' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
           <div className="logo-container">
             <ChessKnight size={48} color="white" strokeWidth={1.5} />

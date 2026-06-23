@@ -250,11 +250,13 @@ input::placeholder, textarea::placeholder {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
-  padding: 1rem;
   border-radius: 1rem;
   margin-bottom: 1rem;
   box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
 }
 
 .logo-container:hover {
