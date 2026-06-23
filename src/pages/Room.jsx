@@ -36,9 +36,9 @@ export default function Room() {
   const [showSurpriseEvent, setShowSurpriseEvent] = useState(false);
   const [seenSurpriseEventId, setSeenSurpriseEventId] = useState(null);
 
-  // User Role
-  const role = localStorage.getItem('sales_arena_role') || 'Observador';
-  const userName = localStorage.getItem('sales_arena_userName') || 'Anónimo';
+  // User Role (read once on mount to avoid cross-tab pollution)
+  const [role] = useState(() => localStorage.getItem('sales_arena_role') || 'Observador');
+  const [userName] = useState(() => localStorage.getItem('sales_arena_userName') || 'Anónimo');
 
   useEffect(() => {
     if (!localStorage.getItem('sales_arena_userName')) {
@@ -169,7 +169,7 @@ export default function Room() {
             />
             
             <div className="center-actions">
-              {isFacilitator && (
+              {!isCloser && (
                 <button 
                   className="btn btn-secondary btn-large" 
                   onClick={() => setShowPrivateInfo(true)}
