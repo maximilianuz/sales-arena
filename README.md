@@ -7,7 +7,7 @@
 <a name="english"></a>
 ## 🇺🇸 English
 
-**Sales Arena Sandbox AI** is a real-time multiplayer web application designed to simulate High Ticket Sales scenarios. It leverages advanced AI models (NVIDIA NIM, OpenAI, Groq, OpenRouter, or local Ollama) to generate dynamic "Buyer Personas" and objections on the fly. 
+**Sales Arena AI** is a real-time multiplayer web application designed to simulate High Ticket Sales scenarios. It leverages advanced AI models (NVIDIA NIM, OpenAI, Groq, OpenRouter, or local Ollama) to generate dynamic "Buyer Personas" and objections on the fly. 
 
 Built with **React, Vite, and Firebase**, it allows multiple participants to join the same room with different roles:
 - **Closer (Salesperson):** Tries to close the deal with a minimalist UI.
@@ -38,7 +38,7 @@ npm run dev
 <a name="español"></a>
 ## 🇪🇸 Español
 
-**Sales Arena Sandbox AI** es una aplicación web multijugador en tiempo real diseñada para simular escenarios de Ventas High Ticket. Utiliza modelos de IA avanzados (NVIDIA NIM, OpenAI, Groq, OpenRouter o Ollama local) para generar "Buyer Personas" y objeciones dinámicas sobre la marcha.
+**Sales Arena AI** es una aplicación web multijugador en tiempo real diseñada para simular escenarios de Ventas High Ticket. Utiliza modelos de IA avanzados (NVIDIA NIM, OpenAI, Groq, OpenRouter o Ollama local) para generar "Buyer Personas" y objeciones dinámicas sobre la marcha.
 
 Construida con **React, Vite y Firebase**, permite que múltiples participantes se unan a la misma sala con diferentes roles:
 - **Closer (Vendedor):** Intenta cerrar el trato con una interfaz minimalista.
