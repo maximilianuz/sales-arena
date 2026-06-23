@@ -1,96 +1,9 @@
 import { OBJECTIONS_THEORY_GENERAL, OBJECTIONS_DICTIONARY } from './objectionsKnowledgeBase';
+import { getIdentityPrompt } from './prompts/identityPrompt';
+import { getObjectionsPrompt } from './prompts/objectionsPrompt';
+import { getPipelinePrompt } from './prompts/pipelinePrompt';
 
-export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, theme, saleType, targetObjection, leadTemperature }, stages = [], language = 'es') {
-  // If no stages provided somehow, fallback to basic structure
-  const activeStages = stages && stages.length > 0 ? stages : [
-    { id: 'apertura', label: 'Apertura', baseQuestions: 'Romper hielo', baseObjections: '' }
-  ];
-
-  const stagesPromptContext = activeStages.map(s => {
-    return `Etapa ID: "${s.id}" (${s.label})
-  - Objetivo: ${s.objective}
-  - Preguntas/Información Base de Referencia: ${s.baseQuestions}
-  - Objeciones Comunes de esta etapa: ${s.baseObjections}`;
-  }).join('\n\n');
-
-  const pipelineKeys = activeStages.map(s => `"${s.id}": ["Pregunta 1", "Pregunta 2"]`).join(',\n        ');
-
-  // Determinar qué framework de objeción inyectar para ahorrar tokens
-  let selectedObjectionKey = targetObjection;
-  const availableKeys = Object.keys(OBJECTIONS_DICTIONARY);
-  
-  if (!selectedObjectionKey || selectedObjectionKey === 'Aleatoria (Sorpréndeme)') {
-    selectedObjectionKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
-  }
-
-  const specificObjectionFramework = OBJECTIONS_DICTIONARY[selectedObjectionKey] || '';
-
-  let tempInstruction = '';
-  if (leadTemperature && leadTemperature !== 'Aleatoria') {
-    tempInstruction = `- TEMPERATURA DEL LEAD: El lead es "${leadTemperature}". Ajusta drásticamente su "Estado Emocional", "Situación Actual" y "Probabilidad de Compra Inicial" acorde a esto. Un lead FRÍO es altamente escéptico, defensivo y su probabilidad es muy baja (<15%). Un lead CALIENTE viene urgido, recomendado o listo para comprar y su probabilidad es alta (>60%). Un lead TEMPLADO tiene curiosidad pero dudas.`;
-  } else {
-    tempInstruction = `- TEMPERATURA DEL LEAD: Define aleatoriamente si es un lead Frío, Templado o Caliente, y ajusta su estado emocional y probabilidad de compra en consecuencia.`;
-  }
-
-  const prompt = `
-    Eres un experto entrenador de ventas y un Master High Ticket Closer.
-    Genera un Buyer Persona profundo y un pipeline de simulación con los siguientes parámetros:
-    - Nivel de dificultad: ${level}
-    - Idioma de respuesta: ${language === 'es' ? 'Español' : 'Inglés'}
-    - Industria/Tema: ${theme}
-    - Tipo de venta: ${saleType}
-    - Objeción Principal Esperada: "${selectedObjectionKey}"
-
-    FRAMEWORK ESPECÍFICO PARA ESTA SIMULACIÓN (DEBE APLICARSE):
-    ${specificObjectionFramework}
-
-    INSTRUCCIONES DE PERFILADO (BUYER PERSONA SIMULATION SCHEMA v3):
-    - DIVERSIDAD DEMOGRÁFICA: Adapta el perfil drásticamente según la Industria/Tema. NO asumas que todos son ejecutivos, CEOs o dueños de negocio. Pueden ser jóvenes estudiantes indecisos, empleados insatisfechos buscando un cambio, personas sin rumbo claro, etc.
-    - PROFUNDIDAD PSICOLÓGICA: El perfil debe tener conflictos de metas internos (ej. deseo de cambio vs. miedo al riesgo), un perfil económico específico (con estrés financiero o presupuestos limitados) y narrativas internas (creencias sobre el dinero y el éxito).
-    ${tempInstruction}
-
-    RECURSOS BASE PARA LAS ETAPAS DEL EMBUDO:
-    ${stagesPromptContext}
-
-    INSTRUCCIONES PARA LAS PREGUNTAS (pipelineQuestions):
-    Basándote estrictamente en los "Recursos Base" de cada etapa y en el "Framework Específico" arriba indicado, genera preguntas de ventas que reflejen esas objeciones o patrones de preguntas. Deben tener un tono directo y de alto valor (High Ticket). 
-    Asegúrate de que la 'visibleObjection' refleje la Objeción Principal Esperada.
-
-    Devuelve ÚNICAMENTE un objeto JSON válido con las siguientes claves exactas (sin omitir ninguna).
-    ESTO ES CRÍTICO: DEBES USAR FORMATO JSON PURO. NO ESCRIBAS TEXTO ADICIONAL:
-    {
-      "demographics": {
-        "name": "Nombre ficticio",
-        "age": "Edad",
-        "role": "Cargo",
-        "industry": "Industria",
-        "companySize": "Tamaño de empresa"
-      },
-      "psychology": {
-        "urgency": "Nivel de urgencia (Alto/Medio/Bajo)",
-        "communicationStyle": "Estilo de comunicación (Ej. Directo, Analítico, Emocional)",
-        "primaryFear": "Miedo principal",
-        "primaryDesire": "Deseo principal"
-      },
-      "currentSituation": {
-        "problem": "Problema actual",
-        "previousAttempts": "Intentos previos de solución",
-        "impact": "Impacto financiero o emocional"
-      },
-      "visibleObjection": "La excusa fácil que dirá primero",
-      "hiddenObjection": "La verdadera razón oculta por la que no compraría (información para el facilitador)",
-      "roleplayGuide": {
-        "moneyBelief": "Su creencia limitante sobre el dinero (ej. 'Invertir es botar plata')",
-        "competingGoal": "Su conflicto interno (ej. 'Quiero delegar PERO no confío en nadie')",
-        "vendorFatigue": "Por qué desconfía de los vendedores o de tu industria",
-        "actorAdvice": "Instrucción directa de cómo debe actuar el Lead (tono de voz, postura, actitud)"
-      },
-      "pipelineQuestions": {
-        ${pipelineKeys}
-      }
-    }
-  `;
-
+async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel) {
   let finalUrl = apiUrl || "/api/nvidia/v1/chat/completions";
   if (finalUrl.includes("integrate.api.nvidia.com")) {
     finalUrl = "/api/nvidia/v1/chat/completions";
@@ -107,7 +20,7 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
         model: apiModel || "meta/llama-3.1-8b-instruct",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 1500, // Permitimos más tokens por módulo
         response_format: { type: "json_object" }
       })
     });
@@ -138,4 +51,57 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     }
     throw error;
   }
+}
+
+export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language = 'es') {
+  const activeStages = stages && stages.length > 0 ? stages : [
+    { id: 'apertura', label: 'Apertura', baseQuestions: 'Romper hielo', baseObjections: '' }
+  ];
+
+  let selectedObjectionKey = config.targetObjection;
+  const availableKeys = Object.keys(OBJECTIONS_DICTIONARY);
+  
+  if (!selectedObjectionKey || selectedObjectionKey === 'Aleatoria (Sorpréndeme)') {
+    selectedObjectionKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
+  }
+
+  const specificObjectionFramework = OBJECTIONS_DICTIONARY[selectedObjectionKey] || '';
+
+  // 1. Llamada Módulo Base (Identidad y Situación)
+  const identityPrompt = getIdentityPrompt({ 
+    level: config.level, 
+    theme: config.theme, 
+    leadTemperature: config.leadTemperature, 
+    language 
+  });
+  console.log("-> Iniciando Módulo 1: Identidad");
+  const baseProfile = await makeAIPromptCall(identityPrompt, apiKey, apiUrl, apiModel);
+
+  // 2. Llamada Módulo Objeciones
+  const objectionsPrompt = getObjectionsPrompt({
+    baseProfile,
+    targetObjection: selectedObjectionKey,
+    language,
+    specificObjectionFramework
+  });
+  console.log("-> Iniciando Módulo 2: Objeciones");
+  const objectionsProfile = await makeAIPromptCall(objectionsPrompt, apiKey, apiUrl, apiModel);
+
+  // 3. Llamada Módulo Pipeline
+  const pipelinePrompt = getPipelinePrompt({
+    baseProfile,
+    objectionsProfile,
+    activeStages,
+    specificObjectionFramework,
+    language
+  });
+  console.log("-> Iniciando Módulo 3: Pipeline");
+  const pipelineProfile = await makeAIPromptCall(pipelinePrompt, apiKey, apiUrl, apiModel);
+
+  // Unificamos todo en un solo objeto para retornarlo a la UI
+  return {
+    ...baseProfile,
+    ...objectionsProfile,
+    ...pipelineProfile
+  };
 }
