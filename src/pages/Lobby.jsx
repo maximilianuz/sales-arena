@@ -101,19 +101,19 @@ export default function Lobby() {
         
         <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Tu Nombre</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>{t('lobby.yourName')}</label>
             <input 
               type="text" 
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="form-input"
-              placeholder="Ej. Juan Pérez"
+              placeholder={t('lobby.namePlaceholder')}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>ID de Sala</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>{t('lobby.roomId')}</label>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <input 
                 type="text" 
@@ -121,7 +121,7 @@ export default function Lobby() {
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
                 className="form-input"
-                placeholder="Ej. sala-secreta-123"
+                placeholder={t('lobby.roomIdPlaceholder')}
                 style={{ flex: 1 }}
               />
               <button 

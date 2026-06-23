@@ -1,6 +1,10 @@
 {
   "lobby": {
     "title": "Sales Arena",
+    "yourName": "Your Name",
+    "namePlaceholder": "E.g. John Doe",
+    "roomId": "Room ID",
+    "roomIdPlaceholder": "E.g. secret-room-123",
     "chooseRole": "Choose your simulator role",
     "whoWillYouPlay": "Who will you play today?",
     "idCopied": "Room ID copied to clipboard",
