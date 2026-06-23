@@ -59,13 +59,14 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
   ];
 
   let selectedObjectionKey = config.targetObjection;
-  const availableKeys = Object.keys(OBJECTIONS_DICTIONARY);
-  
-  if (!selectedObjectionKey || selectedObjectionKey === 'Aleatoria (Sorpréndeme)') {
-    selectedObjectionKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
-  }
+  let specificObjectionFramework = '';
 
-  const specificObjectionFramework = OBJECTIONS_DICTIONARY[selectedObjectionKey] || '';
+  if (!selectedObjectionKey || selectedObjectionKey === 'Aleatoria (Sorpréndeme)') {
+    selectedObjectionKey = 'Aleatoria (Sorpréndeme)';
+    specificObjectionFramework = 'INSTRUCCIÓN ESPECIAL: El usuario ha seleccionado "Sorpréndeme". Eres totalmente libre de INVENTAR la objeción principal más dolorosa, desafiante y atípica basada estrictamente en la Industria y el perfil psicológico generado. ¡Sé creativo y evita los clichés típicos!';
+  } else {
+    specificObjectionFramework = OBJECTIONS_DICTIONARY[selectedObjectionKey] || '';
+  }
 
   // 1. Llamada Módulo Base (Identidad y Situación)
   const identityPrompt = getIdentityPrompt({ 
@@ -82,7 +83,8 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     baseProfile,
     targetObjection: selectedObjectionKey,
     language,
-    specificObjectionFramework
+    specificObjectionFramework,
+    level: config.level
   });
   console.log("-> Iniciando Módulo 2: Objeciones");
   const objectionsProfile = await makeAIPromptCall(objectionsPrompt, apiKey, apiUrl, apiModel);
@@ -97,6 +99,9 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
   });
   console.log("-> Iniciando Módulo 3: Pipeline");
   const pipelineProfile = await makeAIPromptCall(pipelinePrompt, apiKey, apiUrl, apiModel);
+
+  console.log("=== DEBUG: RESULTADOS IA ===");
+  console.log("Módulo 2 (Objeciones):", objectionsProfile);
 
   // Unificamos todo en un solo objeto para retornarlo a la UI
   return {

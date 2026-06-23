@@ -201,9 +201,19 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', animation: 'fadeIn 0.3s' }}>
             <div style={{ background: 'rgba(236, 72, 153, 0.05)', padding: '1.5rem', borderRadius: '0.75rem', borderLeft: '4px solid var(--secondary)' }}>
-              <h4 style={{ color: 'var(--secondary)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>{t('scenario.visibleObjection')}</h4>
+              <h4 style={{ color: 'var(--secondary)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Principal ({t('scenario.visibleObjection')}):</h4>
               <p style={{ margin: 0, fontSize: '1rem', fontStyle: 'italic' }}>"{currentScenario.visibleObjection}"</p>
             </div>
+            {currentScenario.secondaryObjections && currentScenario.secondaryObjections.length > 0 && (
+              <div style={{ background: 'rgba(236, 72, 153, 0.05)', padding: '1.5rem', borderRadius: '0.75rem', borderLeft: '4px solid var(--secondary)', opacity: 0.9 }}>
+                <h4 style={{ color: 'var(--secondary)', marginBottom: '0.5rem', fontSize: '1rem' }}>Arsenal Secundario (Otras objeciones que puede usar):</h4>
+                <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.95rem', fontStyle: 'italic' }}>
+                  {currentScenario.secondaryObjections.map((obj, i) => (
+                    <li key={i} style={{ marginBottom: '0.5rem' }}>"{obj}"</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '0.5rem' }}>
               ℹ️ {t('scenario.hiddenObjectionNote')}
             </div>
@@ -277,12 +287,22 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
         </section>
 
         <section>
-          <h3 style={{ color: 'var(--secondary)', borderBottom: '1px solid var(--glass-border-highlight)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ShieldAlert size={20} /> Tus Objeciones</h3>
+          <h3 style={{ color: 'var(--secondary)', borderBottom: '1px solid var(--glass-border-highlight)', paddingBottom: '0.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ShieldAlert size={20} /> Tus Objeciones (Arsenal)</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ background: 'rgba(236, 72, 153, 0.05)', padding: '1.5rem', borderRadius: '0.75rem', borderLeft: '4px solid var(--secondary)' }}>
-              <h4 style={{ color: 'var(--secondary)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Lo que le dirás al Closer (Objeción de Cortina):</h4>
+              <h4 style={{ color: 'var(--secondary)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Principal (La primera que dirás):</h4>
               <p style={{ margin: 0, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 'bold' }}>"{currentScenario.visibleObjection}"</p>
             </div>
+            {currentScenario.secondaryObjections && currentScenario.secondaryObjections.length > 0 && (
+              <div style={{ background: 'rgba(236, 72, 153, 0.05)', padding: '1.5rem', borderRadius: '0.75rem', borderLeft: '4px solid var(--secondary)' }}>
+                <h4 style={{ color: 'var(--secondary)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Balas Extras (Úsalas si te presiona o durante la llamada):</h4>
+                <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '1.05rem', fontStyle: 'italic' }}>
+                  {currentScenario.secondaryObjections.map((obj, i) => (
+                    <li key={i} style={{ marginBottom: '0.5rem' }}>"{obj}"</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </section>
       </div>

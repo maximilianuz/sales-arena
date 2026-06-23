@@ -7,10 +7,15 @@ export function getPipelinePrompt({ baseProfile, objectionsProfile, activeStages
   - Objeciones Comunes de esta etapa: ${s.baseObjections}`;
   }).join('\n\n');
 
+  const secondaryObsStr = objectionsProfile.secondaryObjections && objectionsProfile.secondaryObjections.length > 0 
+    ? objectionsProfile.secondaryObjections.join(', ')
+    : 'Ninguna adicional';
+
   const contextSummary = `
     - Industria: ${baseProfile.demographics.industry}
     - Problema del Lead: ${baseProfile.currentSituation.problem}
     - Objeción Principal Visible: "${objectionsProfile.visibleObjection}"
+    - Arsenal Secundario (Balas extras): [${secondaryObsStr}]
     - Conflicto Interno: ${objectionsProfile.roleplayGuide.competingGoal}
   `;
 
