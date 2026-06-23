@@ -8,13 +8,21 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
   const [activeTab, setActiveTab] = useState('situacion');
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const [config, setConfig] = useState({
+    level: "Intermedio",
+    theme: "B2B Software",
+    saleType: "Suscripción Anual / High Ticket",
+    targetObjection: "Lo tengo que pensar",
+    leadTemperature: "Templado"
+  });
+
   const handleGenerate = async () => {
     if (!setCurrentScenario) return;
     setIsGenerating(true);
     try {
       const scenario = await generateAIScenario(
         apiKey, apiUrl, apiModel, 
-        { level: "Intermedio", theme: "Ventas B2B", saleType: "Consultoría", targetObjection: "Precio", leadTemperature: "Templado" }, 
+        config, 
         stages, 
         i18n.language
       );
@@ -27,18 +35,54 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
 
   if (!currentScenario) {
     return (
-      <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-        <UserCircle size={64} style={{ opacity: 0.5, marginBottom: '1rem' }} />
-        <h2 style={{ color: 'var(--text-muted)' }}>{t('scenario.waiting')}</h2>
+      <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', padding: '2rem' }}>
+        <UserCircle size={48} style={{ opacity: 0.5, marginBottom: '1rem' }} />
+        <h2 style={{ color: 'white', marginBottom: '1.5rem' }}>{t('scenario.waiting')}</h2>
+        
         {!isReadOnly && (
-          <button 
-            className="btn btn-primary" 
-            style={{ marginTop: '2rem' }}
-            onClick={handleGenerate}
-            disabled={isGenerating}
-          >
-            {isGenerating ? t('scenario.generating') : t('header.generateAI')}
-          </button>
+          <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '1rem', border: '1px solid var(--glass-border)' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Rubro / Industria</label>
+              <select value={config.theme} onChange={e => setConfig({...config, theme: e.target.value})} className="header-title-input" style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)' }}>
+                <option value="B2B Software">B2B - Software/SaaS</option>
+                <option value="B2B Consultoría">B2B - Consultoría de Negocios</option>
+                <option value="B2C Inmobiliario">B2C - Inmobiliario / Real Estate</option>
+                <option value="B2C Fitness/Salud">B2C - Coaching Fitness / Salud</option>
+                <option value="B2C Seguros">B2C - Seguros Personales</option>
+                <option value="B2C Educación">B2C - Cursos / Educación High Ticket</option>
+                <option value="E-commerce (B2B/B2C)">E-commerce (Mayorista/Minorista)</option>
+                <option value="Automotriz">Venta Automotriz</option>
+                <option value="Aleatorio (Sorpréndeme)">Aleatorio (Sorpréndeme)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Dificultad</label>
+              <select value={config.level} onChange={e => setConfig({...config, level: e.target.value})} className="header-title-input" style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)' }}>
+                <option value="Principiante">Principiante (Lead Amigable)</option>
+                <option value="Intermedio">Intermedio (Lead Escéptico)</option>
+                <option value="Avanzado">Avanzado (Lead Hostil/Desafiante)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Temperatura</label>
+              <select value={config.leadTemperature} onChange={e => setConfig({...config, leadTemperature: e.target.value})} className="header-title-input" style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)' }}>
+                <option value="Frío">Frío (No te conoce)</option>
+                <option value="Templado">Templado (Vio un anuncio/webinar)</option>
+                <option value="Caliente">Caliente (Viene referido y con urgencia)</option>
+              </select>
+            </div>
+
+            <button 
+              className="btn btn-primary" 
+              style={{ marginTop: '1rem', padding: '0.8rem', fontSize: '1rem' }}
+              onClick={handleGenerate}
+              disabled={isGenerating}
+            >
+              {isGenerating ? "Generando mente del Lead..." : t('header.generateAI')}
+            </button>
+          </div>
         )}
       </div>
     );
