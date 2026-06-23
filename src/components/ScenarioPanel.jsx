@@ -10,19 +10,19 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
 
   const [config, setConfig] = useState({
     level: "Intermedio",
-    theme: "B2B Software",
+    theme: "B2B Software/SaaS",
     saleType: "Suscripción Anual / High Ticket",
     targetObjection: "Lo tengo que pensar",
     leadTemperature: "Templado"
   });
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (customConfig = null) => {
     if (!setCurrentScenario) return;
     setIsGenerating(true);
     try {
       const scenario = await generateAIScenario(
         apiKey, apiUrl, apiModel, 
-        config, 
+        customConfig || config, 
         stages, 
         i18n.language
       );
@@ -31,6 +31,26 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
       alert("Error: " + error.message);
     }
     setIsGenerating(false);
+  };
+
+  const handleRandomizeAndGenerate = () => {
+    const themes = [
+      "B2B Software/SaaS", "B2B Consultoría", "B2B Agencia Marketing", "B2B Logística",
+      "B2C Inmobiliario", "B2C Fitness/Salud", "B2C Seguros", "B2C Educación", "B2C Cripto/Trading",
+      "E-commerce", "Automotriz", "Servicios Legales / Abogacía"
+    ];
+    const levels = ["Principiante", "Intermedio", "Avanzado", "Avanzado"]; // More weight to advanced
+    const temps = ["Frío", "Frío", "Templado", "Caliente"]; // More weight to cold
+    
+    const randomConfig = {
+      ...config,
+      theme: themes[Math.floor(Math.random() * themes.length)],
+      level: levels[Math.floor(Math.random() * levels.length)],
+      leadTemperature: temps[Math.floor(Math.random() * temps.length)],
+    };
+    
+    setConfig(randomConfig);
+    handleGenerate(randomConfig);
   };
 
   if (!currentScenario) {
@@ -94,14 +114,26 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
               </select>
             </div>
 
-            <button 
-              className="btn btn-primary" 
-              style={{ marginTop: '1rem', padding: '0.8rem', fontSize: '1rem' }}
-              onClick={handleGenerate}
-              disabled={isGenerating}
-            >
-              {isGenerating ? "Generando mente del Lead..." : t('header.generateAI')}
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+              <button 
+                className="btn btn-primary" 
+                style={{ flex: 2, padding: '0.8rem', fontSize: '1rem' }}
+                onClick={() => handleGenerate(null)}
+                disabled={isGenerating}
+              >
+                {isGenerating ? "Generando..." : "Generar Personalizado"}
+              </button>
+              
+              <button 
+                className="btn btn-outline" 
+                style={{ flex: 1, padding: '0.8rem', fontSize: '0.9rem', borderColor: 'var(--accent)', color: 'var(--accent)' }}
+                onClick={handleRandomizeAndGenerate}
+                disabled={isGenerating}
+                title="Elegir valores al azar y generar"
+              >
+                🎲 100% Sorpresa
+              </button>
+            </div>
           </div>
         )}
       </div>

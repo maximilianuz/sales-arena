@@ -102,7 +102,8 @@ export default function Room() {
 
   const handleStageChange = async (newIndex) => {
     await updateActiveStage(newIndex);
-    const newTime = (stages[newIndex]?.estimatedTime || 5) * 60;
+    const estTime = stages[newIndex]?.estimatedTime;
+    const newTime = parseInt(estTime !== undefined ? estTime : 5, 10) * 60;
     await updateTimer({ isRunning: false, endTimestamp: null, timeLeft: newTime });
   };
 
