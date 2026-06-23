@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shuffle, Copy, TrendingUp } from 'lucide-react';
+import { Shuffle, Copy, ChessKnight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
 
@@ -47,7 +47,7 @@ export default function Lobby() {
       <div className="glass-panel" style={{ maxWidth: '500px', width: '100%', marginTop: '2rem', animation: 'modalIn 0.3s ease-out' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
           <div style={{ background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '1rem', borderRadius: '1rem', marginBottom: '1rem', boxShadow: '0 10px 25px rgba(79, 70, 229, 0.4)' }}>
-            <TrendingUp size={48} color="white" strokeWidth={1.5} />
+            <ChessKnight size={48} color="white" strokeWidth={1.5} />
           </div>
           <h2 style={{ 
             textAlign: 'center', 
