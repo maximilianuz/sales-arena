@@ -41,9 +41,6 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     - Tipo de venta: ${saleType}
     - Objeción Principal Esperada: "${selectedObjectionKey}"
 
-    BASE DE CONOCIMIENTO (TEORÍA GENERAL DE OBJECIONES):
-    ${OBJECTIONS_THEORY_GENERAL}
-
     FRAMEWORK ESPECÍFICO PARA ESTA SIMULACIÓN (DEBE APLICARSE):
     ${specificObjectionFramework}
 
@@ -94,7 +91,7 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
         model: apiModel || "meta/llama-3.1-8b-instruct",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
-        max_tokens: 1500,
+        max_tokens: 1000,
         response_format: { type: "json_object" }
       })
     });
