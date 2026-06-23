@@ -59,14 +59,24 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     Devuelve ÚNICAMENTE un objeto JSON válido con las siguientes claves exactas (sin omitir ninguna).
     ESTO ES CRÍTICO: DEBES USAR FORMATO JSON PURO. NO ESCRIBAS TEXTO ADICIONAL:
     {
-      "demographics": "Edad, profesión, rol en la empresa",
-      "emotions": "Estado emocional actual al entrar a la llamada",
-      "desires": "Lo que realmente quiere lograr (su cielo)",
-      "frustrations": "Lo que más le duele actualmente (su infierno)",
-      "currentSituation": "Contexto de su situación actual en 2 oraciones",
-      "dreamSituation": "Dónde quiere estar en 6 meses",
-      "mainBarrier": "Lo que le impide llegar allí por sí mismo",
-      "buyingProbability": "Porcentaje estimado inicial (ej. 30%)",
+      "demographics": {
+        "name": "Nombre ficticio",
+        "age": "Edad",
+        "role": "Cargo",
+        "industry": "Industria",
+        "companySize": "Tamaño de empresa"
+      },
+      "psychology": {
+        "urgency": "Nivel de urgencia (Alto/Medio/Bajo)",
+        "communicationStyle": "Estilo de comunicación (Ej. Directo, Analítico, Emocional)",
+        "primaryFear": "Miedo principal",
+        "primaryDesire": "Deseo principal"
+      },
+      "currentSituation": {
+        "problem": "Problema actual",
+        "previousAttempts": "Intentos previos de solución",
+        "impact": "Impacto financiero o emocional"
+      },
       "visibleObjection": "La excusa fácil que dirá primero",
       "hiddenObjection": "La verdadera razón oculta por la que no compraría (información para el facilitador)",
       "pipelineQuestions": {
