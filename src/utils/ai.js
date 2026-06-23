@@ -77,10 +77,7 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     }
   `;
 
-  let finalUrl = apiUrl || "/api/nvidia/v1/chat/completions";
-  if (finalUrl.includes("integrate.api.nvidia.com")) {
-    finalUrl = "/api/nvidia/v1/chat/completions";
-  }
+  let finalUrl = apiUrl || "https://integrate.api.nvidia.com/v1/chat/completions";
 
   try {
     const response = await fetch(finalUrl, {
