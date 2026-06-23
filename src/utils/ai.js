@@ -59,7 +59,8 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     Basándote estrictamente en los "Recursos Base" de cada etapa y en el "Framework Específico" arriba indicado, genera preguntas de ventas que reflejen esas objeciones o patrones de preguntas. Deben tener un tono directo y de alto valor (High Ticket). 
     Asegúrate de que la 'visibleObjection' refleje la Objeción Principal Esperada.
 
-    Devuelve ÚNICAMENTE un objeto JSON válido con las siguientes claves exactas (sin formato markdown adicional ni comentarios):
+    Devuelve ÚNICAMENTE un objeto JSON válido con las siguientes claves exactas (sin omitir ninguna).
+    ESTO ES CRÍTICO: DEBES USAR FORMATO JSON PURO. NO ESCRIBAS TEXTO ADICIONAL:
     {
       "demographics": "Edad, profesión, rol en la empresa",
       "emotions": "Estado emocional actual al entrar a la llamada",
@@ -77,9 +78,9 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
     }
   `;
 
-  let finalUrl = apiUrl || "https://integrate.api.nvidia.com/v1/chat/completions";
+  let finalUrl = apiUrl || "/api/nvidia/v1/chat/completions";
   if (finalUrl.includes("integrate.api.nvidia.com")) {
-    finalUrl = "https://corsproxy.io/?" + encodeURIComponent(finalUrl);
+    finalUrl = "/api/nvidia/v1/chat/completions";
   }
 
   try {
@@ -90,10 +91,11 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: apiModel || "meta/llama-3.1-70b-instruct",
+        model: apiModel || "meta/llama-3.1-8b-instruct",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: 1500,
+        response_format: { type: "json_object" }
       })
     });
 

@@ -26,7 +26,7 @@ export default function Room() {
   const [showSettings, setShowSettings] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [apiUrl, setApiUrl] = useState('/api/nvidia/v1/chat/completions');
-  const [apiModel, setApiModel] = useState('meta/llama-3.1-70b-instruct');
+  const [apiModel, setApiModel] = useState('meta/llama-3.1-8b-instruct');
   const [participants, setParticipants] = useState([]);
   const [stages, setStages] = useState(() => getDefaultStages(i18n.language));
   
