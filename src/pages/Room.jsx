@@ -166,14 +166,14 @@ export default function Room() {
         <div className="dashboard-grid" style={{ 
           gridTemplateColumns: gridColumns, 
           display: 'grid', 
-          gridAutoRows: 'min-content 1fr',
-          alignItems: 'start',
+          alignItems: 'stretch',
+          gap: '1.5rem',
           justifyContent: isCloser ? 'center' : 'stretch'
         }}>
           
           {/* COLUMNA 1: Persona & Roles */}
           {(showPersona || (showRoles && !isCloser)) && (
-            <div className="grid-column" style={{ gridColumn: '1', gridRow: '1 / span 2', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className="grid-column" style={{ gridColumn: '1', gridRow: '1 / span 2', display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%' }}>
               {showPersona && (
                 <BuyerPersonaPanel 
                   currentScenario={currentScenario} 
@@ -229,7 +229,7 @@ export default function Room() {
 
             {/* Debrief Panel (Evaluación) */}
             {showDebrief && (
-               <div style={{ flex: 1, display: 'flex', minHeight: '500px' }}>
+               <div style={{ flex: 1, display: 'flex', minHeight: '300px', width: '100%' }}>
                  <DebriefPanel 
                     activeStageIndex={activeStageIndex || 0} 
                     stages={stages}
@@ -243,7 +243,7 @@ export default function Room() {
 
           {/* COLUMNA 3: Voting Panel (Exclusivo Facilitador) */}
           {showVoting && (
-            <div className="grid-column" style={{ gridColumn: '3', gridRow: '1 / span 2' }}>
+            <div className="grid-column" style={{ gridColumn: '3', gridRow: '1 / span 2', height: '100%' }}>
               <VotingPanel 
                 isObserver={false} 
                 isFacilitator={isFacilitator}
