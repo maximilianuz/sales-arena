@@ -1,4 +1,4 @@
-# Sales Arena AI 🚀
+# Sales Arena AI ♞
 
 [🇺🇸 Read in English](#english) | [🇪🇸 Leer en Español](#español)
 
