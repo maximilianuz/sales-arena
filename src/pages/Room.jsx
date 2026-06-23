@@ -96,6 +96,14 @@ export default function Room() {
   const handleSetScenario = async (scenario) => {
     await updateScenario(scenario);
     await updateActiveStage(0);
+    const initialTime = (stages[0]?.estimatedTime || 5) * 60;
+    await updateTimer({ isRunning: false, endTimestamp: null, timeLeft: initialTime });
+  };
+
+  const handleStageChange = async (newIndex) => {
+    await updateActiveStage(newIndex);
+    const newTime = (stages[newIndex]?.estimatedTime || 5) * 60;
+    await updateTimer({ isRunning: false, endTimestamp: null, timeLeft: newTime });
   };
 
   if (loading || !roomData) {
@@ -158,7 +166,7 @@ export default function Room() {
       <main className="dashboard-wrapper">
         <PipelinePanel 
           activeStageIndex={activeStageIndex || 0} 
-          setActiveStageIndex={isFacilitator ? updateActiveStage : undefined} 
+          setActiveStageIndex={isFacilitator ? handleStageChange : undefined} 
           pipelineQuestions={currentScenario?.pipelineQuestions} 
           stages={stages}
         />
@@ -199,6 +207,7 @@ export default function Room() {
             {showTimer && (
               <Timer 
                 stages={stages} 
+                activeStageIndex={activeStageIndex || 0}
                 timerState={timerState} 
                 updateTimer={isFacilitator ? updateTimer : undefined} 
               />

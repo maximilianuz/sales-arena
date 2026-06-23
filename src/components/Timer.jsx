@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Play, Square, RefreshCcw, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export default function Timer({ stages, timerState, updateTimer }) {
+export default function Timer({ stages, activeStageIndex, timerState, updateTimer }) {
   const { t } = useTranslation();
   const [localTimeLeft, setLocalTimeLeft] = useState(0);
 
@@ -38,7 +38,8 @@ export default function Timer({ stages, timerState, updateTimer }) {
 
   const handleReset = () => {
     if (!updateTimer) return;
-    const initialTime = (stages[0]?.estimatedTime || 5) * 60;
+    const currentIndex = activeStageIndex !== undefined ? activeStageIndex : 0;
+    const initialTime = (stages[currentIndex]?.estimatedTime || 5) * 60;
     updateTimer({ isRunning: false, endTimestamp: null, timeLeft: initialTime });
   };
 
