@@ -103,18 +103,44 @@ export default function Room() {
   }
 
   const { currentScenario, activeStageIndex, timerState } = roomData;
+  
+  // --- LAYOUT LOGIC ---
   const isFacilitator = role === 'Facilitador';
   const isCloser = role === 'Closer';
   const isLead = role === 'Lead';
   const isObserver = role === 'Observador';
 
-  const showColumn1 = !isCloser;
-  const showColumn3 = isFacilitator || isObserver;
+  let gridColumns = '1fr';
+  let showPersona = false;
+  let showRoles = false;
+  let showTimer = true;
+  let showDebrief = false;
+  let showVoting = false;
+  let showHiddenInfoBtn = false;
+  let showSurpriseBtn = false;
 
-  let gridColumns = '1fr 1fr 1fr';
-  if (isCloser) gridColumns = '1fr';
-  else if (isLead) gridColumns = '1fr 1fr';
-  else if (isObserver) gridColumns = '1fr 2fr'; // Wide center/right column
+  if (isCloser) {
+    gridColumns = 'minmax(300px, 600px)'; // Center focus
+    showRoles = true;
+  } else if (isLead) {
+    gridColumns = '1fr 1fr';
+    showPersona = true;
+    showRoles = true;
+    showHiddenInfoBtn = true;
+  } else if (isObserver) {
+    gridColumns = '1fr 1.5fr'; // Wide center for debrief
+    showPersona = true;
+    showDebrief = true;
+    showHiddenInfoBtn = true;
+  } else if (isFacilitator) {
+    gridColumns = '1fr 1.2fr 1fr'; // 3 Columns
+    showPersona = true;
+    showRoles = true;
+    showVoting = true;
+    showDebrief = true;
+    showHiddenInfoBtn = true;
+    showSurpriseBtn = true;
+  }
 
   return (
     <div className="app-container">
@@ -141,75 +167,89 @@ export default function Room() {
           gridTemplateColumns: gridColumns, 
           display: 'grid', 
           gridAutoRows: 'min-content 1fr',
-          alignItems: 'start'
+          alignItems: 'start',
+          justifyContent: isCloser ? 'center' : 'stretch'
         }}>
-          {showColumn1 && (
-            <div className="grid-column" style={{ gridColumn: '1', gridRow: '1 / span 2' }}>
-              <BuyerPersonaPanel 
-                currentScenario={currentScenario} 
-                setCurrentScenario={isFacilitator ? handleSetScenario : undefined}
-                apiKey={apiKey}
-                apiUrl={apiUrl}
-                apiModel={apiModel}
-                stages={stages}
-                isReadOnly={!isFacilitator}
-              />
-              <RolesPanel 
-                participants={participants}
-                setParticipants={(p) => setParticipants(p)}
-              />
-            </div>
-          )}
-
-          <div className="grid-column center-column" style={{ gridColumn: showColumn1 ? '2' : '1', gridRow: '1' }}>
-            <Timer 
-              stages={stages} 
-              timerState={timerState} 
-              updateTimer={isFacilitator ? updateTimer : undefined} 
-            />
-            
-            <div className="center-actions">
-              {!isCloser && (
-                <button 
-                  className="btn btn-secondary btn-large" 
-                  onClick={() => setShowPrivateInfo(true)}
-                  disabled={!currentScenario}
-                >
-                  {t('room.showHiddenInfo')}
-                </button>
+          
+          {/* COLUMNA 1: Persona & Roles */}
+          {(showPersona || (showRoles && !isCloser)) && (
+            <div className="grid-column" style={{ gridColumn: '1', gridRow: '1 / span 2', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {showPersona && (
+                <BuyerPersonaPanel 
+                  currentScenario={currentScenario} 
+                  setCurrentScenario={isFacilitator ? handleSetScenario : undefined}
+                  apiKey={apiKey}
+                  apiUrl={apiUrl}
+                  apiModel={apiModel}
+                  stages={stages}
+                  isReadOnly={!isFacilitator}
+                />
               )}
-              {isFacilitator && <SurpriseEventButton triggerEvent={triggerSurpriseEvent} />}
-              
-              {/* For Closer, show RolesPanel in center since Col 1 is hidden */}
-              {isCloser && (
+              {showRoles && !isCloser && (
                 <RolesPanel 
                   participants={participants}
                   setParticipants={(p) => setParticipants(p)}
                 />
               )}
             </div>
-          </div>
-
-          {showColumn3 && (
-            <div className="grid-column" style={{ gridColumn: '3', gridRow: '1' }}>
-              <VotingPanel 
-                isObserver={isObserver} 
-                isFacilitator={isFacilitator}
-                questions={roomData.questions}
-                updateQuestions={isObserver || isFacilitator ? updateQuestions : undefined}
-                activeStage={stages[activeStageIndex || 0]}
-              />
-            </div>
           )}
 
-          {showColumn3 && (
-            <div style={{ gridColumn: '2 / span 2', gridRow: '2', display: 'flex', minHeight: '300px' }}>
-              <DebriefPanel 
-                activeStageIndex={activeStageIndex || 0} 
-                stages={stages}
-                roomNotes={roomData.debriefNotes}
-                updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
+          {/* COLUMNA 2: Timer, Center Actions & Debrief */}
+          <div className="grid-column center-column" style={{ gridColumn: isCloser ? '1' : '2', gridRow: '1 / span 2', display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
+            {showTimer && (
+              <Timer 
+                stages={stages} 
+                timerState={timerState} 
+                updateTimer={isFacilitator ? updateTimer : undefined} 
+              />
+            )}
+            
+            {(showHiddenInfoBtn || showSurpriseBtn) && (
+              <div className="center-actions">
+                {showHiddenInfoBtn && (
+                  <button 
+                    className="btn btn-secondary btn-large" 
+                    onClick={() => setShowPrivateInfo(true)}
+                    disabled={!currentScenario}
+                  >
+                    {t('room.showHiddenInfo')}
+                  </button>
+                )}
+                {showSurpriseBtn && <SurpriseEventButton triggerEvent={triggerSurpriseEvent} />}
+              </div>
+            )}
+
+            {/* Para el Closer, RolesPanel va en el centro porque es de una columna */}
+            {isCloser && showRoles && (
+              <RolesPanel 
+                participants={participants}
+                setParticipants={(p) => setParticipants(p)}
+              />
+            )}
+
+            {/* Debrief Panel (Evaluación) */}
+            {showDebrief && (
+               <div style={{ flex: 1, display: 'flex', minHeight: '500px' }}>
+                 <DebriefPanel 
+                    activeStageIndex={activeStageIndex || 0} 
+                    stages={stages}
+                    roomNotes={roomData.debriefNotes}
+                    updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
+                    isFacilitator={isFacilitator}
+                  />
+               </div>
+            )}
+          </div>
+
+          {/* COLUMNA 3: Voting Panel (Exclusivo Facilitador) */}
+          {showVoting && (
+            <div className="grid-column" style={{ gridColumn: '3', gridRow: '1 / span 2' }}>
+              <VotingPanel 
+                isObserver={false} 
                 isFacilitator={isFacilitator}
+                questions={roomData.questions}
+                updateQuestions={updateQuestions}
+                activeStage={stages[activeStageIndex || 0]}
               />
             </div>
           )}
