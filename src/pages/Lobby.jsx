@@ -4,7 +4,7 @@ import { Shuffle, Copy, ChessKnight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Lobby() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
