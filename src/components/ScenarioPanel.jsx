@@ -37,13 +37,13 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
     return (
       <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px', padding: '2rem' }}>
         <UserCircle size={48} style={{ opacity: 0.5, marginBottom: '1rem' }} />
-        <h2 style={{ color: 'white', marginBottom: '1.5rem' }}>{t('scenario.waiting')}</h2>
+        <h3 style={{ color: 'white', marginBottom: '1.5rem', textAlign: 'center', fontSize: '1.2rem', fontWeight: '500' }}>{t('scenario.waiting')}</h3>
         
         {!isReadOnly && (
           <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '1rem', border: '1px solid var(--glass-border)' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Rubro / Industria</label>
-              <select value={config.theme} onChange={e => setConfig({...config, theme: e.target.value})} className="header-title-input" style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)' }}>
+              <select value={config.theme} onChange={e => setConfig({...config, theme: e.target.value})} style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', fontSize: '0.95rem', fontFamily: 'inherit' }}>
                 <optgroup label="B2B (Venta a Empresas)">
                   <option value="B2B Software/SaaS">Software & SaaS</option>
                   <option value="B2B Consultoría">Consultoría de Negocios</option>
@@ -78,7 +78,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
             
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Dificultad</label>
-              <select value={config.level} onChange={e => setConfig({...config, level: e.target.value})} className="header-title-input" style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)' }}>
+              <select value={config.level} onChange={e => setConfig({...config, level: e.target.value})} style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', fontSize: '0.95rem', fontFamily: 'inherit' }}>
                 <option value="Principiante">Principiante (Lead Amigable)</option>
                 <option value="Intermedio">Intermedio (Lead Escéptico)</option>
                 <option value="Avanzado">Avanzado (Lead Hostil/Desafiante)</option>
@@ -87,7 +87,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
 
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Temperatura</label>
-              <select value={config.leadTemperature} onChange={e => setConfig({...config, leadTemperature: e.target.value})} className="header-title-input" style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)' }}>
+              <select value={config.leadTemperature} onChange={e => setConfig({...config, leadTemperature: e.target.value})} style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', fontSize: '0.95rem', fontFamily: 'inherit' }}>
                 <option value="Frío">Frío (No te conoce)</option>
                 <option value="Templado">Templado (Vio un anuncio/webinar)</option>
                 <option value="Caliente">Caliente (Viene referido y con urgencia)</option>
