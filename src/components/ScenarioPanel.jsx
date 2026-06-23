@@ -44,15 +44,35 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Rubro / Industria</label>
               <select value={config.theme} onChange={e => setConfig({...config, theme: e.target.value})} className="header-title-input" style={{ width: '100%', padding: '0.6rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)' }}>
-                <option value="B2B Software">B2B - Software/SaaS</option>
-                <option value="B2B Consultoría">B2B - Consultoría de Negocios</option>
-                <option value="B2C Inmobiliario">B2C - Inmobiliario / Real Estate</option>
-                <option value="B2C Fitness/Salud">B2C - Coaching Fitness / Salud</option>
-                <option value="B2C Seguros">B2C - Seguros Personales</option>
-                <option value="B2C Educación">B2C - Cursos / Educación High Ticket</option>
-                <option value="E-commerce (B2B/B2C)">E-commerce (Mayorista/Minorista)</option>
-                <option value="Automotriz">Venta Automotriz</option>
-                <option value="Aleatorio (Sorpréndeme)">Aleatorio (Sorpréndeme)</option>
+                <optgroup label="B2B (Venta a Empresas)">
+                  <option value="B2B Software/SaaS">Software & SaaS</option>
+                  <option value="B2B Consultoría">Consultoría de Negocios</option>
+                  <option value="B2B Agencia Marketing">Agencias de Marketing</option>
+                  <option value="B2B Equipamiento Industrial">Equipamiento Industrial / Médico</option>
+                  <option value="B2B Logística">Logística y Transporte</option>
+                  <option value="B2B Ciberseguridad">Ciberseguridad y Redes</option>
+                  <option value="B2B Recursos Humanos">Recursos Humanos / Headhunting</option>
+                </optgroup>
+                <optgroup label="B2C (Venta a Particulares)">
+                  <option value="B2C Inmobiliario">Inmobiliario / Real Estate</option>
+                  <option value="B2C Fitness/Salud">Coaching Fitness y Salud</option>
+                  <option value="B2C Seguros">Seguros Personales / Vida</option>
+                  <option value="B2C Educación">Educación High Ticket / Cursos</option>
+                  <option value="B2C Cripto/Trading">Criptomonedas y Trading</option>
+                  <option value="B2C Estética/Dental">Cirugía Estética y Dental</option>
+                  <option value="B2C Gestión Patrimonio">Gestión de Patrimonio / Inversiones</option>
+                  <option value="B2C Energía Solar">Energía Solar Residencial</option>
+                  <option value="B2C Turismo Lujo">Turismo de Lujo</option>
+                </optgroup>
+                <optgroup label="Mixtos / Otros">
+                  <option value="E-commerce">E-commerce</option>
+                  <option value="Automotriz">Automotriz (Agencias)</option>
+                  <option value="Construcción">Construcción y Remodelaciones</option>
+                  <option value="Legal">Servicios Legales / Abogacía</option>
+                  <option value="Franquicias">Venta de Franquicias</option>
+                  <option value="Eventos">Producción Audiovisual / Eventos</option>
+                  <option value="Aleatorio (Sorpréndeme)">Aleatorio (Sorpréndeme)</option>
+                </optgroup>
               </select>
             </div>
             
