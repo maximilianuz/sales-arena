@@ -185,6 +185,17 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
+select option {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+}
+
+select optgroup {
+  background-color: var(--bg-dark);
+  color: var(--primary);
+  font-weight: bold;
+}
+
 input::placeholder, textarea::placeholder {
   color: var(--text-muted);
   opacity: 0.7;
