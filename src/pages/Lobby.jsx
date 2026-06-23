@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shuffle, Copy, ChessKnight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import Header from '../components/Header';
 
 export default function Lobby() {
   const { t } = useTranslation();
@@ -17,6 +16,20 @@ export default function Lobby() {
     { id: 'Lead', label: t('lobby.roles.Lead'), desc: t('lobby.roles.LeadDesc') },
     { id: 'Observador', label: t('lobby.roles.Observador'), desc: t('lobby.roles.ObservadorDesc') }
   ];
+
+  const getRoleColor = (roleId) => {
+    switch(roleId) {
+      case 'Facilitador': return 'var(--primary)';
+      case 'Closer': return 'var(--success)';
+      case 'Lead': return 'var(--accent)';
+      case 'Observador': return 'var(--secondary)';
+      default: return 'var(--primary)';
+    }
+  };
+
+  const changeLanguage = (e) => {
+    i18n.changeLanguage(e.target.value);
+  };
 
   const handleJoin = (e) => {
     e.preventDefault();
@@ -41,12 +54,31 @@ export default function Lobby() {
   };
 
   return (
-    <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Header title={t('lobby.title')} />
+    <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       
+      <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}>
+        <select 
+          onChange={changeLanguage} 
+          value={(i18n.language || 'es').split('-')[0]} 
+          style={{ 
+            background: 'rgba(255,255,255,0.05)', 
+            color: 'var(--text-main)', 
+            border: '1px solid var(--glass-border)', 
+            padding: '0.4rem 0.8rem', 
+            borderRadius: '2rem',
+            cursor: 'pointer',
+            backdropFilter: 'blur(10px)',
+            fontSize: '0.85rem'
+          }}
+        >
+          <option value="es" style={{ background: '#1e1e2f', color: 'white' }}>🇪🇸 Español</option>
+          <option value="en" style={{ background: '#1e1e2f', color: 'white' }}>🇺🇸 English</option>
+        </select>
+      </div>
+
       <div className="glass-panel" style={{ maxWidth: '500px', width: '100%', marginTop: '2rem', animation: 'modalIn 0.3s ease-out' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
-          <div style={{ background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '1rem', borderRadius: '1rem', marginBottom: '1rem', boxShadow: '0 10px 25px rgba(79, 70, 229, 0.4)' }}>
+          <div className="logo-container">
             <ChessKnight size={48} color="white" strokeWidth={1.5} />
           </div>
           <h2 style={{ 
@@ -117,29 +149,33 @@ export default function Lobby() {
           <div>
             <label style={{ display: 'block', marginBottom: '1rem', color: 'var(--text-muted)' }}>{t('lobby.chooseRole')}</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              {roles.map(r => (
-                <div 
-                  key={r.id}
-                  onClick={() => setRole(r.id)}
-                  style={{
-                    padding: '1rem',
-                    borderRadius: '0.75rem',
-                    cursor: 'pointer',
-                    border: `1px solid ${role === r.id ? 'var(--primary)' : 'var(--glass-border)'}`,
-                    background: role === r.id ? 'rgba(99, 102, 241, 0.15)' : 'rgba(0,0,0,0.25)',
-                    boxShadow: role === r.id ? '0 0 15px rgba(99, 102, 241, 0.2)' : 'none',
-                    transform: role === r.id ? 'translateY(-2px)' : 'none',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}
-                >
-                  <strong style={{ display: 'block', color: role === r.id ? 'white' : 'var(--text-main)', marginBottom: '0.25rem' }}>
-                    {r.label}
-                  </strong>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    {r.desc}
-                  </span>
-                </div>
-              ))}
+              {roles.map(r => {
+                const roleColor = getRoleColor(r.id);
+                const isActive = role === r.id;
+                return (
+                  <div 
+                    key={r.id}
+                    onClick={() => setRole(r.id)}
+                    style={{
+                      padding: '1rem',
+                      borderRadius: '0.75rem',
+                      cursor: 'pointer',
+                      border: `1px solid ${isActive ? roleColor : 'var(--glass-border)'}`,
+                      background: isActive ? `color-mix(in srgb, ${roleColor} 15%, transparent)` : 'rgba(0,0,0,0.25)',
+                      boxShadow: isActive ? `0 0 15px color-mix(in srgb, ${roleColor} 30%, transparent)` : 'none',
+                      transform: isActive ? 'translateY(-2px)' : 'none',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                  >
+                    <strong style={{ display: 'block', color: isActive ? 'white' : 'var(--text-main)', marginBottom: '0.25rem' }}>
+                      {r.label}
+                    </strong>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {r.desc}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

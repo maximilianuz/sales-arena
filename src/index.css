@@ -243,3 +243,22 @@ input::placeholder, textarea::placeholder {
   animation: heartbeat 1.5s infinite;
   transform-origin: center;
 }
+
+/* Logo Hover Effect */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-container:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 15px 35px rgba(236, 72, 153, 0.6);
+  filter: brightness(1.1);
+}
