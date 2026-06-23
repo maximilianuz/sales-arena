@@ -119,7 +119,9 @@ export default function Room() {
   return (
     <div className="app-container">
       <Header 
-        title={`${sessionTitle} | Sala: ${roomId} | Rol: ${role}`} 
+        title={sessionTitle}
+        roomId={roomId}
+        role={role}
         onTitleChange={isFacilitator ? (newTitle) => {
           setSessionTitle(newTitle);
           localStorage.setItem('session_title', newTitle);

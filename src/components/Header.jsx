@@ -1,9 +1,18 @@
-import React from 'react';
-import { Settings, Cpu, ChessKnight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Settings, Cpu, ChessKnight, Copy, CheckCircle2, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export default function Header({ title, onTitleChange, onOpenSettings }) {
+export default function Header({ title, roomId, role, onTitleChange, onOpenSettings }) {
   const { t, i18n } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyId = () => {
+    if (roomId) {
+      navigator.clipboard.writeText(roomId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const changeLanguage = (e) => {
     i18n.changeLanguage(e.target.value);
@@ -21,10 +30,28 @@ export default function Header({ title, onTitleChange, onOpenSettings }) {
             value={title} 
             onChange={(e) => onTitleChange(e.target.value)}
             className="header-title-input"
-            style={{ fontSize: '1.5rem', letterSpacing: '-0.02em', background: 'transparent' }}
+            style={{ fontSize: '1.5rem', letterSpacing: '-0.02em', background: 'transparent', maxWidth: '300px' }}
           />
         ) : (
           <h1 style={{ fontSize: '1.5rem', fontWeight: '800', margin: 0, color: 'white', letterSpacing: '-0.02em' }}>{title}</h1>
+        )}
+
+        {role && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: '2rem', border: '1px solid var(--glass-border)', fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '1rem' }}>
+            <User size={14} />
+            <span>{role}</span>
+          </div>
+        )}
+
+        {roomId && (
+          <button 
+            onClick={handleCopyId}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: copied ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: '2rem', border: `1px solid ${copied ? 'var(--success)' : 'var(--glass-border)'}`, fontSize: '0.85rem', color: copied ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', marginLeft: '0.5rem' }}
+            title="Copiar ID de la sala"
+          >
+            {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+            <span style={{ fontFamily: 'monospace', letterSpacing: '0.05em' }}>{roomId}</span>
+          </button>
         )}
       </div>
 
