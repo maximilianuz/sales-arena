@@ -79,6 +79,12 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, { level, them
       },
       "visibleObjection": "La excusa fácil que dirá primero",
       "hiddenObjection": "La verdadera razón oculta por la que no compraría (información para el facilitador)",
+      "roleplayGuide": {
+        "moneyBelief": "Su creencia limitante sobre el dinero (ej. 'Invertir es botar plata')",
+        "competingGoal": "Su conflicto interno (ej. 'Quiero delegar PERO no confío en nadie')",
+        "vendorFatigue": "Por qué desconfía de los vendedores o de tu industria",
+        "actorAdvice": "Instrucción directa de cómo debe actuar el Lead (tono de voz, postura, actitud)"
+      },
       "pipelineQuestions": {
         ${pipelineKeys}
       }

@@ -177,6 +177,29 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
             </div>
           </div>
         );
+      case 'guion':
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', animation: 'fadeIn 0.3s' }}>
+            <div style={{ background: 'rgba(139, 92, 246, 0.05)', padding: '1rem', borderRadius: '0.75rem', borderLeft: '3px solid #8b5cf6' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Creencia sobre el Dinero</div>
+              <p style={{ margin: 0, fontSize: '0.95rem' }}>{currentScenario.roleplayGuide?.moneyBelief}</p>
+            </div>
+            <div style={{ background: 'rgba(139, 92, 246, 0.05)', padding: '1rem', borderRadius: '0.75rem', borderLeft: '3px solid #8b5cf6' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Conflicto Interno (Metas enfrentadas)</div>
+              <p style={{ margin: 0, fontSize: '0.95rem' }}>{currentScenario.roleplayGuide?.competingGoal}</p>
+            </div>
+            <div style={{ background: 'rgba(139, 92, 246, 0.05)', padding: '1rem', borderRadius: '0.75rem', borderLeft: '3px solid #8b5cf6' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Fatiga de Mercado / Escepticismo</div>
+              <p style={{ margin: 0, fontSize: '0.95rem' }}>{currentScenario.roleplayGuide?.vendorFatigue}</p>
+            </div>
+            <div style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1))', padding: '1.2rem', borderRadius: '0.75rem', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+              <div style={{ color: '#8b5cf6', fontSize: '0.9rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                🎭 Instrucciones de Actuación
+              </div>
+              <p style={{ margin: 0, fontSize: '1.05rem', fontStyle: 'italic', lineHeight: '1.5' }}>"{currentScenario.roleplayGuide?.actorAdvice}"</p>
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -229,6 +252,13 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
           style={{ flex: 1, padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'objeciones' ? 'none' : '1px solid transparent' }}
         >
           <ShieldAlert size={16} /> {t('scenario.tabs.objections')}
+        </button>
+        <button 
+          className={`btn ${activeTab === 'guion' ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => setActiveTab('guion')}
+          style={{ flex: 1, minWidth: 'max-content', padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '2rem', border: activeTab === 'guion' ? 'none' : '1px solid transparent' }}
+        >
+          🎭 Guion (Actor)
         </button>
       </div>
 
