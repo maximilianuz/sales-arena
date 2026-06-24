@@ -57,7 +57,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
 
       <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <a 
-          href={i18n.language?.startsWith('en') ? "/presentacion_en.html" : "/presentacion.html"}
+          href={i18n.language?.startsWith('en') ? "/dossier_interno_en.html" : "/dossier_interno.html"}
           target="_blank" 
           rel="noopener noreferrer"
           className="btn btn-outline" 

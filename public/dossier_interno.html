@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sales Arena - Dossier Técnico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/black.min.css" id="theme">
+    
+    <style>
+        body { background-color: #0d0d12; margin: 0; overflow: hidden; }
+        #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; }
+        .reveal { background: transparent !important; z-index: 1; }
+        .reveal .slide-background { background: transparent !important; }
+        .reveal .slides section {
+            background: rgba(10, 10, 15, 0.8);
+            padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(5px);
+        }
+        .reveal h2 { color: #4CAF50; font-size: 2.2em; }
+        .reveal h3 { color: #3b82f6; font-size: 1.5em; margin-bottom: 0.5em; }
+        .reveal h4 { color: #10b981; font-size: 1.2em; margin-top: 1em; }
+        .reveal p, .reveal li { font-size: 0.85em; line-height: 1.4; text-align: left; }
+        .highlight { color: #FF9800; font-weight: bold; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Portada -->
+            <section data-transition="zoom">
+                <h2>⚙️ Dossier Técnico</h2>
+                <h3 class="fragment fade-up">Manual Avanzado de Operaciones</h3>
+                <p class="fragment fade-up" style="text-align: center;">Configuración de IA, Pipelines y Herramientas Estratégicas para Roles.</p>
+            </section>
+            
+            <!-- Setup de Escenario y API -->
+            <section>
+                <section>
+                    <h2>🔌 Configuración Técnica (Facilitador)</h2>
+                    <p class="fragment fade-up">El panel de control permite orquestar la simulación de IA con precisión quirúrgica.</p>
+                    <p class="fragment fade-up text-center">👇 (Desliza hacia abajo)</p>
+                </section>
+                <section>
+                    <h3>Contexto y Escenario</h3>
+                    <ul>
+                        <li class="fragment fade-up"><strong>Producto/Precio:</strong> Define qué se vende y su valor. Esto calibra la dificultad del cierre.</li>
+                        <li class="fragment fade-up"><strong>Contexto del Lead:</strong> Crea asimetría de información. Dale al Lead (Humano o IA) un trasfondo realista (industria, tamaño de empresa, dolores ocultos).</li>
+                        <li class="fragment fade-up"><strong>Objeciones Iniciales:</strong> Fuerza al Lead a lanzar cortinas de humo específicas ("Es caro", "No tengo tiempo") para evaluar la reacción del Vendedor.</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>Integración de IA (API)</h3>
+                    <ul>
+                        <li class="fragment fade-up"><strong>API Key & URL:</strong> Sales Arena soporta cualquier endpoint compatible con OpenAI. Los datos se guardan localmente.</li>
+                        <li class="fragment fade-up"><strong>Modelos Cloud:</strong> Por defecto, usa <em>meta/llama-3.1-8b-instruct</em> vía Nvidia, pero puedes inyectar claves de OpenAI u otros proveedores.</li>
+                        <li class="fragment fade-up highlight"><strong>Ollama (Local):</strong> Para correr modelos locales sin latencia, usa <code>http://localhost:11434/v1</code>. ⚠️ Vital: Inicia Ollama con <code>OLLAMA_ORIGINS="*"</code> para evitar bloqueos CORS en el navegador.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- El Pipeline -->
+            <section>
+                <section>
+                    <h2>📊 El Pipeline Consultivo</h2>
+                    <p class="fragment fade-up">La metodología de 6 etapas que todo Closer debe seguir y todo Observador debe evaluar.</p>
+                    <p class="fragment fade-up text-center">👇 (Desliza hacia abajo)</p>
+                </section>
+                <section>
+                    <h3>Etapas 1 a 3: El Diagnóstico</h3>
+                    <ol>
+                        <li class="fragment fade-up"><strong>1. Apertura / Rapport:</strong> Conectar antes de convencer. Validar sin condescendencia.<br><span class="highlight">Indicador:</span> El lead baja la guardia.</li>
+                        <li class="fragment fade-up"><strong>2. Cualificación:</strong> Diagnosticar usando el checklist: Razón real, Origen, Dolor presente, Brecha Temporal y Confianza.<br><span class="highlight">Indicador:</span> El lead admite hartazgo emocional.</li>
+                        <li class="fragment fade-up"><strong>3. Costo Oportunidad:</strong> Hacer visible el precio de no tomar acción. "¿Cuánto pierdes al mes por seguir así?".<br><span class="highlight">Indicador:</span> Urgencia explícita.</li>
+                    </ol>
+                </section>
+                <section>
+                    <h3>Etapas 4 a 6: El Cierre</h3>
+                    <ol start="4">
+                        <li class="fragment fade-up"><strong>4. Recapitulación:</strong> Ordenar el caos mental del lead resumiendo sus dolores y metas para generar disonancia.<br><span class="highlight">Indicador:</span> El lead dice "Exactamente eso me pasa".</li>
+                        <li class="fragment fade-up"><strong>5. Presentación:</strong> Mostrar el mapa lógico del vehículo anclado a la emoción. Explicar las fases del programa.<br><span class="highlight">Indicador:</span> Visualiza su éxito con tu producto.</li>
+                        <li class="fragment fade-up"><strong>6. Cierre:</strong> Micro-cierre de intención, revelación de inversión y manejo de objeciones desde la Identidad (no desde el regateo).</li>
+                    </ol>
+                </section>
+            </section>
+
+            <!-- Herramientas para el Lead -->
+            <section>
+                <h2>🎭 Herramientas para el LEAD</h2>
+                <p class="fragment fade-up">Tu objetivo es <strong>simular fricción realista</strong>. Usa estas directrices para interpretar al prospecto:</p>
+                <div class="grid-2">
+                    <div>
+                        <h4 class="fragment fade-up">Nivel de Consciencia</h4>
+                        <ul style="font-size: 0.9em">
+                            <li class="fragment fade-up">Inconsciente (No sabe que tiene un problema).</li>
+                            <li class="fragment fade-up">Consciente del Problema (Pero no de tu solución).</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="fragment fade-up">Arquetipos de Personalidad</h4>
+                        <ul style="font-size: 0.9em">
+                            <li class="fragment fade-up"><strong>El Escéptico:</strong> Respuestas cortas, exige pruebas.</li>
+                            <li class="fragment fade-up"><strong>El Divagador:</strong> Habla mucho, no va al punto.</li>
+                        </ul>
+                    </div>
+                </div>
+                <h4 class="fragment fade-up">El Juego de la Dureza</h4>
+                <p class="fragment fade-up" style="font-size: 0.8em">Comienza con objeciones "cortina de humo" (superficiales). Solo revela tu <strong>dolor real</strong> si el Closer logra generar rapport y hace las preguntas correctas. Si el Closer parece leer un guion, ponte a la defensiva.</p>
+            </section>
+
+            <!-- Herramientas para el Observador -->
+            <section>
+                <h2>🕵️‍♂️ Herramientas para el OBSERVADOR</h2>
+                <p class="fragment fade-up">No eres un espectador, eres el <strong>analista de control de calidad</strong>.</p>
+                <h4 class="fragment fade-up">Checklist Operativo de 5 Puntos:</h4>
+                <ul style="font-size: 0.85em">
+                    <li class="fragment fade-up"><strong>1. Nivel de Rapport:</strong> ¿Logró sintonía antes de interrogar? ¿Validó emociones?</li>
+                    <li class="fragment fade-up"><strong>2. Dolor Real vs Superficial:</strong> ¿Se quedó en el síntoma o indagó hasta la verdadera causa de frustración?</li>
+                    <li class="fragment fade-up"><strong>3. Brecha de Valor:</strong> ¿Logró que el Lead exprese su 'Costo de Oportunidad'?</li>
+                    <li class="fragment fade-up"><strong>4. Recapitulación:</strong> ¿Ordenó el caos del Lead y resumió la situación antes del pitch?</li>
+                    <li class="fragment fade-up"><strong>5. Aislamiento de Objeción:</strong> ¿Intentó convencer con lógica en la primera excusa o indagó hasta encontrar la objeción oculta?</li>
+                </ul>
+            </section>
+            
+            <section data-transition="zoom">
+                <h2>🚀 Sales Arena</h2>
+                <h3 class="fragment fade-up">El estándar de oro en simulación.</h3>
+                <p class="fragment fade-up"><br>Regresa a la sala para iniciar la práctica.</p>
+            </section>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, transition: 'fade', transitionSpeed: 'slow',
+            controls: true, progress: true, center: true,
+        });
+
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 70, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": ["#4CAF50", "#3b82f6", "#10b981"] },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.4 },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#4CAF50", "opacity": 0.2, "width": 1.5 },
+                "move": { "enable": true, "speed": 1.5, "direction": "top", "random": true, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                "modes": { "grab": { "distance": 180, "line_linked": { "opacity": 0.6 } }, "push": { "particles_nb": 3 } }
+            },
+            "retina_detect": true
+        });
+    </script>
+</body>
+</html>
