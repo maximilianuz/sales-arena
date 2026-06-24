@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shuffle, Copy, ChessKnight, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -53,9 +53,39 @@ export default function Lobby() {
     alert(t('lobby.idCopied') || 'ID copiado al portapapeles');
   };
 
+  useEffect(() => {
+    if (window.particlesJS) {
+      window.particlesJS("lobby-particles", {
+        "particles": {
+            "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+            "color": { "value": ["#4CAF50", "#3b82f6", "#10b981"] },
+            "shape": { "type": "circle" },
+            "opacity": { "value": 0.4 },
+            "size": { "value": 3, "random": true },
+            "line_linked": { "enable": true, "distance": 150, "color": "#4CAF50", "opacity": 0.2, "width": 1.5 },
+            "move": { "enable": true, "speed": 1.2, "direction": "top", "random": true, "straight": false, "out_mode": "out", "bounce": false }
+        },
+        "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+                "onhover": { "enable": true, "mode": "grab" },
+                "onclick": { "enable": true, "mode": "push" },
+                "resize": true
+            },
+            "modes": {
+                "grab": { "distance": 180, "line_linked": { "opacity": 0.6 } },
+                "push": { "particles_nb": 3 }
+            }
+        },
+        "retina_detect": true
+      });
+    }
+  }, []);
+
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '2rem 1rem' }}>
       
+      <div id="lobby-particles" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}></div>
       <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10, display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <a 
           href={i18n.language?.startsWith('en') ? "/presentacion_en.html" : "/presentacion.html"}
@@ -90,7 +120,7 @@ export default function Lobby() {
         </select>
       </div>
 
-      <div className="glass-panel" style={{ margin: 'auto', maxWidth: '500px', width: '100%', animation: 'modalIn 0.3s ease-out' }}>
+      <div className="glass-panel" style={{ margin: 'auto', maxWidth: '500px', width: '100%', animation: 'modalIn 0.3s ease-out', position: 'relative', zIndex: 1 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem' }}>
           <div className="logo-container">
             <ChessKnight size={48} color="white" strokeWidth={1.5} />
