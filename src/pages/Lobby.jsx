@@ -58,7 +58,7 @@ export default function Lobby() {
       
       <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10, display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <a 
-          href="/presentacion.html" 
+          href={i18n.language?.startsWith('en') ? "/presentacion_en.html" : "/presentacion.html"}
           target="_blank" 
           rel="noopener noreferrer"
           style={{
@@ -69,7 +69,7 @@ export default function Lobby() {
             fontSize: '0.85rem', backdropFilter: 'blur(10px)'
           }}
         >
-          <BookOpen size={16} /> Instrucciones
+          <BookOpen size={16} /> {i18n.language?.startsWith('en') ? 'Instructions' : 'Instrucciones'}
         </a>
         <select 
           onChange={changeLanguage} 

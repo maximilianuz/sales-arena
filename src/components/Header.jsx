@@ -57,12 +57,12 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
 
       <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <a 
-          href="/presentacion.html" 
+          href={i18n.language?.startsWith('en') ? "/presentacion_en.html" : "/presentacion.html"}
           target="_blank" 
           rel="noopener noreferrer"
           className="btn btn-outline" 
           style={{ border: '1px solid rgba(16, 185, 129, 0.5)', color: 'white', background: 'rgba(16, 185, 129, 0.1)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
-          title="Ver Presentación"
+          title={i18n.language?.startsWith('en') ? "View Presentation" : "Ver Presentación"}
         >
           <BookOpen size={18} /> Dossier
         </a>
