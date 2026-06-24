@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shuffle, Copy, ChessKnight } from 'lucide-react';
+import { Shuffle, Copy, ChessKnight, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Lobby() {
@@ -56,7 +56,21 @@ export default function Lobby() {
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '2rem 1rem' }}>
       
-      <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}>
+      <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10, display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <a 
+          href="/presentacion.html" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            background: 'rgba(16, 185, 129, 0.1)', color: 'white',
+            border: '1px solid rgba(16, 185, 129, 0.5)', padding: '0.4rem 0.8rem',
+            borderRadius: '2rem', cursor: 'pointer', textDecoration: 'none',
+            fontSize: '0.85rem', backdropFilter: 'blur(10px)'
+          }}
+        >
+          <BookOpen size={16} /> Instrucciones
+        </a>
         <select 
           onChange={changeLanguage} 
           value={(i18n.language || 'es').split('-')[0]} 
