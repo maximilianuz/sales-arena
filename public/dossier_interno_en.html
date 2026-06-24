@@ -15,9 +15,13 @@
         .reveal .slide-background { background: transparent !important; }
         .reveal .slides section {
             background: rgba(10, 10, 15, 0.8);
-            padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(5px);
+            max-height: 90vh; overflow-y: auto !important;
         }
+        /* Custom scrollbar para slides largos */
+        .reveal .slides section::-webkit-scrollbar { width: 6px; }
+        .reveal .slides section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
         .reveal h2 { color: #4CAF50; font-size: 2.2em; }
         .reveal h3 { color: #3b82f6; font-size: 1.5em; margin-bottom: 0.5em; }
         .reveal h4 { color: #10b981; font-size: 1.2em; margin-top: 1em; }
@@ -91,40 +95,55 @@
 
             <!-- Tools for the Lead -->
             <section>
-                <h2>🎭 Tools for the LEAD</h2>
-                <p class="fragment fade-up">Your goal is to <strong>simulate realistic friction</strong>. Use these guidelines to play the prospect:</p>
-                <div class="grid-2">
-                    <div>
-                        <h4 class="fragment fade-up">Awareness Level</h4>
-                        <ul style="font-size: 0.9em">
-                            <li class="fragment fade-up">Unaware (Doesn't know they have a problem).</li>
-                            <li class="fragment fade-up">Problem Aware (But not aware of your solution).</li>
-                        </ul>
+                <section>
+                    <h2>🎭 Tools for the LEAD</h2>
+                    <p class="fragment fade-up">Your goal is to <strong>simulate realistic friction</strong>. Use these guidelines to play the prospect:</p>
+                    <p class="fragment fade-up text-center">👇 (Swipe down)</p>
+                </section>
+                <section>
+                    <h2>🎭 Tools for the LEAD</h2>
+                    <div class="grid-2">
+                        <div>
+                            <h4 class="fragment fade-up">Awareness Level</h4>
+                            <ul style="font-size: 0.9em">
+                                <li class="fragment fade-up">Unaware (Doesn't know they have a problem).</li>
+                                <li class="fragment fade-up">Problem Aware (But not aware of your solution).</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="fragment fade-up">Personality Archetypes</h4>
+                            <ul style="font-size: 0.9em">
+                                <li class="fragment fade-up"><strong>The Skeptic:</strong> Short answers, demands proof.</li>
+                                <li class="fragment fade-up"><strong>The Rambler:</strong> Talks a lot, avoids the point.</li>
+                            </ul>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="fragment fade-up">Personality Archetypes</h4>
-                        <ul style="font-size: 0.9em">
-                            <li class="fragment fade-up"><strong>The Skeptic:</strong> Short answers, demands proof.</li>
-                            <li class="fragment fade-up"><strong>The Rambler:</strong> Talks a lot, avoids the point.</li>
-                        </ul>
-                    </div>
-                </div>
-                <h4 class="fragment fade-up">The Game of Toughness</h4>
-                <p class="fragment fade-up" style="font-size: 0.8em">Start with "smokescreen" (superficial) objections. Only reveal your <strong>real pain</strong> if the Closer manages to build rapport and asks the right questions. If the Closer seems to be reading a script, get defensive.</p>
+                </section>
+                <section>
+                    <h2>🎭 Tools for the LEAD</h2>
+                    <h4 class="fragment fade-up">The Game of Toughness</h4>
+                    <p class="fragment fade-up" style="font-size: 0.8em">Start with "smokescreen" (superficial) objections. Only reveal your <strong>real pain</strong> if the Closer manages to build rapport and asks the right questions. If the Closer seems to be reading a script, get defensive.</p>
+                </section>
             </section>
 
             <!-- Tools for the Observer -->
             <section>
-                <h2>🕵️‍♂️ Tools for the OBSERVER</h2>
-                <p class="fragment fade-up">You are not a spectator, you are the <strong>quality control analyst</strong>.</p>
-                <h4 class="fragment fade-up">5-Point Operational Checklist:</h4>
-                <ul style="font-size: 0.85em">
-                    <li class="fragment fade-up"><strong>1. Rapport Level:</strong> Did they build rapport before interrogating? Did they validate emotions?</li>
-                    <li class="fragment fade-up"><strong>2. Real vs Superficial Pain:</strong> Did they stay on the symptom or dig into the real cause of frustration?</li>
-                    <li class="fragment fade-up"><strong>3. Value Gap:</strong> Did they make the Lead express their 'Opportunity Cost'?</li>
-                    <li class="fragment fade-up"><strong>4. Recapitulation:</strong> Did they organize the Lead's chaos and summarize the situation before pitching?</li>
-                    <li class="fragment fade-up"><strong>5. Objection Isolation:</strong> Did they try to convince with logic at the first excuse, or did they dig to find the hidden objection?</li>
-                </ul>
+                <section>
+                    <h2>🕵️‍♂️ Tools for the OBSERVER</h2>
+                    <p class="fragment fade-up">You are not a spectator, you are the <strong>quality control analyst</strong>.</p>
+                    <p class="fragment fade-up text-center">👇 (Swipe down)</p>
+                </section>
+                <section>
+                    <h2>🕵️‍♂️ Tools for the OBSERVER</h2>
+                    <h4 class="fragment fade-up">5-Point Operational Checklist:</h4>
+                    <ul style="font-size: 0.85em">
+                        <li class="fragment fade-up"><strong>1. Rapport Level:</strong> Did they build rapport before interrogating? Did they validate emotions?</li>
+                        <li class="fragment fade-up"><strong>2. Real vs Superficial Pain:</strong> Did they stay on the symptom or dig into the real cause of frustration?</li>
+                        <li class="fragment fade-up"><strong>3. Value Gap:</strong> Did they make the Lead express their 'Opportunity Cost'?</li>
+                        <li class="fragment fade-up"><strong>4. Recapitulation:</strong> Did they organize the Lead's chaos and summarize the situation before pitching?</li>
+                        <li class="fragment fade-up"><strong>5. Objection Isolation:</strong> Did they try to convince with logic at the first excuse, or did they dig to find the hidden objection?</li>
+                    </ul>
+                </section>
             </section>
             
             <section data-transition="zoom">

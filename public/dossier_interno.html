@@ -15,9 +15,13 @@
         .reveal .slide-background { background: transparent !important; }
         .reveal .slides section {
             background: rgba(10, 10, 15, 0.8);
-            padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(5px);
+            max-height: 90vh; overflow-y: auto !important;
         }
+        /* Custom scrollbar para slides largos */
+        .reveal .slides section::-webkit-scrollbar { width: 6px; }
+        .reveal .slides section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
         .reveal h2 { color: #4CAF50; font-size: 2.2em; }
         .reveal h3 { color: #3b82f6; font-size: 1.5em; margin-bottom: 0.5em; }
         .reveal h4 { color: #10b981; font-size: 1.2em; margin-top: 1em; }
@@ -91,40 +95,55 @@
 
             <!-- Herramientas para el Lead -->
             <section>
-                <h2>🎭 Herramientas para el LEAD</h2>
-                <p class="fragment fade-up">Tu objetivo es <strong>simular fricción realista</strong>. Usa estas directrices para interpretar al prospecto:</p>
-                <div class="grid-2">
-                    <div>
-                        <h4 class="fragment fade-up">Nivel de Consciencia</h4>
-                        <ul style="font-size: 0.9em">
-                            <li class="fragment fade-up">Inconsciente (No sabe que tiene un problema).</li>
-                            <li class="fragment fade-up">Consciente del Problema (Pero no de tu solución).</li>
-                        </ul>
+                <section>
+                    <h2>🎭 Herramientas para el LEAD</h2>
+                    <p class="fragment fade-up">Tu objetivo es <strong>simular fricción realista</strong>. Usa estas directrices para interpretar al prospecto:</p>
+                    <p class="fragment fade-up text-center">👇 (Desliza hacia abajo)</p>
+                </section>
+                <section>
+                    <h2>🎭 Herramientas para el LEAD</h2>
+                    <div class="grid-2">
+                        <div>
+                            <h4 class="fragment fade-up">Nivel de Consciencia</h4>
+                            <ul style="font-size: 0.9em">
+                                <li class="fragment fade-up">Inconsciente (No sabe que tiene un problema).</li>
+                                <li class="fragment fade-up">Consciente del Problema (Pero no de tu solución).</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="fragment fade-up">Arquetipos de Personalidad</h4>
+                            <ul style="font-size: 0.9em">
+                                <li class="fragment fade-up"><strong>El Escéptico:</strong> Respuestas cortas, exige pruebas.</li>
+                                <li class="fragment fade-up"><strong>El Divagador:</strong> Habla mucho, no va al punto.</li>
+                            </ul>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="fragment fade-up">Arquetipos de Personalidad</h4>
-                        <ul style="font-size: 0.9em">
-                            <li class="fragment fade-up"><strong>El Escéptico:</strong> Respuestas cortas, exige pruebas.</li>
-                            <li class="fragment fade-up"><strong>El Divagador:</strong> Habla mucho, no va al punto.</li>
-                        </ul>
-                    </div>
-                </div>
-                <h4 class="fragment fade-up">El Juego de la Dureza</h4>
-                <p class="fragment fade-up" style="font-size: 0.8em">Comienza con objeciones "cortina de humo" (superficiales). Solo revela tu <strong>dolor real</strong> si el Closer logra generar rapport y hace las preguntas correctas. Si el Closer parece leer un guion, ponte a la defensiva.</p>
+                </section>
+                <section>
+                    <h2>🎭 Herramientas para el LEAD</h2>
+                    <h4 class="fragment fade-up">El Juego de la Dureza</h4>
+                    <p class="fragment fade-up" style="font-size: 0.8em">Comienza con objeciones "cortina de humo" (superficiales). Solo revela tu <strong>dolor real</strong> si el Closer logra generar rapport y hace las preguntas correctas. Si el Closer parece leer un guion, ponte a la defensiva.</p>
+                </section>
             </section>
 
             <!-- Herramientas para el Observador -->
             <section>
-                <h2>🕵️‍♂️ Herramientas para el OBSERVADOR</h2>
-                <p class="fragment fade-up">No eres un espectador, eres el <strong>analista de control de calidad</strong>.</p>
-                <h4 class="fragment fade-up">Checklist Operativo de 5 Puntos:</h4>
-                <ul style="font-size: 0.85em">
-                    <li class="fragment fade-up"><strong>1. Nivel de Rapport:</strong> ¿Logró sintonía antes de interrogar? ¿Validó emociones?</li>
-                    <li class="fragment fade-up"><strong>2. Dolor Real vs Superficial:</strong> ¿Se quedó en el síntoma o indagó hasta la verdadera causa de frustración?</li>
-                    <li class="fragment fade-up"><strong>3. Brecha de Valor:</strong> ¿Logró que el Lead exprese su 'Costo de Oportunidad'?</li>
-                    <li class="fragment fade-up"><strong>4. Recapitulación:</strong> ¿Ordenó el caos del Lead y resumió la situación antes del pitch?</li>
-                    <li class="fragment fade-up"><strong>5. Aislamiento de Objeción:</strong> ¿Intentó convencer con lógica en la primera excusa o indagó hasta encontrar la objeción oculta?</li>
-                </ul>
+                <section>
+                    <h2>🕵️‍♂️ Herramientas para el OBSERVADOR</h2>
+                    <p class="fragment fade-up">No eres un espectador, eres el <strong>analista de control de calidad</strong>.</p>
+                    <p class="fragment fade-up text-center">👇 (Desliza hacia abajo)</p>
+                </section>
+                <section>
+                    <h2>🕵️‍♂️ Herramientas para el OBSERVADOR</h2>
+                    <h4 class="fragment fade-up">Checklist Operativo de 5 Puntos:</h4>
+                    <ul style="font-size: 0.85em">
+                        <li class="fragment fade-up"><strong>1. Nivel de Rapport:</strong> ¿Logró sintonía antes de interrogar? ¿Validó emociones?</li>
+                        <li class="fragment fade-up"><strong>2. Dolor Real vs Superficial:</strong> ¿Se quedó en el síntoma o indagó hasta la verdadera causa de frustración?</li>
+                        <li class="fragment fade-up"><strong>3. Brecha de Valor:</strong> ¿Logró que el Lead exprese su 'Costo de Oportunidad'?</li>
+                        <li class="fragment fade-up"><strong>4. Recapitulación:</strong> ¿Ordenó el caos del Lead y resumió la situación antes del pitch?</li>
+                        <li class="fragment fade-up"><strong>5. Aislamiento de Objeción:</strong> ¿Intentó convencer con lógica en la primera excusa o indagó hasta encontrar la objeción oculta?</li>
+                    </ul>
+                </section>
             </section>
             
             <section data-transition="zoom">

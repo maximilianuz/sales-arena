@@ -32,12 +32,16 @@
         /* Para asegurar que el texto sea muy legible sobre el fondo interactivo */
         .reveal .slides section {
             background: rgba(10, 10, 15, 0.7);
-            padding: 40px;
+            padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.05);
             backdrop-filter: blur(5px);
+            max-height: 90vh; overflow-y: auto !important;
         }
+        /* Custom scrollbar para slides largos */
+        .reveal .slides section::-webkit-scrollbar { width: 6px; }
+        .reveal .slides section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
         .reveal h2 { color: #4CAF50; }
         .highlight { color: #FF9800; }
     </style>
