@@ -9,16 +9,28 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
   const [localPain, setLocalPain] = useState('');
   const [localObjection, setLocalObjection] = useState('');
 
+  // Lead evaluation states
+  const [localLeadPain, setLocalLeadPain] = useState('');
+  const [localLeadSignals, setLocalLeadSignals] = useState('');
+  const [localLeadObjection, setLocalLeadObjection] = useState('');
+
   // Sync from remote when roomNotes changes, but only if not currently typing
   useEffect(() => {
     if (roomNotes) {
       if (document.activeElement.id !== 'toneInput') setLocalTone(roomNotes.tone || '');
       if (document.activeElement.id !== 'painInput') setLocalPain(roomNotes.pain || '');
       if (document.activeElement.id !== 'objectionInput') setLocalObjection(roomNotes.objection || '');
+      
+      if (document.activeElement.id !== 'leadPainInput') setLocalLeadPain(roomNotes.leadPain || '');
+      if (document.activeElement.id !== 'leadSignalsInput') setLocalLeadSignals(roomNotes.leadSignals || '');
+      if (document.activeElement.id !== 'leadObjectionInput') setLocalLeadObjection(roomNotes.leadObjection || '');
     } else {
       setLocalTone('');
       setLocalPain('');
       setLocalObjection('');
+      setLocalLeadPain('');
+      setLocalLeadSignals('');
+      setLocalLeadObjection('');
     }
   }, [roomNotes]);
 
@@ -39,13 +51,20 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
   const handleBlurPain = () => updateNotes && updateNotes({ ...roomNotes, pain: localPain });
   const handleBlurObjection = () => updateNotes && updateNotes({ ...roomNotes, objection: localObjection });
 
+  const handleBlurLeadPain = () => updateNotes && updateNotes({ ...roomNotes, leadPain: localLeadPain });
+  const handleBlurLeadSignals = () => updateNotes && updateNotes({ ...roomNotes, leadSignals: localLeadSignals });
+  const handleBlurLeadObjection = () => updateNotes && updateNotes({ ...roomNotes, leadObjection: localLeadObjection });
+
   const clearDebrief = () => {
     if (!updateNotes) return;
     updateNotes({ 
       completedStages: [], 
       tone: '', 
       pain: '', 
-      objection: '' 
+      objection: '',
+      leadPain: '',
+      leadSignals: '',
+      leadObjection: ''
     });
   };
 
@@ -99,52 +118,116 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
           </div>
         </div>
 
-        {/* Métrica de Tono */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            <Activity size={16} color="#8b5cf6" /> Métrica de Tono del Closer
-          </div>
-          <textarea 
-            id="toneInput"
-            value={localTone}
-            onChange={(e) => setLocalTone(e.target.value)}
-            onBlur={handleBlurTone}
-            readOnly={!updateNotes}
-            placeholder={updateNotes ? "¿Mantuvo autoridad? ¿Se mostró inseguro o reactivo cuando el Lead presionó?" : "Esperando notas del Observador..."}
-            style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(139, 92, 246, 0.05)', border: '1px solid rgba(139, 92, 246, 0.2)' }}
-          />
-        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', flex: 1 }}>
+          {/* EVALUACIÓN DEL CLOSER */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#8b5cf6', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(139, 92, 246, 0.3)', paddingBottom: '0.5rem' }}>
+              <Activity size={18} /> Análisis del Closer
+            </h3>
+            
+            {/* Métrica de Tono */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Tono y Autoridad
+              </div>
+              <textarea 
+                id="toneInput"
+                value={localTone}
+                onChange={(e) => setLocalTone(e.target.value)}
+                onBlur={handleBlurTone}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Mantuvo autoridad? ¿Se mostró inseguro o reactivo cuando el Lead presionó?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(139, 92, 246, 0.05)', border: '1px solid rgba(139, 92, 246, 0.2)' }}
+              />
+            </div>
 
-        {/* Diagnóstico de Dolor */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            <HeartPulse size={16} color="var(--primary)" /> Diagnóstico de Dolor Profundo
-          </div>
-          <textarea 
-            id="painInput"
-            value={localPain}
-            onChange={(e) => setLocalPain(e.target.value)}
-            onBlur={handleBlurPain}
-            readOnly={!updateNotes}
-            placeholder={updateNotes ? "¿Encontró el verdadero dolor emocional del Lead o se quedó resolviendo dudas técnicas en la superficie?" : "Esperando notas del Observador..."}
-            style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(79, 70, 229, 0.05)', border: '1px solid rgba(79, 70, 229, 0.2)' }}
-          />
-        </div>
+            {/* Diagnóstico de Dolor */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Extracción de Dolor
+              </div>
+              <textarea 
+                id="painInput"
+                value={localPain}
+                onChange={(e) => setLocalPain(e.target.value)}
+                onBlur={handleBlurPain}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Encontró el verdadero dolor emocional del Lead o se quedó resolviendo dudas técnicas en la superficie?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(79, 70, 229, 0.05)', border: '1px solid rgba(79, 70, 229, 0.2)' }}
+              />
+            </div>
 
-        {/* Manejo de Objeción */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            <ShieldAlert size={16} color="var(--accent)" /> Manejo de la Objeción Real
+            {/* Manejo de Objeción */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Manejo de Objeción
+              </div>
+              <textarea 
+                id="objectionInput"
+                value={localObjection}
+                onChange={(e) => setLocalObjection(e.target.value)}
+                onBlur={handleBlurObjection}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Logró aislar la excusa falsa y encontrar la verdadera razón por la que no querían comprar?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)' }}
+              />
+            </div>
           </div>
-          <textarea 
-            id="objectionInput"
-            value={localObjection}
-            onChange={(e) => setLocalObjection(e.target.value)}
-            onBlur={handleBlurObjection}
-            readOnly={!updateNotes}
-            placeholder={updateNotes ? "¿Logró aislar la excusa falsa y encontrar la verdadera razón por la que no querían comprar?" : "Esperando notas del Observador..."}
-            style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)' }}
-          />
+
+          {/* EVALUACIÓN DEL LEAD */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(16, 185, 129, 0.3)', paddingBottom: '0.5rem' }}>
+              <Target size={18} /> Análisis del Lead
+            </h3>
+            
+            {/* Dolor Real */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Motivación Oculta
+              </div>
+              <textarea 
+                id="leadPainInput"
+                value={localLeadPain}
+                onChange={(e) => setLocalLeadPain(e.target.value)}
+                onBlur={handleBlurLeadPain}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Cuál fue el verdadero dolor o motivación del Lead que pudiste detectar como observador?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}
+              />
+            </div>
+
+            {/* Señales de Compra/Alerta */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Señales / Lenguaje
+              </div>
+              <textarea 
+                id="leadSignalsInput"
+                value={localLeadSignals}
+                onChange={(e) => setLocalLeadSignals(e.target.value)}
+                onBlur={handleBlurLeadSignals}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Qué señales de compra o de resistencia notaste en su voz/actitud?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}
+              />
+            </div>
+
+            {/* Objeción Raíz */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Motivo de Rechazo
+              </div>
+              <textarea 
+                id="leadObjectionInput"
+                value={localLeadObjection}
+                onChange={(e) => setLocalLeadObjection(e.target.value)}
+                onBlur={handleBlurLeadObjection}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Por qué realmente puso objeciones? (ej. falta de confianza, miedo al riesgo, etc.)" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}
+              />
+            </div>
+          </div>
         </div>
 
       </div>

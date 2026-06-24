@@ -226,7 +226,15 @@ export default function Room() {
                     {t('room.showHiddenInfo')}
                   </button>
                 )}
-                {showSurpriseBtn && <SurpriseEventButton triggerEvent={triggerSurpriseEvent} />}
+                {showSurpriseBtn && (
+                  <SurpriseEventButton 
+                    triggerEvent={triggerSurpriseEvent} 
+                    apiKey={apiKey}
+                    apiUrl={apiUrl}
+                    apiModel={apiModel}
+                    currentScenario={currentScenario}
+                  />
+                )}
               </div>
             )}
 

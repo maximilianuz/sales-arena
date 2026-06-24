@@ -110,3 +110,34 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     ...pipelineProfile
   };
 }
+
+export async function generateSurpriseEvent(apiKey, apiUrl, apiModel, scenario, language = 'es') {
+  if (!scenario) {
+    throw new Error("No hay un escenario activo para generar el evento.");
+  }
+  
+  const prompt = `
+Actúa como un director de simulaciones de ventas. Tienes que crear UN EVENTO SORPRESA ALEATORIO (tipo "plot twist") para el siguiente Lead con el que un vendedor está hablando en este momento.
+
+Contexto del Lead:
+- Nombre: ${scenario.demographics?.name || 'Cliente'}
+- Industria/Cargo: ${scenario.demographics?.industry || 'Empresa'} - ${scenario.demographics?.role || 'Dueño'}
+- Problema actual: ${scenario.currentSituation?.problem || 'Tiene un problema a resolver'}
+- Objeción principal (NO repetirla): ${scenario.visibleObjection || 'Ninguna'}
+
+Requisitos del evento sorpresa:
+1. Debe ser un suceso INESPERADO que interrumpa o cambie radicalmente el rumbo de la llamada de ventas. 
+2. NO debe ser simplemente otra objeción de precio o tiempo.
+3. Debe estar íntimamente relacionado con su industria, cargo o problema actual.
+4. Tienes un pool mental de más de 100 tipos de eventos diferentes (ej: llamadas entrantes, emergencias en su empresa, confesiones inesperadas, la aparición repentina de un socio/jefe en la sala, problemas técnicos, revelaciones de la competencia, interrupciones externas, etc.). Elige uno al azar.
+5. Redáctalo en 1 o 2 oraciones, de forma impactante.
+
+Responde ÚNICAMENTE en formato JSON con la siguiente estructura:
+{
+  "eventText": "Texto del evento sorpresa que debe leer el actor."
+}
+`;
+
+  const result = await makeAIPromptCall(prompt, apiKey, apiUrl, apiModel);
+  return result.eventText;
+}

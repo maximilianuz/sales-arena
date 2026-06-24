@@ -1,32 +1,42 @@
-import React from 'react';
-import { Dices } from 'lucide-react';
+import React, { useState } from 'react';
+import { Dices, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { generateSurpriseEvent } from '../utils/ai';
 
-const EVENTS = [
-  "event.crossed_arms",
-  "event.competitor",
-  "event.budget_frozen",
-  "event.two_minutes",
-  "event.ghost_objection"
-];
-
-export default function SurpriseEventButton({ triggerEvent }) {
+export default function SurpriseEventButton({ triggerEvent, apiKey, apiUrl, apiModel, currentScenario }) {
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
 
-  const handleClick = () => {
-    if (!triggerEvent) return;
-    const randomEvent = EVENTS[Math.floor(Math.random() * EVENTS.length)];
-    triggerEvent(t(randomEvent));
+  const handleClick = async () => {
+    if (!triggerEvent || !currentScenario) {
+      alert("Genera un escenario primero para poder crear un evento sorpresa personalizado.");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const eventText = await generateSurpriseEvent(apiKey, apiUrl, apiModel, currentScenario);
+      triggerEvent(eventText);
+    } catch (error) {
+      alert("Error al generar evento sorpresa: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <button 
       className="btn btn-secondary btn-large" 
       onClick={handleClick}
+      disabled={loading || !currentScenario}
       style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '1.5rem', background: 'linear-gradient(135deg, var(--secondary), var(--primary))' }}
     >
-      <Dices size={48} />
-      <span>{t('surprise.button')}</span>
+      {loading ? (
+        <Loader2 size={48} style={{ animation: 'spin 2s linear infinite' }} />
+      ) : (
+        <Dices size={48} />
+      )}
+      <span>{loading ? "Generando..." : t('surprise.button')}</span>
     </button>
   );
 }
