@@ -17,11 +17,7 @@
             background: rgba(10, 10, 15, 0.8);
             padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(5px);
-            max-height: 90vh; overflow-y: auto !important;
         }
-        /* Custom scrollbar para slides largos */
-        .reveal .slides section::-webkit-scrollbar { width: 6px; }
-        .reveal .slides section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
         .reveal h2 { color: #4CAF50; font-size: 2.2em; }
         .reveal h3 { color: #3b82f6; font-size: 1.5em; margin-bottom: 0.5em; }
         .reveal h4 { color: #10b981; font-size: 1.2em; margin-top: 1em; }
@@ -161,6 +157,7 @@
         Reveal.initialize({
             hash: true, transition: 'fade', transitionSpeed: 'slow',
             controls: true, progress: true, center: true,
+            width: 1024, height: 850, margin: 0.08, minScale: 0.2, maxScale: 2.0
         });
 
         particlesJS("particles-js", {
