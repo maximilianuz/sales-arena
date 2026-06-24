@@ -7,39 +7,49 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/black.min.css" id="theme">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            background-color: #0d0d12;
-            margin: 0;
-            overflow: hidden;
-        }
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 0; /* Detrás de la presentación */
-        }
-        .reveal {
-            background: transparent !important;
-            z-index: 1; /* Por encima de las partículas */
-        }
-        .reveal .slide-background {
-            background: transparent !important;
-        }
+        body { background-color: #0d0d12; margin: 0; overflow: hidden; font-family: 'Outfit', sans-serif; }
+        #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; }
+        
+        .reveal { font-family: 'Outfit', sans-serif !important; z-index: 1; background: transparent !important; }
+        .reveal .slide-background { background: transparent !important; }
+        
         /* Para asegurar que el texto sea muy legible sobre el fondo interactivo */
         .reveal .slides section {
-            background: rgba(10, 10, 15, 0.7);
+            background: rgba(10, 10, 15, 0.85);
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.05);
-            backdrop-filter: blur(5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
         }
-        .reveal h2 { color: #4CAF50; }
-        .highlight { color: #FF9800; }
+        
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            font-family: 'Outfit', sans-serif !important;
+            font-weight: 600 !important;
+            letter-spacing: -0.02em;
+        }
+        
+        .reveal h2 { 
+            color: #4CAF50; 
+            font-size: 2.2em; 
+            background: linear-gradient(135deg, #4CAF50, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .reveal p, .reveal li {
+            font-weight: 300;
+            color: #e2e8f0;
+            line-height: 1.5;
+            letter-spacing: 0.01em;
+        }
+        
+        .reveal strong { font-weight: 500; color: #ffffff; }
+        .highlight { color: #FF9800; font-weight: 500; }
     </style>
 </head>
 <body>
