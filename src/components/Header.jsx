@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Cpu, ChessKnight, Copy, CheckCircle2, User } from 'lucide-react';
+import { Settings, Cpu, ChessKnight, Copy, CheckCircle2, User, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Header({ title, roomId, role, onTitleChange, onOpenSettings }) {
@@ -56,6 +56,17 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
       </div>
 
       <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <a 
+          href="/presentacion.html" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="btn btn-outline" 
+          style={{ border: '1px solid rgba(16, 185, 129, 0.5)', color: 'white', background: 'rgba(16, 185, 129, 0.1)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+          title="Ver Presentación"
+        >
+          <BookOpen size={18} /> Dossier
+        </a>
+
         <select 
           onChange={changeLanguage} 
           value={(i18n.language || 'es').split('-')[0]} 
