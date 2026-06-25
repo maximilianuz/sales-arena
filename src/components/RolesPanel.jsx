@@ -51,19 +51,20 @@ export default function RolesPanel({ participants, setParticipants }) {
         )}
       </div>
 
-      <form onSubmit={addParticipant} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+      <form onSubmit={addParticipant} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
         <input 
           type="text" 
           placeholder={t('roles.placeholder')}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
+          style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}
         />
-        <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>
-          <UserPlus size={20} />
+        <button type="submit" className="btn btn-primary" style={{ padding: '0.4rem 0.75rem' }}>
+          <UserPlus size={16} />
         </button>
       </form>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem', minHeight: '40px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem', minHeight: '30px' }}>
         {participants.map(p => (
           <div key={p} style={{ 
             background: 'rgba(255,255,255,0.1)', 
@@ -86,42 +87,25 @@ export default function RolesPanel({ participants, setParticipants }) {
         {participants.length === 0 && <span style={{ color: 'var(--text-muted)' }}>{t('roles.empty')}</span>}
       </div>
 
-      <button className="btn btn-secondary" style={{ width: '100%', marginBottom: '1.5rem' }} onClick={assignRoles}>
-        <Shuffle size={18} />
+      <button className="btn btn-secondary" style={{ width: '100%', marginBottom: '0.75rem', padding: '0.5rem', fontSize: '0.85rem' }} onClick={assignRoles}>
+        <Shuffle size={14} />
         {t('roles.random')}
       </button>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <div style={{ background: 'rgba(79, 70, 229, 0.2)', padding: '1rem', borderRadius: '0.5rem', borderLeft: '4px solid var(--primary)' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('roles.seller')}</div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{roles.seller || '-'}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <div style={{ background: 'rgba(79, 70, 229, 0.2)', padding: '0.5rem 0.75rem', borderRadius: '0.4rem', borderLeft: '3px solid var(--primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 'bold' }}>{t('roles.seller')}</span>
+          <strong style={{ fontSize: '0.95rem' }}>{roles.seller || '-'}</strong>
         </div>
-        <div style={{ background: 'rgba(236, 72, 153, 0.2)', padding: '1rem', borderRadius: '0.5rem', borderLeft: '4px solid var(--secondary)' }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('roles.client')}</div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{roles.client || '-'}</div>
+        <div style={{ background: 'rgba(236, 72, 153, 0.2)', padding: '0.5rem 0.75rem', borderRadius: '0.4rem', borderLeft: '3px solid var(--secondary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 'bold' }}>{t('roles.client')}</span>
+          <strong style={{ fontSize: '0.95rem' }}>{roles.client || '-'}</strong>
         </div>
-        <div style={{ background: 'rgba(245, 158, 11, 0.2)', padding: '1rem', borderRadius: '0.5rem', borderLeft: '4px solid var(--accent)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t('roles.observers')}</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
-                {roles.observers && roles.observers.length > 0 ? roles.observers.join(', ') : '-'}
-              </div>
-            </div>
-            {roles.observers && roles.observers.length > 0 && (
-              <button 
-                className="btn btn-outline" 
-                style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', borderColor: 'var(--accent)', color: 'var(--accent)' }}
-                onClick={() => {
-                  navigator.clipboard.writeText(t('roles.checklistContent'));
-                  alert(t('roles.checklistCopied'));
-                }}
-                title={t('roles.copyChecklist')}
-              >
-                {t('roles.copyChecklist')}
-              </button>
-            )}
-          </div>
+        <div style={{ background: 'rgba(245, 158, 11, 0.2)', padding: '0.5rem 0.75rem', borderRadius: '0.4rem', borderLeft: '3px solid var(--accent)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 'bold' }}>{t('roles.observers')}</span>
+          <strong style={{ fontSize: '0.95rem', textAlign: 'right', flex: 1, marginLeft: '1rem' }}>
+            {roles.observers && roles.observers.length > 0 ? roles.observers.join(', ') : '-'}
+          </strong>
         </div>
       </div>
     </div>
