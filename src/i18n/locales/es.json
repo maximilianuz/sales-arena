@@ -116,6 +116,13 @@
     "helpText": "Los datos se guardan localmente en tu navegador. Puedes conectarte a cualquier API que soporte el formato de OpenAI. Para usar Ollama, asegúrate de que esté corriendo en tu PC.",
     "stagesHelp": "Configura las etapas de tu proceso de ventas. La Inteligencia Artificial utilizará la 'Información Base' que proporciones aquí para generar objeciones y patrones de preguntas realistas para tu escenario."
   },
+  "product": {
+    "title": "Presentación del Producto",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "placeholder": "Escribe aquí la presentación del producto que el Closer debe vender...",
+    "empty": "No hay presentación del producto definida."
+  },
   "room": {
     "syncing": "Sincronizando Sala {{roomId}}...",
     "showHiddenInfo": "Mostrar Info Oculta del Cliente",

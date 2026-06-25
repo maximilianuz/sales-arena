@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import PipelinePanel from '../components/PipelinePanel';
 import BuyerPersonaPanel from '../components/ScenarioPanel';
 import RolesPanel from '../components/RolesPanel';
+import ProductPanel from '../components/ProductPanel';
 import Timer from '../components/Timer';
 import PrivateInfoModal from '../components/PrivateInfoModal';
 import SurpriseEventButton from '../components/SurpriseEventButton';
@@ -20,7 +21,7 @@ export default function Room() {
   const { t, i18n } = useTranslation();
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent } = useRoomSync(roomId);
+  const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -95,6 +96,9 @@ export default function Room() {
 
   const handleSetScenario = async (scenario) => {
     await updateScenario(scenario);
+    if (scenario.productToSell) {
+      await updateProductPresentation(scenario.productToSell);
+    }
     await updateActiveStage(0);
     const initialTime = (stages[0]?.estimatedTime || 5) * 60;
     await updateTimer({ isRunning: false, endTimestamp: null, timeLeft: initialTime });
@@ -127,10 +131,12 @@ export default function Room() {
   let showVoting = false;
   let showHiddenInfoBtn = false;
   let showSurpriseBtn = false;
+  let showProductPresentation = false;
 
   if (isCloser) {
     gridColumns = 'minmax(300px, 600px)'; // Center focus
-    showRoles = true;
+    showRoles = false;
+    showProductPresentation = true;
   } else if (isLead) {
     gridColumns = '1fr 300px';
     showPersona = true;
@@ -149,6 +155,7 @@ export default function Room() {
     showDebrief = true;
     showHiddenInfoBtn = true;
     showSurpriseBtn = true;
+    showProductPresentation = true;
   }
 
   return (
@@ -238,11 +245,11 @@ export default function Room() {
               </div>
             )}
 
-            {/* Para el Closer, RolesPanel va en el centro porque es de una columna */}
-            {isCloser && showRoles && (
-              <RolesPanel 
-                participants={participants}
-                setParticipants={(p) => setParticipants(p)}
+            {/* Para el Closer, la presentación va en el centro porque es de una columna */}
+            {isCloser && showProductPresentation && (
+              <ProductPanel 
+                productPresentation={roomData.productPresentation}
+                isReadOnly={true}
               />
             )}
 
@@ -260,16 +267,25 @@ export default function Room() {
             )}
           </div>
 
-          {/* COLUMNA 3: Voting Panel (Exclusivo Facilitador) */}
-          {showVoting && (
-            <div className="grid-column" style={{ gridColumn: '3', gridRow: '1 / span 2', height: '100%' }}>
-              <VotingPanel 
-                isObserver={false} 
-                isFacilitator={isFacilitator}
-                questions={roomData.questions}
-                updateQuestions={updateQuestions}
-                activeStage={stages[activeStageIndex || 0]}
-              />
+          {/* COLUMNA 3: Voting Panel & Product Presentation (Exclusivo Facilitador) */}
+          {(showVoting || (isFacilitator && showProductPresentation)) && (
+            <div className="grid-column" style={{ gridColumn: '3', gridRow: '1 / span 2', height: '100%', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {showVoting && (
+                <VotingPanel 
+                  isObserver={false} 
+                  isFacilitator={isFacilitator}
+                  questions={roomData.questions}
+                  updateQuestions={updateQuestions}
+                  activeStage={stages[activeStageIndex || 0]}
+                />
+              )}
+              {showProductPresentation && isFacilitator && (
+                <ProductPanel
+                  productPresentation={roomData.productPresentation}
+                  updateProductPresentation={updateProductPresentation}
+                  isReadOnly={false}
+                />
+              )}
             </div>
           )}
         </div>

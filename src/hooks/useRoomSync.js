@@ -28,6 +28,7 @@ export function useRoomSync(roomId) {
           },
           activeStageIndex: 0,
           currentScenario: null,
+          productPresentation: "",
           questions: [
             { id: 1, question: "¿Encontró la objeción real?", options: [{ text: "Sí", votes: 0, color: "var(--success)" }, { text: "No", votes: 0, color: "var(--danger)" }] },
             { id: 2, question: "¿Quién tuvo el control?", options: [{ text: "Cliente", votes: 0, color: "var(--secondary)" }, { text: "Vendedor", votes: 0, color: "var(--primary)" }] },
@@ -67,6 +68,10 @@ export function useRoomSync(roomId) {
     await update(roomRef, { surpriseEvent: { text: eventText, id: Date.now() } });
   };
 
+  const updateProductPresentation = async (text) => {
+    await update(roomRef, { productPresentation: text });
+  };
+
   return {
     roomData,
     loading,
@@ -75,6 +80,7 @@ export function useRoomSync(roomId) {
     updateActiveStage,
     updateQuestions,
     updateDebriefNotes,
-    triggerSurpriseEvent
+    triggerSurpriseEvent,
+    updateProductPresentation
   };
 }

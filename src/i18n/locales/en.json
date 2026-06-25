@@ -116,6 +116,13 @@
     "helpText": "Data is saved locally in your browser. You can connect to any API supporting the OpenAI format. To use Ollama, ensure it is running on your PC.",
     "stagesHelp": "Configure the stages of your sales process. The AI will use the 'Base Information' provided here to generate realistic objections and question patterns for your scenario."
   },
+  "product": {
+    "title": "Product Presentation",
+    "save": "Save",
+    "saving": "Saving...",
+    "placeholder": "Write the product presentation the Closer must sell here...",
+    "empty": "No product presentation defined."
+  },
   "room": {
     "syncing": "Syncing Room {{roomId}}...",
     "showHiddenInfo": "Show Hidden Client Info",

@@ -39,7 +39,8 @@ export function getIdentityPrompt({ level, theme, leadTemperature, language }) {
         "problem": "Problema actual profundo",
         "previousAttempts": "Intentos previos de solución (qué probó y por qué falló)",
         "impact": "Impacto financiero o emocional de no resolver el problema"
-      }
+      },
+      "productToSell": "Describe en 1 o 2 párrafos el producto o servicio específico que el Closer (vendedor) debe ofrecer para resolver de forma perfecta el problema de este Lead. Incluye el nombre del servicio, características clave, y el precio/inversión aproximada (High Ticket)."
     }
   `;
 }
