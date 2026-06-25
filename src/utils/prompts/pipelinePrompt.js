@@ -24,7 +24,7 @@ export function getPipelinePrompt({ baseProfile, objectionsProfile, activeStages
     Basado en el siguiente perfil resumido del Lead:
     ${contextSummary}
 
-    Tu tarea final es generar las preguntas/objeciones específicas que el Lead lanzará durante cada etapa de la llamada (Pipeline Questions), para que el Facilitador guíe la simulación.
+    Tu tarea final es generar preguntas estratégicas, frases de transición y consejos (salvavidas) que el CLOSER (Vendedor) debe usar en cada etapa de la llamada para guiar y cualificar a este Lead específico.
     - Idioma de respuesta: ${language === 'es' ? 'Español' : 'Inglés'}
 
     FRAMEWORK ESPECÍFICO QUE GUÍA ESTA SIMULACIÓN:
@@ -34,10 +34,10 @@ export function getPipelinePrompt({ baseProfile, objectionsProfile, activeStages
     ${stagesPromptContext}
 
     INSTRUCCIONES PARA LAS PREGUNTAS (pipelineQuestions):
-    Basándote estrictamente en los "Recursos Base" de cada etapa y en el "Framework Específico", genera de 2 a 4 frases, preguntas u objeciones que el LEAD dirá en cada etapa. Deben sonar muy naturales, con un tono adaptado a su problema y conflicto interno.
-    Asegúrate de que, especialmente en las etapas de cierre, aparezca claramente su "Objeción Principal Visible".
+    Basándote estrictamente en los "Recursos Base" de cada etapa y en el "Framework Específico", genera de 2 a 4 preguntas poderosas, afirmaciones o mini-consejos que sirvan como un "salvavidas" directo para el CLOSER.
+    Deben estar perfectamente adaptadas a la industria, el dolor principal y la psicología de este Lead específico. Escribe las preguntas exactas que el Closer debería formularle (ej. "¿Cómo está impactando la falta de visibilidad en tus ventas este trimestre?").
 
-    Devuelve ÚNICAMENTE un objeto JSON válido con las siguientes claves exactas (los ID de las etapas), donde el valor es un arreglo de strings (las frases del Lead):
+    Devuelve ÚNICAMENTE un objeto JSON válido con las siguientes claves exactas (los ID de las etapas), donde el valor es un arreglo de strings (las preguntas/consejos para el CLOSER):
     {
       "pipelineQuestions": {
         ${pipelineKeys}
