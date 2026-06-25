@@ -143,10 +143,10 @@ export default function Room() {
     showRoles = false;
     showHiddenInfoBtn = true;
   } else if (isObserver) {
-    gridColumns = '1fr 1.5fr'; // Wide center for debrief
+    gridColumns = '300px 1fr'; // Narrow left, wide right for debrief
     showPersona = true;
     showDebrief = true;
-    showHiddenInfoBtn = true;
+    showHiddenInfoBtn = false; // It's shown in the compact panel
   } else if (isFacilitator) {
     gridColumns = '1fr 1.2fr 1fr'; // 3 Columns
     showPersona = true;
@@ -172,7 +172,7 @@ export default function Room() {
       />
       
       <main className="dashboard-wrapper">
-        {!isLead && (
+        {!isLead && !isObserver && (
           <PipelinePanel 
             activeStageIndex={activeStageIndex || 0} 
             setActiveStageIndex={isFacilitator ? handleStageChange : undefined} 
@@ -202,7 +202,21 @@ export default function Room() {
                   stages={stages}
                   isReadOnly={!isFacilitator}
                   isLeadRole={isLead}
+                  isCompactObserver={isObserver}
                 />
+              )}
+              {isObserver && stages[activeStageIndex || 0] && (
+                <div className="glass-panel" style={{ padding: '1.25rem' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                    Camino del Closer (Etapa {activeStageIndex + 1})
+                  </div>
+                  <div style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                    {stages[activeStageIndex || 0].label}
+                  </div>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                    <strong>Objetivo:</strong> {stages[activeStageIndex || 0].objective}
+                  </div>
+                </div>
               )}
               {showRoles && !isCloser && (
                 <RolesPanel 

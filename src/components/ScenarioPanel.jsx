@@ -3,7 +3,7 @@ import { UserCircle, HeartPulse, Target, ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { generateAIScenario } from '../utils/ai';
 
-export default function ScenarioPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly, isLeadRole }) {
+export default function ScenarioPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly, isLeadRole, isCompactObserver }) {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('situacion');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -140,7 +140,32 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
     );
   }
 
-    const renderTabContent = () => {
+  if (isCompactObserver) {
+    return (
+      <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 'bold' }}>
+          <UserCircle size={16} /> Resumen del Lead
+        </div>
+        
+        <div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Perfil:</div>
+          <div style={{ fontWeight: '600', fontSize: '1rem' }}>{currentScenario.demographics.role} en {currentScenario.demographics.industry}</div>
+        </div>
+
+        <div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Dolor Principal:</div>
+          <div style={{ fontSize: '0.95rem', lineHeight: '1.4' }}>{currentScenario.currentSituation.problem}</div>
+        </div>
+
+        <div style={{ background: 'rgba(236, 72, 153, 0.05)', padding: '0.75rem', borderRadius: '0.5rem', borderLeft: '3px solid var(--secondary)' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--secondary)', marginBottom: '0.2rem', fontWeight: 'bold' }}>Objeción Principal:</div>
+          <div style={{ fontSize: '0.95rem', fontStyle: 'italic' }}>"{currentScenario.visibleObjection}"</div>
+        </div>
+      </div>
+    );
+  }
+
+  const renderTabContent = () => {
     switch(activeTab) {
       case 'demografia':
         return (
