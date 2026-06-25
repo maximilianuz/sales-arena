@@ -172,12 +172,14 @@ export default function Room() {
       />
       
       <main className="dashboard-wrapper">
-        <PipelinePanel 
-          activeStageIndex={activeStageIndex || 0} 
-          setActiveStageIndex={isFacilitator ? handleStageChange : undefined} 
-          pipelineQuestions={currentScenario?.pipelineQuestions} 
-          stages={stages}
-        />
+        {!isLead && (
+          <PipelinePanel 
+            activeStageIndex={activeStageIndex || 0} 
+            setActiveStageIndex={isFacilitator ? handleStageChange : undefined} 
+            pipelineQuestions={currentScenario?.pipelineQuestions} 
+            stages={stages}
+          />
+        )}
 
         <div className="dashboard-grid" style={{ 
           gridTemplateColumns: gridColumns, 
