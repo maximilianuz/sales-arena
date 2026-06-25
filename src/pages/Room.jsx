@@ -126,7 +126,7 @@ export default function Room() {
   let gridColumns = '1fr';
   let showPersona = false;
   let showRoles = false;
-  let showTimer = true;
+  let showTimer = !isLead;
   let showDebrief = false;
   let showVoting = false;
   let showHiddenInfoBtn = false;
