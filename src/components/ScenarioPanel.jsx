@@ -368,12 +368,12 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
             </button>
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', lineHeight: '1.6' }}>
+          <div style={{ flex: 1, paddingRight: '0.5rem', lineHeight: '1.6' }}>
             {renderTabContent()}
           </div>
         </>
       ) : (
-        <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem', lineHeight: '1.6' }}>
+        <div style={{ flex: 1, paddingRight: '0.5rem', lineHeight: '1.6' }}>
           {renderExpandedLeadScript()}
         </div>
       )}

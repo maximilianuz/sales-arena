@@ -84,7 +84,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
         )}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, overflowY: 'auto', paddingRight: '0.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, paddingRight: '0.5rem' }}>
         
         {/* Etapas Completadas */}
         <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '0.75rem', border: '1px solid var(--glass-border)' }}>
