@@ -192,7 +192,7 @@ export default function Lobby() {
 
           <div>
             <label style={{ display: 'block', marginBottom: '1rem', color: 'var(--text-muted)' }}>{t('lobby.chooseRole')}</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="roles-grid">
               {roles.map(r => {
                 const roleColor = getRoleColor(r.id);
                 const isActive = role === r.id;

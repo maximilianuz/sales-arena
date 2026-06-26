@@ -14,6 +14,12 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
   const [localLeadSignals, setLocalLeadSignals] = useState('');
   const [localLeadObjection, setLocalLeadObjection] = useState('');
 
+  // Retrospective states
+  const [localRetroPositivo, setLocalRetroPositivo] = useState('');
+  const [localRetroDescartable, setLocalRetroDescartable] = useState('');
+  const [localRetroMejorar, setLocalRetroMejorar] = useState('');
+  const [localRetroHerramientas, setLocalRetroHerramientas] = useState('');
+
   // Sync from remote when roomNotes changes, but only if not currently typing
   useEffect(() => {
     if (roomNotes) {
@@ -24,6 +30,11 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       if (document.activeElement.id !== 'leadPainInput') setLocalLeadPain(roomNotes.leadPain || '');
       if (document.activeElement.id !== 'leadSignalsInput') setLocalLeadSignals(roomNotes.leadSignals || '');
       if (document.activeElement.id !== 'leadObjectionInput') setLocalLeadObjection(roomNotes.leadObjection || '');
+
+      if (document.activeElement.id !== 'retroPositivoInput') setLocalRetroPositivo(roomNotes.retroPositivo || '');
+      if (document.activeElement.id !== 'retroDescartableInput') setLocalRetroDescartable(roomNotes.retroDescartable || '');
+      if (document.activeElement.id !== 'retroMejorarInput') setLocalRetroMejorar(roomNotes.retroMejorar || '');
+      if (document.activeElement.id !== 'retroHerramientasInput') setLocalRetroHerramientas(roomNotes.retroHerramientas || '');
     } else {
       setLocalTone('');
       setLocalPain('');
@@ -31,6 +42,10 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       setLocalLeadPain('');
       setLocalLeadSignals('');
       setLocalLeadObjection('');
+      setLocalRetroPositivo('');
+      setLocalRetroDescartable('');
+      setLocalRetroMejorar('');
+      setLocalRetroHerramientas('');
     }
   }, [roomNotes]);
 
@@ -55,6 +70,11 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
   const handleBlurLeadSignals = () => updateNotes && updateNotes({ ...roomNotes, leadSignals: localLeadSignals });
   const handleBlurLeadObjection = () => updateNotes && updateNotes({ ...roomNotes, leadObjection: localLeadObjection });
 
+  const handleBlurRetroPositivo = () => updateNotes && updateNotes({ ...roomNotes, retroPositivo: localRetroPositivo });
+  const handleBlurRetroDescartable = () => updateNotes && updateNotes({ ...roomNotes, retroDescartable: localRetroDescartable });
+  const handleBlurRetroMejorar = () => updateNotes && updateNotes({ ...roomNotes, retroMejorar: localRetroMejorar });
+  const handleBlurRetroHerramientas = () => updateNotes && updateNotes({ ...roomNotes, retroHerramientas: localRetroHerramientas });
+
   const clearDebrief = () => {
     if (!updateNotes) return;
     updateNotes({ 
@@ -64,7 +84,11 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       objection: '',
       leadPain: '',
       leadSignals: '',
-      leadObjection: ''
+      leadObjection: '',
+      retroPositivo: '',
+      retroDescartable: '',
+      retroMejorar: '',
+      retroHerramientas: ''
     });
   };
 
@@ -227,6 +251,80 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
                 style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}
               />
             </div>
+          </div>
+        </div>
+
+        {/* RETROSPECTIVA Y MEJORA CONTINUA */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
+          <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0ea5e9', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(14, 165, 233, 0.3)', paddingBottom: '0.5rem' }}>
+            <Activity size={18} /> Retrospectiva y Mejora Continua
+          </h3>
+          <div className="retro-grid">
+            
+            {/* Nuestros aciertos */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Lo positivo
+              </div>
+              <textarea 
+                id="retroPositivoInput"
+                value={localRetroPositivo}
+                onChange={(e) => setLocalRetroPositivo(e.target.value)}
+                onBlur={handleBlurRetroPositivo}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Qué funcionó bien en este proceso/ciclo y definitivamente debe mantenerse?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(14, 165, 233, 0.05)', border: '1px solid rgba(14, 165, 233, 0.2)' }}
+              />
+            </div>
+
+            {/* Oportunidades de ajuste */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Lo descartable
+              </div>
+              <textarea 
+                id="retroDescartableInput"
+                value={localRetroDescartable}
+                onChange={(e) => setLocalRetroDescartable(e.target.value)}
+                onBlur={handleBlurRetroDescartable}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Qué aspectos no sumaron valor y podríamos dejar fuera, o cuáles necesitan mejorarse?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(14, 165, 233, 0.05)', border: '1px solid rgba(14, 165, 233, 0.2)' }}
+              />
+            </div>
+
+            {/* Nuestra evolución */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                El siguiente nivel
+              </div>
+              <textarea 
+                id="retroMejorarInput"
+                value={localRetroMejorar}
+                onChange={(e) => setLocalRetroMejorar(e.target.value)}
+                onBlur={handleBlurRetroMejorar}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "Pensando en la excelencia, ¿cómo podríamos hacer nuestro trabajo aún mejor la próxima vez?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(14, 165, 233, 0.05)', border: '1px solid rgba(14, 165, 233, 0.2)' }}
+              />
+            </div>
+
+            {/* Nuevas herramientas */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Enfoque comercial
+              </div>
+              <textarea 
+                id="retroHerramientasInput"
+                value={localRetroHerramientas}
+                onChange={(e) => setLocalRetroHerramientas(e.target.value)}
+                onBlur={handleBlurRetroHerramientas}
+                readOnly={!updateNotes}
+                placeholder={updateNotes ? "¿Qué elementos, herramientas o argumentos podríamos agregar para fortalecer la venta?" : "Esperando notas del Observador..."}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(14, 165, 233, 0.05)', border: '1px solid rgba(14, 165, 233, 0.2)' }}
+              />
+            </div>
+
           </div>
         </div>
 
