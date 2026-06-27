@@ -251,7 +251,7 @@ export default function Lobby() {
         </p>
         <div style={{ background: 'white', padding: '0.5rem', borderRadius: '0.5rem', display: 'inline-block' }}>
           <img 
-            src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://expo.dev/accounts/maximilianoclosers-organization/projects/sales-arena/builds/9280d1d5-e75d-47f5-9e09-ad598e0a5269" 
+            src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://github.com/maximilianuz/sales-arena-mobile/raw/master/sales-arena-mobile.apk" 
             alt="QR Code Mobile App" 
             style={{ display: 'block' }}
           />
