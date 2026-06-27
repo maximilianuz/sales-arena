@@ -249,13 +249,20 @@ export default function Lobby() {
         <p style={{ color: 'var(--text-main)', marginBottom: '1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
           📱 {i18n.language?.startsWith('en') ? 'Download the Mobile App' : 'Descarga la App Móvil'}
         </p>
-        <div style={{ background: 'white', padding: '0.5rem', borderRadius: '0.5rem', display: 'inline-block' }}>
+        <a 
+          href="https://github.com/maximilianuz/sales-arena-mobile/raw/master/sales-arena-mobile.apk"
+          style={{ background: 'white', padding: '0.5rem', borderRadius: '0.5rem', display: 'inline-block', position: 'relative', cursor: 'pointer' }}
+          title="Haz clic para descargar el APK"
+        >
           <img 
             src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://github.com/maximilianuz/sales-arena-mobile/raw/master/sales-arena-mobile.apk" 
             alt="QR Code Mobile App" 
             style={{ display: 'block' }}
           />
-        </div>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '2px', borderRadius: '4px', display: 'flex' }}>
+            <ChessKnight size={24} color="black" strokeWidth={2} />
+          </div>
+        </a>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '1rem' }}>
           {i18n.language?.startsWith('en') ? 'Scan to play from your smartphone' : 'Escanea el código para participar desde tu celular'}
         </p>
