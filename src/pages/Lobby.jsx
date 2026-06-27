@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shuffle, Copy, ChessKnight, BookOpen } from 'lucide-react';
+import { Shuffle, Copy, ChessKnight, BookOpen, Smartphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Lobby() {
@@ -246,9 +246,14 @@ export default function Lobby() {
         maxWidth: '500px',
         width: '100%'
       }}>
-        <p style={{ color: 'var(--text-main)', marginBottom: '1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-          📱 {i18n.language?.startsWith('en') ? 'Download the Mobile App' : 'Descarga la App Móvil'}
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+          <div style={{ background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '0.4rem', borderRadius: '0.5rem', display: 'flex', boxShadow: '0 4px 15px rgba(79, 70, 229, 0.4)' }}>
+            <Smartphone size={20} color="white" strokeWidth={2} />
+          </div>
+          <p style={{ color: 'var(--text-main)', margin: 0, fontWeight: 'bold', fontSize: '1.1rem', letterSpacing: '0.02em' }}>
+            {i18n.language?.startsWith('en') ? 'Download the Mobile App' : 'Descarga la App Móvil'}
+          </p>
+        </div>
         <a 
           href="https://github.com/maximilianuz/sales-arena-mobile/raw/master/sales-arena-mobile.apk"
           style={{ background: 'white', padding: '0.5rem', borderRadius: '0.5rem', display: 'inline-block', position: 'relative', cursor: 'pointer' }}
