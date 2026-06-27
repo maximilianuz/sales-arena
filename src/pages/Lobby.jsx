@@ -255,12 +255,14 @@ export default function Lobby() {
           </p>
         </div>
         <a 
-          href="https://github.com/maximilianuz/sales-arena-mobile/raw/master/sales-arena-mobile.apk"
+          href="https://sales-arena-mobile.netlify.app/"
           style={{ background: 'white', padding: '0.5rem', borderRadius: '0.5rem', display: 'inline-block', position: 'relative', cursor: 'pointer' }}
-          title="Haz clic para descargar el APK"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Haz clic para visitar la página de descarga"
         >
           <img 
-            src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://github.com/maximilianuz/sales-arena-mobile/raw/master/sales-arena-mobile.apk" 
+            src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://sales-arena-mobile.netlify.app/" 
             alt="QR Code Mobile App" 
             style={{ display: 'block' }}
           />
