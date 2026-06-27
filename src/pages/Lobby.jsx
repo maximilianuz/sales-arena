@@ -256,18 +256,18 @@ export default function Lobby() {
         </div>
         <a 
           href="https://sales-arena-mobile.netlify.app/"
-          style={{ background: 'white', padding: '0.5rem', borderRadius: '0.5rem', display: 'inline-block', position: 'relative', cursor: 'pointer' }}
+          style={{ background: 'white', padding: '0.75rem', borderRadius: '0.75rem', display: 'inline-block', position: 'relative', cursor: 'pointer' }}
           target="_blank"
           rel="noopener noreferrer"
           title="Haz clic para visitar la página de descarga"
         >
           <img 
-            src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://sales-arena-mobile.netlify.app/" 
+            src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://sales-arena-mobile.netlify.app/&ecc=H" 
             alt="QR Code Mobile App" 
             style={{ display: 'block' }}
           />
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '2px', borderRadius: '4px', display: 'flex' }}>
-            <ChessKnight size={24} color="black" strokeWidth={2} />
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '4px', borderRadius: '4px', display: 'flex' }}>
+            <ChessKnight size={32} color="black" strokeWidth={2} />
           </div>
         </a>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '1rem' }}>
