@@ -25,7 +25,7 @@ export default function Room() {
   const navigate = useNavigate();
   const { isFree } = useSubscriptionContext() || { isFree: false };
   const [upgradeModal, setUpgradeModal] = useState(null); // { feature, requiredPlan }
-  const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation } = useRoomSync(roomId);
+  const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -106,6 +106,7 @@ export default function Room() {
     await updateActiveStage(0);
     const initialTime = (stages[0]?.estimatedTime || 5) * 60;
     await updateTimer({ isRunning: false, endTimestamp: null, timeLeft: initialTime });
+    await updateSessionStartedAt(); // marca inicio de sesión para el timer acumulativo
   };
 
   const handleStageChange = async (newIndex) => {
@@ -177,11 +178,13 @@ export default function Room() {
       
       <main className="dashboard-wrapper">
         {!isLead && !isObserver && (
-          <PipelinePanel 
-            activeStageIndex={activeStageIndex || 0} 
-            setActiveStageIndex={isFacilitator ? handleStageChange : undefined} 
-            pipelineQuestions={currentScenario?.pipelineQuestions} 
+          <PipelinePanel
+            activeStageIndex={activeStageIndex || 0}
+            setActiveStageIndex={isFacilitator ? handleStageChange : undefined}
+            pipelineQuestions={currentScenario?.pipelineQuestions}
             stages={stages}
+            isFree={isFree}
+            onUpgradeStage={() => setUpgradeModal({ feature: 'Cualificación y Cierre', requiredPlan: 'closer' })}
           />
         )}
 
@@ -240,6 +243,7 @@ export default function Room() {
                 timerState={timerState}
                 updateTimer={isFacilitator ? updateTimer : undefined}
                 maxMinutes={isFree ? 30 : null}
+                sessionStartedAt={roomData?.sessionStartedAt || null}
                 onTimeLimitReached={isFree ? () => setUpgradeModal({ feature: 'Sesiones ilimitadas', requiredPlan: 'closer' }) : null}
               />
             )}

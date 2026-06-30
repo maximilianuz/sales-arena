@@ -1,14 +1,19 @@
 import React from 'react';
-import { ArrowRight, CheckCircle2, Target } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Target, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, pipelineQuestions, stages }) {
+const FREE_LOCKED_STAGES = ['cualificacion_diagnostico', 'cierre_transicion'];
+
+export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, pipelineQuestions, stages, isFree, onUpgradeStage }) {
   const { t } = useTranslation();
-  
+
+  const isLocked = (stage) => isFree && FREE_LOCKED_STAGES.includes(stage?.id);
+
   const handleNext = () => {
-    if (activeStageIndex < stages.length - 1) {
-      setActiveStageIndex(activeStageIndex + 1);
-    }
+    if (activeStageIndex >= stages.length - 1) return;
+    const next = stages[activeStageIndex + 1];
+    if (isLocked(next)) { onUpgradeStage?.(); return; }
+    setActiveStageIndex(activeStageIndex + 1);
   };
 
   const handlePrev = () => {
@@ -32,24 +37,33 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
         {stages.map((stage, index) => {
           const isActive = index === activeStageIndex;
           const isPast = index < activeStageIndex;
+          const locked = isLocked(stage);
           return (
             <div key={stage.id} style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-              <div 
-                onClick={() => setActiveStageIndex && setActiveStageIndex(index)}
-                style={{ 
-                  padding: '0.4rem 1rem', 
+              <div
+                onClick={() => {
+                  if (!setActiveStageIndex) return;
+                  if (locked) { onUpgradeStage?.(); return; }
+                  setActiveStageIndex(index);
+                }}
+                style={{
+                  padding: '0.4rem 1rem',
                   borderRadius: '2rem',
                   fontSize: '0.85rem',
                   fontWeight: isActive ? '700' : '600',
                   cursor: setActiveStageIndex ? 'pointer' : 'default',
-                  background: isActive ? 'linear-gradient(135deg, var(--primary), #818cf8)' : (isPast ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-dark)'),
-                  color: isActive ? 'white' : (isPast ? 'var(--success)' : 'var(--text-muted)'),
-                  border: isActive ? '1px solid rgba(255,255,255,0.2)' : `1px solid ${isPast ? 'var(--success)' : 'var(--glass-border)'}`,
+                  background: locked ? 'rgba(0,0,0,0.3)' : isActive ? 'linear-gradient(135deg, var(--primary), #818cf8)' : (isPast ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-dark)'),
+                  color: locked ? 'var(--text-muted)' : isActive ? 'white' : (isPast ? 'var(--success)' : 'var(--text-muted)'),
+                  border: locked ? '1px dashed var(--glass-border)' : isActive ? '1px solid rgba(255,255,255,0.2)' : `1px solid ${isPast ? 'var(--success)' : 'var(--glass-border)'}`,
                   boxShadow: isActive ? '0 0 20px rgba(99, 102, 241, 0.4)' : 'none',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  opacity: locked ? 0.6 : 1,
+                  display: 'flex', alignItems: 'center', gap: '0.4rem'
                 }}>
-                {stage.label} <span style={{ opacity: isActive ? 0.9 : 0.6, fontSize: '0.85em', marginLeft: '6px' }}>({stage.estimatedTime || 5}m)</span>
+                {locked && <Lock size={12} />}
+                {stage.label}
+                <span style={{ opacity: isActive ? 0.9 : 0.6, fontSize: '0.85em' }}>({stage.estimatedTime || 5}m)</span>
               </div>
             </div>
           );

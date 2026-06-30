@@ -72,6 +72,10 @@ export function useRoomSync(roomId) {
     await update(roomRef, { productPresentation: text });
   };
 
+  const updateSessionStartedAt = async () => {
+    await update(roomRef, { sessionStartedAt: Date.now() });
+  };
+
   return {
     roomData,
     loading,
@@ -81,6 +85,7 @@ export function useRoomSync(roomId) {
     updateQuestions,
     updateDebriefNotes,
     triggerSurpriseEvent,
-    updateProductPresentation
+    updateProductPresentation,
+    updateSessionStartedAt
   };
 }
