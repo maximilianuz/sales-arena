@@ -4,25 +4,35 @@ import { getObjectionsPrompt } from './prompts/objectionsPrompt';
 import { getPipelinePrompt } from './prompts/pipelinePrompt';
 
 async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel) {
-  let finalUrl = apiUrl || "/api/nvidia/v1/chat/completions";
-  if (finalUrl.includes("integrate.api.nvidia.com")) {
-    finalUrl = "/api/nvidia/v1/chat/completions";
+  // Modo experto (BYOK): el usuario cargó su propia key/URL en Ajustes y pega
+  // directo al proveedor externo. Por defecto (sin key propia) usamos nuestro
+  // proxy serverless, que nunca expone una key al cliente.
+  const useOwnKey = Boolean(apiKey);
+
+  let finalUrl = "/api/generate";
+  const headers = { "Content-Type": "application/json" };
+  let requestBody = { prompt };
+
+  if (useOwnKey) {
+    finalUrl = apiUrl || "/api/nvidia/v1/chat/completions";
+    if (finalUrl.includes("integrate.api.nvidia.com")) {
+      finalUrl = "/api/nvidia/v1/chat/completions";
+    }
+    headers["Authorization"] = `Bearer ${apiKey}`;
+    requestBody = {
+      model: apiModel || "meta/llama-3.1-8b-instruct",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1500, // Permitimos más tokens por módulo
+      response_format: { type: "json_object" }
+    };
   }
 
   try {
     const response = await fetch(finalUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: apiModel || "meta/llama-3.1-8b-instruct",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-        max_tokens: 1500, // Permitimos más tokens por módulo
-        response_format: { type: "json_object" }
-      })
+      headers,
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
@@ -37,7 +47,7 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel) {
 
     const data = await response.json();
     const content = data.choices[0].message.content;
-    
+
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
