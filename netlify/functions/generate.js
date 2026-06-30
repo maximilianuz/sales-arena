@@ -1,48 +1,43 @@
-// Proxy server-side hacia el proveedor de IA. La API key vive solo acá (env vars),
-// nunca se envía al cliente.
+const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
-const DEFAULT_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
-const DEFAULT_MODEL = "meta/llama-3.1-8b-instruct";
+export const handler = async (event) => {
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Content-Type": "application/json"
+  };
 
-export default async (req) => {
-  if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json" }
-    });
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 204, headers, body: "" };
+  }
+
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
   const apiKey = process.env.AI_API_KEY;
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "AI_API_KEY no configurada en el servidor." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" }
-    });
+    return { statusCode: 500, headers, body: JSON.stringify({ error: "AI_API_KEY no configurada en el servidor." }) };
   }
 
   let body;
   try {
-    body = await req.json();
+    body = JSON.parse(event.body || "{}");
   } catch (e) {
-    return new Response(JSON.stringify({ error: "Body inválido, se esperaba JSON." }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" }
-    });
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "Body inválido, se esperaba JSON." }) };
   }
 
-  const { prompt, temperature, max_tokens } = body || {};
+  const { prompt, temperature, max_tokens } = body;
   if (!prompt || typeof prompt !== "string") {
-    return new Response(JSON.stringify({ error: "Falta 'prompt' (string) en el body." }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" }
-    });
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "Falta 'prompt' (string) en el body." }) };
   }
 
   const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
   const model = process.env.AI_DEFAULT_MODEL || DEFAULT_MODEL;
 
   try {
-    const upstreamResponse = await fetch(apiUrl, {
+    const upstream = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,29 +52,16 @@ export default async (req) => {
       })
     });
 
-    const data = await upstreamResponse.json();
+    const data = await upstream.json();
 
-    if (!upstreamResponse.ok) {
+    if (!upstream.ok) {
       const message = data?.error?.message || data?.message || "Error en la API de IA.";
-      return new Response(JSON.stringify({ error: message }), {
-        status: upstreamResponse.status,
-        headers: { "Content-Type": "application/json" }
-      });
+      return { statusCode: upstream.status, headers, body: JSON.stringify({ error: message }) };
     }
 
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
+    return { statusCode: 200, headers, body: JSON.stringify(data) };
   } catch (error) {
-    console.error("generate.js proxy error:", error);
-    return new Response(JSON.stringify({ error: "Error al contactar al proveedor de IA." }), {
-      status: 502,
-      headers: { "Content-Type": "application/json" }
-    });
+    console.error("generate handler error:", error);
+    return { statusCode: 502, headers, body: JSON.stringify({ error: "Error al contactar al proveedor de IA." }) };
   }
-};
-
-export const config = {
-  path: "/api/generate"
 };
