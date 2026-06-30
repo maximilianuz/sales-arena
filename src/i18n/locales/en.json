@@ -156,7 +156,14 @@
     "freePlan": {
       "name": "Free",
       "description": "1 session · 30 min max · basic features · no credit card required",
-      "cta": "Start for Free"
+      "cta": "Start for Free",
+      "features": [
+        "1 roleplay session",
+        "30 minute maximum",
+        "AI-generated Buyer Persona",
+        "Access to all roles",
+        "No credit card required"
+      ]
     },
     "plans": {
       "closer": {

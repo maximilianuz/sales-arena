@@ -156,7 +156,14 @@
     "freePlan": {
       "name": "Gratis",
       "description": "1 sesión · 30 min máx · funciones básicas · sin tarjeta de crédito",
-      "cta": "Empezar Gratis"
+      "cta": "Empezar Gratis",
+      "features": [
+        "1 sesión de roleplay",
+        "Duración máxima 30 minutos",
+        "Buyer Persona generada por IA",
+        "Acceso a todos los roles",
+        "Sin tarjeta de crédito"
+      ]
     },
     "plans": {
       "closer": {

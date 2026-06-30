@@ -94,7 +94,7 @@ export default function SubscriptionGate({ user, children, isActive, isLoading }
         </select>
       </div>
 
-      <div style={{ maxWidth: '860px', width: '100%', margin: 'auto' }}>
+      <div style={{ maxWidth: '1100px', width: '100%', margin: 'auto' }}>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
@@ -139,27 +139,35 @@ export default function SubscriptionGate({ user, children, isActive, isLoading }
           ))}
         </div>
 
-        {/* Plan gratuito */}
-        <div className="glass-panel" style={{ marginBottom: '1.5rem', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-              <Lock size={18} color="var(--text-muted)" />
-              <h3 style={{ margin: 0, fontWeight: '700', fontSize: '1.1rem' }}>{t('subscription.freePlan.name')}</h3>
-            </div>
-            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('subscription.freePlan.description')}</p>
-          </div>
-          <button
-            className="btn btn-outline"
-            onClick={handleFree}
-            disabled={!!loadingPlan}
-            style={{ whiteSpace: 'nowrap' }}
-          >
-            {loadingPlan === 'free' ? t('subscription.loading') : t('subscription.freePlan.cta')}
-          </button>
-        </div>
+        {/* Plan cards — 3 columnas */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem', marginBottom: '1.5rem' }}>
 
-        {/* Plan cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+          {/* Card Gratis */}
+          <div className="glass-panel" style={{ border: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ color: 'var(--text-muted)', marginBottom: '0.75rem' }}><Lock size={28} /></div>
+            <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700' }}>{t('subscription.freePlan.name')}</h2>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '2.5rem', fontWeight: '800' }}>$0</span>
+            </div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', flex: 1 }}>
+              {t('subscription.freePlan.features', { returnObjects: true }).map(f => (
+                <li key={f} style={{ display: 'flex', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  <Check size={15} color="var(--text-muted)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <button
+              className="btn btn-outline"
+              onClick={handleFree}
+              disabled={!!loadingPlan}
+              style={{ width: '100%', marginTop: 'auto' }}
+            >
+              {loadingPlan === 'free' ? t('subscription.loading') : t('subscription.freePlan.cta')}
+            </button>
+          </div>
+
+        {/* Plan cards pagos */}
           {PLAN_META.map(plan => {
             const price = billing === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;
             const planId = billing === 'monthly' ? plan.monthlyId : plan.yearlyId;
