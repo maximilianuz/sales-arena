@@ -1,3 +1,5 @@
+import { getSubscriptionStatus } from './lib/firebaseAdmin.js';
+
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
@@ -28,7 +30,23 @@ export const handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Body inválido, se esperaba JSON." }) };
   }
 
-  const { prompt, temperature, max_tokens } = body;
+  const { prompt, temperature, max_tokens, uid, byok } = body;
+
+  // Chequeo de suscripción — se saltea solo si el usuario usa su propia key (BYOK)
+  if (!byok) {
+    if (!uid) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: "Se requiere autenticación." }) };
+    }
+    try {
+      const status = await getSubscriptionStatus(uid);
+      if (status !== 'active') {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "subscription_required" }) };
+      }
+    } catch (e) {
+      console.error("Error chequeando suscripción:", e);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Error verificando suscripción." }) };
+    }
+  }
   if (!prompt || typeof prompt !== "string") {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Falta 'prompt' (string) en el body." }) };
   }

@@ -8,6 +8,42 @@
   force = true
 
 [[redirects]]
+  from = "/api/create-mp-preference"
+  to = "/.netlify/functions/create-mp-preference"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/create-stripe-session"
+  to = "/.netlify/functions/create-stripe-session"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/create-crypto-charge"
+  to = "/.netlify/functions/create-crypto-charge"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/webhook-mp"
+  to = "/.netlify/functions/webhook-mp"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/webhook-stripe"
+  to = "/.netlify/functions/webhook-stripe"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/webhook-nowpayments"
+  to = "/.netlify/functions/webhook-nowpayments"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/nvidia/*"
   to = "https://integrate.api.nvidia.com/:splat"
   status = 200

@@ -2,6 +2,7 @@ import { OBJECTIONS_THEORY_GENERAL, OBJECTIONS_DICTIONARY } from './objectionsKn
 import { getIdentityPrompt } from './prompts/identityPrompt';
 import { getObjectionsPrompt } from './prompts/objectionsPrompt';
 import { getPipelinePrompt } from './prompts/pipelinePrompt';
+import { auth } from './db';
 
 async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel) {
   // Modo experto (BYOK): el usuario cargó su propia key/URL en Ajustes y pega
@@ -11,9 +12,10 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel) {
 
   let finalUrl = "/api/generate";
   const headers = { "Content-Type": "application/json" };
-  let requestBody = { prompt };
+  let requestBody = { prompt, uid: auth.currentUser?.uid };
 
   if (useOwnKey) {
+    requestBody.byok = true;
     finalUrl = apiUrl || "/api/nvidia/v1/chat/completions";
     if (finalUrl.includes("integrate.api.nvidia.com")) {
       finalUrl = "/api/nvidia/v1/chat/completions";
