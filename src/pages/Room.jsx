@@ -14,6 +14,7 @@ import VotingPanel from '../components/VotingPanel';
 import DebriefPanel from '../components/DebriefPanel';
 import SettingsModal from '../components/SettingsModal';
 import UpgradeModal from '../components/UpgradeModal';
+import SessionAnalysis from '../components/SessionAnalysis';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import { Dices, X, Lock } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
@@ -23,8 +24,9 @@ export default function Room() {
   const { t, i18n } = useTranslation();
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const { isFree } = useSubscriptionContext() || { isFree: false };
-  const [upgradeModal, setUpgradeModal] = useState(null); // { feature, requiredPlan }
+  const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
+  const [upgradeModal, setUpgradeModal] = useState(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
   const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
@@ -359,8 +361,17 @@ export default function Room() {
         </div>
       </main>
 
-      <footer style={{ textAlign: 'center', padding: '2rem 1rem', marginTop: 'auto', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-        {t('room.madeWith')} <span className="heart-beat">❤️</span> {t('room.by')} <a href="https://maximilianoc.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>Maximiliano C.</a>
+      <footer style={{ textAlign: 'center', padding: '2rem 1rem', marginTop: 'auto', fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+        <span>{t('room.madeWith')} <span className="heart-beat">❤️</span> {t('room.by')} <a href="https://maximilianoc.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>Maximiliano C.</a></span>
+        {isPaid && currentScenario && (
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowAnalysis(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+          >
+            📊 {i18n.language?.startsWith('en') ? 'Analyze Session' : 'Analizar Sesión'}
+          </button>
+        )}
       </footer>
 
       {showPrivateInfo && currentScenario && (
@@ -416,6 +427,14 @@ export default function Room() {
           feature={upgradeModal.feature}
           requiredPlan={upgradeModal.requiredPlan}
           onClose={() => setUpgradeModal(null)}
+        />
+      )}
+
+      {showAnalysis && (
+        <SessionAnalysis
+          roomData={roomData}
+          stages={stages}
+          onClose={() => setShowAnalysis(false)}
         />
       )}
     </div>

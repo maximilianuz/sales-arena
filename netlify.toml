@@ -44,6 +44,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/analyze-session"
+  to = "/.netlify/functions/analyze-session"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/nvidia/*"
   to = "https://integrate.api.nvidia.com/:splat"
   status = 200

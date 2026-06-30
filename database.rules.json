@@ -9,7 +9,19 @@
     "users": {
       "$uid": {
         ".read": "$uid === auth.uid",
-        ".write": "$uid === auth.uid && newData.child('subscriptionStatus').val() === 'free'"
+        "subscriptionStatus": {
+          ".write": "$uid === auth.uid && newData.val() === 'free'"
+        },
+        "subscriptionPlan": { ".write": false },
+        "sessionsUsed": { ".write": false },
+        "subscriptionExpiry": { ".write": false },
+        "subscriptionProvider": { ".write": false },
+        "history": {
+          "$sessionId": {
+            ".read": "$uid === auth.uid",
+            ".write": false
+          }
+        }
       }
     },
     "$other": {
