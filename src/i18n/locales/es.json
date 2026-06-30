@@ -128,5 +128,45 @@
     "showHiddenInfo": "Mostrar Info Oculta del Cliente",
     "madeWith": "Hecho con",
     "by": "por"
+  },
+  "subscription": {
+    "title": "Elegí tu plan",
+    "subtitle": "Entrenate como un pro. Cerrá como un campeón.",
+    "monthly": "Mensual",
+    "annual": "Anual",
+    "saveLabel": "Ahorrá 40%+",
+    "perMonth": "/mes",
+    "perYear": "/año",
+    "billedAnnually": "${{price}}/mes facturado anualmente",
+    "mostPopular": "MÁS POPULAR",
+    "payCard": "Pagar con Tarjeta (Stripe)",
+    "payMP": "🇦🇷 MercadoPago",
+    "payCrypto": "Pagar con Cripto (USDT/USDC)",
+    "redirecting": "Redirigiendo...",
+    "loggedAs": "Sesión iniciada como {{email}}",
+    "signOut": "Cerrar sesión",
+    "loading": "Cargando...",
+    "plans": {
+      "closer": {
+        "name": "Closer",
+        "features": [
+          "Acceso a todas las salas y roles",
+          "Buyer Personas generadas por IA",
+          "Sesiones multiplayer en tiempo real",
+          "Frameworks de objeciones",
+          "Debrief y votación de sesión"
+        ]
+      },
+      "trainer": {
+        "name": "Trainer",
+        "features": [
+          "Todo lo de Closer",
+          "Salas y sesiones ilimitadas",
+          "Controles de Facilitador y analytics",
+          "Gestión de cohortes de alumnos",
+          "Soporte prioritario"
+        ]
+      }
+    }
   }
 }
