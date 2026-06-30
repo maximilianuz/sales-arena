@@ -3,7 +3,7 @@ import { X, Save, Key, Settings, Layers } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import StagesEditor from './StagesEditor';
 
-export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave, onClose }) {
+export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave, onClose, isFree, onUpgradeStages }) {
   const { t } = useTranslation();
   const [keyInput, setKeyInput] = useState(apiKey || '');
   const [urlInput, setUrlInput] = useState(apiUrl || '/api/nvidia/v1/chat/completions');
@@ -137,11 +137,26 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
         )}
 
         {activeTab === 'stages' && (
-          <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ marginBottom: '1.5rem', position: 'relative' }}>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
               {t('settings.stagesHelp')}
             </p>
-            <StagesEditor stages={localStages} setStages={setLocalStages} />
+            <StagesEditor stages={localStages} setStages={isFree ? () => {} : setLocalStages} />
+            {isFree && (
+              <div
+                onClick={onUpgradeStages}
+                style={{
+                  position: 'absolute', inset: 0, backdropFilter: 'blur(4px)',
+                  background: 'rgba(0,0,0,0.5)', borderRadius: '0.75rem',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', gap: '0.5rem'
+                }}
+              >
+                <span style={{ fontSize: '1.5rem' }}>🔒</span>
+                <span style={{ color: 'white', fontWeight: '700' }}>Personalización de etapas</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Disponible en Plan Closer</span>
+              </div>
+            )}
           </div>
         )}
 

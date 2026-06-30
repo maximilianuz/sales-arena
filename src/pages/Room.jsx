@@ -13,7 +13,9 @@ import SurpriseEventButton from '../components/SurpriseEventButton';
 import VotingPanel from '../components/VotingPanel';
 import DebriefPanel from '../components/DebriefPanel';
 import SettingsModal from '../components/SettingsModal';
-import { Dices, X } from 'lucide-react';
+import UpgradeModal from '../components/UpgradeModal';
+import { useSubscriptionContext } from '../contexts/SubscriptionContext';
+import { Dices, X, Lock } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
 import '../App.css';
 
@@ -21,6 +23,8 @@ export default function Room() {
   const { t, i18n } = useTranslation();
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const { isFree } = useSubscriptionContext() || { isFree: false };
+  const [upgradeModal, setUpgradeModal] = useState(null); // { feature, requiredPlan }
   const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
@@ -230,11 +234,13 @@ export default function Room() {
           {/* COLUMNA 2: Timer, Center Actions & Debrief */}
           <div className="grid-column center-column" style={{ gridColumn: isCloser ? '1' : '2', gridRow: '1 / span 2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {showTimer && (
-              <Timer 
-                stages={stages} 
+              <Timer
+                stages={stages}
                 activeStageIndex={activeStageIndex || 0}
-                timerState={timerState} 
-                updateTimer={isFacilitator ? updateTimer : undefined} 
+                timerState={timerState}
+                updateTimer={isFacilitator ? updateTimer : undefined}
+                maxMinutes={isFree ? 30 : null}
+                onTimeLimitReached={isFree ? () => setUpgradeModal({ feature: 'Sesiones ilimitadas', requiredPlan: 'closer' }) : null}
               />
             )}
             
@@ -250,13 +256,23 @@ export default function Room() {
                   </button>
                 )}
                 {showSurpriseBtn && (
-                  <SurpriseEventButton 
-                    triggerEvent={triggerSurpriseEvent} 
-                    apiKey={apiKey}
-                    apiUrl={apiUrl}
-                    apiModel={apiModel}
-                    currentScenario={currentScenario}
-                  />
+                  isFree ? (
+                    <button
+                      className="btn btn-outline"
+                      style={{ opacity: 0.5, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                      onClick={() => setUpgradeModal({ feature: 'Evento Sorpresa', requiredPlan: 'closer' })}
+                    >
+                      <Lock size={16} /> Evento Sorpresa
+                    </button>
+                  ) : (
+                    <SurpriseEventButton
+                      triggerEvent={triggerSurpriseEvent}
+                      apiKey={apiKey}
+                      apiUrl={apiUrl}
+                      apiModel={apiModel}
+                      currentScenario={currentScenario}
+                    />
+                  )
                 )}
               </div>
             )}
@@ -271,15 +287,30 @@ export default function Room() {
 
             {/* Debrief Panel (Evaluación) */}
             {showDebrief && (
-               <div style={{ flex: 1, display: 'flex', minHeight: '300px', width: '100%' }}>
-                 <DebriefPanel 
-                    activeStageIndex={activeStageIndex || 0} 
-                    stages={stages}
-                    roomNotes={roomData.debriefNotes}
-                    updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
-                    isFacilitator={isFacilitator}
-                  />
-               </div>
+              <div style={{ flex: 1, display: 'flex', minHeight: '300px', width: '100%', position: 'relative' }}>
+                <DebriefPanel
+                  activeStageIndex={activeStageIndex || 0}
+                  stages={stages}
+                  roomNotes={roomData.debriefNotes}
+                  updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
+                  isFacilitator={isFacilitator}
+                />
+                {isFree && (
+                  <div
+                    onClick={() => setUpgradeModal({ feature: 'Debrief completo', requiredPlan: 'closer' })}
+                    style={{
+                      position: 'absolute', inset: 0, backdropFilter: 'blur(6px)',
+                      background: 'rgba(0,0,0,0.4)', borderRadius: '0.75rem',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', gap: '0.5rem'
+                    }}
+                  >
+                    <Lock size={28} color="var(--primary)" />
+                    <span style={{ color: 'white', fontWeight: '700' }}>Desbloqueá el Debrief</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Plan Closer</span>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
@@ -287,13 +318,30 @@ export default function Room() {
           {(showVoting || (isFacilitator && showProductPresentation)) && (
             <div className="grid-column" style={{ gridColumn: '3', gridRow: '1 / span 2', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {showVoting && (
-                <VotingPanel 
-                  isObserver={false} 
-                  isFacilitator={isFacilitator}
-                  questions={roomData.questions}
-                  updateQuestions={updateQuestions}
-                  activeStage={stages[activeStageIndex || 0]}
-                />
+                <div style={{ position: 'relative' }}>
+                  <VotingPanel
+                    isObserver={false}
+                    isFacilitator={isFacilitator}
+                    questions={roomData.questions}
+                    updateQuestions={updateQuestions}
+                    activeStage={stages[activeStageIndex || 0]}
+                  />
+                  {isFree && (
+                    <div
+                      onClick={() => setUpgradeModal({ feature: 'Panel de Votación', requiredPlan: 'closer' })}
+                      style={{
+                        position: 'absolute', inset: 0, backdropFilter: 'blur(6px)',
+                        background: 'rgba(0,0,0,0.4)', borderRadius: '0.75rem',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', gap: '0.5rem'
+                      }}
+                    >
+                      <Lock size={28} color="var(--primary)" />
+                      <span style={{ color: 'white', fontWeight: '700' }}>Desbloqueá la Votación</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Plan Closer</span>
+                    </div>
+                  )}
+                </div>
               )}
               {showProductPresentation && isFacilitator && (
                 <ProductPanel
@@ -347,13 +395,23 @@ export default function Room() {
       )}
 
       {showSettings && isFacilitator && (
-        <SettingsModal 
-          apiKey={apiKey} 
+        <SettingsModal
+          apiKey={apiKey}
           apiUrl={apiUrl}
           apiModel={apiModel}
           stages={stages}
-          onSave={handleSaveSettings} 
-          onClose={() => setShowSettings(false)} 
+          onSave={handleSaveSettings}
+          onClose={() => setShowSettings(false)}
+          isFree={isFree}
+          onUpgradeStages={() => setUpgradeModal({ feature: 'Personalización de etapas', requiredPlan: 'closer' })}
+        />
+      )}
+
+      {upgradeModal && (
+        <UpgradeModal
+          feature={upgradeModal.feature}
+          requiredPlan={upgradeModal.requiredPlan}
+          onClose={() => setUpgradeModal(null)}
         />
       )}
     </div>

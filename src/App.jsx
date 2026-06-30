@@ -4,15 +4,16 @@ import Lobby from './pages/Lobby';
 import Room from './pages/Room';
 import Login from './pages/Login';
 import SubscriptionGate from './components/SubscriptionGate';
+import { SubscriptionProvider, useSubscriptionContext } from './contexts/SubscriptionContext';
 import { subscribeToAuthState } from './utils/auth';
-import { useSubscription } from './hooks/useSubscription';
 import './App.css';
 
-function AuthenticatedApp({ user }) {
-  const { isActive, isLoading } = useSubscription(user.uid);
+function GatedRoutes({ user }) {
+  const { isActive, isLoading, isFree } = useSubscriptionContext();
+  const hasAccess = isActive || isFree;
 
   return (
-    <SubscriptionGate user={user} isActive={isActive} isLoading={isLoading}>
+    <SubscriptionGate user={user} isActive={hasAccess} isLoading={isLoading}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Lobby />} />
@@ -20,6 +21,14 @@ function AuthenticatedApp({ user }) {
         </Routes>
       </BrowserRouter>
     </SubscriptionGate>
+  );
+}
+
+function AuthenticatedApp({ user }) {
+  return (
+    <SubscriptionProvider user={user}>
+      <GatedRoutes user={user} />
+    </SubscriptionProvider>
   );
 }
 

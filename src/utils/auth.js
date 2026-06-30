@@ -6,7 +6,8 @@ import {
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
-import { auth } from './db';
+import { ref, set } from 'firebase/database';
+import { auth, db } from './db';
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -28,4 +29,12 @@ export function signOutUser() {
 
 export function subscribeToAuthState(callback) {
   return onAuthStateChanged(auth, callback);
+}
+
+export function activateFreeplan(uid) {
+  return set(ref(db, `users/${uid}`), {
+    subscriptionStatus: 'free',
+    subscriptionPlan: 'free',
+    sessionsUsed: 0
+  });
 }

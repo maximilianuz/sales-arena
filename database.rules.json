@@ -9,7 +9,7 @@
     "users": {
       "$uid": {
         ".read": "$uid === auth.uid",
-        ".write": false
+        ".write": "$uid === auth.uid && newData.child('subscriptionStatus').val() === 'free'"
       }
     },
     "$other": {

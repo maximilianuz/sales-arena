@@ -129,6 +129,13 @@
     "madeWith": "Made with",
     "by": "by"
   },
+  "upgrade": {
+    "title": "Premium Feature",
+    "availableIn": "is available in",
+    "planDescription": "Unlimited sessions, unlimited duration, all analysis and customization tools.",
+    "later": "Not now",
+    "cta": "See plans"
+  },
   "subscription": {
     "title": "Choose your plan",
     "subtitle": "Train like a pro. Close like a champion.",
@@ -146,6 +153,11 @@
     "loggedAs": "Logged in as {{email}}",
     "signOut": "Sign out",
     "loading": "Loading...",
+    "freePlan": {
+      "name": "Free",
+      "description": "1 session · 30 min max · basic features · no credit card required",
+      "cta": "Start for Free"
+    },
     "plans": {
       "closer": {
         "name": "Closer",

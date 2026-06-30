@@ -129,6 +129,13 @@
     "madeWith": "Hecho con",
     "by": "por"
   },
+  "upgrade": {
+    "title": "Feature Premium",
+    "availableIn": "está disponible en el",
+    "planDescription": "Sesiones ilimitadas, duración ilimitada, todas las herramientas de análisis y personalización.",
+    "later": "Ahora no",
+    "cta": "Ver planes"
+  },
   "subscription": {
     "title": "Elegí tu plan",
     "subtitle": "Entrenate como un pro. Cerrá como un campeón.",
@@ -146,6 +153,11 @@
     "loggedAs": "Sesión iniciada como {{email}}",
     "signOut": "Cerrar sesión",
     "loading": "Cargando...",
+    "freePlan": {
+      "name": "Gratis",
+      "description": "1 sesión · 30 min máx · funciones básicas · sin tarjeta de crédito",
+      "cta": "Empezar Gratis"
+    },
     "plans": {
       "closer": {
         "name": "Closer",

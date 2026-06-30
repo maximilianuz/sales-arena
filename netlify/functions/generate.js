@@ -1,4 +1,4 @@
-import { getSubscriptionStatus } from './lib/firebaseAdmin.js';
+import { getSubscriptionStatus, getAdminDb } from './lib/firebaseAdmin.js';
 
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_MODEL = "llama-3.3-70b-versatile";
@@ -38,8 +38,21 @@ export const handler = async (event) => {
       return { statusCode: 401, headers, body: JSON.stringify({ error: "Se requiere autenticación." }) };
     }
     try {
-      const status = await getSubscriptionStatus(uid);
-      if (status !== 'active') {
+      const adminDb = getAdminDb();
+      const userSnap = await adminDb.ref(`users/${uid}`).get();
+      const userData = userSnap.val() || {};
+      const status = userData.subscriptionStatus;
+
+      if (status === 'active') {
+        // paid — sin restricciones
+      } else if (status === 'free') {
+        const sessionsUsed = userData.sessionsUsed || 0;
+        if (sessionsUsed >= 1) {
+          return { statusCode: 403, headers, body: JSON.stringify({ error: "session_limit_reached" }) };
+        }
+        // Incrementar contador de sesiones usadas
+        await adminDb.ref(`users/${uid}/sessionsUsed`).set(sessionsUsed + 1);
+      } else {
         return { statusCode: 403, headers, body: JSON.stringify({ error: "subscription_required" }) };
       }
     } catch (e) {

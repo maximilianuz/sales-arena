@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard } from 'lucide-react';
+import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { signOutUser } from '../utils/auth';
+import { signOutUser, activateFreeplan } from '../utils/auth';
 
 const PLAN_META = [
   {
@@ -39,6 +39,16 @@ export default function SubscriptionGate({ user, children, isActive, isLoading }
   }
 
   if (isActive) return children;
+
+  const handleFree = async () => {
+    setLoadingPlan('free');
+    try {
+      await activateFreeplan(user.uid);
+    } catch (e) {
+      setError(e.message);
+      setLoadingPlan(null);
+    }
+  };
 
   const handleCheckout = async (planId, provider) => {
     setError('');
@@ -127,6 +137,25 @@ export default function SubscriptionGate({ user, children, isActive, isLoading }
               )}
             </button>
           ))}
+        </div>
+
+        {/* Plan gratuito */}
+        <div className="glass-panel" style={{ marginBottom: '1.5rem', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+              <Lock size={18} color="var(--text-muted)" />
+              <h3 style={{ margin: 0, fontWeight: '700', fontSize: '1.1rem' }}>{t('subscription.freePlan.name')}</h3>
+            </div>
+            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>{t('subscription.freePlan.description')}</p>
+          </div>
+          <button
+            className="btn btn-outline"
+            onClick={handleFree}
+            disabled={!!loadingPlan}
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            {loadingPlan === 'free' ? t('subscription.loading') : t('subscription.freePlan.cta')}
+          </button>
         </div>
 
         {/* Plan cards */}
