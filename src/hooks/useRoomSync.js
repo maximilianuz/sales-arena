@@ -76,6 +76,19 @@ export function useRoomSync(roomId) {
     await update(roomRef, { sessionStartedAt: Date.now() });
   };
 
+  // Checkout simulado (Etapa 3)
+  const enableCheckout = async () => {
+    await update(roomRef, { checkout: { enabled: true, phase: 'idle', result: null, completedAt: null } });
+  };
+
+  const updateCheckoutPhase = async (phase, result = null) => {
+    await update(roomRef, {
+      'checkout/phase': phase,
+      'checkout/result': result,
+      'checkout/completedAt': result ? Date.now() : null
+    });
+  };
+
   return {
     roomData,
     loading,
@@ -86,6 +99,8 @@ export function useRoomSync(roomId) {
     updateDebriefNotes,
     triggerSurpriseEvent,
     updateProductPresentation,
-    updateSessionStartedAt
+    updateSessionStartedAt,
+    enableCheckout,
+    updateCheckoutPhase
   };
 }

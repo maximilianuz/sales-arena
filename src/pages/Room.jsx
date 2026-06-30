@@ -15,6 +15,8 @@ import DebriefPanel from '../components/DebriefPanel';
 import SettingsModal from '../components/SettingsModal';
 import UpgradeModal from '../components/UpgradeModal';
 import SessionAnalysis from '../components/SessionAnalysis';
+import LeadCheckoutPanel from '../components/LeadCheckoutPanel';
+import CheckoutResultBanner from '../components/CheckoutResultBanner';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import { Dices, X, Lock } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
@@ -27,7 +29,7 @@ export default function Room() {
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt } = useRoomSync(roomId);
+  const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -228,9 +230,17 @@ export default function Room() {
                 </div>
               )}
               {showRoles && !isCloser && (
-                <RolesPanel 
+                <RolesPanel
                   participants={participants}
                   setParticipants={(p) => setParticipants(p)}
+                />
+              )}
+              {/* Panel de checkout del Lead */}
+              {isLead && currentScenario && (
+                <LeadCheckoutPanel
+                  checkout={roomData?.checkout}
+                  scenario={currentScenario}
+                  updateCheckoutPhase={updateCheckoutPhase}
                 />
               )}
             </div>
@@ -261,6 +271,22 @@ export default function Room() {
                     {t('room.showHiddenInfo')}
                   </button>
                 )}
+                {/* Botón habilitar checkout (solo Facilitador) */}
+                {isFacilitator && currentScenario && !roomData?.checkout?.enabled && (
+                  <button
+                    className="btn btn-outline"
+                    onClick={enableCheckout}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  >
+                    🛒 {i18n.language?.startsWith('en') ? 'Enable Closing Phase' : 'Habilitar Fase de Cierre'}
+                  </button>
+                )}
+                {isFacilitator && roomData?.checkout?.enabled && !roomData?.checkout?.result && (
+                  <div style={{ fontSize: '0.82rem', color: 'var(--success)', textAlign: 'center', padding: '0.4rem 0.8rem', background: 'rgba(16,185,129,0.1)', borderRadius: '1rem', border: '1px solid rgba(16,185,129,0.3)' }}>
+                    ✅ {i18n.language?.startsWith('en') ? 'Closing phase active' : 'Fase de Cierre activa'}
+                  </div>
+                )}
+
                 {showSurpriseBtn && (
                   isFree ? (
                     <button
@@ -437,6 +463,9 @@ export default function Room() {
           onClose={() => setShowAnalysis(false)}
         />
       )}
+
+      {/* Banner de resultado del checkout visible para todos */}
+      {!isLead && <CheckoutResultBanner checkout={roomData?.checkout} />}
     </div>
   );
 }

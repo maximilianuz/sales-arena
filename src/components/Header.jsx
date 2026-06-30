@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Settings, Cpu, ChessKnight, Copy, CheckCircle2, User, BookOpen } from 'lucide-react';
+import { Settings, Cpu, ChessKnight, Copy, CheckCircle2, User, BookOpen, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { signOutUser } from '../utils/auth';
 
 export default function Header({ title, roomId, role, onTitleChange, onOpenSettings }) {
   const { t, i18n } = useTranslation();
@@ -88,6 +89,13 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
             <Cpu size={18} /> {t('header.aiSettings')}
           </button>
         )}
+        <button
+          onClick={signOutUser}
+          title={i18n.language?.startsWith('en') ? 'Sign out' : 'Cerrar sesión'}
+          style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: 'rgba(255,255,255,0.5)', borderRadius: '0.5rem', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+        >
+          <LogOut size={16} />
+        </button>
       </div>
     </header>
   );
