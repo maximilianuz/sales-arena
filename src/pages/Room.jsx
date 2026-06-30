@@ -17,6 +17,7 @@ import UpgradeModal from '../components/UpgradeModal';
 import SessionAnalysis from '../components/SessionAnalysis';
 import LeadCheckoutPanel from '../components/LeadCheckoutPanel';
 import CheckoutResultBanner from '../components/CheckoutResultBanner';
+import CloserCommandPanel from '../components/CloserCommandPanel';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import { Dices, X, Lock } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
@@ -309,11 +310,13 @@ export default function Room() {
               </div>
             )}
 
-            {/* Para el Closer, la presentación va en el centro porque es de una columna */}
-            {isCloser && showProductPresentation && (
-              <ProductPanel 
+            {/* Closer command panel: stage objective + questions + product */}
+            {isCloser && (
+              <CloserCommandPanel
+                currentScenario={currentScenario}
+                activeStage={stages[activeStageIndex || 0]}
+                pipelineQuestions={currentScenario?.pipelineQuestions}
                 productPresentation={roomData.productPresentation}
-                isReadOnly={true}
               />
             )}
 

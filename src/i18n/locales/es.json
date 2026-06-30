@@ -9,8 +9,8 @@
     "whoWillYouPlay": "¿Quién vas a jugar hoy?",
     "idCopied": "ID de sala copiado al portapapeles",
     "roles": {
-      "Facilitador": "Facilitador",
-      "FacilitadorDesc": "El que controla la IA y las etapas",
+      "Facilitador": "Trainer",
+      "FacilitadorDesc": "Controla la IA, las etapas y la sesión",
       "Closer": "Closer",
       "CloserDesc": "El que vende",
       "Lead": "Lead",

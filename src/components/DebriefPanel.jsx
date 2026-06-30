@@ -1,9 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, CheckSquare, Target, Save, RotateCcw, Activity, ShieldAlert, HeartPulse } from 'lucide-react';
+import { MessageSquare, CheckSquare, Target, RotateCcw, Activity, ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+const MARKERS = [
+  { type: 'good',        emoji: '🟢', color: '16,185,129',  label: { es: 'Brillante',   en: 'Brilliant' } },
+  { type: 'opportunity', emoji: '🟡', color: '245,158,11',  label: { es: 'Oportunidad', en: 'Opportunity' } },
+  { type: 'error',       emoji: '🔴', color: '239,68,68',   label: { es: 'Error',        en: 'Error' } }
+];
+
 export default function DebriefPanel({ activeStageIndex, stages, roomNotes, updateNotes, isFacilitator }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language?.startsWith('en');
+  const [markerNote, setMarkerNote] = useState('');
+
+  const addMoment = (type) => {
+    if (!updateNotes) return;
+    const activeStage = stages?.[activeStageIndex];
+    const moment = { type, note: markerNote || '', stage: activeStage?.label || '', time: Date.now() };
+    const moments = [...(roomNotes?.moments || []), moment];
+    updateNotes({ ...roomNotes, moments });
+    setMarkerNote('');
+  };
   // Use local state for text areas to avoid losing focus/cursor jumping on remote updates
   const [localTone, setLocalTone] = useState('');
   const [localPain, setLocalPain] = useState('');
@@ -77,10 +94,11 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
 
   const clearDebrief = () => {
     if (!updateNotes) return;
-    updateNotes({ 
-      completedStages: [], 
-      tone: '', 
-      pain: '', 
+    updateNotes({
+      completedStages: [],
+      moments: [],
+      tone: '',
+      pain: '',
       objection: '',
       leadPain: '',
       leadSignals: '',
@@ -109,7 +127,49 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, paddingRight: '0.5rem' }}>
-        
+
+        {/* Live moment markers */}
+        {updateNotes && (
+          <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '0.875rem', padding: '0.875rem', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '0.6rem' }}>
+              ⚡ {isEn ? 'Live moment markers' : 'Marcadores en vivo'}
+            </div>
+            <input
+              value={markerNote}
+              onChange={e => setMarkerNote(e.target.value)}
+              placeholder={isEn ? 'Optional note (then click a marker)...' : 'Nota opcional (luego click en el marcador)...'}
+              style={{ width: '100%', padding: '0.45rem 0.65rem', borderRadius: '0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'white', fontSize: '0.82rem', marginBottom: '0.5rem', fontFamily: 'inherit', boxSizing: 'border-box' }}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {MARKERS.map(m => (
+                <button key={m.type} onClick={() => addMoment(m.type)} style={{ flex: 1, padding: '0.5rem 0.4rem', borderRadius: '0.625rem', border: `1px solid rgba(${m.color},0.3)`, background: `rgba(${m.color},0.08)`, color: `rgb(${m.color})`, cursor: 'pointer', fontSize: '0.78rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', transition: 'all 0.15s' }}>
+                  {m.emoji} {isEn ? m.label.en : m.label.es}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Moments timeline */}
+        {(roomNotes?.moments || []).length > 0 && (
+          <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: '0.75rem', padding: '0.75rem', border: '1px solid rgba(255,255,255,0.05)', maxHeight: '140px', overflowY: 'auto' }}>
+            <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '0.5rem' }}>
+              {isEn ? 'Timeline' : 'Línea de tiempo'}
+            </div>
+            {(roomNotes.moments || []).slice().reverse().map((m, i) => {
+              const marker = MARKERS.find(mk => mk.type === m.type) || MARKERS[0];
+              const mins = Math.floor((Date.now() - m.time) / 60000);
+              return (
+                <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', marginBottom: '0.35rem', fontSize: '0.78rem' }}>
+                  <span>{marker.emoji}</span>
+                  <span style={{ color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>{mins === 0 ? (isEn ? 'Just now' : 'Ahora') : `${mins}m`}{m.stage ? ` · ${m.stage}` : ''}</span>
+                  {m.note && <span style={{ color: 'rgba(255,255,255,0.65)' }}>{m.note}</span>}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {/* Etapas Completadas */}
         <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '0.75rem', border: '1px solid var(--glass-border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '1rem', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>

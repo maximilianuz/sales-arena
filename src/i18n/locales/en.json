@@ -9,8 +9,8 @@
     "whoWillYouPlay": "Who will you play today?",
     "idCopied": "Room ID copied to clipboard",
     "roles": {
-      "Facilitador": "Facilitator",
-      "FacilitadorDesc": "Controls the AI and simulation stages",
+      "Facilitador": "Trainer",
+      "FacilitadorDesc": "Controls AI, stages and the full session",
       "Closer": "Closer",
       "CloserDesc": "The salesperson",
       "Lead": "Lead",
