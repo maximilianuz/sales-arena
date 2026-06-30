@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shuffle, Copy, ChessKnight, BookOpen, Smartphone } from 'lucide-react';
+import { Shuffle, Copy, ChessKnight, BookOpen, Smartphone, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 
 export default function Lobby() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { isFree, openPlans } = useSubscriptionContext() || {};
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [roomId, setRoomId] = useState('');
@@ -87,9 +89,23 @@ export default function Lobby() {
       
       <div id="lobby-particles" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}></div>
       <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10, display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <a 
+        {isFree && openPlans && (
+          <button
+            onClick={openPlans}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+              color: 'white', border: 'none', padding: '0.4rem 0.8rem',
+              borderRadius: '2rem', cursor: 'pointer', fontSize: '0.85rem',
+              fontWeight: '600', boxShadow: '0 4px 15px rgba(79,70,229,0.4)'
+            }}
+          >
+            <Zap size={14} /> {i18n.language?.startsWith('en') ? 'Upgrade' : 'Mejorar Plan'}
+          </button>
+        )}
+        <a
           href={i18n.language?.startsWith('en') ? "/presentacion_en.html" : "/presentacion.html"}
-          target="_blank" 
+          target="_blank"
           rel="noopener noreferrer"
           style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem',

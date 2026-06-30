@@ -24,7 +24,7 @@ const PLAN_META = [
   }
 ];
 
-export default function SubscriptionGate({ user, children, isActive, isLoading }) {
+export default function SubscriptionGate({ user, children, isActive, isLoading, onClose }) {
   const { t, i18n } = useTranslation();
   const [billing, setBilling] = useState('yearly');
   const [loadingPlan, setLoadingPlan] = useState(null);
@@ -77,6 +77,19 @@ export default function SubscriptionGate({ user, children, isActive, isLoading }
 
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', padding: '2rem 1rem', position: 'relative' }}>
+
+      {/* Botón volver (solo cuando el usuario ya tiene acceso y abrió planes manualmente) */}
+      {onClose && (
+        <div style={{ position: 'absolute', top: '1rem', left: '1rem' }}>
+          <button
+            className="btn btn-outline"
+            onClick={onClose}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+          >
+            ← {t('subscription.back')}
+          </button>
+        </div>
+      )}
 
       {/* Selector de idioma */}
       <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>

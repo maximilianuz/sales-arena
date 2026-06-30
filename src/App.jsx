@@ -9,11 +9,11 @@ import { subscribeToAuthState } from './utils/auth';
 import './App.css';
 
 function GatedRoutes({ user }) {
-  const { isActive, isLoading, isFree } = useSubscriptionContext();
-  const hasAccess = isActive || isFree;
+  const { isActive, isLoading, isFree, showPlans, closePlans } = useSubscriptionContext();
+  const hasAccess = (isActive || isFree) && !showPlans;
 
   return (
-    <SubscriptionGate user={user} isActive={hasAccess} isLoading={isLoading}>
+    <SubscriptionGate user={user} isActive={hasAccess} isLoading={isLoading} onClose={closePlans}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Lobby />} />

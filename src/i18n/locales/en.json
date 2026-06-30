@@ -153,6 +153,7 @@
     "loggedAs": "Logged in as {{email}}",
     "signOut": "Sign out",
     "loading": "Loading...",
+    "back": "Back",
     "freePlan": {
       "name": "Free",
       "description": "1 session · 30 min max · basic features · no credit card required",

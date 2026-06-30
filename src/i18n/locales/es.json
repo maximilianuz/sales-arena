@@ -153,6 +153,7 @@
     "loggedAs": "Sesión iniciada como {{email}}",
     "signOut": "Cerrar sesión",
     "loading": "Cargando...",
+    "back": "Volver",
     "freePlan": {
       "name": "Gratis",
       "description": "1 sesión · 30 min máx · funciones básicas · sin tarjeta de crédito",
