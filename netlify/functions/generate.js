@@ -1,4 +1,4 @@
-import { getSubscriptionStatus, getAdminDb } from './lib/firebaseAdmin.js';
+import { getUserData, setSessionsUsed } from './lib/firebaseAdmin.js';
 
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 // Netlify Functions en plan Free/Starter tienen un límite duro de 10s por invocación
@@ -43,9 +43,7 @@ export const handler = async (event) => {
       return { statusCode: 401, headers, body: JSON.stringify({ error: "Se requiere autenticación." }) };
     }
     try {
-      const adminDb = getAdminDb();
-      const userSnap = await adminDb.ref(`users/${uid}`).get();
-      const userData = userSnap.val() || {};
+      const userData = await getUserData(uid);
       const status = userData.subscriptionStatus;
 
       if (status === 'active') {
@@ -56,7 +54,7 @@ export const handler = async (event) => {
           return { statusCode: 403, headers, body: JSON.stringify({ error: "session_limit_reached" }) };
         }
         // Incrementar contador de sesiones usadas
-        await adminDb.ref(`users/${uid}/sessionsUsed`).set(sessionsUsed + 1);
+        await setSessionsUsed(uid, sessionsUsed + 1);
       } else {
         return { statusCode: 403, headers, body: JSON.stringify({ error: "subscription_required" }) };
       }

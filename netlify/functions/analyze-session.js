@@ -1,7 +1,7 @@
-import { getAdminDb } from './lib/firebaseAdmin.js';
+import { getUserData, setPath } from './lib/firebaseAdmin.js';
 
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+const DEFAULT_MODEL = "llama-3.1-8b-instant";
 
 export const handler = async (event) => {
   const headers = {
@@ -24,9 +24,8 @@ export const handler = async (event) => {
 
   // Verificar suscripción (solo closer/trainer pueden guardar historial)
   try {
-    const adminDb = getAdminDb();
-    const snap = await adminDb.ref(`users/${uid}/subscriptionStatus`).get();
-    if (snap.val() !== 'active') {
+    const userData = await getUserData(uid);
+    if (userData.subscriptionStatus !== 'active') {
       return { statusCode: 403, headers, body: JSON.stringify({ error: "Se requiere plan pago para guardar historial." }) };
     }
   } catch (e) {
@@ -131,8 +130,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
     const content = data.choices[0].message.content;
     const analysis = JSON.parse(content.match(/\{[\s\S]*\}/)[0]);
 
-    // Guardar en Firebase via Admin SDK
-    const adminDb = getAdminDb();
+    // Guardar en Firebase vía REST
     const sessionId = `session_${Date.now()}`;
     const historyEntry = {
       sessionId,
@@ -146,7 +144,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
       analysis
     };
 
-    await adminDb.ref(`users/${uid}/history/${sessionId}`).set(historyEntry);
+    await setPath(`/users/${uid}/history/${sessionId}`, historyEntry);
 
     return { statusCode: 200, headers, body: JSON.stringify({ sessionId, analysis }) };
   } catch (err) {
