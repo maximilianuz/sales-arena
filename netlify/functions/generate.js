@@ -55,11 +55,12 @@ export const handler = async (event) => {
       const userData = await getUserData(uid);
       const status = userData.subscriptionStatus;
 
-      // Admin/dev: acceso ilimitado. Si aún no está marcado como active en la
-      // base, lo activamos una vez (con expiración lejana) para que el resto de
-      // la app — incluida la UI del cliente — lo trate como Pro automáticamente.
+      // Admin/dev: acceso ilimitado como Trainer. Nos aseguramos de que quede
+      // marcado active CON plan 'trainer' (para que la UI muestre Analytics),
+      // incluso si ya estaba active con otro plan por una edición manual previa.
       if (isAdminEmail(email)) {
-        if (status !== 'active') {
+        const plan = userData.subscriptionPlan || '';
+        if (status !== 'active' || !plan.startsWith('trainer')) {
           await activateSubscription(uid, 'trainer', 'admin', 36500); // ~100 años
         }
       } else if (status === 'active') {
