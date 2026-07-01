@@ -1,7 +1,12 @@
 import { getSubscriptionStatus, getAdminDb } from './lib/firebaseAdmin.js';
 
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+// Netlify Functions en plan Free/Starter tienen un límite duro de 10s por invocación
+// (no configurable por código). "llama-3.1-8b-instant" es sustancialmente más rápido
+// en Groq que los modelos 70b, lo que da margen real para completar antes del corte.
+// Si en el futuro se sube a Netlify Pro (timeout hasta 26s), se puede volver a un
+// modelo más grande seteando AI_DEFAULT_MODEL en las variables de entorno.
+const DEFAULT_MODEL = "llama-3.1-8b-instant";
 
 export const handler = async (event) => {
   const headers = {
