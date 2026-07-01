@@ -1,116 +1,125 @@
 import React, { useState } from 'react';
-import { ChessKnight } from 'lucide-react';
+import { ChessKnight, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { signInWithGoogle, registerWithEmail, signInWithEmail } from '../utils/auth';
 
 export default function Login() {
-  const [mode, setMode] = useState('signin'); // 'signin' | 'signup'
+  const { i18n } = useTranslation();
+  const isEn = i18n.language?.startsWith('en');
+  const [mode, setMode] = useState('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleGoogle = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      await signInWithGoogle();
-    } catch (e) {
-      setError(e.message || 'No se pudo iniciar sesión con Google.');
-    } finally {
-      setLoading(false);
-    }
+    setError(''); setLoading(true);
+    try { await signInWithGoogle(); }
+    catch (e) { setError(e.message || (isEn ? "Couldn't sign in with Google." : 'No se pudo iniciar sesión con Google.')); }
+    finally { setLoading(false); }
   };
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setError(''); setLoading(true);
     try {
-      if (mode === 'signup') {
-        await registerWithEmail(email, password);
-      } else {
-        await signInWithEmail(email, password);
-      }
+      if (mode === 'signup') await registerWithEmail(email, password);
+      else await signInWithEmail(email, password);
     } catch (e) {
-      setError(e.message || 'No se pudo autenticar.');
-    } finally {
-      setLoading(false);
-    }
+      setError(e.message || (isEn ? "Couldn't authenticate." : 'No se pudo autenticar.'));
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
-      <div className="glass-panel" style={{ margin: 'auto', maxWidth: '420px', width: '100%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
-          <div className="logo-container">
-            <ChessKnight size={48} color="white" strokeWidth={1.5} />
-          </div>
-          <h2 style={{
-            textAlign: 'center',
-            fontSize: '2.2rem',
-            fontWeight: '800',
-            background: 'linear-gradient(to right, #ffffff, #a5b4fc)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            margin: 0
+    <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem', position: 'relative' }}>
+      {/* Language toggle */}
+      <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem' }}>
+        <select onChange={e => i18n.changeLanguage(e.target.value)} value={(i18n.language || 'es').split('-')[0]}
+          style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', border: '1px solid var(--glass-border)', padding: '0.35rem 0.6rem', borderRadius: '2rem', cursor: 'pointer', fontSize: '0.82rem', width: 'auto' }}>
+          <option value="es" style={{ background: '#1e1e2f' }}>🇪🇸 ES</option>
+          <option value="en" style={{ background: '#1e1e2f' }}>🇺🇸 EN</option>
+        </select>
+      </div>
+
+      <div style={{
+        margin: 'auto', maxWidth: '420px', width: '100%',
+        background: 'rgba(15,15,30,0.75)', backdropFilter: 'blur(24px)',
+        borderRadius: '1.5rem', border: '1px solid rgba(255,255,255,0.07)',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(134,59,255,0.08)',
+        padding: '2.5rem 2.25rem', animation: 'modalIn 0.4s ease-out'
+      }}>
+        {/* Hero */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', gap: '0.75rem' }}>
+          <div style={{
+            width: '68px', height: '68px', borderRadius: '1.25rem',
+            background: 'linear-gradient(135deg,#47bfff 0%,#863bff 55%,#7e14ff 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 0 40px rgba(134,59,255,0.45), 0 8px 24px rgba(0,0,0,0.3)'
           }}>
-            Sales Arena
-          </h2>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-            {mode === 'signup' ? 'Crea tu cuenta' : 'Inicia sesión para continuar'}
+            <ChessKnight size={38} color="white" strokeWidth={1.5} />
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{ fontSize: '2.2rem', fontWeight: '900', margin: 0, letterSpacing: '-0.04em', background: 'linear-gradient(135deg,#fff 40%,#c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Sales Arena
+            </h1>
+            <p style={{ margin: '0.4rem 0 0', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(196,181,253,0.55)' }}>
+              AI · Multiplayer · Roleplay
+            </p>
+          </div>
+          <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
+            {mode === 'signup' ? (isEn ? 'Create your account' : 'Creá tu cuenta') : (isEn ? 'Sign in to continue' : 'Iniciá sesión para continuar')}
           </p>
         </div>
 
-        <button
-          type="button"
-          className="btn btn-outline"
-          style={{ width: '100%', marginBottom: '1.5rem' }}
-          onClick={handleGoogle}
-          disabled={loading}
-        >
-          Continuar con Google
+        {/* Google */}
+        <button type="button" onClick={handleGoogle} disabled={loading}
+          style={{
+            width: '100%', padding: '0.75rem', borderRadius: '0.875rem', cursor: 'pointer',
+            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)',
+            color: 'white', fontWeight: '600', fontSize: '0.92rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+            transition: 'all 0.2s', opacity: loading ? 0.6 : 1
+          }}>
+          <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
+          {isEn ? 'Continue with Google' : 'Continuar con Google'}
         </button>
 
-        <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0.5rem 0 1.5rem' }}>
-          o con tu email
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.25rem 0' }}>
+          <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem' }}>{isEn ? 'or with email' : 'o con tu email'}</span>
+          <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
         </div>
 
-        <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="form-input"
-            placeholder="tu@email.com"
-          />
-          <input
-            type="password"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="form-input"
-            placeholder="Contraseña (mín. 6 caracteres)"
-          />
-          {error && (
-            <div style={{ color: 'var(--danger)', fontSize: '0.85rem' }}>{error}</div>
-          )}
-          <button type="submit" className="btn btn-primary btn-large" disabled={loading}>
-            {mode === 'signup' ? 'Crear cuenta' : 'Entrar'}
+        <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ position: 'relative' }}>
+            <Mail size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" style={{ paddingLeft: '2.5rem' }} />
+          </div>
+          <div style={{ position: 'relative' }}>
+            <Lock size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+            <input type="password" required minLength={6} value={password} onChange={e => setPassword(e.target.value)} placeholder={isEn ? 'Password (min. 6)' : 'Contraseña (mín. 6)'} style={{ paddingLeft: '2.5rem' }} />
+          </div>
+          {error && <div style={{ color: 'var(--danger)', fontSize: '0.82rem' }}>{error}</div>}
+          <button type="submit" disabled={loading}
+            style={{
+              width: '100%', padding: '0.8rem', marginTop: '0.25rem', borderRadius: '0.875rem', cursor: 'pointer',
+              background: 'linear-gradient(135deg,#47bfff,#863bff 55%,#7e14ff)', color: 'white', border: 'none',
+              fontWeight: '700', fontSize: '0.95rem', boxShadow: '0 8px 24px rgba(134,59,255,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: loading ? 0.6 : 1
+            }}>
+            {mode === 'signup' ? (isEn ? 'Create account' : 'Crear cuenta') : (isEn ? 'Sign in' : 'Entrar')}
+            <ArrowRight size={17} />
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem' }}>
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
           {mode === 'signup' ? (
-            <span style={{ color: 'var(--text-muted)' }}>
-              ¿Ya tenés cuenta?{' '}
-              <a href="#" onClick={(e) => { e.preventDefault(); setMode('signin'); }}>Inicia sesión</a>
+            <span>{isEn ? 'Already have an account?' : '¿Ya tenés cuenta?'}{' '}
+              <a href="#" onClick={e => { e.preventDefault(); setMode('signin'); }} style={{ color: '#c4b5fd', fontWeight: '600' }}>{isEn ? 'Sign in' : 'Iniciá sesión'}</a>
             </span>
           ) : (
-            <span style={{ color: 'var(--text-muted)' }}>
-              ¿No tenés cuenta?{' '}
-              <a href="#" onClick={(e) => { e.preventDefault(); setMode('signup'); }}>Registrate</a>
+            <span>{isEn ? "Don't have an account?" : '¿No tenés cuenta?'}{' '}
+              <a href="#" onClick={e => { e.preventDefault(); setMode('signup'); }} style={{ color: '#c4b5fd', fontWeight: '600' }}>{isEn ? 'Sign up' : 'Registrate'}</a>
             </span>
           )}
         </div>

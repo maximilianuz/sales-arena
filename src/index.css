@@ -1,16 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Silicon Valley Tech Color Palette */
-  --primary: #6366f1; /* Indigo 500 */
-  --primary-hover: #4f46e5; /* Indigo 600 */
-  --primary-glow: rgba(99, 102, 241, 0.4);
-  
-  --secondary: #ec4899; /* Pink 500 */
-  --secondary-hover: #db2777; /* Pink 600 */
+  /* Paleta de marca — alineada al favicon (celeste → púrpura → violeta) */
+  --primary: #863bff; /* Púrpura favicon */
+  --primary-hover: #7e14ff; /* Violeta profundo */
+  --primary-glow: rgba(134, 59, 255, 0.4);
+  --brand-cyan: #47bfff; /* Acento celeste del favicon */
+
+  --secondary: #ec4899; /* Pink 500 — color semántico (objeciones) */
+  --secondary-hover: #db2777;
   --secondary-glow: rgba(236, 72, 153, 0.4);
-  
-  --accent: #f59e0b; /* Amber 500 */
+
+  --accent: #f59e0b; /* Amber 500 — urgencia */
   --success: #10b981; /* Emerald 500 */
   --success-glow: rgba(16, 185, 129, 0.3);
   --danger: #ef4444; /* Red 500 */
@@ -41,10 +42,10 @@ body {
   margin: 0;
   background-color: var(--bg-dark);
   /* Animated Mesh Gradient Background */
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.12), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.12), transparent 25%),
-    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.08), transparent 25%);
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(134, 59, 255, 0.13), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(71, 191, 255, 0.10), transparent 25%),
+    radial-gradient(circle at 50% 80%, rgba(126, 20, 255, 0.08), transparent 25%);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
@@ -118,7 +119,7 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), #818cf8);
+  background: linear-gradient(135deg, var(--brand-cyan), var(--primary) 55%, var(--primary-hover));
   box-shadow: 0 4px 15px -3px var(--primary-glow);
 }
 .btn-primary:hover:not(:disabled) {
@@ -182,7 +183,7 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
   border-color: var(--primary);
   background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 2px rgba(134, 59, 255, 0.25);
 }
 
 select option {
