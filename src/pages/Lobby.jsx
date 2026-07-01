@@ -255,9 +255,9 @@ export default function Lobby() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem', gap: '0.75rem' }}>
           <div style={{
             width: '72px', height: '72px', borderRadius: '1.25rem',
-            background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+            background: 'linear-gradient(135deg,#47bfff 0%,#863bff 55%,#7e14ff 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 40px rgba(99,102,241,0.45), 0 8px 24px rgba(0,0,0,0.3)'
+            boxShadow: '0 0 40px rgba(134,59,255,0.45), 0 8px 24px rgba(0,0,0,0.3)'
           }}>
             <ChessKnight size={40} color="white" strokeWidth={1.5} />
           </div>

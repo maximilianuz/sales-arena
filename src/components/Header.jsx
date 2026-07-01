@@ -22,7 +22,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
   return (
     <header className="header-container" style={{ position: 'sticky', top: '1rem', zIndex: 50 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', padding: '0.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 15px rgba(79, 70, 229, 0.3)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#47bfff 0%,#863bff 55%,#7e14ff 100%)', padding: '0.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 15px rgba(134, 59, 255, 0.3)' }}>
           <ChessKnight size={24} color="white" strokeWidth={1.5} />
         </div>
         {onTitleChange ? (

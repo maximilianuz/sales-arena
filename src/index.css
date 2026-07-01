@@ -260,10 +260,11 @@ input::placeholder, textarea::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  /* Paleta original del favicon: celeste #47bfff → púrpura #863bff → violeta #7e14ff */
+  background: linear-gradient(135deg, #47bfff 0%, #863bff 55%, #7e14ff 100%);
   border-radius: 1rem;
   margin-bottom: 1rem;
-  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 10px 25px rgba(134, 59, 255, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 80px;
   height: 80px;
@@ -272,6 +273,6 @@ input::placeholder, textarea::placeholder {
 
 .logo-container:hover {
   transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 15px 35px rgba(236, 72, 153, 0.6);
+  box-shadow: 0 15px 35px rgba(134, 59, 255, 0.6);
   filter: brightness(1.1);
 }
