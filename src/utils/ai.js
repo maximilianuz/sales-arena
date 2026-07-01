@@ -121,7 +121,9 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     language
   });
 
-  const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 2200);
+  // 2800 tokens de salida acomoda los campos nuevos (behavioralCues, decisionStyle,
+  // triggerEvent) sin acercarse al límite de 6000 TPM.
+  const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 2800);
   return scenario;
 }
 

@@ -154,6 +154,32 @@ function LeadActorView({ scenario }) {
         </div>
       )}
 
+      {/* Behavioral cues — cómo actuar en la conversación */}
+      {scenario.behavioralCues && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {scenario.behavioralCues.verbalStyle && (
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '0.75rem', padding: '0.7rem 0.875rem' }}>
+              <div style={{ fontSize: '0.66rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.25rem' }}>{isEn ? 'How you talk' : 'Cómo hablás'}</div>
+              <p style={{ margin: 0, fontSize: '0.83rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>{scenario.behavioralCues.verbalStyle}</p>
+            </div>
+          )}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+            {scenario.behavioralCues.opensUpWhen && (
+              <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.18)', borderRadius: '0.75rem', padding: '0.7rem' }}>
+                <div style={{ fontSize: '0.64rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.25rem' }}>{isEn ? 'You open up when' : 'Te abrís si'}</div>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.62)', lineHeight: '1.35' }}>{scenario.behavioralCues.opensUpWhen}</p>
+              </div>
+            )}
+            {scenario.behavioralCues.shutsDownWhen && (
+              <div style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.18)', borderRadius: '0.75rem', padding: '0.7rem' }}>
+                <div style={{ fontSize: '0.64rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--danger)', marginBottom: '0.25rem' }}>{isEn ? 'You shut down when' : 'Te cerrás si'}</div>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.62)', lineHeight: '1.35' }}>{scenario.behavioralCues.shutsDownWhen}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Main objection */}
       <div style={{ background: 'rgba(236,72,153,0.08)', border: '2px solid rgba(236,72,153,0.4)', borderRadius: '1rem', padding: '1.125rem' }}>
         <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--secondary)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -250,9 +276,14 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
         <F label={isEn ? 'Urgency / Style' : 'Urgencia / Estilo'} value={`${scenario.psychology?.urgency} / ${scenario.psychology?.communicationStyle}`} accent="245,158,11" />
         <F label={isEn ? 'Core fear' : 'Miedo'} value={scenario.psychology?.primaryFear} accent="239,68,68" />
         <F label={isEn ? 'Core desire' : 'Deseo'} value={scenario.psychology?.primaryDesire} accent="16,185,129" />
+        {scenario.psychology?.decisionStyle && <F label={isEn ? 'Decision style' : 'Estilo de decisión'} value={scenario.psychology.decisionStyle} accent="99,102,241" />}
+        {scenario.psychology?.trustTrigger && <F label={isEn ? 'Trust trigger' : 'Gatillo de confianza'} value={scenario.psychology.trustTrigger} accent="99,102,241" />}
+        {scenario.behavioralCues?.opensUpWhen && <F label={isEn ? 'Opens up when' : 'Se abre si'} value={scenario.behavioralCues.opensUpWhen} accent="16,185,129" />}
+        {scenario.behavioralCues?.shutsDownWhen && <F label={isEn ? 'Shuts down when' : 'Se cierra si'} value={scenario.behavioralCues.shutsDownWhen} accent="239,68,68" />}
       </div>);
       case 'situacion': return (<div>
         <F label={isEn ? 'Problem' : 'Problema'} value={scenario.currentSituation?.problem} accent="16,185,129" />
+        {scenario.currentSituation?.triggerEvent && <F label={isEn ? 'Trigger event' : 'Evento detonante'} value={scenario.currentSituation.triggerEvent} accent="245,158,11" />}
         <F label={isEn ? 'Previous attempts' : 'Intentos previos'} value={scenario.currentSituation?.previousAttempts} accent="16,185,129" />
         <F label={isEn ? 'Impact' : 'Impacto'} value={scenario.currentSituation?.impact} accent="16,185,129" />
       </div>);
