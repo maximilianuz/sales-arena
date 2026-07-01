@@ -12,6 +12,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
   const { t, i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const [markerNote, setMarkerNote] = useState('');
+  const [debriefTab, setDebriefTab] = useState('live'); // 'live' | 'analysis' | 'retro'
 
   const addMoment = (type) => {
     if (!updateNotes) return;
@@ -114,20 +115,38 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
 
   return (
     <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-      <div className="panel-title" style={{ justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <MessageSquare size={20} />
-          Panel de Análisis Clínico (Observers)
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <MessageSquare size={14} color="rgba(139,92,246,0.8)" />
+          <span style={{ fontSize: '0.7rem', fontWeight: '800', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+            {isEn ? 'Evaluation' : 'Evaluación'}
+          </span>
         </div>
         {isFacilitator && (
-          <button className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem' }} onClick={clearDebrief}>
-            <RotateCcw size={14} /> {t('debrief.clear')}
+          <button onClick={clearDebrief} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.6rem', borderRadius: '0.5rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'rgba(239,68,68,0.7)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: '600' }}>
+            <RotateCcw size={11} /> {t('debrief.clear')}
           </button>
         )}
       </div>
 
+      {/* Tab bar */}
+      <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '0.625rem', padding: '0.2rem' }}>
+        {[
+          { id: 'live', label: isEn ? '⚡ Live' : '⚡ En Vivo' },
+          { id: 'analysis', label: isEn ? 'Analysis' : 'Análisis' },
+          { id: 'retro', label: isEn ? 'Retro' : 'Retro' }
+        ].map(tab => (
+          <button key={tab.id} onClick={() => setDebriefTab(tab.id)}
+            style={{ flex: 1, padding: '0.4rem 0.3rem', borderRadius: '0.45rem', border: 'none', cursor: 'pointer', background: debriefTab === tab.id ? 'rgba(139,92,246,0.28)' : 'transparent', color: debriefTab === tab.id ? 'white' : 'rgba(255,255,255,0.4)', fontSize: '0.78rem', fontWeight: debriefTab === tab.id ? '700' : '500', transition: 'all 0.15s' }}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, paddingRight: '0.5rem' }}>
 
+        {/* ── TAB: EN VIVO ── */}
+        {debriefTab === 'live' && (<>
         {/* Live moment markers */}
         {updateNotes && (
           <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '0.875rem', padding: '0.875rem', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -201,7 +220,10 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
             })}
           </div>
         </div>
+        </>)}
 
+        {/* ── TAB: ANÁLISIS ── */}
+        {debriefTab === 'analysis' && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', flex: 1 }}>
           {/* EVALUACIÓN DEL CLOSER */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -313,11 +335,13 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
             </div>
           </div>
         </div>
+        )}
 
-        {/* RETROSPECTIVA Y MEJORA CONTINUA */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
+        {/* ── TAB: RETRO ── */}
+        {debriefTab === 'retro' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0ea5e9', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(14, 165, 233, 0.3)', paddingBottom: '0.5rem' }}>
-            <Activity size={18} /> Retrospectiva y Mejora Continua
+            <Activity size={18} /> {isEn ? 'Retrospective & Continuous Improvement' : 'Retrospectiva y Mejora Continua'}
           </h3>
           <div className="retro-grid">
             
@@ -387,6 +411,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
 
           </div>
         </div>
+        )}
 
       </div>
     </div>
