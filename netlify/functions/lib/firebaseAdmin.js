@@ -106,6 +106,17 @@ export async function setSessionsUsed(uid, count) {
   return dbPatch(`/users/${uid}`, { sessionsUsed: count });
 }
 
+// Auto-provisiona / actualiza el plan gratuito desde el servidor. El service
+// account no está sujeto a las reglas de Firebase, así que puede escribir
+// subscriptionStatus + sessionsUsed juntos sin que las reglas lo rechacen.
+export async function setFreePlanUsage(uid, sessionsUsed) {
+  return dbPatch(`/users/${uid}`, {
+    subscriptionStatus: 'free',
+    subscriptionPlan: 'free',
+    sessionsUsed
+  });
+}
+
 export async function activateSubscription(uid, plan, provider, durationDays) {
   const expiry = Date.now() + durationDays * 24 * 60 * 60 * 1000;
   return dbPatch(`/users/${uid}`, {

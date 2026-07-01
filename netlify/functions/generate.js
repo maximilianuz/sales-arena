@@ -1,4 +1,4 @@
-import { getUserData, setSessionsUsed } from './lib/firebaseAdmin.js';
+import { getUserData, setFreePlanUsage } from './lib/firebaseAdmin.js';
 
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 // Netlify Functions en plan Free/Starter tienen un límite duro de 10s por invocación
@@ -47,16 +47,18 @@ export const handler = async (event) => {
       const status = userData.subscriptionStatus;
 
       if (status === 'active') {
-        // paid — sin restricciones
-      } else if (status === 'free') {
+        // Plan pago — sin restricciones
+      } else {
+        // Todos los demás (free, o usuario nuevo sin registro) obtienen el
+        // plan gratuito: 1 sesión. El servidor auto-provisiona el registro
+        // en la primera generación, así no dependemos de que el cliente haya
+        // escrito nada — el cliente ya asume 'free' por defecto, y acá quedan
+        // consistentes cliente y servidor.
         const sessionsUsed = userData.sessionsUsed || 0;
         if (sessionsUsed >= 1) {
           return { statusCode: 403, headers, body: JSON.stringify({ error: "session_limit_reached" }) };
         }
-        // Incrementar contador de sesiones usadas
-        await setSessionsUsed(uid, sessionsUsed + 1);
-      } else {
-        return { statusCode: 403, headers, body: JSON.stringify({ error: "subscription_required" }) };
+        await setFreePlanUsage(uid, sessionsUsed + 1);
       }
     } catch (e) {
       console.error("Error chequeando suscripción:", e);
