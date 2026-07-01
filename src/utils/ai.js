@@ -12,7 +12,7 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
 
   let finalUrl = "/api/generate";
   const headers = { "Content-Type": "application/json" };
-  let requestBody = { prompt, uid: auth.currentUser?.uid };
+  let requestBody = { prompt, uid: auth.currentUser?.uid, email: auth.currentUser?.email };
 
   if (useOwnKey) {
     requestBody.byok = true;

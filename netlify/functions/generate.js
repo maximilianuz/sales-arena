@@ -1,4 +1,13 @@
-import { getUserData, setFreePlanUsage } from './lib/firebaseAdmin.js';
+import { getUserData, setFreePlanUsage, activateSubscription } from './lib/firebaseAdmin.js';
+
+// Lista de emails con acceso admin/dev (bypass de límites). Se configura en
+// Netlify como variable de entorno ADMIN_EMAILS, separados por coma.
+function isAdminEmail(email) {
+  if (!email) return false;
+  const raw = process.env.ADMIN_EMAILS || '';
+  const admins = raw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+  return admins.includes(email.toLowerCase());
+}
 
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 // Netlify Functions en plan Free/Starter tienen un límite duro de 10s por invocación
@@ -35,7 +44,7 @@ export const handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Body inválido, se esperaba JSON." }) };
   }
 
-  const { prompt, temperature, max_tokens, uid, byok } = body;
+  const { prompt, temperature, max_tokens, uid, email, byok } = body;
 
   // Chequeo de suscripción — se saltea solo si el usuario usa su propia key (BYOK)
   if (!byok) {
@@ -46,7 +55,14 @@ export const handler = async (event) => {
       const userData = await getUserData(uid);
       const status = userData.subscriptionStatus;
 
-      if (status === 'active') {
+      // Admin/dev: acceso ilimitado. Si aún no está marcado como active en la
+      // base, lo activamos una vez (con expiración lejana) para que el resto de
+      // la app — incluida la UI del cliente — lo trate como Pro automáticamente.
+      if (isAdminEmail(email)) {
+        if (status !== 'active') {
+          await activateSubscription(uid, 'trainer', 'admin', 36500); // ~100 años
+        }
+      } else if (status === 'active') {
         // Plan pago — sin restricciones
       } else {
         // Todos los demás (free, o usuario nuevo sin registro) obtienen el
