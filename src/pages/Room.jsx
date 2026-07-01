@@ -18,6 +18,7 @@ import SessionAnalysis from '../components/SessionAnalysis';
 import LeadCheckoutPanel from '../components/LeadCheckoutPanel';
 import CheckoutResultBanner from '../components/CheckoutResultBanner';
 import CloserCommandPanel from '../components/CloserCommandPanel';
+import RoleOnboarding from '../components/RoleOnboarding';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import { Dices, X, Lock } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
@@ -469,6 +470,9 @@ export default function Room() {
 
       {/* Banner de resultado del checkout visible para todos */}
       {!isLead && <CheckoutResultBanner checkout={roomData?.checkout} />}
+
+      {/* Guía contextual la primera vez que este rol entra a una sala */}
+      <RoleOnboarding role={role} />
     </div>
   );
 }
