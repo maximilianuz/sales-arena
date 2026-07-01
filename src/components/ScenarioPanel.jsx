@@ -10,7 +10,7 @@ const GENERATION_STEPS = [
 ];
 
 // ─── Config form ─────────────────────────────────────────────────────────────
-function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating, generatingStep }) {
+function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating, generatingStep, genError }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
 
@@ -92,6 +92,14 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
           ))}
         </div>
       </div>
+
+      {/* Error banner */}
+      {genError && !isGenerating && (
+        <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '0.75rem', padding: '0.75rem 0.875rem', fontSize: '0.82rem', color: 'rgba(255,255,255,0.75)', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+          <span style={{ color: 'var(--danger)', flexShrink: 0 }}>⚠️</span>
+          <span>{genError}</span>
+        </div>
+      )}
 
       {/* CTA / progress */}
       {isGenerating ? (
@@ -296,19 +304,21 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
   const isEn = i18n.language?.startsWith('en');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStep, setGeneratingStep] = useState(0);
+  const [genError, setGenError] = useState('');
   const [config, setConfig] = useState({ level: 'Intermedio', theme: 'B2B Software/SaaS', saleType: 'Suscripción Anual / High Ticket', targetObjection: 'Lo tengo que pensar', leadTemperature: 'Templado' });
 
   const handleGenerate = async (customConfig = null) => {
     if (!setCurrentScenario) return;
     setIsGenerating(true);
     setGeneratingStep(0);
+    setGenError('');
     const t1 = setTimeout(() => setGeneratingStep(1), 2200);
     const t2 = setTimeout(() => setGeneratingStep(2), 5000);
     try {
       const scenario = await generateAIScenario(apiKey, apiUrl, apiModel, customConfig || config, stages, i18n.language);
       await setCurrentScenario(scenario);
     } catch (error) {
-      alert('Error: ' + error.message);
+      setGenError(error.message || 'Error al generar el escenario.');
     } finally {
       clearTimeout(t1); clearTimeout(t2);
       setIsGenerating(false); setGeneratingStep(0);
@@ -356,7 +366,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
         </div>
       </div>
       {!currentScenario
-        ? <ScenarioConfig config={config} setConfig={setConfig} onGenerate={handleGenerate} onRandom={handleRandom} isGenerating={isGenerating} generatingStep={generatingStep} />
+        ? <ScenarioConfig config={config} setConfig={setConfig} onGenerate={handleGenerate} onRandom={handleRandom} isGenerating={isGenerating} generatingStep={generatingStep} genError={genError} />
         : <TrainerView scenario={currentScenario} isReadOnly={isReadOnly} onRegenerate={handleGenerate} isGenerating={isGenerating} />
       }
     </div>

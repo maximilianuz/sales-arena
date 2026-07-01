@@ -4,7 +4,7 @@ import { getObjectionsPrompt } from './prompts/objectionsPrompt';
 import { getPipelinePrompt } from './prompts/pipelinePrompt';
 import { auth } from './db';
 
-async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel) {
+async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 1) {
   // Modo experto (BYOK): el usuario cargó su propia key/URL en Ajustes y pega
   // directo al proveedor externo. Por defecto (sin key propia) usamos nuestro
   // proxy serverless, que nunca expone una key al cliente.
@@ -38,13 +38,22 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel) {
     });
 
     if (!response.ok) {
+      // Timeouts/errores transitorios del proveedor: reintentar una vez antes de rendirnos.
+      const isRetryable = (response.status === 504 || response.status === 502 || response.status === 503) && retriesLeft > 0;
+      if (isRetryable) {
+        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1);
+      }
+
       let errorData;
       try {
         errorData = await response.json();
       } catch (e) {
         throw new Error(`HTTP Error ${response.status}: Asegúrate de que la API soporte conexiones desde el navegador (CORS).`);
       }
-      throw new Error(errorData?.error?.message || errorData?.message || "Error en la API");
+      if (errorData?.error === 'timeout_upstream') {
+        throw new Error("La IA tardó demasiado en responder. Intentá de nuevo — si persiste, probá en unos minutos.");
+      }
+      throw new Error(errorData?.error?.message || errorData?.error || errorData?.message || "Error en la API");
     }
 
     const data = await response.json();

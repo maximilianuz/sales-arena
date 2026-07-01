@@ -67,21 +67,41 @@ export const handler = async (event) => {
   const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
   const model = process.env.AI_DEFAULT_MODEL || DEFAULT_MODEL;
 
+  const callUpstream = async (timeoutMs) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const upstream = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: prompt }],
+          temperature: typeof temperature === "number" ? temperature : 0.7,
+          max_tokens: typeof max_tokens === "number" ? max_tokens : 1500,
+          response_format: { type: "json_object" }
+        }),
+        signal: controller.signal
+      });
+      return upstream;
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  // Un solo reintento rápido si la primera llamada falla por timeout/red.
+  // El límite total de la función (Netlify) es ~10s, así que repartimos: 6s + 3.5s.
   try {
-    const upstream = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: "user", content: prompt }],
-        temperature: typeof temperature === "number" ? temperature : 0.7,
-        max_tokens: typeof max_tokens === "number" ? max_tokens : 1500,
-        response_format: { type: "json_object" }
-      })
-    });
+    let upstream;
+    try {
+      upstream = await callUpstream(6000);
+    } catch (firstError) {
+      console.warn("Primer intento a Groq falló, reintentando:", firstError.message);
+      upstream = await callUpstream(3500);
+    }
 
     const data = await upstream.json();
 
@@ -93,6 +113,11 @@ export const handler = async (event) => {
     return { statusCode: 200, headers, body: JSON.stringify(data) };
   } catch (error) {
     console.error("generate handler error:", error);
-    return { statusCode: 502, headers, body: JSON.stringify({ error: "Error al contactar al proveedor de IA." }) };
+    const isTimeout = error.name === 'AbortError';
+    return {
+      statusCode: isTimeout ? 504 : 502,
+      headers,
+      body: JSON.stringify({ error: isTimeout ? "timeout_upstream" : "Error al contactar al proveedor de IA." })
+    };
   }
 };
