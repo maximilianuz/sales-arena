@@ -59,7 +59,7 @@ Devolvé ÚNICAMENTE un objeto JSON válido con esta estructura EXACTA:
     "moneyBelief": "Creencia limitante sobre el dinero, 1 frase",
     "competingGoal": "Conflicto interno, 1 frase",
     "vendorFatigue": "Por qué desconfía de vendedores, 1 frase",
-    "actorAdvice": "Instrucción corta y accionable para el actor (tono, postura, resistencia inicial), legible en 5 segundos"
+    "actorAdvice": "Instrucción para la persona que ACTÚA DE ESTE LEAD (el comprador), NO para el vendedor. Hablale en segunda persona ('vos'/'tú') indicándole cómo interpretar al personaje: tono de voz, postura corporal, actitud, nivel de resistencia inicial y qué emoción proyectar. Ejemplo: 'Hablá cortante y apurado, con los brazos cruzados. Mostrate a la defensiva y desconfiado, pero dejá entrever que en el fondo estás desesperado por una solución.' NUNCA des consejos de venta ni menciones 'ayudar al cliente' — esto es puramente actuación del comprador."
   },
   "pipelineQuestions": {
       ${pipelineKeys}
