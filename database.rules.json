@@ -21,6 +21,9 @@
             ".read": "$uid === auth.uid",
             ".write": false
           }
+        },
+        "library": {
+          ".write": "$uid === auth.uid"
         }
       }
     },

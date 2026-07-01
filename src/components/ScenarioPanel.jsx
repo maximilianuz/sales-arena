@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { UserCircle, HeartPulse, Target, ShieldAlert, RefreshCw, Shuffle } from 'lucide-react';
+import { UserCircle, HeartPulse, Target, ShieldAlert, RefreshCw, Shuffle, BookMarked } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { generateAIScenario } from '../utils/ai';
+import { useSubscriptionContext } from '../contexts/SubscriptionContext';
+import ScenarioLibrary from './ScenarioLibrary';
 
 const GENERATION_STEPS = [
   { es: 'Construyendo identidad del Lead...', en: 'Building Lead identity...' },
@@ -302,9 +304,11 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
 export default function ScenarioPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly, isLeadRole, isCompactObserver }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
+  const { isPaid } = useSubscriptionContext() || {};
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStep, setGeneratingStep] = useState(0);
   const [genError, setGenError] = useState('');
+  const [library, setLibrary] = useState(null); // null | 'load' | 'save'
   const [config, setConfig] = useState({ level: 'Intermedio', theme: 'B2B Software/SaaS', saleType: 'Suscripción Anual / High Ticket', targetObjection: 'Lo tengo que pensar', leadTemperature: 'Templado' });
 
   const handleGenerate = async (customConfig = null) => {
@@ -355,6 +359,11 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
     );
   }
 
+  const handleLoadFromLibrary = async (scenario) => {
+    if (setCurrentScenario) await setCurrentScenario(scenario);
+    setLibrary(null);
+  };
+
   return (
     <div className="glass-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -364,11 +373,31 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
             {currentScenario ? 'Buyer Persona' : (isEn ? 'Configure Scenario' : 'Configurar Escenario')}
           </span>
         </div>
+        {/* Botones de biblioteca (solo plan pago, no read-only) */}
+        {isPaid && !isReadOnly && (
+          <button
+            onClick={() => setLibrary(currentScenario ? 'save' : 'load')}
+            title={currentScenario ? (isEn ? 'Save to library' : 'Guardar en biblioteca') : (isEn ? 'Load from library' : 'Cargar de biblioteca')}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.65rem', borderRadius: '0.5rem', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', color: 'rgba(165,180,252,0.9)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: '600' }}
+          >
+            <BookMarked size={12} /> {currentScenario ? (isEn ? 'Save' : 'Guardar') : (isEn ? 'Library' : 'Biblioteca')}
+          </button>
+        )}
       </div>
       {!currentScenario
         ? <ScenarioConfig config={config} setConfig={setConfig} onGenerate={handleGenerate} onRandom={handleRandom} isGenerating={isGenerating} generatingStep={generatingStep} genError={genError} />
         : <TrainerView scenario={currentScenario} isReadOnly={isReadOnly} onRegenerate={handleGenerate} isGenerating={isGenerating} />
       }
+
+      {library && (
+        <ScenarioLibrary
+          mode={library}
+          currentScenario={library === 'save' ? currentScenario : null}
+          currentConfig={config}
+          onLoad={handleLoadFromLibrary}
+          onClose={() => setLibrary(null)}
+        />
+      )}
     </div>
   );
 }
