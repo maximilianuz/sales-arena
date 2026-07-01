@@ -3,7 +3,8 @@ import { ref, onValue } from 'firebase/database';
 import { db, auth } from '../utils/db';
 import { getCohortCode } from '../utils/cohort';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Copy, CheckCircle2, Users, TrendingUp, Award, Target, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Copy, CheckCircle2, Users, TrendingUp, Award, Target, ChevronDown, ChevronUp, FileText, FileSpreadsheet } from 'lucide-react';
+import { exportCohortCSV, exportCohortPDF } from '../utils/export';
 
 const SCORE_KEYS = ['rapport', 'objectionHandling', 'closing', 'activeListening'];
 
@@ -136,9 +137,19 @@ export default function TrainerAnalytics({ onBack }) {
           <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
           </button>
-          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
+          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', flex: 1 }}>
             {isEn ? '📊 Trainer Analytics' : '📊 Analytics del Trainer'}
           </h1>
+          {students.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button className="btn btn-outline" onClick={() => exportCohortCSV(students, isEn)} title="CSV" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem' }}>
+                <FileSpreadsheet size={15} /> CSV
+              </button>
+              <button className="btn btn-outline" onClick={() => exportCohortPDF(students, auth.currentUser?.email, isEn)} title="PDF" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem' }}>
+                <FileText size={15} /> PDF
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Cohort code card */}

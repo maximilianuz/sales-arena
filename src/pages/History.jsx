@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ref, onValue } from 'firebase/database';
 import { db, auth } from '../utils/db';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Star, TrendingUp, TrendingDown, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Star, TrendingUp, TrendingDown, Lightbulb, ChevronDown, ChevronUp, FileText, FileSpreadsheet } from 'lucide-react';
+import { exportHistoryCSV, exportHistoryPDF } from '../utils/export';
 
 function ScoreBar({ label, value }) {
   const color = value >= 8 ? 'var(--success)' : value >= 6 ? 'var(--accent)' : 'var(--danger)';
@@ -120,9 +121,19 @@ export default function History({ onBack }) {
           <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
           </button>
-          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
+          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', flex: 1 }}>
             {isEn ? '📈 My History' : '📈 Mi Historial'}
           </h1>
+          {sessions.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button className="btn btn-outline" onClick={() => exportHistoryCSV(sessions, isEn)} title="CSV" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem' }}>
+                <FileSpreadsheet size={15} /> CSV
+              </button>
+              <button className="btn btn-outline" onClick={() => exportHistoryPDF(sessions, auth.currentUser?.email, isEn)} title="PDF" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem' }}>
+                <FileText size={15} /> PDF
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Resumen */}
