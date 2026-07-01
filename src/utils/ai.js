@@ -1,10 +1,10 @@
 import { OBJECTIONS_THEORY_GENERAL, OBJECTIONS_DICTIONARY } from './objectionsKnowledgeBase';
-import { getIdentityPrompt } from './prompts/identityPrompt';
-import { getObjectionsPrompt } from './prompts/objectionsPrompt';
-import { getPipelinePrompt } from './prompts/pipelinePrompt';
+import { getFullScenarioPrompt } from './prompts/fullScenarioPrompt';
 import { auth } from './db';
 
-async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 2) {
+const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 2, maxTokens = 1500) {
   // Modo experto (BYOK): el usuario cargó su propia key/URL en Ajustes y pega
   // directo al proveedor externo. Por defecto (sin key propia) usamos nuestro
   // proxy serverless, que nunca expone una key al cliente.
@@ -12,7 +12,7 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
 
   let finalUrl = "/api/generate";
   const headers = { "Content-Type": "application/json" };
-  let requestBody = { prompt, uid: auth.currentUser?.uid, email: auth.currentUser?.email };
+  let requestBody = { prompt, uid: auth.currentUser?.uid, email: auth.currentUser?.email, max_tokens: maxTokens };
 
   if (useOwnKey) {
     requestBody.byok = true;
@@ -25,7 +25,7 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
       model: apiModel || "meta/llama-3.1-8b-instruct",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
-      max_tokens: 1500, // Permitimos más tokens por módulo
+      max_tokens: maxTokens,
       response_format: { type: "json_object" }
     };
   }
@@ -38,10 +38,23 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
     });
 
     if (!response.ok) {
-      // Timeouts/errores transitorios del proveedor: reintentar una vez antes de rendirnos.
+      // Rate limit (429): esperar el tiempo sugerido y reintentar (una vez).
+      if (response.status === 429 && retriesLeft > 0) {
+        let waitMs = 8000;
+        try {
+          const rl = await response.clone().json();
+          const msg = rl?.error?.message || rl?.error || '';
+          const match = /try again in ([\d.]+)s/i.exec(msg);
+          if (match) waitMs = Math.min(Math.ceil(parseFloat(match[1]) * 1000) + 500, 20000);
+        } catch (e) { /* usar default */ }
+        await sleep(waitMs);
+        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens);
+      }
+
+      // Timeouts/errores transitorios del proveedor: reintentar antes de rendirnos.
       const isRetryable = (response.status === 504 || response.status === 502 || response.status === 503) && retriesLeft > 0;
       if (isRetryable) {
-        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1);
+        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens);
       }
 
       let errorData;
@@ -55,6 +68,9 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
       }
       if (errorData?.error === 'timeout_upstream') {
         throw new Error("La IA tardó demasiado en responder. Intentá de nuevo — si persiste, probá en unos minutos.");
+      }
+      if (response.status === 429) {
+        throw new Error("El servicio de IA está saturado en este momento. Esperá unos segundos y volvé a intentar.");
       }
       throw new Error(errorData?.error?.message || errorData?.error || errorData?.message || "Error en la API");
     }
@@ -92,47 +108,21 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     specificObjectionFramework = OBJECTIONS_DICTIONARY[selectedObjectionKey] || '';
   }
 
-  // 1. Llamada Módulo Base (Identidad y Situación)
-  const identityPrompt = getIdentityPrompt({ 
-    level: config.level, 
-    theme: config.theme, 
-    leadTemperature: config.leadTemperature, 
-    language 
-  });
-  console.log("-> Iniciando Módulo 1: Identidad");
-  const baseProfile = await makeAIPromptCall(identityPrompt, apiKey, apiUrl, apiModel);
-
-  // 2. Llamada Módulo Objeciones
-  const objectionsPrompt = getObjectionsPrompt({
-    baseProfile,
+  // UNA sola llamada consolidada (antes eran 3). Baja el consumo de tokens de
+  // ~7500 a ~2700 (bajo el límite de 6000 TPM de Groq free tier), evita el rate
+  // limit y reduce la latencia ~3x (mitiga los 504 de Netlify).
+  const fullPrompt = getFullScenarioPrompt({
+    level: config.level,
+    theme: config.theme,
+    leadTemperature: config.leadTemperature,
     targetObjection: selectedObjectionKey,
-    language,
     specificObjectionFramework,
-    level: config.level
-  });
-  console.log("-> Iniciando Módulo 2: Objeciones");
-  const objectionsProfile = await makeAIPromptCall(objectionsPrompt, apiKey, apiUrl, apiModel);
-
-  // 3. Llamada Módulo Pipeline
-  const pipelinePrompt = getPipelinePrompt({
-    baseProfile,
-    objectionsProfile,
     activeStages,
-    specificObjectionFramework,
     language
   });
-  console.log("-> Iniciando Módulo 3: Pipeline");
-  const pipelineProfile = await makeAIPromptCall(pipelinePrompt, apiKey, apiUrl, apiModel);
 
-  console.log("=== DEBUG: RESULTADOS IA ===");
-  console.log("Módulo 2 (Objeciones):", objectionsProfile);
-
-  // Unificamos todo en un solo objeto para retornarlo a la UI
-  return {
-    ...baseProfile,
-    ...objectionsProfile,
-    ...pipelineProfile
-  };
+  const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 2200);
+  return scenario;
 }
 
 export async function generateSurpriseEvent(apiKey, apiUrl, apiModel, scenario, language = 'es') {
