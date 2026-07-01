@@ -50,6 +50,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/cohort"
+  to = "/.netlify/functions/cohort"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/nvidia/*"
   to = "https://integrate.api.nvidia.com/:splat"
   status = 200

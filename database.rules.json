@@ -24,6 +24,16 @@
         }
       }
     },
+    "cohorts": {
+      "$trainerUid": {
+        ".read": "$trainerUid === auth.uid",
+        ".write": false
+      }
+    },
+    "cohortCodes": {
+      ".read": false,
+      ".write": false
+    },
     "$other": {
       ".read": false,
       ".write": false

@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import {
   Shuffle, Copy, ChessKnight, BookOpen, Smartphone,
   Zap, History, Target, TrendingUp, Theater, Eye,
-  ArrowRight, CheckCircle2, LogOut
+  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import { signOutUser } from '../utils/auth';
+import { joinCohort } from '../utils/cohort';
 import { auth } from '../utils/db';
 import HistoryPage from './History';
+import TrainerAnalytics from './TrainerAnalytics';
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
@@ -21,8 +23,13 @@ const ROLE_META = {
 export default function Lobby() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { isFree, isPaid, openPlans } = useSubscriptionContext() || {};
+  const { isFree, isPaid, tier, openPlans } = useSubscriptionContext() || {};
   const [showHistory, setShowHistory] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showJoinCohort, setShowJoinCohort] = useState(false);
+  const [cohortCodeInput, setCohortCodeInput] = useState('');
+  const [joinMsg, setJoinMsg] = useState('');
+  const [joining, setJoining] = useState(false);
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [roomId, setRoomId] = useState('');
@@ -31,6 +38,25 @@ export default function Lobby() {
   const isEn = i18n.language?.startsWith('en');
 
   if (showHistory) return <HistoryPage onBack={() => setShowHistory(false)} />;
+  if (showAnalytics) return <TrainerAnalytics onBack={() => setShowAnalytics(false)} />;
+
+  const handleJoinCohort = async () => {
+    if (!cohortCodeInput.trim()) return;
+    setJoining(true); setJoinMsg('');
+    try {
+      await joinCohort(cohortCodeInput);
+      setJoinMsg(isEn ? '✓ Joined! Your sessions will be shared with your trainer.' : '✓ ¡Te uniste! Tus sesiones se compartirán con tu trainer.');
+      setCohortCodeInput('');
+      setTimeout(() => setShowJoinCohort(false), 2000);
+    } catch (e) {
+      const msg = e.message === 'code_not_found' ? (isEn ? 'Code not found.' : 'Código no encontrado.')
+        : e.message === 'cant_join_own' ? (isEn ? "You can't join your own cohort." : 'No podés unirte a tu propio cohorte.')
+        : e.message;
+      setJoinMsg('⚠️ ' + msg);
+    } finally {
+      setJoining(false);
+    }
+  };
 
   const roles = [
     { id: 'Facilitador', label: t('lobby.roles.Facilitador'), desc: t('lobby.roles.FacilitadorDesc') },
@@ -107,6 +133,24 @@ export default function Lobby() {
 
         {/* Right: actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          {tier === 'trainer' && (
+            <button onClick={() => setShowAnalytics(true)} style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              background: 'rgba(139,92,246,0.15)', color: 'white',
+              border: '1px solid rgba(139,92,246,0.4)', padding: '0.35rem 0.8rem',
+              borderRadius: '2rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600'
+            }}>
+              <BarChart2 size={13} /> {isEn ? 'Analytics' : 'Analytics'}
+            </button>
+          )}
+          <button onClick={() => setShowJoinCohort(true)} style={{
+            display: 'flex', alignItems: 'center', gap: '0.4rem',
+            background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.7)',
+            border: '1px solid rgba(255,255,255,0.12)', padding: '0.35rem 0.8rem',
+            borderRadius: '2rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600'
+          }}>
+            <Users size={13} /> {isEn ? 'Join cohort' : 'Unirme a cohorte'}
+          </button>
           {isPaid && (
             <button onClick={() => setShowHistory(true)} style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
@@ -344,6 +388,41 @@ export default function Lobby() {
           </p>
         </div>
       </div>
+
+      {/* ── Join cohort modal ──────────────────────────────── */}
+      {showJoinCohort && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div style={{ maxWidth: '400px', width: '100%', background: 'rgba(15,15,30,0.95)', backdropFilter: 'blur(24px)', borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.08)', padding: '2rem', position: 'relative' }}>
+            <button onClick={() => { setShowJoinCohort(false); setJoinMsg(''); }} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              <X size={20} />
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <Users size={20} color="var(--primary)" />
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '700' }}>{isEn ? 'Join a cohort' : 'Unirme a un cohorte'}</h3>
+            </div>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+              {isEn ? 'Enter the code your trainer gave you. Your session results will be shared with them so they can track your progress.' : 'Ingresá el código que te dio tu trainer. Tus resultados de sesión se compartirán con él para que siga tu progreso.'}
+            </p>
+            <input
+              value={cohortCodeInput}
+              onChange={e => setCohortCodeInput(e.target.value.toUpperCase())}
+              placeholder="COACH-XXXX"
+              className="form-input"
+              style={{ fontFamily: 'monospace', fontSize: '1.1rem', letterSpacing: '0.1em', textAlign: 'center', marginBottom: '0.75rem' }}
+            />
+            {joinMsg && (
+              <div style={{ fontSize: '0.85rem', marginBottom: '0.75rem', color: joinMsg.startsWith('✓') ? 'var(--success)' : 'var(--danger)' }}>{joinMsg}</div>
+            )}
+            <button
+              onClick={handleJoinCohort}
+              disabled={joining || !cohortCodeInput.trim()}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', border: 'none', fontWeight: '700', cursor: 'pointer', opacity: (joining || !cohortCodeInput.trim()) ? 0.5 : 1 }}
+            >
+              {joining ? (isEn ? 'Joining...' : 'Uniéndome...') : (isEn ? 'Join' : 'Unirme')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

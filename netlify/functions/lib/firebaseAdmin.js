@@ -130,3 +130,11 @@ export async function activateSubscription(uid, plan, provider, durationDays) {
 export async function setPath(path, data) {
   return dbSet(path, data);
 }
+
+export async function getPath(path) {
+  return dbGet(path);
+}
+
+export async function patchPath(path, data) {
+  return dbPatch(path, data);
+}

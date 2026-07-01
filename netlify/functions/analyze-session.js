@@ -23,8 +23,9 @@ export const handler = async (event) => {
   }
 
   // Verificar suscripción (solo closer/trainer pueden guardar historial)
+  let userData;
   try {
-    const userData = await getUserData(uid);
+    userData = await getUserData(uid);
     if (userData.subscriptionStatus !== 'active') {
       return { statusCode: 403, headers, body: JSON.stringify({ error: "Se requiere plan pago para guardar historial." }) };
     }
@@ -145,6 +146,21 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
     };
 
     await setPath(`/users/${uid}/history/${sessionId}`, historyEntry);
+
+    // Si el alumno está en un cohorte, propagar un resumen liviano al Trainer
+    if (userData.joinedTrainerUid) {
+      try {
+        await setPath(`/cohorts/${userData.joinedTrainerUid}/students/${uid}/sessions/${sessionId}`, {
+          savedAt: historyEntry.savedAt,
+          overallScore: analysis.overallScore || 0,
+          scores: analysis.scores || {},
+          scenario: historyEntry.scenario
+        });
+      } catch (e) {
+        console.error("No se pudo propagar sesión al cohorte:", e.message);
+        // No bloqueamos la respuesta al alumno si esto falla
+      }
+    }
 
     return { statusCode: 200, headers, body: JSON.stringify({ sessionId, analysis }) };
   } catch (err) {
