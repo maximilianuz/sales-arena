@@ -40,7 +40,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
         {role && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: '2rem', border: '1px solid var(--glass-border)', fontSize: '0.85rem', color: 'var(--text-muted)', marginLeft: '1rem' }}>
             <User size={14} />
-            <span>{role}</span>
+            <span>{t(`lobby.roles.${role}`, role)}</span>
           </div>
         )}
 
