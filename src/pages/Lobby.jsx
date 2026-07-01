@@ -37,9 +37,6 @@ export default function Lobby() {
 
   const isEn = i18n.language?.startsWith('en');
 
-  if (showHistory) return <HistoryPage onBack={() => setShowHistory(false)} />;
-  if (showAnalytics) return <TrainerAnalytics onBack={() => setShowAnalytics(false)} />;
-
   const handleJoinCohort = async () => {
     if (!cohortCodeInput.trim()) return;
     setJoining(true); setJoinMsg('');
@@ -106,6 +103,10 @@ export default function Lobby() {
   }, []);
 
   const canSubmit = name && role && roomId;
+
+  // Returns condicionales DESPUÉS de todos los hooks (regla de hooks de React).
+  if (showHistory) return <HistoryPage onBack={() => setShowHistory(false)} />;
+  if (showAnalytics) return <TrainerAnalytics onBack={() => setShowAnalytics(false)} />;
 
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '1.5rem 1rem 3rem' }}>
