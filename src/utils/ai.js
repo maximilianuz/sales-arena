@@ -4,7 +4,7 @@ import { getObjectionsPrompt } from './prompts/objectionsPrompt';
 import { getPipelinePrompt } from './prompts/pipelinePrompt';
 import { auth } from './db';
 
-async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 1) {
+async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 2) {
   // Modo experto (BYOK): el usuario cargó su propia key/URL en Ajustes y pega
   // directo al proveedor externo. Por defecto (sin key propia) usamos nuestro
   // proxy serverless, que nunca expone una key al cliente.
@@ -48,6 +48,9 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
       try {
         errorData = await response.json();
       } catch (e) {
+        if (response.status === 504) {
+          throw new Error("La IA tardó demasiado en responder varias veces seguidas. Probá de nuevo en unos minutos.");
+        }
         throw new Error(`HTTP Error ${response.status}: Asegúrate de que la API soporte conexiones desde el navegador (CORS).`);
       }
       if (errorData?.error === 'timeout_upstream') {

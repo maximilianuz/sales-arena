@@ -92,17 +92,14 @@ export const handler = async (event) => {
     }
   };
 
-  // Un solo reintento rápido si la primera llamada falla por timeout/red.
-  // El límite total de la función (Netlify) es ~10s, así que repartimos: 6s + 3.5s.
+  // Una sola llamada por invocación: el límite duro de Netlify Functions es ~10s
+  // total (incluye el chequeo de suscripción previo), así que NO reintentamos
+  // dentro de la misma invocación — eso agotaba el presupuesto y Netlify mataba
+  // la función a nivel de plataforma antes de poder devolver un error legible.
+  // El reintento vive del lado del cliente (ai.js), que dispara una invocación
+  // nueva con presupuesto de tiempo fresco.
   try {
-    let upstream;
-    try {
-      upstream = await callUpstream(6000);
-    } catch (firstError) {
-      console.warn("Primer intento a Groq falló, reintentando:", firstError.message);
-      upstream = await callUpstream(3500);
-    }
-
+    const upstream = await callUpstream(8000);
     const data = await upstream.json();
 
     if (!upstream.ok) {
