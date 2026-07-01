@@ -202,7 +202,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', flex: 1 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', flex: 1 }}>
           {/* EVALUACIÓN DEL CLOSER */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#8b5cf6', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(139, 92, 246, 0.3)', paddingBottom: '0.5rem' }}>

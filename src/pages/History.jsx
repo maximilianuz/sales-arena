@@ -138,7 +138,7 @@ export default function History({ onBack }) {
 
         {/* Resumen */}
         {sessions.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
             {[
               { label: isEn ? 'Sessions' : 'Sesiones', value: sessions.length },
               { label: isEn ? 'Avg Score' : 'Score Promedio', value: avgScore ? `${avgScore}/10` : '-' },

@@ -147,8 +147,33 @@
   .app-container {
     padding: 0.5rem;
   }
-  
+
   .glass-panel {
     padding: 1rem;
   }
+
+  /* Modales: menos padding y ocupan casi todo el ancho */
+  .modal-content {
+    padding: 1.5rem 1.25rem;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  /* Reducir el timer gigante en pantallas chicas se maneja inline, pero
+     aseguramos que los grids de 2 columnas embebidos respiren */
+  .center-actions {
+    max-width: 100%;
+    margin-top: 1rem;
+  }
+
+  /* Títulos hero más chicos en móvil */
+  h1 { font-size: 1.6rem !important; }
+}
+
+/* Grids que se auto-colapsan en móvil sin depender de media queries inline.
+   Usar la clase .auto-2col en vez de gridTemplateColumns '1fr 1fr' fijo. */
+.auto-2col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.65rem;
 }

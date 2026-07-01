@@ -177,7 +177,7 @@ export default function TrainerAnalytics({ onBack }) {
 
         {/* Aggregate stats */}
         {totalSessions > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
             {[
               { icon: <Users size={16} />, label: isEn ? 'Students' : 'Alumnos', value: students.length },
               { icon: <Target size={16} />, label: isEn ? 'Sessions' : 'Sesiones', value: totalSessions },

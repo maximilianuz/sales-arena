@@ -153,7 +153,7 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
         </div>
 
         {/* Plan cards — 3 columnas */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
 
           {/* Card Gratis */}
           <div className="glass-panel" style={{ border: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column' }}>
