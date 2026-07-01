@@ -6,7 +6,7 @@ import {
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
-import { ref, set } from 'firebase/database';
+import { ref, update } from 'firebase/database';
 import { auth, db } from './db';
 
 const googleProvider = new GoogleAuthProvider();
@@ -32,9 +32,13 @@ export function subscribeToAuthState(callback) {
 }
 
 export function activateFreeplan(uid) {
-  return set(ref(db, `users/${uid}`), {
-    subscriptionStatus: 'free',
-    subscriptionPlan: 'free',
-    sessionsUsed: 0
+  // Solo tocamos el campo subscriptionStatus: es el único que las reglas de
+  // Firebase permiten escribir al cliente. subscriptionPlan y sessionsUsed
+  // quedan bajo control exclusivo del servidor (generate.js vía REST con el
+  // service account, que no está sujeto a estas reglas). Si se escriben los
+  // 3 campos juntos en un solo set(), Firebase rechaza TODA la operación
+  // porque subscriptionPlan/sessionsUsed tienen .write:false explícito.
+  return update(ref(db, `users/${uid}`), {
+    subscriptionStatus: 'free'
   });
 }
