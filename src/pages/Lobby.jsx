@@ -20,6 +20,41 @@ const ROLE_META = {
   Observador:  { icon: <Eye size={22} />, color: '#8b5cf6', gradient: 'linear-gradient(135deg,#8b5cf6,#ec4899)' }
 };
 
+function FeatureButton({ icon, label, accent, onClick }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        display: 'flex', alignItems: 'center', gap: '0.6rem',
+        padding: '0.65rem 1.25rem 0.65rem 0.65rem',
+        borderRadius: '2rem', cursor: 'pointer',
+        background: hover
+          ? `linear-gradient(135deg, rgba(${accent},0.28), rgba(${accent},0.14))`
+          : `rgba(${accent},0.08)`,
+        border: `1px solid rgba(${accent},${hover ? 0.6 : 0.3})`,
+        color: 'white', fontSize: '0.9rem', fontWeight: '700',
+        boxShadow: hover ? `0 8px 24px rgba(${accent},0.35)` : `0 2px 8px rgba(0,0,0,0.2)`,
+        transform: hover ? 'translateY(-2px)' : 'none',
+        transition: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+        backdropFilter: 'blur(12px)'
+      }}
+    >
+      <span style={{
+        width: '30px', height: '30px', borderRadius: '50%', flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: `linear-gradient(135deg, rgb(${accent}), rgba(${accent},0.6))`,
+        color: 'white', boxShadow: `0 2px 10px rgba(${accent},0.4)`
+      }}>
+        {icon}
+      </span>
+      {label}
+    </button>
+  );
+}
+
 export default function Lobby() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -132,36 +167,8 @@ export default function Lobby() {
           )}
         </div>
 
-        {/* Right: actions */}
+        {/* Right: utility actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          {tier === 'trainer' && (
-            <button onClick={() => setShowAnalytics(true)} style={{
-              display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(139,92,246,0.15)', color: 'white',
-              border: '1px solid rgba(139,92,246,0.4)', padding: '0.35rem 0.8rem',
-              borderRadius: '2rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600'
-            }}>
-              <BarChart2 size={13} /> {isEn ? 'Analytics' : 'Analytics'}
-            </button>
-          )}
-          <button onClick={() => setShowJoinCohort(true)} style={{
-            display: 'flex', alignItems: 'center', gap: '0.4rem',
-            background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.7)',
-            border: '1px solid rgba(255,255,255,0.12)', padding: '0.35rem 0.8rem',
-            borderRadius: '2rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600'
-          }}>
-            <Users size={13} /> {isEn ? 'Join cohort' : 'Unirme a cohorte'}
-          </button>
-          {isPaid && (
-            <button onClick={() => setShowHistory(true)} style={{
-              display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(99,102,241,0.12)', color: 'white',
-              border: '1px solid rgba(99,102,241,0.35)', padding: '0.35rem 0.8rem',
-              borderRadius: '2rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600'
-            }}>
-              <History size={13} /> {isEn ? 'History' : 'Historial'}
-            </button>
-          )}
           {isFree && openPlans && (
             <button onClick={openPlans} style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
@@ -202,9 +209,38 @@ export default function Lobby() {
         </div>
       </nav>
 
+      {/* ── Feature buttons (centered, premium) ───────────── */}
+      <div style={{
+        position: 'relative', zIndex: 1, marginTop: '4.5rem',
+        display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', width: '100%'
+      }}>
+        {tier === 'trainer' && (
+          <FeatureButton
+            icon={<BarChart2 size={16} />}
+            label="Analytics"
+            accent="139,92,246"
+            onClick={() => setShowAnalytics(true)}
+          />
+        )}
+        {isPaid && (
+          <FeatureButton
+            icon={<History size={16} />}
+            label={isEn ? 'History' : 'Historial'}
+            accent="99,102,241"
+            onClick={() => setShowHistory(true)}
+          />
+        )}
+        <FeatureButton
+          icon={<Users size={16} />}
+          label={isEn ? 'Join cohort' : 'Unirme a cohorte'}
+          accent="16,185,129"
+          onClick={() => setShowJoinCohort(true)}
+        />
+      </div>
+
       {/* ── Main card ──────────────────────────────────────── */}
       <div style={{
-        margin: 'auto', marginTop: '4.5rem', maxWidth: '580px', width: '100%',
+        margin: 'auto', marginTop: '1.5rem', maxWidth: '580px', width: '100%',
         position: 'relative', zIndex: 1,
         background: 'rgba(15,15,30,0.75)',
         backdropFilter: 'blur(24px)',
