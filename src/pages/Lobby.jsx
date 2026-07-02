@@ -12,6 +12,7 @@ import { joinCohort } from '../utils/cohort';
 import { auth } from '../utils/db';
 import HistoryPage from './History';
 import TrainerAnalytics from './TrainerAnalytics';
+import LevelCard from '../components/LevelCard';
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
@@ -237,6 +238,9 @@ export default function Lobby() {
           onClick={() => setShowJoinCohort(true)}
         />
       </div>
+
+      {/* ── Tarjeta de nivel / progreso (gamificación) ─────── */}
+      <LevelCard />
 
       {/* ── Main card ──────────────────────────────────────── */}
       <div style={{

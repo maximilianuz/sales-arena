@@ -167,6 +167,37 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
 
     await setPath(`/users/${uid}/history/${sessionId}`, historyEntry);
 
+    // Gamificación: acumular XP, racha y stats del alumno. El servicio (REST con
+    // service account) bypassea las reglas, así que puede escribir en /stats.
+    try {
+      const prev = userData.stats || {};
+      const rubricVals = rubric ? Object.values(rubric).filter(v => typeof v === 'number' && v > 0) : [];
+      const rubricAvg = rubricVals.length ? rubricVals.reduce((a, b) => a + b, 0) / rubricVals.length : 0;
+      // Comisión USD: base 50 + score*45 (max 450) + rúbrica*40 (max 200).
+      // (Debe coincidir con commissionForSession de src/utils/gamification.js.)
+      const earned = 50 + Math.round((analysis.overallScore || 0) * 45) + Math.round(rubricAvg * 40);
+
+      const today = new Date().toISOString().slice(0, 10);
+      let streak = 1;
+      if (prev.lastSessionDate) {
+        const diffDays = Math.round((new Date(today) - new Date(prev.lastSessionDate)) / 86400000);
+        if (diffDays === 0) streak = prev.streak || 1;        // misma fecha
+        else if (diffDays === 1) streak = (prev.streak || 0) + 1; // día consecutivo
+        else streak = 1;                                       // se cortó la racha
+      }
+
+      await setPath(`/users/${uid}/stats`, {
+        totalEarnings: (prev.totalEarnings || 0) + earned,
+        sessionsCompleted: (prev.sessionsCompleted || 0) + 1,
+        bestScore: Math.max(prev.bestScore || 0, analysis.overallScore || 0),
+        streak,
+        lastSessionDate: today,
+        updatedAt: Date.now(),
+      });
+    } catch (e) {
+      console.error("No se pudo actualizar stats de gamificación:", e.message);
+    }
+
     // Si el alumno está en un cohorte, propagar un resumen liviano al Trainer
     if (userData.joinedTrainerUid) {
       try {
