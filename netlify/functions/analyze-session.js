@@ -16,7 +16,7 @@ export const handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
-  const { uid, scenario, debriefNotes, votingResults, stages, sessionDurationMinutes, language = 'es' } = body;
+  const { uid, scenario, debriefNotes, votingResults, rubric, stages, sessionDurationMinutes, language = 'es' } = body;
 
   if (!uid || !scenario) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
@@ -44,6 +44,19 @@ export const handler = async (event) => {
     .map(q => `${q.question}: ${q.options?.map(o => `${o.text}(${o.votes})`).join(', ')}`)
     .join('\n') || (isEn ? 'No votes.' : 'Sin votaciones.');
 
+  // Rúbrica estructurada del Observador (1-5). Es observación humana directa →
+  // el prompt le pide al modelo que la pondere fuerte.
+  const RUBRIC_LABELS = {
+    rapport: isEn ? 'Rapport' : 'Rapport',
+    real_pain: isEn ? 'Real vs. surface pain' : 'Dolor real vs. superficial',
+    value_gap: isEn ? 'Value gap' : 'Brecha de valor',
+    recap: isEn ? 'Recap' : 'Recapitulación',
+    objection_isolation: isEn ? 'Objection isolation' : 'Aislamiento de objeción',
+  };
+  const rubricText = rubric && Object.keys(rubric).length
+    ? Object.entries(rubric).map(([k, v]) => `${RUBRIC_LABELS[k] || k}: ${v}/5`).join('\n')
+    : (isEn ? 'No rubric scores.' : 'Sin puntajes de rúbrica.');
+
   const prompt = isEn
     ? `You are an expert sales coach. Analyze this sales roleplay session and provide structured feedback.
 
@@ -61,6 +74,9 @@ ${debriefText}
 
 VOTING RESULTS:
 ${votingText}
+
+OBSERVER RUBRIC (1-5, structured human scoring — weigh this heavily; it is direct observation of the roleplay):
+${rubricText}
 
 Respond ONLY in valid JSON with this exact structure:
 {
@@ -91,6 +107,9 @@ ${debriefText}
 
 RESULTADOS DE VOTACIÓN:
 ${votingText}
+
+RÚBRICA DEL OBSERVADOR (1-5, puntaje humano estructurado — ponderála fuerte; es observación directa del roleplay):
+${rubricText}
 
 Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
 {
@@ -142,6 +161,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
         industry: scenario.demographics?.industry,
         objection: scenario.visibleObjection
       },
+      rubric: rubric || null,
       analysis
     };
 
@@ -154,6 +174,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
           savedAt: historyEntry.savedAt,
           overallScore: analysis.overallScore || 0,
           scores: analysis.scores || {},
+          rubric: rubric || null,
           scenario: historyEntry.scenario
         });
       } catch (e) {

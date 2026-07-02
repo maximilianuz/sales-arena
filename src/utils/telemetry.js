@@ -28,7 +28,6 @@ export function logEvent(type, payload = {}) {
       type,
       ...payload,
       uid: (auth && auth.currentUser && auth.currentUser.uid) || null,
-      email: (auth && auth.currentUser && auth.currentUser.email) || null,
       platform: 'web',
       url: (typeof window !== 'undefined' && window.location) ? window.location.href : null,
       ua: (typeof navigator !== 'undefined') ? navigator.userAgent : null,

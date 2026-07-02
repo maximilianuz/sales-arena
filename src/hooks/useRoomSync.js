@@ -105,6 +105,9 @@ export function useRoomSync(roomId) {
       'checkout/completedAt': result ? Date.now() : null
     }, 'checkoutPhase');
 
+  // Rúbrica de evaluación del Closer (puntajes 1-5 por criterio).
+  const updateRubric = (rubric) => safeWrite({ rubric }, 'rubric');
+
   return {
     roomData,
     loading,
@@ -118,6 +121,7 @@ export function useRoomSync(roomId) {
     updateProductPresentation,
     updateSessionStartedAt,
     enableCheckout,
-    updateCheckoutPhase
+    updateCheckoutPhase,
+    updateRubric
   };
 }

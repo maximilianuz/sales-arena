@@ -46,6 +46,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
           scenario: roomData.currentScenario,
           debriefNotes: roomData.debriefNotes,
           votingResults: roomData.questions,
+          rubric: roomData.rubric,
           stages,
           sessionDurationMinutes,
           language: i18n.language || 'es'

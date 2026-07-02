@@ -15,6 +15,7 @@ import DebriefPanel from '../components/DebriefPanel';
 import SettingsModal from '../components/SettingsModal';
 import UpgradeModal from '../components/UpgradeModal';
 import SessionAnalysis from '../components/SessionAnalysis';
+import RubricPanel from '../components/RubricPanel';
 import LeadCheckoutPanel from '../components/LeadCheckoutPanel';
 import CheckoutResultBanner from '../components/CheckoutResultBanner';
 import CloserCommandPanel from '../components/CloserCommandPanel';
@@ -31,7 +32,7 @@ export default function Room() {
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase } = useRoomSync(roomId);
+  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -367,6 +368,15 @@ export default function Room() {
                   </div>
                 )}
               </div>
+            )}
+
+            {/* Rúbrica de evaluación (Observador puntúa; Trainer también) */}
+            {showDebrief && currentScenario && (
+              <RubricPanel
+                rubric={roomData?.rubric}
+                updateRubric={updateRubric}
+                canScore={isObserver || isFacilitator}
+              />
             )}
           </div>
 
