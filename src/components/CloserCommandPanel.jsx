@@ -1,6 +1,20 @@
 import React, { useState } from 'react';
-import { Target, MessageSquare, ChevronDown, ChevronUp, Package, Zap } from 'lucide-react';
+import { Target, MessageSquare, ChevronDown, ChevronUp, Package, Zap, Ear, Brain, Volume2, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { getStageCoaching } from '../utils/coachingKnowledge';
+
+// Fila compacta del coach de etapa: icono + etiqueta + consejo.
+function CoachRow({ Icon, color, label, text }) {
+  return (
+    <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'flex-start' }}>
+      <Icon size={15} color={color} style={{ marginTop: '2px', flexShrink: 0 }} />
+      <div>
+        <span style={{ fontSize: '0.7rem', fontWeight: '800', letterSpacing: '0.1em', textTransform: 'uppercase', color, display: 'block', marginBottom: '2px' }}>{label}</span>
+        <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>{text}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function CloserCommandPanel({ currentScenario, activeStage, pipelineQuestions, productPresentation }) {
   const { i18n } = useTranslation();
@@ -8,6 +22,8 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
   const [showProduct, setShowProduct] = useState(false);
 
   const questions = pipelineQuestions && activeStage ? pipelineQuestions[activeStage.id] : [];
+  // Guía curada por etapa (qué escuchar, tono, mente, evitar + socráticas).
+  const coaching = getStageCoaching(activeStage?.id, i18n.language);
 
   if (!currentScenario || !activeStage) {
     return (
@@ -54,8 +70,18 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
         )}
       </div>
 
-      {/* Questions / script card */}
-      {questions && questions.length > 0 && (
+      {/* Coach de etapa: guía curada para closers novatos (no depende de la IA) */}
+      {coaching && (
+        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1rem', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+          <CoachRow Icon={Ear} color="#a5b4fc" label={isEn ? 'What to listen for' : 'Qué escuchar'} text={coaching.lookFor} />
+          <CoachRow Icon={Volume2} color="var(--accent)" label={isEn ? 'Voice tone' : 'Tono de voz'} text={coaching.tonality} />
+          <CoachRow Icon={Brain} color="var(--success)" label={isEn ? 'Mindset · NLP' : 'Mente · PNL'} text={coaching.mindset} />
+          <CoachRow Icon={AlertTriangle} color="var(--danger)" label={isEn ? 'Avoid' : 'Evitá'} text={coaching.avoid} />
+        </div>
+      )}
+
+      {/* Questions / script card: dinámicas del lead (IA) + consultivas curadas */}
+      {((questions && questions.length > 0) || coaching?.socratic?.length > 0) && (
         <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '1rem', padding: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <MessageSquare size={15} color="var(--success)" />
@@ -63,15 +89,29 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
               {isEn ? 'Your questions for this stage' : 'Tus preguntas para esta etapa'}
             </span>
           </div>
-          <ul style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-            {questions.map((q, i) => (
-              <li key={i} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.75)', lineHeight: '1.5' }}>{q}</li>
-            ))}
-          </ul>
+          {questions && questions.length > 0 && (
+            <ul style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              {questions.map((q, i) => (
+                <li key={i} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.75)', lineHeight: '1.5' }}>{q}</li>
+              ))}
+            </ul>
+          )}
+          {coaching?.socratic?.length > 0 && (
+            <>
+              <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', margin: '0.9rem 0 0.5rem' }}>
+                {isEn ? 'Consultative — always work' : 'Consultivas — siempre funcionan'}
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {coaching.socratic.map((q, i) => (
+                  <li key={i} style={{ fontSize: '0.87rem', color: 'rgba(255,255,255,0.55)', lineHeight: '1.5' }}>{q}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       )}
 
-      {/* Quick lead intel */}
+      {/* Quick lead intel — 4 fichas: objeción, miedo, cuándo se abre, qué le da confianza */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
         <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
           <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.4rem' }}>
@@ -89,6 +129,26 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
             {currentScenario.psychology?.primaryFear}
           </p>
         </div>
+        {currentScenario.behavioralCues?.opensUpWhen && (
+          <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.4rem' }}>
+              {isEn ? 'Opens up when' : 'Se abre cuando'}
+            </div>
+            <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>
+              {currentScenario.behavioralCues.opensUpWhen}
+            </p>
+          </div>
+        )}
+        {currentScenario.psychology?.trustTrigger && (
+          <div style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a5b4fc', marginBottom: '0.4rem' }}>
+              {isEn ? 'Builds trust' : 'Genera confianza'}
+            </div>
+            <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>
+              {currentScenario.psychology.trustTrigger}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Product — collapsible */}

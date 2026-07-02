@@ -31,7 +31,7 @@ export default function Room() {
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const { roomData, loading, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase } = useRoomSync(roomId);
+  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -169,9 +169,29 @@ export default function Room() {
     showProductPresentation = true;
   }
 
+  const isEn = (i18n.language || '').toLowerCase().startsWith('en');
+
   return (
     <div className="app-container">
-      <Header 
+      {syncError && (
+        <div
+          role="alert"
+          style={{
+            background: 'rgba(239, 68, 68, 0.14)',
+            color: 'var(--danger)',
+            borderBottom: '1px solid rgba(239, 68, 68, 0.3)',
+            padding: '0.6rem 1rem',
+            textAlign: 'center',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+          }}
+        >
+          {isEn
+            ? 'Connection to the room was lost. Reconnecting… your changes will sync automatically.'
+            : 'Se perdió la conexión con la sala. Reconectando… tus cambios se sincronizarán solos.'}
+        </div>
+      )}
+      <Header
         title={sessionTitle}
         roomId={roomId}
         role={role}

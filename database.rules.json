@@ -37,6 +37,15 @@
       ".read": false,
       ".write": false
     },
+    "telemetry": {
+      ".read": false,
+      "$day": {
+        "$entry": {
+          ".write": "auth != null",
+          ".validate": "newData.hasChild('type')"
+        }
+      }
+    },
     "$other": {
       ".read": false,
       ".write": false

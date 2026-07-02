@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Ruflo / claude-flow runtime state (herramienta de dev, no parte de la app)
+.claude-flow/
+.swarm/
+ruvector.db
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

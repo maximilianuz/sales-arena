@@ -1,6 +1,7 @@
 import { OBJECTIONS_THEORY_GENERAL, OBJECTIONS_DICTIONARY } from './objectionsKnowledgeBase';
 import { getFullScenarioPrompt } from './prompts/fullScenarioPrompt';
 import { auth } from './db';
+import { logError } from './telemetry';
 
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
@@ -76,16 +77,30 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+
+    // Blindaje: el proveedor puede devolver un shape inesperado (choices vacío,
+    // message nulo, content no-string). Sin estos guards, se cae con un
+    // "Cannot read properties of undefined" críptico en vez de un mensaje útil.
+    const content = data?.choices?.[0]?.message?.content;
+    if (typeof content !== 'string' || content.trim() === '') {
+      throw new Error("La IA devolvió una respuesta vacía o con un formato inesperado. Probá de nuevo.");
+    }
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
-    } else {
+    if (!jsonMatch) {
       throw new Error("La respuesta de la IA no tenía formato JSON válido.");
+    }
+
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch {
+      // El modelo devolvió algo que parece JSON pero está mal formado
+      // (comillas sin cerrar, coma final, etc.). Mensaje accionable en vez de crash.
+      throw new Error("La IA devolvió un JSON mal formado. Volvé a intentar en unos segundos.");
     }
   } catch (error) {
     console.error("AI Generation error:", error);
+    logError(error, { source: 'ai_generate' });
     if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
       throw new Error("Error de conexión. Si usas Ollama local, asegúrate de haberlo iniciado con OLLAMA_ORIGINS='*'. Si usas otra API, podría estar bloqueando conexiones desde el navegador (CORS).");
     }
