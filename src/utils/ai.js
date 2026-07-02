@@ -2,6 +2,7 @@ import { OBJECTIONS_THEORY_GENERAL, OBJECTIONS_DICTIONARY } from './objectionsKn
 import { getFullScenarioPrompt } from './prompts/fullScenarioPrompt';
 import { auth } from './db';
 import { logError } from './telemetry';
+import { randomPersonality, personalityView } from './leadPersonalities';
 
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
@@ -126,6 +127,12 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
   // UNA sola llamada consolidada (antes eran 3). Baja el consumo de tokens de
   // ~7500 a ~2700 (bajo el límite de 6000 TPM de Groq free tier), evita el rate
   // limit y reduce la latencia ~3x (mitiga los 504 de Netlify).
+  // Personalidad del lead (DISC): la elegimos acá y la estampamos en el escenario
+  // (no confiamos en que el modelo la eche). El prompt hace que el lead la encarne.
+  const personality = randomPersonality();
+  const pv = personalityView(personality, language);
+  const personalityHint = `${pv.name} — ${pv.essence}`;
+
   const fullPrompt = getFullScenarioPrompt({
     level: config.level,
     theme: config.theme,
@@ -133,12 +140,14 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     targetObjection: selectedObjectionKey,
     specificObjectionFramework,
     activeStages,
-    language
+    language,
+    personalityHint
   });
 
   // 2800 tokens de salida acomoda los campos nuevos (behavioralCues, decisionStyle,
   // triggerEvent) sin acercarse al límite de 6000 TPM.
   const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 2800);
+  if (scenario && typeof scenario === 'object') scenario.personality = personality.id;
   return scenario;
 }
 

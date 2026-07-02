@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Target, MessageSquare, ChevronDown, ChevronUp, Package, Zap, Ear, Brain, Volume2, AlertTriangle } from 'lucide-react';
+import { Target, MessageSquare, ChevronDown, ChevronUp, Package, Zap, Ear, Brain, Volume2, AlertTriangle, Fingerprint } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getStageCoaching } from '../utils/coachingKnowledge';
+import { getPersonality, personalityView } from '../utils/leadPersonalities';
 
 // Fila compacta del coach de etapa: icono + etiqueta + consejo.
 function CoachRow({ Icon, color, label, text }) {
@@ -24,6 +25,8 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
   const questions = pipelineQuestions && activeStage ? pipelineQuestions[activeStage.id] : [];
   // Guía curada por etapa (qué escuchar, tono, mente, evitar + socráticas).
   const coaching = getStageCoaching(activeStage?.id, i18n.language);
+  // Perfil de personalidad del lead (DISC) → cómo abordarlo.
+  const persona = currentScenario ? personalityView(getPersonality(currentScenario.personality), i18n.language) : null;
 
   if (!currentScenario || !activeStage) {
     return (
@@ -69,6 +72,25 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
           </div>
         )}
       </div>
+
+      {/* Perfil de personalidad del lead + cómo venderle (extraído del método) */}
+      {persona && (
+        <div style={{ background: `${persona.color}12`, border: `1px solid ${persona.color}40`, borderRadius: '1rem', padding: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <Fingerprint size={15} color={persona.color} />
+            <span style={{ fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.12em', textTransform: 'uppercase', color: persona.color }}>
+              {isEn ? 'Lead profile' : 'Perfil del lead'}: {persona.name}
+            </span>
+          </div>
+          <p style={{ margin: '0 0 0.85rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>{persona.essence}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem', lineHeight: 1.5 }}>
+            <div><strong style={{ color: 'var(--success)' }}>{isEn ? 'Connect: ' : 'Conectá: '}</strong><span style={{ color: 'rgba(255,255,255,0.72)' }}>{persona.connect}</span></div>
+            <div><strong style={{ color: '#a5b4fc' }}>{isEn ? 'Close: ' : 'Cerrá: '}</strong><span style={{ color: 'rgba(255,255,255,0.72)' }}>{persona.close}</span></div>
+            <div><strong style={{ color: 'var(--danger)' }}>{isEn ? 'Avoid: ' : 'Evitá: '}</strong><span style={{ color: 'rgba(255,255,255,0.72)' }}>{persona.avoid}</span></div>
+            <div><strong style={{ color: 'var(--accent)' }}>{isEn ? 'Tone: ' : 'Tono: '}</strong><span style={{ color: 'rgba(255,255,255,0.72)' }}>{persona.tone}</span></div>
+          </div>
+        </div>
+      )}
 
       {/* Coach de etapa: guía curada para closers novatos (no depende de la IA) */}
       {coaching && (
