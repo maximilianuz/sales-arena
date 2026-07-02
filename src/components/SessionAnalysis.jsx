@@ -47,6 +47,9 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
           debriefNotes: roomData.debriefNotes,
           votingResults: roomData.questions,
           rubric: roomData.rubric,
+          productPrice: roomData.currentScenario?.productPrice,
+          commissionPct: roomData.config?.commissionPct,
+          closed: roomData.checkout?.result === 'closed',
           stages,
           sessionDurationMinutes,
           language: i18n.language || 'es'

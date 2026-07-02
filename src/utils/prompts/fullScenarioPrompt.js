@@ -1,7 +1,7 @@
 // Prompt consolidado: genera TODO el escenario (identidad + psicología + objeciones
 // + pipeline) en UNA sola llamada. Enriquecido para máxima profundidad psicológica
 // y realismo conductual, manteniendo la salida acotada (free tier de Groq, 6000 TPM).
-export function getFullScenarioPrompt({ level, theme, leadTemperature, targetObjection, specificObjectionFramework, activeStages, language, personalityHint }) {
+export function getFullScenarioPrompt({ level, theme, leadTemperature, targetObjection, specificObjectionFramework, activeStages, language, personalityHint, realProduct }) {
   const lang = language === 'es' ? 'Español' : 'Inglés';
 
   let tempInstruction;
@@ -36,6 +36,7 @@ PARÁMETROS:
 - Objeción principal esperada: "${targetObjection}"
 ${specificObjectionFramework ? `- Framework de objeción a aplicar: ${specificObjectionFramework}` : ''}
 ${personalityHint ? `- PERSONALIDAD del lead (encarnala con fuerza en psychology, behavioralCues y verbalStyle — cómo habla, qué lo abre y qué lo cierra): ${personalityHint}` : ''}
+${realProduct ? `- PRODUCTO FIJO que el Closer vende (usá EXACTAMENTE este, NO inventes otro): "${realProduct.name}" — ${realProduct.description}. Precio USD ${realProduct.price}. Generá un lead que sea un prospecto realista de ESTE producto/servicio, con un problema que este producto resuelve.` : ''}
 
 PRINCIPIOS DE REALISMO (críticos):
 - Personas de verdad, con contradicciones. NO asumas que todos son CEOs; adaptá al rubro (empleados, freelancers, estudiantes, dueños chicos, etc.).
@@ -72,6 +73,7 @@ Devolvé ÚNICAMENTE un objeto JSON válido con esta estructura EXACTA:
     "impact": "Impacto financiero Y emocional concreto de no resolverlo"
   },
   "productToSell": "1-2 párrafos: producto/servicio High Ticket que el Closer debe ofrecer, con nombre, características clave y PRECIO de USD 1500 o más (nunca menos de 1500)",
+  "productPrice": <número entero en USD SIN símbolos ni texto, igual al precio del producto, 1500 o más>,
   "visibleObjection": "La excusa fácil que dirá primero",
   "secondaryObjections": ["", ""],
   "hiddenObjection": "La verdadera razón oculta (para el Trainer), conectada al miedo y a la herida",

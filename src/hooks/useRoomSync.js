@@ -108,6 +108,9 @@ export function useRoomSync(roomId) {
   // Rúbrica de evaluación del Closer (puntajes 1-5 por criterio).
   const updateRubric = (rubric) => safeWrite({ rubric }, 'rubric');
 
+  // Config de la sala seteada por el Trainer (comisión %, producto real, etc.).
+  const updateConfig = (config) => safeWrite({ config }, 'config');
+
   return {
     roomData,
     loading,
@@ -122,6 +125,7 @@ export function useRoomSync(roomId) {
     updateSessionStartedAt,
     enableCheckout,
     updateCheckoutPhase,
-    updateRubric
+    updateRubric,
+    updateConfig
   };
 }

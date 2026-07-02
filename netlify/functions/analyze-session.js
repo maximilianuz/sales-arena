@@ -16,7 +16,7 @@ export const handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
-  const { uid, scenario, debriefNotes, votingResults, rubric, stages, sessionDurationMinutes, language = 'es' } = body;
+  const { uid, scenario, debriefNotes, votingResults, rubric, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed } = body;
 
   if (!uid || !scenario) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
@@ -173,9 +173,17 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
       const prev = userData.stats || {};
       const rubricVals = rubric ? Object.values(rubric).filter(v => typeof v === 'number' && v > 0) : [];
       const rubricAvg = rubricVals.length ? rubricVals.reduce((a, b) => a + b, 0) / rubricVals.length : 0;
-      // Comisión USD: base 50 + score*45 (max 450) + rúbrica*40 (max 200).
-      // (Debe coincidir con commissionForSession de src/utils/gamification.js.)
-      const earned = 50 + Math.round((analysis.overallScore || 0) * 45) + Math.round(rubricAvg * 40);
+      // Comisión USD (cuenta bancaria del Closer): si el trato CERRÓ, gana
+      // precio * comisión% (como paga el dueño, configurado en la sala). Si no
+      // cerró, un crédito de práctica chico para que el esfuerzo igual cuente.
+      const price = Number(productPrice) || 0;
+      const pct = Number(commissionPct) || 0;
+      let earned;
+      if (closed && price > 0) {
+        earned = Math.round(price * (pct > 0 ? pct : 10) / 100); // % configurado o 10% por defecto
+      } else {
+        earned = 50 + Math.round((analysis.overallScore || 0) * 20); // crédito de práctica
+      }
 
       const today = new Date().toISOString().slice(0, 10);
       let streak = 1;

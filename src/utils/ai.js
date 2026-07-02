@@ -133,6 +133,9 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
   const pv = personalityView(personality, language);
   const personalityHint = `${pv.name} — ${pv.essence}`;
 
+  // Producto real del dueño (si lo configuró): el lead se genera para venderle ESTO.
+  const realProduct = config.realProduct && config.realProduct.name ? config.realProduct : null;
+
   const fullPrompt = getFullScenarioPrompt({
     level: config.level,
     theme: config.theme,
@@ -141,13 +144,22 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     specificObjectionFramework,
     activeStages,
     language,
-    personalityHint
+    personalityHint,
+    realProduct
   });
 
   // 2800 tokens de salida acomoda los campos nuevos (behavioralCues, decisionStyle,
   // triggerEvent) sin acercarse al límite de 6000 TPM.
   const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 2800);
-  if (scenario && typeof scenario === 'object') scenario.personality = personality.id;
+  if (scenario && typeof scenario === 'object') {
+    scenario.personality = personality.id;
+    // Si hay producto real, lo estampamos EXACTO (no dependemos del modelo).
+    if (realProduct) {
+      scenario.productToSell = `${realProduct.name} — ${realProduct.description} (USD ${realProduct.price})`;
+      const p = parseInt(realProduct.price, 10);
+      if (p > 0) scenario.productPrice = p;
+    }
+  }
   return scenario;
 }
 

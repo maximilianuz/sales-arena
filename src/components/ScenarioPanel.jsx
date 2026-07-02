@@ -316,7 +316,7 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
 }
 
 // ─── Main export ──────────────────────────────────────────────────────────────
-export default function ScenarioPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly, isLeadRole, isCompactObserver }) {
+export default function ScenarioPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly, isLeadRole, isCompactObserver, roomConfig }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const { isPaid } = useSubscriptionContext() || {};
@@ -334,7 +334,8 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
     const t1 = setTimeout(() => setGeneratingStep(1), 2200);
     const t2 = setTimeout(() => setGeneratingStep(2), 5000);
     try {
-      const scenario = await generateAIScenario(apiKey, apiUrl, apiModel, customConfig || config, stages, i18n.language);
+      const genConfig = { ...(customConfig || config), realProduct: roomConfig?.realProduct || null };
+      const scenario = await generateAIScenario(apiKey, apiUrl, apiModel, genConfig, stages, i18n.language);
       await setCurrentScenario(scenario);
     } catch (error) {
       setGenError(error.message || 'Error al generar el escenario.');
