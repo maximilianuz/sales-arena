@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { generateAIScenario } from '../utils/ai';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import ScenarioLibrary from './ScenarioLibrary';
+import { INDUSTRY_CATEGORIES, randomIndustryValue } from '../utils/industries';
 
 const GENERATION_STEPS = [
   { es: 'Construyendo identidad del Lead...', en: 'Building Lead identity...' },
@@ -33,31 +34,14 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
         </label>
         <select value={config.theme} onChange={e => setConfig({ ...config, theme: e.target.value })}
           style={{ width: '100%', padding: '0.7rem 0.875rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.04)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.9rem', fontFamily: 'inherit', cursor: 'pointer' }}>
-          <optgroup label="B2B">
-            <option value="B2B Software/SaaS">Software & SaaS</option>
-            <option value="B2B Consultoría">{isEn ? 'Business Consulting' : 'Consultoría'}</option>
-            <option value="B2B Agencia Marketing">{isEn ? 'Marketing Agency' : 'Agencia Marketing'}</option>
-            <option value="B2B Equipamiento Industrial">{isEn ? 'Industrial Equipment' : 'Equipamiento Industrial'}</option>
-            <option value="B2B Logística">{isEn ? 'Logistics' : 'Logística'}</option>
-            <option value="B2B Ciberseguridad">Cybersecurity</option>
-            <option value="B2B Recursos Humanos">HR / Headhunting</option>
-          </optgroup>
-          <optgroup label="B2C">
-            <option value="B2C Inmobiliario">{isEn ? 'Real Estate' : 'Inmobiliario'}</option>
-            <option value="B2C Fitness/Salud">{isEn ? 'Fitness & Health' : 'Fitness y Salud'}</option>
-            <option value="B2C Seguros">{isEn ? 'Insurance' : 'Seguros'}</option>
-            <option value="B2C Educación">{isEn ? 'High Ticket Education' : 'Educación High Ticket'}</option>
-            <option value="B2C Cripto/Trading">Crypto & Trading</option>
-            <option value="B2C Estética/Dental">{isEn ? 'Aesthetic & Dental' : 'Estética y Dental'}</option>
-            <option value="B2C Gestión Patrimonio">{isEn ? 'Wealth Management' : 'Gestión Patrimonio'}</option>
-            <option value="B2C Energía Solar">{isEn ? 'Solar Energy' : 'Energía Solar'}</option>
-            <option value="B2C Turismo Lujo">{isEn ? 'Luxury Travel' : 'Turismo de Lujo'}</option>
-          </optgroup>
-          <optgroup label={isEn ? 'Other' : 'Otros'}>
-            <option value="Automotriz">{isEn ? 'Automotive' : 'Automotriz'}</option>
-            <option value="Construcción">{isEn ? 'Construction' : 'Construcción'}</option>
-            <option value="Legal">{isEn ? 'Legal Services' : 'Servicios Legales'}</option>
-            <option value="Franquicias">Franchises</option>
+          {INDUSTRY_CATEGORIES.map((cat) => (
+            <optgroup key={cat.es} label={isEn ? cat.en : cat.es}>
+              {cat.items.map((it) => (
+                <option key={it.es} value={it.es}>{isEn ? it.en : it.es}</option>
+              ))}
+            </optgroup>
+          ))}
+          <optgroup label={isEn ? 'Random' : 'Aleatorio'}>
             <option value="Aleatorio (Sorpréndeme)">{isEn ? '🎲 Surprise me' : '🎲 Sorpréndeme'}</option>
           </optgroup>
         </select>
@@ -340,7 +324,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
   const [generatingStep, setGeneratingStep] = useState(0);
   const [genError, setGenError] = useState('');
   const [library, setLibrary] = useState(null); // null | 'load' | 'save'
-  const [config, setConfig] = useState({ level: 'Intermedio', theme: 'B2B Software/SaaS', saleType: 'Suscripción Anual / High Ticket', targetObjection: 'Lo tengo que pensar', leadTemperature: 'Templado' });
+  const [config, setConfig] = useState({ level: 'Intermedio', theme: 'Software B2B / SaaS', saleType: 'Suscripción Anual / High Ticket', targetObjection: 'Lo tengo que pensar', leadTemperature: 'Templado' });
 
   const handleGenerate = async (customConfig = null) => {
     if (!setCurrentScenario) return;
@@ -361,10 +345,9 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
   };
 
   const handleRandom = () => {
-    const themes = ['B2B Software/SaaS', 'B2B Consultoría', 'B2C Inmobiliario', 'B2C Fitness/Salud', 'B2C Educación', 'Automotriz', 'Legal'];
     const levels = ['Principiante', 'Intermedio', 'Avanzado', 'Avanzado'];
     const temps = ['Frío', 'Frío', 'Templado', 'Caliente'];
-    const rc = { ...config, theme: themes[Math.floor(Math.random() * themes.length)], level: levels[Math.floor(Math.random() * levels.length)], leadTemperature: temps[Math.floor(Math.random() * temps.length)] };
+    const rc = { ...config, theme: randomIndustryValue(), level: levels[Math.floor(Math.random() * levels.length)], leadTemperature: temps[Math.floor(Math.random() * temps.length)] };
     setConfig(rc);
     handleGenerate(rc);
   };
