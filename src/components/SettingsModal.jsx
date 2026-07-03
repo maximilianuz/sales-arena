@@ -19,6 +19,7 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
   const [prodName, setProdName] = useState(_rp.name || '');
   const [prodDesc, setProdDesc] = useState(_rp.description || '');
   const [prodPrice, setProdPrice] = useState(_rp.price || '');
+  const [focusStageId, setFocusStageId] = useState(_rc.focusStageId || 'all');
 
   const handleProviderChange = (provider) => {
     switch (provider) {
@@ -55,7 +56,7 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
       const realProduct = prodName.trim()
         ? { name: prodName.trim(), description: prodDesc.trim(), price: price > 0 ? price : 1500 }
         : null;
-      onSaveConfig({ commissionPct: Number(commissionPct) || 0, realProduct });
+      onSaveConfig({ commissionPct: Number(commissionPct) || 0, realProduct, focusStageId });
     }
   };
 
@@ -186,6 +187,21 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
         {activeTab === 'sale' && (
           <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
+              <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--accent)' }}>
+                {isEn ? 'Practice stage' : 'Etapa a practicar'}
+              </label>
+              <select value={focusStageId} onChange={(e) => setFocusStageId(e.target.value)}
+                style={{ width: '100%', padding: '0.6rem', borderRadius: '0.4rem', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.5)', color: 'white' }}>
+                <option value="all" style={{ background: '#1e1e2f' }}>{isEn ? 'Full sale (all stages)' : 'Toda la venta (todas las etapas)'}</option>
+                {(Array.isArray(stages) ? stages : []).map((s) => (
+                  <option key={s.id} value={s.id} style={{ background: '#1e1e2f' }}>{s.label}</option>
+                ))}
+              </select>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+                {isEn ? 'Focus the session on a single stage (e.g. only Closing) or the whole sale.' : 'Enfocá la sesión en una sola etapa (ej. solo Cierre) o en toda la venta.'}
+              </p>
+            </div>
+            <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '1rem' }}>
               <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--accent)' }}>
                 {isEn ? 'Commission (% of price)' : 'Comisión (% del precio)'}
               </label>

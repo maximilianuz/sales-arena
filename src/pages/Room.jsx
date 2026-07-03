@@ -121,14 +121,18 @@ export default function Room() {
       await updateProductPresentation(scenario.productToSell);
     }
     await updateActiveStage(0);
-    const initialTime = (stages[0]?.estimatedTime || 5) * 60;
+    const _fid = roomData?.config?.focusStageId;
+    const _eff = _fid && _fid !== 'all' ? stages.filter(s => s.id === _fid) : stages;
+    const initialTime = (_eff[0]?.estimatedTime || 5) * 60;
     await updateTimer({ isRunning: false, endTimestamp: null, timeLeft: initialTime });
     await updateSessionStartedAt(); // marca inicio de sesión para el timer acumulativo
   };
 
   const handleStageChange = async (newIndex) => {
     await updateActiveStage(newIndex);
-    const estTime = stages[newIndex]?.estimatedTime;
+    const _fid = roomData?.config?.focusStageId;
+    const _eff = _fid && _fid !== 'all' ? stages.filter(s => s.id === _fid) : stages;
+    const estTime = _eff[newIndex]?.estimatedTime;
     const newTime = parseInt(estTime !== undefined ? estTime : 5, 10) * 60;
     await updateTimer({ isRunning: false, endTimestamp: null, timeLeft: newTime });
   };
@@ -138,7 +142,13 @@ export default function Room() {
   }
 
   const { currentScenario, activeStageIndex, timerState } = roomData;
-  
+
+  // Etapas efectivas: si el Trainer eligió una etapa puntual, la sesión se enfoca
+  // solo en ella; si no, se usan todas.
+  const stagesEff = (roomData.config?.focusStageId && roomData.config.focusStageId !== 'all')
+    ? stages.filter(s => s.id === roomData.config.focusStageId)
+    : stages;
+
   // --- LAYOUT LOGIC ---
   const isFacilitator = role === 'Facilitador';
   const isCloser = role === 'Closer';
@@ -219,7 +229,7 @@ export default function Room() {
             activeStageIndex={activeStageIndex || 0}
             setActiveStageIndex={isFacilitator ? handleStageChange : undefined}
             pipelineQuestions={currentScenario?.pipelineQuestions}
-            stages={stages}
+            stages={stagesEff}
             isFree={isFree}
             onUpgradeStage={() => setUpgradeModal({ feature: 'Cualificación y Cierre', requiredPlan: 'closer' })}
           />
@@ -243,23 +253,23 @@ export default function Room() {
                   apiKey={apiKey}
                   apiUrl={apiUrl}
                   apiModel={apiModel}
-                  stages={stages}
+                  stages={stagesEff}
                   isReadOnly={!isFacilitator}
                   isLeadRole={isLead}
                   isCompactObserver={isObserver}
                   roomConfig={roomData?.config}
                 />
               )}
-              {isObserver && stages[activeStageIndex || 0] && (
+              {isObserver && stagesEff[activeStageIndex || 0] && (
                 <div className="glass-panel" style={{ padding: '1.25rem' }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>
                     Camino del Closer (Etapa {activeStageIndex + 1})
                   </div>
                   <div style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-                    {stages[activeStageIndex || 0].label}
+                    {stagesEff[activeStageIndex || 0].label}
                   </div>
                   <div style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                    <strong>Objetivo:</strong> {stages[activeStageIndex || 0].objective}
+                    <strong>Objetivo:</strong> {stagesEff[activeStageIndex || 0].objective}
                   </div>
                 </div>
               )}
@@ -284,7 +294,7 @@ export default function Room() {
           <div className="grid-column center-column" style={{ gridColumn: isCloser ? '1' : '2', gridRow: '1 / span 2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {showTimer && (
               <Timer
-                stages={stages}
+                stages={stagesEff}
                 activeStageIndex={activeStageIndex || 0}
                 timerState={timerState}
                 updateTimer={isFacilitator ? updateTimer : undefined}
@@ -347,7 +357,7 @@ export default function Room() {
             {isCloser && (
               <CloserCommandPanel
                 currentScenario={currentScenario}
-                activeStage={stages[activeStageIndex || 0]}
+                activeStage={stagesEff[activeStageIndex || 0]}
                 pipelineQuestions={currentScenario?.pipelineQuestions}
                 productPresentation={roomData.productPresentation}
               />
@@ -358,7 +368,7 @@ export default function Room() {
               <div style={{ flex: 1, display: 'flex', minHeight: '300px', width: '100%', position: 'relative' }}>
                 <DebriefPanel
                   activeStageIndex={activeStageIndex || 0}
-                  stages={stages}
+                  stages={stagesEff}
                   roomNotes={roomData.debriefNotes}
                   updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
                   isFacilitator={isFacilitator}
@@ -410,7 +420,7 @@ export default function Room() {
                     isFacilitator={isFacilitator}
                     questions={roomData.questions}
                     updateQuestions={updateQuestions}
-                    activeStage={stages[activeStageIndex || 0]}
+                    activeStage={stagesEff[activeStageIndex || 0]}
                   />
                   {isFree && (
                     <div
@@ -494,7 +504,7 @@ export default function Room() {
           apiKey={apiKey}
           apiUrl={apiUrl}
           apiModel={apiModel}
-          stages={stages}
+          stages={Array.isArray(stages) ? stages : []}
           onSave={handleSaveSettings}
           onClose={() => setShowSettings(false)}
           isFree={isFree}
@@ -515,7 +525,7 @@ export default function Room() {
       {showAnalysis && (
         <SessionAnalysis
           roomData={roomData}
-          stages={stages}
+          stages={stagesEff}
           onClose={() => setShowAnalysis(false)}
         />
       )}
