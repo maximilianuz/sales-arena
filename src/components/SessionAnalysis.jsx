@@ -50,6 +50,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
           productPrice: roomData.currentScenario?.productPrice,
           commissionPct: roomData.config?.commissionPct,
           closed: roomData.checkout?.result === 'closed',
+          closerUid: roomData.closerUid || null,
           stages,
           sessionDurationMinutes,
           language: i18n.language || 'es'

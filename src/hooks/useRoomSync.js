@@ -111,6 +111,9 @@ export function useRoomSync(roomId) {
   // Config de la sala seteada por el Trainer (comisión %, producto real, etc.).
   const updateConfig = (config) => safeWrite({ config }, 'config');
 
+  // Registra quién actúa de Closer (para acreditarle la comisión al analizar).
+  const registerCloser = (uid, name) => safeWrite({ closerUid: uid, closerName: name || null }, 'closer');
+
   return {
     roomData,
     loading,
@@ -126,6 +129,7 @@ export function useRoomSync(roomId) {
     enableCheckout,
     updateCheckoutPhase,
     updateRubric,
-    updateConfig
+    updateConfig,
+    registerCloser
   };
 }

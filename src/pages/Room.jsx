@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRoomSync } from '../hooks/useRoomSync';
+import { auth } from '../utils/db';
 import Header from '../components/Header';
 import PipelinePanel from '../components/PipelinePanel';
 import BuyerPersonaPanel from '../components/ScenarioPanel';
@@ -32,7 +33,7 @@ export default function Room() {
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig } = useRoomSync(roomId);
+  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -89,6 +90,14 @@ export default function Room() {
       setShowSurpriseEvent(true);
     }
   }, [roomData?.surpriseEvent, seenSurpriseEventId]);
+
+  // Registrar quién actúa de Closer para acreditarle a ÉL la comisión al analizar.
+  useEffect(() => {
+    if (role === 'Closer' && roomData && auth.currentUser && roomData.closerUid !== auth.currentUser.uid) {
+      registerCloser(auth.currentUser.uid, userName);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, roomData, userName]);
 
   const handleSaveSettings = (newKey, newUrl, newModel, newStages) => {
     setApiKey(newKey);

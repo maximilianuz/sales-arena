@@ -16,7 +16,7 @@ export const handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
-  const { uid, scenario, debriefNotes, votingResults, rubric, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed } = body;
+  const { uid, scenario, debriefNotes, votingResults, rubric, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid } = body;
 
   if (!uid || !scenario) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
@@ -31,6 +31,15 @@ export const handler = async (event) => {
     }
   } catch (e) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Error verificando suscripción." }) };
+  }
+
+  // La comisión y el progreso se acreditan al CLOSER (quien practicó), no a quien
+  // analiza (que puede ser el Trainer/dueño). Si no hay closer registrado, cae al
+  // que llama (caso: el propio closer analiza su sesión).
+  const creditUid = closerUid || uid;
+  let creditData = userData;
+  if (creditUid !== uid) {
+    try { creditData = await getUserData(creditUid); } catch { creditData = {}; }
   }
 
   const lang = language.startsWith('en') ? 'en' : 'es';
@@ -165,12 +174,12 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
       analysis
     };
 
-    await setPath(`/users/${uid}/history/${sessionId}`, historyEntry);
+    await setPath(`/users/${creditUid}/history/${sessionId}`, historyEntry);
 
-    // Gamificación: acumular XP, racha y stats del alumno. El servicio (REST con
-    // service account) bypassea las reglas, así que puede escribir en /stats.
+    // Gamificación: acumular comisión, racha y stats del CLOSER. El servicio (REST
+    // con service account) bypassea las reglas, así que puede escribir en /stats.
     try {
-      const prev = userData.stats || {};
+      const prev = (creditData && creditData.stats) || {};
       const rubricVals = rubric ? Object.values(rubric).filter(v => typeof v === 'number' && v > 0) : [];
       const rubricAvg = rubricVals.length ? rubricVals.reduce((a, b) => a + b, 0) / rubricVals.length : 0;
       // Comisión USD (cuenta bancaria del Closer): si el trato CERRÓ, gana
@@ -194,7 +203,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
         else streak = 1;                                       // se cortó la racha
       }
 
-      await setPath(`/users/${uid}/stats`, {
+      await setPath(`/users/${creditUid}/stats`, {
         totalEarnings: (prev.totalEarnings || 0) + earned,
         sessionsCompleted: (prev.sessionsCompleted || 0) + 1,
         bestScore: Math.max(prev.bestScore || 0, analysis.overallScore || 0),
@@ -206,10 +215,10 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
       console.error("No se pudo actualizar stats de gamificación:", e.message);
     }
 
-    // Si el alumno está en un cohorte, propagar un resumen liviano al Trainer
-    if (userData.joinedTrainerUid) {
+    // Si el Closer está en un cohorte, propagar un resumen liviano al Trainer
+    if (creditData && creditData.joinedTrainerUid) {
       try {
-        await setPath(`/cohorts/${userData.joinedTrainerUid}/students/${uid}/sessions/${sessionId}`, {
+        await setPath(`/cohorts/${creditData.joinedTrainerUid}/students/${creditUid}/sessions/${sessionId}`, {
           savedAt: historyEntry.savedAt,
           overallScore: analysis.overallScore || 0,
           scores: analysis.scores || {},
