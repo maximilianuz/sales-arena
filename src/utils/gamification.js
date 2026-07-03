@@ -22,6 +22,22 @@ export function commissionForSession({ overallScore = 0, rubricAvg = 0, closed =
   return usd;
 }
 
+// Puntos de soporte por sesión para Lead y Observador. Todos los roles suman:
+// menos que la comisión del Closer (el protagonista), pero el esfuerzo de
+// actuar de lead u observar con rúbrica/bitácora completa se reconoce.
+// Debe coincidir con el cálculo inline del servidor (analyze-session.js).
+export function supportPointsForSession({ role, overallScore = 0, hasRubric = false, hasListeningLog = false }) {
+  if (role === 'lead') {
+    // El Lead hace posible la práctica: base + bonus por sesión bien jugada.
+    return 100 + Math.round((overallScore || 0) * 10); // hasta 200
+  }
+  // Observador: base + bonus por entregar rúbrica y bitácora (trabajo real).
+  let pts = 80;
+  if (hasRubric) pts += 60;
+  if (hasListeningLog) pts += 60;
+  return pts; // hasta 200
+}
+
 // Nivel/rango actual + progreso hacia el siguiente según la comisión acumulada.
 export function tierFromEarnings(total = 0) {
   let current = TIERS[0];

@@ -37,6 +37,18 @@
       ".read": false,
       ".write": false
     },
+    "leaderboard": {
+      ".read": "auth != null",
+      ".write": false
+    },
+    "scouting": {
+      "profiles": {
+        "$uid": {
+          ".read": "$uid === auth.uid",
+          ".write": false
+        }
+      }
+    },
     "telemetry": {
       ".read": false,
       "$day": {

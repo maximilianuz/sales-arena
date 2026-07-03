@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ref, onValue } from 'firebase/database';
 import { useTranslation } from 'react-i18next';
-import { Flame, Target, Wallet } from 'lucide-react';
+import { Flame, Target, Wallet, HandHeart } from 'lucide-react';
 import { db, auth } from '../utils/db';
-import { tierFromEarnings, tierLabel, formatMoney } from '../utils/gamification';
+import { tierFromEarnings, tierLabel, formatMoney, TIERS } from '../utils/gamification';
+import { earnedBadges, badgeLabel } from '../utils/badges';
+
+const LAST_TIER_KEY = 'sales_arena_last_tier';
 
 // "Cuenta bancaria del Closer": comisión simulada acumulada + rango + progreso.
 // Lee users/{uid}/stats (lo escribe analyze-session).
@@ -11,19 +14,37 @@ export default function LevelCard() {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const [stats, setStats] = useState(null);
+  const [levelUp, setLevelUp] = useState(null); // tier al que acaba de ascender
 
   useEffect(() => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    const unsub = onValue(ref(db, `users/${uid}/stats`), (s) => setStats(s.val()));
+    const unsub = onValue(ref(db, `users/${uid}/stats`), (s) => {
+      const val = s.val();
+      setStats(val);
+      if (!val) return;
+      // Celebrar la subida de rango: comparamos con el último tier visto en
+      // este dispositivo; si subió, overlay festivo una sola vez.
+      const { tier: curTier } = tierFromEarnings(val.totalEarnings || 0);
+      const lastId = localStorage.getItem(LAST_TIER_KEY);
+      const lastIdx = TIERS.findIndex(t => t.id === lastId);
+      const curIdx = TIERS.findIndex(t => t.id === curTier.id);
+      if (lastId && curIdx > lastIdx) {
+        setLevelUp(curTier);
+        setTimeout(() => setLevelUp(null), 3500);
+      }
+      localStorage.setItem(LAST_TIER_KEY, curTier.id);
+    });
     return () => unsub();
   }, []);
 
   const total = stats?.totalEarnings || 0;
   const { tier, next, progress, toNext } = tierFromEarnings(total);
+  const badges = earnedBadges(stats || {});
   const label = tierLabel(tier, i18n.language);
   const streak = stats?.streak || 0;
   const sessions = stats?.sessionsCompleted || 0;
+  const supportPoints = stats?.supportPoints || 0;
 
   return (
     <div style={{
@@ -71,7 +92,46 @@ export default function LevelCard() {
           : <span style={{ color: tier.color, fontWeight: '700' }}>{isEn ? 'Top rank 🏆' : 'Rango máximo 🏆'}</span>}
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Flame size={12} color="var(--accent)" /> {streak}</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Target size={12} /> {sessions}</span>
+        {supportPoints > 0 && (
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }} title={isEn ? 'Support points (Lead/Observer)' : 'Puntos de soporte (Lead/Observador)'}>
+            <HandHeart size={12} color="#8b5cf6" /> {supportPoints.toLocaleString('en-US')} pts
+          </span>
+        )}
       </div>
+
+      {/* Insignias ganadas (derivadas de stats, sin escritura extra) */}
+      {badges.length > 0 && (
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
+          {badges.map(b => (
+            <span key={b.id} title={badgeLabel(b, i18n.language)} style={{
+              fontSize: '0.72rem', fontWeight: '700', color: 'rgba(255,255,255,0.85)',
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
+              padding: '0.2rem 0.55rem', borderRadius: '2rem', cursor: 'default',
+            }}>
+              {b.icon} {badgeLabel(b, i18n.language)}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Overlay de subida de rango */}
+      {levelUp && (
+        <div style={{
+          position: 'absolute', inset: 0, borderRadius: '1.25rem', zIndex: 2,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          background: `linear-gradient(135deg, ${levelUp.color}ee, ${levelUp.color}99)`,
+          animation: 'levelUpPop 0.5s ease',
+        }}>
+          <div style={{ fontSize: '2rem', lineHeight: 1 }}>🎉</div>
+          <div style={{ fontWeight: '900', fontSize: '1.15rem', color: 'white', marginTop: '0.35rem' }}>
+            {isEn ? 'Rank up!' : '¡Subiste de rango!'}
+          </div>
+          <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            {tierLabel(levelUp, i18n.language)}
+          </div>
+          <style>{`@keyframes levelUpPop { 0% { opacity: 0; transform: scale(0.85); } 60% { transform: scale(1.03); } 100% { opacity: 1; transform: scale(1); } }`}</style>
+        </div>
+      )}
     </div>
   );
 }

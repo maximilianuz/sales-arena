@@ -34,7 +34,7 @@ export default function Room() {
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, updateListeningLog } = useRoomSync(roomId);
+  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, registerLead, registerObserver, updateListeningLog } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -92,10 +92,17 @@ export default function Room() {
     }
   }, [roomData?.surpriseEvent, seenSurpriseEventId]);
 
-  // Registrar quién actúa de Closer para acreditarle a ÉL la comisión al analizar.
+  // Registrar quién ocupa cada rol: al Closer se le acredita la comisión al
+  // analizar; Lead y Observadores reciben puntos de soporte.
   useEffect(() => {
-    if (role === 'Closer' && roomData && auth.currentUser && roomData.closerUid !== auth.currentUser.uid) {
-      registerCloser(auth.currentUser.uid, userName);
+    if (!roomData || !auth.currentUser) return;
+    const uid = auth.currentUser.uid;
+    if (role === 'Closer' && roomData.closerUid !== uid) {
+      registerCloser(uid, userName);
+    } else if (role === 'Lead' && roomData.leadUid !== uid) {
+      registerLead(uid, userName);
+    } else if (role === 'Observador' && !(roomData.observers || {})[uid]) {
+      registerObserver(uid, userName);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, roomData, userName]);

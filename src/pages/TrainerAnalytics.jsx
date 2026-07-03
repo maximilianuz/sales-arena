@@ -3,13 +3,71 @@ import { ref, onValue } from 'firebase/database';
 import { db, auth } from '../utils/db';
 import { getCohortCode } from '../utils/cohort';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Copy, CheckCircle2, Users, TrendingUp, Award, Target, ChevronDown, ChevronUp, FileText, FileSpreadsheet } from 'lucide-react';
+import { ArrowLeft, Copy, CheckCircle2, Users, TrendingUp, Award, Target, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Wallet } from 'lucide-react';
 import { exportCohortCSV, exportCohortPDF } from '../utils/export';
+import { tierFromEarnings, tierLabel, formatMoney, commissionForSession } from '../utils/gamification';
 
 const SCORE_KEYS = ['rapport', 'objectionHandling', 'closing', 'activeListening'];
 
 function scoreColor(v) {
   return v >= 8 ? 'var(--success)' : v >= 6 ? 'var(--accent)' : 'var(--danger)';
+}
+
+// Comisión acumulada del alumno. Preferimos el valor autoritativo propagado por
+// analyze-session (student.totalEarnings). Para cohortes previos a esa propagación
+// (aún sin totalEarnings), estimamos sumando la comisión de cada sesión conocida.
+function studentEarnings(student) {
+  if (typeof student.totalEarnings === 'number') return student.totalEarnings;
+  const sessions = Object.values(student.sessions || {});
+  if (!sessions.length) return 0;
+  return sessions.reduce((sum, s) => {
+    if (typeof s.earned === 'number') return sum + s.earned;
+    const rubricVals = s.rubric ? Object.values(s.rubric).filter(v => typeof v === 'number' && v > 0) : [];
+    const rubricAvg = rubricVals.length ? rubricVals.reduce((a, b) => a + b, 0) / rubricVals.length : 0;
+    return sum + commissionForSession({ overallScore: s.overallScore || 0, rubricAvg });
+  }, 0);
+}
+
+const MEDALS = ['🥇', '🥈', '🥉'];
+
+function CohortLeaderboard({ students, isEn, lng }) {
+  const ranked = students
+    .map(s => ({ id: s.id, name: (s.profile || {}).name || 'Alumno', earnings: studentEarnings(s) }))
+    .filter(s => s.earnings > 0)
+    .sort((a, b) => b.earnings - a.earnings);
+
+  if (ranked.length < 2) return null; // un leaderboard de 1 no motiva a nadie
+
+  return (
+    <div className="glass-panel" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+        <Wallet size={17} color="var(--primary)" />
+        <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: '800' }}>
+          {isEn ? 'Commission leaderboard' : 'Ranking de comisiones'}
+        </h2>
+      </div>
+      {ranked.map((s, i) => {
+        const { tier } = tierFromEarnings(s.earnings);
+        const medal = MEDALS[i];
+        return (
+          <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '0.55rem 0', borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ width: '28px', textAlign: 'center', fontSize: medal ? '1.15rem' : '0.9rem', fontWeight: '800', color: medal ? 'inherit' : 'var(--text-muted)' }}>
+              {medal || `${i + 1}`}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>
+              <div style={{ fontSize: '0.72rem', fontWeight: '700', color: tier.color, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {tierLabel(tier, lng)}
+              </div>
+            </div>
+            <div style={{ fontWeight: '900', fontSize: '1.05rem', color: 'white', fontVariantNumeric: 'tabular-nums' }}>
+              {formatMoney(s.earnings)}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function StudentRow({ student, uid, isEn }) {
@@ -126,6 +184,8 @@ export default function TrainerAnalytics({ onBack }) {
     });
   }
 
+  const cohortEarnings = students.reduce((sum, s) => sum + studentEarnings(s), 0);
+
   const areaLabels = isEn
     ? { rapport: 'Rapport', objectionHandling: 'Objection Handling', closing: 'Closing', activeListening: 'Active Listening' }
     : { rapport: 'Rapport', objectionHandling: 'Manejo de Objeciones', closing: 'Cierre', activeListening: 'Escucha Activa' };
@@ -182,6 +242,7 @@ export default function TrainerAnalytics({ onBack }) {
               { icon: <Users size={16} />, label: isEn ? 'Students' : 'Alumnos', value: students.length },
               { icon: <Target size={16} />, label: isEn ? 'Sessions' : 'Sesiones', value: totalSessions },
               { icon: <Award size={16} />, label: isEn ? 'Cohort avg' : 'Prom. cohorte', value: cohortAvg ? `${cohortAvg}` : '—' },
+              { icon: <Wallet size={16} />, label: isEn ? 'Cohort commissions' : 'Comisiones cohorte', value: cohortEarnings > 0 ? formatMoney(cohortEarnings) : '—', small: cohortEarnings >= 100000 },
               { icon: <TrendingUp size={16} />, label: isEn ? 'Weakest area' : 'Área débil', value: weakestArea ? areaLabels[weakestArea] : '—', small: true }
             ].map((stat, i) => (
               <div key={i} className="glass-panel" style={{ textAlign: 'center', padding: '1rem 0.5rem' }}>
@@ -192,6 +253,9 @@ export default function TrainerAnalytics({ onBack }) {
             ))}
           </div>
         )}
+
+        {/* Commission leaderboard */}
+        <CohortLeaderboard students={students} isEn={isEn} lng={i18n.language} />
 
         {/* Students list */}
         <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'rgba(255,255,255,0.6)', marginBottom: '0.75rem' }}>

@@ -1,4 +1,4 @@
-import { getUserData, setPath } from './lib/firebaseAdmin.js';
+import { getUserData, getPath, setPath, patchPath } from './lib/firebaseAdmin.js';
 
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_MODEL = "llama-3.1-8b-instant";
@@ -16,7 +16,7 @@ export const handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
-  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid } = body;
+  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid, closerName, leadUid, observers } = body;
 
   if (!uid || !scenario) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
@@ -196,6 +196,9 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
 
     // Gamificación: acumular comisión, racha y stats del CLOSER. El servicio (REST
     // con service account) bypassea las reglas, así que puede escribir en /stats.
+    let newTotalEarnings = null; // comisión acumulada tras esta sesión (para el cohorte)
+    let sessionEarned = 0;       // comisión de esta sesión puntual
+    let closerStats = null;      // stats resultantes del Closer (para el leaderboard)
     try {
       const prev = (creditData && creditData.stats) || {};
       const rubricVals = rubric ? Object.values(rubric).filter(v => typeof v === 'number' && v > 0) : [];
@@ -221,28 +224,110 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
         else streak = 1;                                       // se cortó la racha
       }
 
-      await setPath(`/users/${creditUid}/stats`, {
-        totalEarnings: (prev.totalEarnings || 0) + earned,
+      newTotalEarnings = (prev.totalEarnings || 0) + earned;
+      sessionEarned = earned;
+
+      closerStats = {
+        totalEarnings: newTotalEarnings,
         sessionsCompleted: (prev.sessionsCompleted || 0) + 1,
+        closesCount: (prev.closesCount || 0) + (closed ? 1 : 0),
         bestScore: Math.max(prev.bestScore || 0, analysis.overallScore || 0),
         streak,
         lastSessionDate: today,
         updatedAt: Date.now(),
-      });
+      };
+      // patch (no set) para no pisar campos que no manejamos acá (supportPoints, badges).
+      await patchPath(`/users/${creditUid}/stats`, closerStats);
     } catch (e) {
       console.error("No se pudo actualizar stats de gamificación:", e.message);
     }
 
+    // ── Puntos de soporte: Lead y Observadores también suman ─────────────────
+    // Menos que la comisión del Closer, pero el rol se reconoce (sin lead no
+    // hay práctica; sin observador no hay rúbrica ni bitácora).
+    try {
+      const hasRubric = !!(rubric && Object.keys(rubric).length);
+      const hasListeningLog = !!(listeningLog && Object.values(listeningLog).some(v => v && String(v).trim()));
+      const score = analysis.overallScore || 0;
+
+      const supportCredits = [];
+      if (leadUid && leadUid !== creditUid) {
+        supportCredits.push({ uid: leadUid, role: 'lead', pts: 100 + Math.round(score * 10) });
+      }
+      const obsPts = 80 + (hasRubric ? 60 : 0) + (hasListeningLog ? 60 : 0);
+      for (const ouid of Object.keys(observers || {})) {
+        if (ouid !== creditUid && ouid !== leadUid) {
+          supportCredits.push({ uid: ouid, role: 'observer', pts: obsPts });
+        }
+      }
+
+      // En paralelo: cada crédito son 2 llamadas REST y el límite de Netlify es 10s.
+      await Promise.all(supportCredits.map(async (c) => {
+        try {
+          const prevStats = (await getPath(`/users/${c.uid}/stats`)) || {};
+          const sessKey = c.role === 'lead' ? 'sessionsAsLead' : 'sessionsAsObserver';
+          await patchPath(`/users/${c.uid}/stats`, {
+            supportPoints: (prevStats.supportPoints || 0) + c.pts,
+            [sessKey]: (prevStats[sessKey] || 0) + 1,
+            updatedAt: Date.now(),
+          });
+        } catch (e) {
+          console.error(`No se pudo acreditar soporte a ${c.uid}:`, e.message);
+        }
+      }));
+    } catch (e) {
+      console.error("No se pudo acreditar puntos de soporte:", e.message);
+    }
+
+    // ── Leaderboard mundial + torneo mensual ─────────────────────────────────
+    // El servidor (bypassa rules) mantiene un nodo liviano y público de ranking:
+    // global acumulado + temporada YYYY-MM (el "torneo": cada mes arranca de 0).
+    if (newTotalEarnings !== null) {
+      try {
+        const displayName = closerName || scenario?.closerName || 'Closer';
+        const season = new Date().toISOString().slice(0, 7); // YYYY-MM
+        await setPath(`/leaderboard/global/${creditUid}`, {
+          name: displayName,
+          totalEarnings: newTotalEarnings,
+          sessions: closerStats?.sessionsCompleted || 0,
+          closes: closerStats?.closesCount || 0,
+          updatedAt: Date.now(),
+        });
+        const prevSeason = (await getPath(`/leaderboard/seasons/${season}/${creditUid}`)) || {};
+        await setPath(`/leaderboard/seasons/${season}/${creditUid}`, {
+          name: displayName,
+          earnings: (prevSeason.earnings || 0) + sessionEarned,
+          closes: (prevSeason.closes || 0) + (closed ? 1 : 0),
+          sessions: (prevSeason.sessions || 0) + 1,
+          totalEarnings: newTotalEarnings, // para mostrar el rango real en el torneo
+          updatedAt: Date.now(),
+        });
+      } catch (e) {
+        console.error("No se pudo actualizar el leaderboard:", e.message);
+      }
+    }
+
     // Si el Closer está en un cohorte, propagar un resumen liviano al Trainer
     if (creditData && creditData.joinedTrainerUid) {
+      const studentBase = `/cohorts/${creditData.joinedTrainerUid}/students/${creditUid}`;
       try {
-        await setPath(`/cohorts/${creditData.joinedTrainerUid}/students/${creditUid}/sessions/${sessionId}`, {
+        await setPath(`${studentBase}/sessions/${sessionId}`, {
           savedAt: historyEntry.savedAt,
           overallScore: analysis.overallScore || 0,
           scores: analysis.scores || {},
           rubric: rubric || null,
+          earned: sessionEarned,
           scenario: historyEntry.scenario
         });
+        // Comisión acumulada del alumno → alimenta el leaderboard del cohorte.
+        // patch (no set) para no pisar profile/sessions. Solo si la gamificación
+        // se calculó bien (si falló, newTotalEarnings queda null).
+        if (newTotalEarnings !== null) {
+          await patchPath(studentBase, {
+            totalEarnings: newTotalEarnings,
+            earningsUpdatedAt: Date.now(),
+          });
+        }
       } catch (e) {
         console.error("No se pudo propagar sesión al cohorte:", e.message);
         // No bloqueamos la respuesta al alumno si esto falla

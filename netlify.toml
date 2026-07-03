@@ -56,6 +56,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/scouting"
+  to = "/.netlify/functions/scouting"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/nvidia/*"
   to = "https://integrate.api.nvidia.com/:splat"
   status = 200

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Shuffle, Copy, ChessKnight, BookOpen, Smartphone,
   Zap, History, Target, TrendingUp, Theater, Eye,
-  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X
+  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
@@ -12,6 +12,9 @@ import { joinCohort } from '../utils/cohort';
 import { auth } from '../utils/db';
 import HistoryPage from './History';
 import TrainerAnalytics from './TrainerAnalytics';
+import Leaderboard from './Leaderboard';
+import Scouting from './Scouting';
+import ScoutingModal from '../components/ScoutingModal';
 import LevelCard from '../components/LevelCard';
 
 const ROLE_META = {
@@ -62,6 +65,9 @@ export default function Lobby() {
   const { isFree, isPaid, tier, openPlans } = useSubscriptionContext() || {};
   const [showHistory, setShowHistory] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showScouting, setShowScouting] = useState(false);
+  const [showScoutingModal, setShowScoutingModal] = useState(false);
   const [showJoinCohort, setShowJoinCohort] = useState(false);
   const [cohortCodeInput, setCohortCodeInput] = useState('');
   const [joinMsg, setJoinMsg] = useState('');
@@ -143,6 +149,8 @@ export default function Lobby() {
   // Returns condicionales DESPUÉS de todos los hooks (regla de hooks de React).
   if (showHistory) return <HistoryPage onBack={() => setShowHistory(false)} />;
   if (showAnalytics) return <TrainerAnalytics onBack={() => setShowAnalytics(false)} />;
+  if (showLeaderboard) return <Leaderboard onBack={() => setShowLeaderboard(false)} />;
+  if (showScouting) return <Scouting onBack={() => setShowScouting(false)} />;
 
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '1.5rem 1rem 3rem' }}>
@@ -231,6 +239,28 @@ export default function Lobby() {
             onClick={() => setShowHistory(true)}
           />
         )}
+        <FeatureButton
+          icon={<Trophy size={16} />}
+          label={isEn ? 'Leaderboard' : 'Ranking'}
+          accent="245,158,11"
+          onClick={() => setShowLeaderboard(true)}
+        />
+        {tier === 'trainer' ? (
+          <FeatureButton
+            icon={<Briefcase size={16} />}
+            label={isEn ? 'Scouting' : 'Cantera'}
+            accent="236,72,153"
+            onClick={() => setShowScouting(true)}
+          />
+        ) : (
+          <FeatureButton
+            icon={<Briefcase size={16} />}
+            label={isEn ? 'Job offers' : 'Ofertas laborales'}
+            accent="236,72,153"
+            onClick={() => setShowScoutingModal(true)}
+          />
+        )}
+
         <FeatureButton
           icon={<Users size={16} />}
           label={isEn ? 'Join cohort' : 'Unirme a cohorte'}
@@ -431,6 +461,8 @@ export default function Lobby() {
       </div>
 
       {/* ── Join cohort modal ──────────────────────────────── */}
+      {showScoutingModal && <ScoutingModal onClose={() => setShowScoutingModal(false)} />}
+
       {showJoinCohort && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
           <div style={{ maxWidth: '400px', width: '100%', background: 'rgba(15,15,30,0.95)', backdropFilter: 'blur(24px)', borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.08)', padding: '2rem', position: 'relative' }}>
