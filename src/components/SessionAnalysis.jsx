@@ -47,6 +47,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
           debriefNotes: roomData.debriefNotes,
           votingResults: roomData.questions,
           rubric: roomData.rubric,
+          listeningLog: roomData.listeningLog,
           productPrice: roomData.currentScenario?.productPrice,
           commissionPct: roomData.config?.commissionPct,
           closed: roomData.checkout?.result === 'closed',

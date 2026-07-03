@@ -17,6 +17,7 @@ import SettingsModal from '../components/SettingsModal';
 import UpgradeModal from '../components/UpgradeModal';
 import SessionAnalysis from '../components/SessionAnalysis';
 import RubricPanel from '../components/RubricPanel';
+import ListeningLogPanel from '../components/ListeningLogPanel';
 import LeadCheckoutPanel from '../components/LeadCheckoutPanel';
 import CheckoutResultBanner from '../components/CheckoutResultBanner';
 import CloserCommandPanel from '../components/CloserCommandPanel';
@@ -33,7 +34,7 @@ export default function Room() {
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser } = useRoomSync(roomId);
+  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, updateListeningLog } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -386,6 +387,15 @@ export default function Room() {
                 rubric={roomData?.rubric}
                 updateRubric={updateRubric}
                 canScore={isObserver || isFacilitator}
+              />
+            )}
+
+            {/* Bitácora de escucha activa (Observador captura; Trainer la ve) */}
+            {showDebrief && currentScenario && (
+              <ListeningLogPanel
+                listeningLog={roomData?.listeningLog}
+                updateListeningLog={updateListeningLog}
+                canEdit={isObserver}
               />
             )}
           </div>

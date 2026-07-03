@@ -16,7 +16,7 @@ export const handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
-  const { uid, scenario, debriefNotes, votingResults, rubric, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid } = body;
+  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid } = body;
 
   if (!uid || !scenario) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
@@ -66,6 +66,18 @@ export const handler = async (event) => {
     ? Object.entries(rubric).map(([k, v]) => `${RUBRIC_LABELS[k] || k}: ${v}/5`).join('\n')
     : (isEn ? 'No rubric scores.' : 'Sin puntajes de rúbrica.');
 
+  // Bitácora de escucha activa del Observador (señales reales de la llamada).
+  const LL_LABELS = {
+    quote: isEn ? 'Key quote' : 'Cita clave',
+    realPain: isEn ? 'Real pain' : 'Dolor real',
+    realObjection: isEn ? 'Real objection' : 'Objeción real',
+    keyMoment: isEn ? 'Decisive moment' : 'Momento decisivo',
+  };
+  const listeningText = listeningLog
+    ? Object.entries(listeningLog).filter(([, v]) => v && String(v).trim()).map(([k, v]) => `${LL_LABELS[k] || k}: ${v}`).join('\n')
+    : '';
+  const listeningBlock = listeningText || (isEn ? 'No listening notes.' : 'Sin notas de escucha.');
+
   const prompt = isEn
     ? `You are an expert sales coach. Analyze this sales roleplay session and provide structured feedback.
 
@@ -86,6 +98,9 @@ ${votingText}
 
 OBSERVER RUBRIC (1-5, structured human scoring — weigh this heavily; it is direct observation of the roleplay):
 ${rubricText}
+
+OBSERVER ACTIVE-LISTENING LOG (real signals captured from the call — use to ground your feedback):
+${listeningBlock}
 
 Respond ONLY in valid JSON with this exact structure:
 {
@@ -119,6 +134,9 @@ ${votingText}
 
 RÚBRICA DEL OBSERVADOR (1-5, puntaje humano estructurado — ponderála fuerte; es observación directa del roleplay):
 ${rubricText}
+
+BITÁCORA DE ESCUCHA ACTIVA DEL OBSERVADOR (señales reales capturadas de la llamada — usalas para fundamentar tu feedback):
+${listeningBlock}
 
 Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
 {
