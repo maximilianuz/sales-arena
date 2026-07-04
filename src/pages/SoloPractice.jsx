@@ -338,6 +338,7 @@ export default function SoloPractice({ onBack }) {
               state={state}
               speaking={speaking}
               name={`${leadName}${persona ? ` · ${isEn ? persona.en : persona.es}` : ''}`}
+              seed={leadName}
               isEn={isEn}
               size={120}
             />

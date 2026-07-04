@@ -102,6 +102,11 @@
   50% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(239,68,68,0); }
 }
 
+@keyframes avatarPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
 .roles-grid,
 .retro-grid {
   display: grid;

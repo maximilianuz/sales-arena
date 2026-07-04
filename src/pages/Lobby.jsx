@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Shuffle, Copy, ChessKnight, BookOpen, Smartphone,
@@ -17,7 +17,9 @@ import Scouting from './Scouting';
 import ScoutingModal from '../components/ScoutingModal';
 import LevelCard from '../components/LevelCard';
 import ProgressPath from '../components/ProgressPath';
-import SoloPractice from './SoloPractice';
+// Carga diferida: SoloPractice arrastra la librería de avatares (DiceBear); solo
+// se baja cuando el usuario abre "Practicar solo".
+const SoloPractice = lazy(() => import('./SoloPractice'));
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
@@ -154,7 +156,11 @@ export default function Lobby() {
   if (showAnalytics) return <TrainerAnalytics onBack={() => setShowAnalytics(false)} />;
   if (showLeaderboard) return <Leaderboard onBack={() => setShowLeaderboard(false)} />;
   if (showScouting) return <Scouting onBack={() => setShowScouting(false)} />;
-  if (showSolo) return <SoloPractice onBack={() => setShowSolo(false)} />;
+  if (showSolo) return (
+    <Suspense fallback={<div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}><p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Loading…' : 'Cargando…'}</p></div>}>
+      <SoloPractice onBack={() => setShowSolo(false)} />
+    </Suspense>
+  );
 
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '1.5rem 1rem 3rem' }}>

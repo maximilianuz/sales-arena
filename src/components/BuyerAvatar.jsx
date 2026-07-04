@@ -1,14 +1,15 @@
-// Avatar reactivo estilizado del comprador IA. Es una cara SVG que refleja EN
-// VIVO el estado emocional que ya calcula el buyer (temperatura/confianza/
-// paciencia): cejas por paciencia, boca por temperatura/interés, párpados por
-// confianza, aura de color por temperatura, y animación de habla. Costo $0 y
-// es un diferenciador único: está atado a NUESTRO modelo psicológico, cosa que
-// un avatar fotorrealista genérico no hace. Sin dependencias.
+import { useMemo } from 'react';
+import { createAvatar } from '@dicebear/core';
+import { avataaars } from '@dicebear/collection';
 
-// Interpola frío (azul) → cálido (naranja/rojo) según la temperatura de compra.
+// Avatar ILUSTRADO y REACTIVO del comprador IA. Usa DiceBear (librería offline,
+// sin API ni tokens): genera una persona ilustrada estable por lead (semilla =
+// su nombre) y MAPEA el estado emocional del buyer (temperatura/confianza/
+// paciencia) a su expresión (boca, cejas, ojos). Así queda lindo Y sigue
+// reaccionando en vivo a cómo va la venta — lo mejor de ambos mundos.
+
 function tempColor(t) {
-  // t: 0..100 → hue 210 (azul) a 20 (naranja)
-  const hue = 210 - (Math.max(0, Math.min(100, t)) / 100) * 190;
+  const hue = 210 - (Math.max(0, Math.min(100, t)) / 100) * 190; // azul→naranja
   return `hsl(${hue}, 70%, 55%)`;
 }
 
@@ -22,75 +23,44 @@ function moodLabel(state, isEn) {
   return isEn ? 'Neutral' : 'Neutral';
 }
 
-export default function BuyerAvatar({ state, speaking = false, name = '', isEn = false, size = 160 }) {
+// Estado → expresión (valores válidos del estilo avataaars de DiceBear).
+function expressionFor({ temperature: t, trust: tr, patience: p }) {
+  if (p < 20) return { eyebrows: 'angry', mouth: 'serious', eyes: 'squint' };
+  if (t < 20) return { eyebrows: 'sadConcerned', mouth: 'sad', eyes: 'side' };
+  if (tr < 25) return { eyebrows: 'flatNatural', mouth: 'serious', eyes: 'squint' };
+  if (t > 70 && tr > 60) return { eyebrows: 'raisedExcited', mouth: 'smile', eyes: 'happy' };
+  if (tr > 55) return { eyebrows: 'defaultNatural', mouth: 'default', eyes: 'default' };
+  return { eyebrows: 'defaultNatural', mouth: 'default', eyes: 'default' };
+}
+
+export default function BuyerAvatar({ state, speaking = false, name = '', seed = '', isEn = false, size = 130 }) {
   const t = state?.temperature ?? 35;
   const tr = state?.trust ?? 25;
   const p = state?.patience ?? 70;
-
-  const skin = tempColor(t);
   const glow = tempColor(t);
+  const expr = expressionFor({ temperature: t, trust: tr, patience: p });
 
-  // Cejas: paciencia baja → anguladas hacia adentro (enojo). Alta → relajadas.
-  // browAngle en grados; browY desplazamiento vertical.
-  const browAngle = p < 40 ? (40 - p) / 3 : 0;      // 0..13°
-  const browLift = tr > 60 ? -3 : 0;                 // confianza alta → cejas levantadas
-
-  // Párpados: confianza baja → ojos entrecerrados (desconfía).
-  const eyeOpen = tr < 25 ? 0.55 : tr < 55 ? 0.8 : 1;
-  const eyeRy = 7 * eyeOpen;
-
-  // Boca: temperatura alta → sonrisa (curva hacia arriba); baja → ceño.
-  // curve>0 sonríe, <0 frunce. Rango -8..+10.
-  const curve = ((t - 45) / 100) * 18;
-  const mouthPath = `M 60 118 Q 100 ${118 + curve} 140 118`;
+  // Regeneramos el SVG solo cuando cambia el lead o su expresión (barato).
+  const uri = useMemo(() => createAvatar(avataaars, {
+    seed: seed || name || 'lead',
+    mouth: [expr.mouth],
+    eyebrows: [expr.eyebrows],
+    eyes: [expr.eyes],
+    backgroundColor: [],
+    radius: 50,
+  }).toDataUri(), [seed, name, expr.mouth, expr.eyebrows, expr.eyes]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
       <div style={{
         width: size, height: size, borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: `0 0 ${speaking ? 40 : 24}px ${glow}${speaking ? '66' : '33'}`,
-        transition: 'box-shadow 0.3s ease',
+        border: `3px solid ${glow}`,
+        boxShadow: `0 0 ${speaking ? 34 : 18}px ${glow}${speaking ? '77' : '44'}`,
+        transition: 'box-shadow 0.3s ease, border-color 0.4s ease',
+        overflow: 'hidden', background: 'rgba(255,255,255,0.04)',
+        animation: speaking ? 'avatarPulse 1.1s ease-in-out infinite' : 'none',
       }}>
-        <svg viewBox="0 0 200 200" width={size} height={size} style={{ display: 'block' }}>
-          {/* Halo/aura por temperatura */}
-          <circle cx="100" cy="100" r="92" fill="none" stroke={glow} strokeWidth="2" opacity="0.35" />
-          {/* Cabeza */}
-          <circle cx="100" cy="100" r="78" fill={skin} opacity="0.22" stroke={skin} strokeWidth="2.5" />
-
-          {/* Cejas */}
-          <g stroke="rgba(255,255,255,0.85)" strokeWidth="4" strokeLinecap="round">
-            <line
-              x1="62" y1={72 + browLift + browAngle} x2="86" y2={72 + browLift - browAngle}
-              style={{ transition: 'all 0.4s ease' }}
-            />
-            <line
-              x1="114" y1={72 + browLift - browAngle} x2="138" y2={72 + browLift + browAngle}
-              style={{ transition: 'all 0.4s ease' }}
-            />
-          </g>
-
-          {/* Ojos (párpados por confianza) */}
-          <g fill="white">
-            <ellipse cx="74" cy="90" rx="8" ry={eyeRy} style={{ transition: 'all 0.4s ease' }} />
-            <ellipse cx="126" cy="90" rx="8" ry={eyeRy} style={{ transition: 'all 0.4s ease' }} />
-          </g>
-          <g fill="#1a1a2e">
-            <circle cx="74" cy="91" r={3.2 * eyeOpen} />
-            <circle cx="126" cy="91" r={3.2 * eyeOpen} />
-          </g>
-
-          {/* Boca: si habla, animación; si no, curva por temperatura */}
-          {speaking ? (
-            <g>
-              <ellipse cx="100" cy="120" rx="16" ry="9" fill="rgba(255,255,255,0.9)">
-                <animate attributeName="ry" values="4;11;5;10;4" dur="0.5s" repeatCount="indefinite" />
-              </ellipse>
-            </g>
-          ) : (
-            <path d={mouthPath} fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="4" strokeLinecap="round" style={{ transition: 'all 0.4s ease' }} />
-          )}
-        </svg>
+        <img src={uri} alt="" width={size} height={size} style={{ display: 'block' }} />
       </div>
       <div style={{ textAlign: 'center' }}>
         {name && <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>{name}</div>}
