@@ -4,6 +4,7 @@ import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sp
 import { auth } from '../utils/db';
 import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, initialBuyerState } from '../utils/roleplayClient';
+import { openingLine } from '../utils/buyerPrompt';
 import { getPersonality } from '../utils/leadPersonalities';
 import BuyerAvatar from '../components/BuyerAvatar';
 import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices } from '../utils/voice';
@@ -87,18 +88,14 @@ export default function SoloPractice({ onBack }) {
       if (!sc || typeof sc !== 'object') throw new Error(isEn ? 'Could not generate the buyer.' : 'No se pudo generar el comprador.');
       setScenario(sc);
 
-      // Turno de apertura: el lead "atiende el teléfono" en personaje.
-      const opening = await buyerTurn({
-        scenario: sc,
-        state: initialBuyerState(),
-        history: [{ role: 'user', content: isEn ? '[The call connects. Greet briefly in character.]' : '[La llamada conecta. Saludá breve en personaje.]' }],
-        language: i18n.language,
-      });
-      setState(opening.state);
-      setMessages([{ role: 'assistant', content: opening.reply }]);
-      if (opening.thought) setThoughts([opening.thought]);
+      // Saludo de apertura SIN IA (evita un 2º pedido grande en el mismo minuto
+      // → esquiva el rate limit de Groq free). La IA responde desde el 1er turno.
+      const greet = openingLine(sc, i18n.language);
+      setState(initialBuyerState());
+      setMessages([{ role: 'assistant', content: greet }]);
+      setThoughts([]);
       setPhase('live');
-      playBuyerVoice(opening.reply, sc);
+      playBuyerVoice(greet, sc);
     } catch (e) {
       setError(e.message);
       setPhase('intro');

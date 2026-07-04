@@ -48,10 +48,12 @@ export const handler = async (event) => {
   const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
   const model = process.env.AI_DEFAULT_MODEL || DEFAULT_MODEL;
 
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), 9000);
   try {
-    const upstream = await fetch(apiUrl, {
+    const callOnce = () => fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
       body: JSON.stringify({
@@ -63,6 +65,20 @@ export const handler = async (event) => {
       }),
       signal: controller.signal
     });
+
+    let upstream = await callOnce();
+    // Rate limit de Groq (6000 TPM en free): suele pedir esperar <1s. Reintentamos
+    // una vez dentro del presupuesto de 10s de Netlify en vez de fallarle al usuario.
+    if (upstream.status === 429) {
+      let waitMs = 1200;
+      try {
+        const rl = await upstream.clone().json();
+        const m = /try again in ([\d.]+)\s*s/i.exec(rl?.error?.message || '');
+        if (m) waitMs = Math.min(Math.ceil(parseFloat(m[1]) * 1000) + 300, 4000);
+      } catch { /* usar default */ }
+      await sleep(waitMs);
+      upstream = await callOnce();
+    }
 
     const data = await upstream.json();
     if (!upstream.ok) {

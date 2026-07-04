@@ -128,3 +128,26 @@ Respondé ÚNICAMENTE con JSON válido (nada de texto afuera):
 export function initialBuyerState() {
   return { temperature: 35, trust: 25, patience: 75 };
 }
+
+// Saludo inicial SIN llamar a la IA (ahorra tokens: generar el escenario ya
+// consume una tanda grande, y sumarle el saludo por IA en el mismo minuto
+// dispara el rate limit de Groq free — 6000 TPM). El saludo va acorde a la
+// personalidad DISC; a partir del primer mensaje del closer ya responde la IA.
+export function openingLine(scenario = {}, language = 'es') {
+  const isEn = typeof language === 'string' && language.startsWith('en');
+  const id = scenario.personality;
+  const linesEs = {
+    directivo: 'Sí, hola. Tengo cinco minutos nomás, así que aprovechémoslos. ¿De qué se trata?',
+    entusiasta: '¡Hola! Sí, sí, contame — ¿con quién tengo el gusto?',
+    empatico: 'Hola, buenas… sí, ¿quién habla?',
+    analitico: 'Buenas. Sí, dígame. ¿En qué le puedo ser útil?',
+  };
+  const linesEn = {
+    directivo: "Yeah, hi. I've only got five minutes, so let's make them count. What's this about?",
+    entusiasta: 'Hey! Yeah, sure — who am I speaking with?',
+    empatico: "Hi, hello… yes, who's this?",
+    analitico: 'Good afternoon. Yes, how can I help you?',
+  };
+  const table = isEn ? linesEn : linesEs;
+  return table[id] || (isEn ? "Hello? Who's this?" : 'Hola, ¿sí? ¿Quién habla?');
+}
