@@ -5,6 +5,8 @@ import { Flame, Target, Wallet, HandHeart } from 'lucide-react';
 import { db, auth } from '../utils/db';
 import { tierFromEarnings, tierLabel, formatMoney, TIERS } from '../utils/gamification';
 import { earnedBadges, badgeLabel } from '../utils/badges';
+import { flagEmoji } from '../utils/countries';
+import CountryPicker from './CountryPicker';
 
 const LAST_TIER_KEY = 'sales_arena_last_tier';
 
@@ -14,6 +16,8 @@ export default function LevelCard() {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const [stats, setStats] = useState(null);
+  const [country, setCountry] = useState(null);
+  const [showCountry, setShowCountry] = useState(false);
   const [levelUp, setLevelUp] = useState(null); // tier al que acaba de ascender
   // Timestamp estable por montaje (precisión de días → alcanza y el linter
   // del compiler no permite Date.now() en render).
@@ -38,6 +42,13 @@ export default function LevelCard() {
       }
       localStorage.setItem(LAST_TIER_KEY, curTier.id);
     });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    const unsub = onValue(ref(db, `users/${uid}/country`), (s) => setCountry(s.val()));
     return () => unsub();
   }, []);
 
@@ -75,8 +86,14 @@ export default function LevelCard() {
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '700' }}>
-            {isEn ? 'Commission account' : 'Cuenta de comisiones'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '700' }}>
+              {isEn ? 'Commission account' : 'Cuenta de comisiones'}
+            </div>
+            <button onClick={() => setShowCountry(true)} title={isEn ? 'Set your country' : 'Poné tu país'}
+              style={{ background: 'none', border: country ? 'none' : '1px dashed rgba(255,255,255,0.2)', borderRadius: '0.4rem', cursor: 'pointer', padding: country ? 0 : '0.05rem 0.35rem', fontSize: country ? '1rem' : '0.62rem', color: 'var(--text-muted)', lineHeight: 1 }}>
+              {country ? flagEmoji(country) : (isEn ? '+ flag' : '+ bandera')}
+            </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', flexWrap: 'wrap' }}>
             <span style={{ fontWeight: '900', fontSize: '1.9rem', color: 'white', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
@@ -152,6 +169,8 @@ export default function LevelCard() {
           <style>{`@keyframes levelUpPop { 0% { opacity: 0; transform: scale(0.85); } 60% { transform: scale(1.03); } 100% { opacity: 1; transform: scale(1); } }`}</style>
         </div>
       )}
+
+      {showCountry && <CountryPicker current={country} onClose={() => setShowCountry(false)} onSaved={setCountry} />}
     </div>
   );
 }

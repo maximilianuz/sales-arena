@@ -16,7 +16,7 @@ export const handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
-  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid, closerName, leadUid, observers, transcript } = body;
+  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid, closerName, leadUid, observers, transcript, soloMode } = body;
 
   if (!uid || !scenario) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
@@ -230,6 +230,11 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
         earned = 50 + Math.round((analysis.overallScore || 0) * 20); // crédito de práctica
       }
 
+      // La práctica SOLO contra la IA vale MENOS que una sesión real con otras
+      // personas (lead/observador humanos): entrenás, pero no reemplaza la
+      // presión de una llamada real. Se acredita la mitad.
+      if (soloMode) earned = Math.round(earned * 0.5);
+
       const today = new Date().toISOString().slice(0, 10);
 
       // Espíritu de equipo: acá no hay lobos solitarios. Tras 3 sesiones de
@@ -321,9 +326,11 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
     if (newTotalEarnings !== null) {
       try {
         const displayName = closerName || scenario?.closerName || 'Closer';
+        const country = (creditData && creditData.country) || null; // ISO-2 para la bandera
         const season = new Date().toISOString().slice(0, 7); // YYYY-MM
         await setPath(`/leaderboard/global/${creditUid}`, {
           name: displayName,
+          country,
           totalEarnings: newTotalEarnings,
           sessions: closerStats?.sessionsCompleted || 0,
           closes: closerStats?.closesCount || 0,
@@ -332,6 +339,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
         const prevSeason = (await getPath(`/leaderboard/seasons/${season}/${creditUid}`)) || {};
         await setPath(`/leaderboard/seasons/${season}/${creditUid}`, {
           name: displayName,
+          country,
           earnings: (prevSeason.earnings || 0) + sessionEarned,
           closes: (prevSeason.closes || 0) + (closed ? 1 : 0),
           sessions: (prevSeason.sessions || 0) + 1,
@@ -343,6 +351,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
         const prevDaily = (await getPath(`/leaderboard/daily/${day}/${creditUid}`)) || {};
         await setPath(`/leaderboard/daily/${day}/${creditUid}`, {
           name: displayName,
+          country,
           earnings: (prevDaily.earnings || 0) + sessionEarned,
           closes: (prevDaily.closes || 0) + (closed ? 1 : 0),
           totalEarnings: newTotalEarnings, // para el rango real en la tabla
@@ -392,7 +401,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
         analysis,
         // Info de gamificación para que la UI muestre lo ganado y el estado
         // de espíritu de equipo (bonus/penalty/neutral).
-        gamification: { earned: sessionEarned, teamSpirit }
+        gamification: { earned: sessionEarned, teamSpirit, solo: !!soloMode }
       })
     };
   } catch (err) {

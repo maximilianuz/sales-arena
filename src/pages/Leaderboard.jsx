@@ -4,6 +4,7 @@ import { db, auth } from '../utils/db';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Globe, Trophy, Zap, CheckCircle2 } from 'lucide-react';
 import { tierFromEarnings, tierLabel, formatMoney } from '../utils/gamification';
+import { flagEmoji } from '../utils/countries';
 
 // Tabla de posiciones estilo Skool: 7 días / 30 días / histórico. Las ventanas
 // rodantes se agregan client-side desde los buckets diarios `leaderboard/daily`
@@ -17,11 +18,12 @@ function aggregateDaily(daysData) {
   const agg = {};
   Object.values(daysData || {}).forEach(dayNode => {
     Object.entries(dayNode || {}).forEach(([uid, e]) => {
-      const a = agg[uid] || (agg[uid] = { uid, name: '', earnings: 0, closes: 0, totalEarnings: 0 });
+      const a = agg[uid] || (agg[uid] = { uid, name: '', country: null, earnings: 0, closes: 0, totalEarnings: 0 });
       a.earnings += e.earnings || 0;
       a.closes += e.closes || 0;
       a.totalEarnings = Math.max(a.totalEarnings, e.totalEarnings || 0);
       a.name = e.name || a.name;
+      a.country = e.country || a.country;
     });
   });
   return Object.values(agg);
@@ -43,6 +45,7 @@ function LeaderRow({ rank, entry, isMe, isEn, lng }) {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {entry.country && <span style={{ marginRight: '0.35rem' }}>{flagEmoji(entry.country)}</span>}
           {entry.name || 'Closer'} {isMe && <span style={{ fontSize: '0.72rem', color: 'var(--primary)', fontWeight: '800' }}>{isEn ? '(you)' : '(vos)'}</span>}
         </div>
         <div style={{ fontSize: '0.72rem', fontWeight: '700', color: tier.color, textTransform: 'uppercase', letterSpacing: '0.04em' }}>

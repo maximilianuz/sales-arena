@@ -331,8 +331,13 @@ export default function SoloPractice({ onBack }) {
                   {analysis.overallScore}/10
                 </div>
                 {analysis.gamification?.earned > 0 && (
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--success)', fontWeight: '800', marginTop: '0.25rem' }}>
-                    <Trophy size={16} /> +${analysis.gamification.earned.toLocaleString('en-US')}
+                  <div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--success)', fontWeight: '800', marginTop: '0.25rem' }}>
+                      <Trophy size={16} /> +${analysis.gamification.earned.toLocaleString('en-US')}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                      {isEn ? 'Solo practice earns half — real sessions with people are worth more.' : 'La práctica solo acredita la mitad — las sesiones reales con gente valen más.'}
+                    </div>
                   </div>
                 )}
               </div>

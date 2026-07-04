@@ -12,6 +12,9 @@
         "subscriptionStatus": {
           ".write": "$uid === auth.uid && newData.val() === 'free'"
         },
+        "country": {
+          ".write": "$uid === auth.uid && (newData.isString() && newData.val().length <= 2)"
+        },
         "subscriptionPlan": { ".write": false },
         "sessionsUsed": { ".write": false },
         "subscriptionExpiry": { ".write": false },
