@@ -16,7 +16,7 @@ export const handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
-  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid, closerName, leadUid, observers } = body;
+  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid, closerName, leadUid, observers, transcript } = body;
 
   if (!uid || !scenario) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
@@ -78,6 +78,18 @@ export const handler = async (event) => {
     : '';
   const listeningBlock = listeningText || (isEn ? 'No listening notes.' : 'Sin notas de escucha.');
 
+  // Transcript real de la conversación (modo práctica solo contra el comprador
+  // IA). Cuando existe es la FUENTE PRIMARIA de verdad: se scorea lo que
+  // realmente se dijo, no opiniones de terceros. Se recorta por las dudas.
+  const transcriptText = typeof transcript === 'string' && transcript.trim()
+    ? transcript.trim().slice(0, 6000)
+    : '';
+  const transcriptBlock = transcriptText
+    ? (isEn
+        ? `\n\nFULL CALL TRANSCRIPT (primary source of truth — base your scores on what was ACTUALLY said here):\n${transcriptText}`
+        : `\n\nTRANSCRIPT COMPLETO DE LA LLAMADA (fuente primaria de verdad — basá tus puntajes en lo que REALMENTE se dijo acá):\n${transcriptText}`)
+    : '';
+
   const prompt = isEn
     ? `You are an expert sales coach. Analyze this sales roleplay session and provide structured feedback.
 
@@ -101,6 +113,7 @@ ${rubricText}
 
 OBSERVER ACTIVE-LISTENING LOG (real signals captured from the call — use to ground your feedback):
 ${listeningBlock}
+${transcriptBlock}
 
 Respond ONLY in valid JSON with this exact structure:
 {
@@ -137,6 +150,7 @@ ${rubricText}
 
 BITÁCORA DE ESCUCHA ACTIVA DEL OBSERVADOR (señales reales capturadas de la llamada — usalas para fundamentar tu feedback):
 ${listeningBlock}
+${transcriptBlock}
 
 Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
 {

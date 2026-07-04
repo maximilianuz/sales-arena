@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Shuffle, Copy, ChessKnight, BookOpen, Smartphone,
   Zap, History, Target, TrendingUp, Theater, Eye,
-  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase
+  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase, Target as TargetIcon
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
@@ -17,6 +17,7 @@ import Scouting from './Scouting';
 import ScoutingModal from '../components/ScoutingModal';
 import LevelCard from '../components/LevelCard';
 import ProgressPath from '../components/ProgressPath';
+import SoloPractice from './SoloPractice';
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
@@ -69,6 +70,7 @@ export default function Lobby() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showScouting, setShowScouting] = useState(false);
   const [showScoutingModal, setShowScoutingModal] = useState(false);
+  const [showSolo, setShowSolo] = useState(false);
   const [showJoinCohort, setShowJoinCohort] = useState(false);
   const [cohortCodeInput, setCohortCodeInput] = useState('');
   const [joinMsg, setJoinMsg] = useState('');
@@ -152,6 +154,7 @@ export default function Lobby() {
   if (showAnalytics) return <TrainerAnalytics onBack={() => setShowAnalytics(false)} />;
   if (showLeaderboard) return <Leaderboard onBack={() => setShowLeaderboard(false)} />;
   if (showScouting) return <Scouting onBack={() => setShowScouting(false)} />;
+  if (showSolo) return <SoloPractice onBack={() => setShowSolo(false)} />;
 
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '1.5rem 1rem 3rem' }}>
@@ -224,6 +227,12 @@ export default function Lobby() {
         position: 'relative', zIndex: 1, marginTop: '4.5rem',
         display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', width: '100%'
       }}>
+        <FeatureButton
+          icon={<TargetIcon size={16} />}
+          label={isEn ? 'Practice solo' : 'Practicar solo'}
+          accent="16,185,129"
+          onClick={() => setShowSolo(true)}
+        />
         {tier === 'trainer' && (
           <FeatureButton
             icon={<BarChart2 size={16} />}

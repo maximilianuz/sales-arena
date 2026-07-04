@@ -62,6 +62,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/roleplay-turn"
+  to = "/.netlify/functions/roleplay-turn"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/nvidia/*"
   to = "https://integrate.api.nvidia.com/:splat"
   status = 200
