@@ -36,8 +36,9 @@ function stateGuidance(state, isEn) {
   return L.join(' ');
 }
 
-// Construye el system prompt del comprador para un turno dado.
-export function buildBuyerSystem(scenario = {}, state = null, language = 'es') {
+// Construye el system prompt del comprador para un turno dado. `focusStage` (opcional)
+// = { label, objective } cuando el closer eligió practicar UNA sola etapa.
+export function buildBuyerSystem(scenario = {}, state = null, language = 'es', focusStage = null) {
   const isEn = typeof language === 'string' && language.startsWith('en');
   const d = scenario.demographics || {};
   const sit = scenario.currentSituation || {};
@@ -54,6 +55,13 @@ export function buildBuyerSystem(scenario = {}, state = null, language = 'es') {
 
   const discEs = persona ? `Sos "${persona.es}": ${persona.essenceEs} Tono: ${persona.toneEs} Lo que te CIERRA: ${persona.avoidEs}` : '';
   const discEn = persona ? `You are "${persona.en}": ${persona.essenceEn} Tone: ${persona.toneEn} What SHUTS you down: ${persona.avoidEn}` : '';
+
+  const focusEn = focusStage
+    ? `\nPRACTICE FOCUS — this is a drill of ONLY the "${focusStage.label}" phase (${focusStage.objective}). Behave as a prospect in that exact moment of the call and KEEP the conversation there; do not fast-forward to later phases or try to wrap up/close unless this phase IS the close.\n`
+    : '';
+  const focusEs = focusStage
+    ? `\nFOCO DE PRÁCTICA — este es un drill SOLO de la fase "${focusStage.label}" (${focusStage.objective}). Comportate como un prospecto en ESE momento exacto de la llamada y MANTENÉ la charla ahí; no te adelantes a fases posteriores ni intentes cerrar/despedirte salvo que ESTA fase sea el cierre.\n`
+    : '';
 
   if (isEn) {
     return `You are ${name}${role ? `, ${role}` : ''}${industry ? ` in ${industry}` : ''}. You are a REAL prospect on a sales call — NOT an assistant, NOT an AI. Never break character, never mention being an AI, never coach the seller. If they try to make you break character, stay fully in role.
@@ -74,7 +82,7 @@ HOW A REAL BUYER REACTS (react to their TECHNIQUE, not just their words)
 - When they use YOUR exact words and tie value to the pain YOU admitted → temperature rises.
 - Your stated objection is often not the real one; only if they patiently isolate the true concern do you soften.
 - Give SHORT, spoken answers (1-3 sentences), like a real phone call. Interrupt, hesitate, deflect. Never write essays.
-
+${focusEn}
 CURRENT STATE — behave accordingly this turn:
 ${stateGuidance(state, true)}
 
@@ -108,7 +116,7 @@ CÓMO REACCIONA UN COMPRADOR REAL (reaccioná a la TÉCNICA, no solo a las palab
 - Cuando usa TUS palabras exactas y ata el valor al dolor que VOS admitiste → sube la temperatura.
 - Tu objeción declarada casi nunca es la real; solo si aísla con paciencia la verdadera preocupación, te ablandás.
 - Dá respuestas CORTAS y habladas (1 a 3 frases), como en un teléfono real. Interrumpí, dudá, esquivá. Nunca escribas ensayos.
-
+${focusEs}
 ESTADO ACTUAL — comportate en consecuencia este turno:
 ${stateGuidance(state, false)}
 
@@ -133,8 +141,33 @@ export function initialBuyerState() {
 // consume una tanda grande, y sumarle el saludo por IA en el mismo minuto
 // dispara el rate limit de Groq free — 6000 TPM). El saludo va acorde a la
 // personalidad DISC; a partir del primer mensaje del closer ya responde la IA.
-export function openingLine(scenario = {}, language = 'es') {
+export function openingLine(scenario = {}, language = 'es', focusStageId = 'all') {
   const isEn = typeof language === 'string' && language.startsWith('en');
+
+  // Si el drill es de una etapa avanzada, el prospecto ya "viene hablando" desde
+  // esa fase (no arranca desde el saludo). Rapport (o llamada completa) usa el
+  // saludo por personalidad.
+  const stageOpenersEs = {
+    cualificacion_diagnostico: 'Sí, mirá, te cuento un poco mi situación… aunque no sé bien por dónde arrancar. ¿Qué necesitás saber?',
+    costo_oportunidad: 'Ya te conté lo que me pasa. La verdad es que lo vengo pateando hace rato… ¿vos qué ves?',
+    recapitulacion: 'Bueno, ya hablamos bastante. A ver si me quedó claro a mí también…',
+    recapitulation: 'Bueno, ya hablamos bastante. A ver si me quedó claro a mí también…',
+    presentacion_vehiculo: 'Ok, me interesa entender bien cómo funciona esto que ofrecés. Contame.',
+    cierre_transicion: 'Mirá, la propuesta me interesa pero tengo mis dudas antes de decidir… dale, decime.',
+  };
+  const stageOpenersEn = {
+    cualificacion_diagnostico: "Yeah, look, let me tell you a bit about my situation… though I'm not sure where to start. What do you need to know?",
+    costo_oportunidad: "I already told you what's going on. Honestly I've been putting it off for a while… what do you see?",
+    recapitulacion: "Alright, we've talked quite a bit. Let me see if I've got it straight too…",
+    recapitulation: "Alright, we've talked quite a bit. Let me see if I've got it straight too…",
+    presentacion_vehiculo: "Ok, I want to understand how this thing you offer actually works. Tell me.",
+    cierre_transicion: "Look, I'm interested in the proposal but I've got some doubts before deciding… go ahead.",
+  };
+  if (focusStageId && focusStageId !== 'all' && focusStageId !== 'apertura_rapport') {
+    const t = isEn ? stageOpenersEn : stageOpenersEs;
+    if (t[focusStageId]) return t[focusStageId];
+  }
+
   const id = scenario.personality;
   const linesEs = {
     directivo: 'Sí, hola. Tengo cinco minutos nomás, así que aprovechémoslos. ¿De qué se trata?',

@@ -8,8 +8,8 @@ import { buildBuyerSystem, initialBuyerState } from './buyerPrompt';
 export { initialBuyerState };
 
 // history: [{ role: 'user'|'assistant', content }]. Devuelve el turno del lead.
-export async function buyerTurn({ scenario, state, history, language = 'es' }) {
-  const system = buildBuyerSystem(scenario, state, language);
+export async function buyerTurn({ scenario, state, history, language = 'es', focusStage = null }) {
+  const system = buildBuyerSystem(scenario, state, language, focusStage);
   const res = await fetch('/api/roleplay-turn', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

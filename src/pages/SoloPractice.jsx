@@ -6,6 +6,7 @@ import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, initialBuyerState } from '../utils/roleplayClient';
 import { openingLine } from '../utils/buyerPrompt';
 import { getPersonality } from '../utils/leadPersonalities';
+import { getDefaultStages } from '../utils/defaultStages';
 import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
 import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices } from '../utils/voice';
@@ -56,8 +57,15 @@ export default function SoloPractice({ onBack }) {
   const [speaking, setSpeaking] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [showCoach, setShowCoach] = useState(false);
+  // Foco: 'all' = llamada completa; o el id de una etapa para practicarla suelta.
+  const [focusStageId, setFocusStageId] = useState('all');
+  const [elapsed, setElapsed] = useState(0); // segundos de llamada
   const recorderRef = useRef(null);
   const scrollRef = useRef(null);
+
+  const MAX_SECONDS = 60 * 60; // tope duro de 60 minutos
+  const stagesList = getDefaultStages(i18n.language);
+  const focusStage = focusStageId === 'all' ? null : (stagesList.find(s => s.id === focusStageId) || null);
 
   useEffect(() => { warmUpVoices(); }, []);
   useEffect(() => () => stopSpeaking(), []); // cortar la voz al desmontar
@@ -65,6 +73,23 @@ export default function SoloPractice({ onBack }) {
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, phase]);
+
+  // Cronómetro de la llamada + tope duro de 60 minutos.
+  useEffect(() => {
+    if (phase !== 'live') return;
+    const id = setInterval(() => {
+      setElapsed(e => {
+        const next = e + 1;
+        if (next >= MAX_SECONDS) {
+          stopSpeaking();
+          setOutcome('timeout');
+          setPhase('ended');
+        }
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reproduce la respuesta del lead con voz (si está activada) y anima el avatar.
   // (start/submitTurn se recrean cada render, así que capturan el voiceOn actual.)
@@ -92,11 +117,12 @@ export default function SoloPractice({ onBack }) {
       setScenario(sc);
 
       // Saludo de apertura SIN IA (evita un 2º pedido grande en el mismo minuto
-      // → esquiva el rate limit de Groq free). La IA responde desde el 1er turno.
-      const greet = openingLine(sc, i18n.language);
+      // → esquiva el rate limit de Groq free). Se adapta a la etapa elegida.
+      const greet = openingLine(sc, i18n.language, focusStageId);
       setState(initialBuyerState());
       setMessages([{ role: 'assistant', content: greet }]);
       setThoughts([]);
+      setElapsed(0);
       setPhase('live');
       playBuyerVoice(greet, sc);
     } catch (e) {
@@ -113,7 +139,7 @@ export default function SoloPractice({ onBack }) {
     setMessages(nextHistory);
     setBusy(true);
     try {
-      const turn = await buyerTurn({ scenario, state, history: nextHistory, language: i18n.language });
+      const turn = await buyerTurn({ scenario, state, history: nextHistory, language: i18n.language, focusStage });
       setState(turn.state);
       setMessages([...nextHistory, { role: 'assistant', content: turn.reply }]);
       if (turn.thought) setThoughts(t => [...t, turn.thought]);
@@ -177,8 +203,11 @@ export default function SoloPractice({ onBack }) {
     setScoring(true);
     setError('');
     try {
-      const transcript = messages
-        .map(m => `${m.role === 'user' ? (isEn ? 'CLOSER' : 'CLOSER') : leadName.toUpperCase()}: ${m.content}`)
+      const header = focusStage
+        ? (isEn ? `[Focused drill: only the "${focusStage.label}" phase]\n` : `[Práctica enfocada: solo la fase "${focusStage.label}"]\n`)
+        : '';
+      const transcript = header + messages
+        .map(m => `${m.role === 'user' ? 'CLOSER' : leadName.toUpperCase()}: ${m.content}`)
         .join('\n');
       const res = await fetch('/api/analyze-session', {
         method: 'POST',
@@ -223,6 +252,29 @@ export default function SoloPractice({ onBack }) {
                 ? 'A real, skeptical prospect with hidden objections and a mood that shifts with your technique. Earn their trust — or lose the call. Scored on the same rubric as team sessions.'
                 : 'Un prospecto real y escéptico, con objeciones ocultas y un ánimo que cambia según tu técnica. Ganate su confianza — o perdé la llamada. Se puntúa con la misma rúbrica que las sesiones en equipo.'}
             </p>
+            {/* Selector: llamada completa o una etapa suelta */}
+            <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
+                {isEn ? 'What do you want to practice?' : '¿Qué querés practicar?'}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                {[{ id: 'all', label: isEn ? '📞 Full call (up to 60 min)' : '📞 Llamada completa (hasta 60 min)' },
+                  ...stagesList.map(s => ({ id: s.id, label: s.label }))].map(opt => {
+                  const active = focusStageId === opt.id;
+                  return (
+                    <button key={opt.id} onClick={() => setFocusStageId(opt.id)} style={{
+                      padding: '0.45rem 0.75rem', borderRadius: '2rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '700',
+                      background: active ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.05)',
+                      border: `1px solid ${active ? 'transparent' : 'rgba(255,255,255,0.12)'}`,
+                      color: active ? 'white' : 'var(--text-muted)',
+                    }}>
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {error && <p style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '1rem' }}>{error}</p>}
             <button className="btn btn-primary btn-large" onClick={start} disabled={phase === 'loading'} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
               {phase === 'loading'
@@ -241,11 +293,13 @@ export default function SoloPractice({ onBack }) {
       <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', padding: '2rem 1rem' }}>
         <div style={{ maxWidth: '560px', width: '100%', margin: 'auto' }}>
           <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', marginBottom: '1rem' }}>
-            <div style={{ fontSize: '2.5rem' }}>{outcome === 'closed' ? '🤝' : '📞'}</div>
+            <div style={{ fontSize: '2.5rem' }}>{outcome === 'closed' ? '🤝' : outcome === 'timeout' ? '⏰' : '📞'}</div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0.5rem 0', color: outcome === 'closed' ? 'var(--success)' : 'var(--text-muted)' }}>
               {outcome === 'closed'
                 ? (isEn ? 'Deal closed!' : '¡Trato cerrado!')
-                : (isEn ? 'Call ended' : 'Llamada terminada')}
+                : outcome === 'timeout'
+                  ? (isEn ? 'Time is up (60 min)' : 'Se acabó el tiempo (60 min)')
+                  : (isEn ? 'Call ended' : 'Llamada terminada')}
             </h2>
 
             {/* Lo que el comprador realmente pensaba — coaching que ChatGPT no da */}
@@ -300,7 +354,7 @@ export default function SoloPractice({ onBack }) {
 
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <button className="btn btn-outline" onClick={onBack} style={{ flex: 1 }}>{isEn ? 'Back to lobby' : 'Volver al lobby'}</button>
-            <button className="btn btn-primary" onClick={() => { setPhase('intro'); setScenario(null); setMessages([]); setThoughts([]); setAnalysis(null); setOutcome(null); setState(initialBuyerState()); }} style={{ flex: 1 }}>
+            <button className="btn btn-primary" onClick={() => { setPhase('intro'); setScenario(null); setMessages([]); setThoughts([]); setAnalysis(null); setOutcome(null); setElapsed(0); setState(initialBuyerState()); }} style={{ flex: 1 }}>
               {isEn ? 'New call' : 'Nueva llamada'}
             </button>
           </div>
@@ -316,7 +370,17 @@ export default function SoloPractice({ onBack }) {
         {/* Header tipo videollamada: avatar reactivo + medidores */}
         <div className="glass-panel" style={{ padding: '0.85rem 1rem', marginBottom: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowLeft size={18} /></button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowLeft size={18} /></button>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', fontWeight: '700', color: elapsed >= MAX_SECONDS - 300 ? 'var(--danger)' : 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
+                <Clock size={13} /> {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
+              </span>
+              {focusStage && (
+                <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', padding: '0.15rem 0.5rem', borderRadius: '2rem' }}>
+                  {focusStage.label}
+                </span>
+              )}
+            </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button onClick={() => setShowCoach(true)} title={isEn ? 'Closer guide' : 'Guía del closer'}
                 style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.35)', borderRadius: '0.6rem', padding: '0.45rem 0.7rem', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: '700' }}>
