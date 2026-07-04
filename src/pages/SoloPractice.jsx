@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX } from 'lucide-react';
 import { auth } from '../utils/db';
 import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, initialBuyerState } from '../utils/roleplayClient';
 import { getPersonality } from '../utils/leadPersonalities';
+import BuyerAvatar from '../components/BuyerAvatar';
+import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices } from '../utils/voice';
 
 // Modo PRÁCTICA SOLO: el closer le vende a un comprador IA con estado real
 // (temperatura/confianza/paciencia), capa oculta y consecuencias (puede cortar).
@@ -46,11 +48,32 @@ export default function SoloPractice({ onBack }) {
   const [thoughts, setThoughts] = useState([]); // lo que el lead "pensaba" (revelado al final)
   const [analysis, setAnalysis] = useState(null);
   const [scoring, setScoring] = useState(false);
+  // Voz
+  const [voiceOn, setVoiceOn] = useState(speechSupported());
+  const [recording, setRecording] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const recorderRef = useRef(null);
   const scrollRef = useRef(null);
+
+  useEffect(() => { warmUpVoices(); }, []);
+  useEffect(() => () => stopSpeaking(), []); // cortar la voz al desmontar
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, phase]);
+
+  // Reproduce la respuesta del lead con voz (si está activada) y anima el avatar.
+  // (start/submitTurn se recrean cada render, así que capturan el voiceOn actual.)
+  const playBuyerVoice = async (reply, sc) => {
+    if (!voiceOn || !reply) return;
+    setSpeaking(true);
+    try {
+      await speak(reply, { personalityId: (sc || scenario)?.personality, language: i18n.language });
+    } finally {
+      setSpeaking(false);
+    }
+  };
 
   const persona = scenario ? getPersonality(scenario.personality) : null;
   const leadName = scenario?.demographics?.name || (isEn ? 'Prospect' : 'Prospecto');
@@ -75,16 +98,16 @@ export default function SoloPractice({ onBack }) {
       setMessages([{ role: 'assistant', content: opening.reply }]);
       if (opening.thought) setThoughts([opening.thought]);
       setPhase('live');
+      playBuyerVoice(opening.reply, sc);
     } catch (e) {
       setError(e.message);
       setPhase('intro');
     }
   };
 
-  const send = async () => {
-    const text = input.trim();
+  const submitTurn = async (text) => {
     if (!text || busy || phase !== 'live') return;
-    setInput('');
+    stopSpeaking();
     setError('');
     const nextHistory = [...messages, { role: 'user', content: text }];
     setMessages(nextHistory);
@@ -97,7 +120,10 @@ export default function SoloPractice({ onBack }) {
       if (turn.outcome === 'closed' || turn.outcome === 'lost') {
         setOutcome(turn.outcome);
         setPhase('ended');
+        setBusy(false);
+        return;
       }
+      playBuyerVoice(turn.reply);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -105,7 +131,43 @@ export default function SoloPractice({ onBack }) {
     }
   };
 
+  const send = () => {
+    const text = input.trim();
+    if (!text) return;
+    setInput('');
+    submitTurn(text);
+  };
+
+  // Push-to-talk: grabar → transcribir con Whisper → mandar como turno del closer.
+  const toggleMic = async () => {
+    if (busy || transcribing) return;
+    if (recording) {
+      setRecording(false);
+      try {
+        const { base64, mimeType } = await recorderRef.current.stop();
+        recorderRef.current = null;
+        setTranscribing(true);
+        const text = await transcribe(base64, mimeType, i18n.language);
+        setTranscribing(false);
+        if (text.trim()) submitTurn(text.trim());
+        else setError(isEn ? 'I did not catch that. Try again.' : 'No se entendió. Probá de nuevo.');
+      } catch (e) {
+        setTranscribing(false);
+        setError(e.message);
+      }
+    } else {
+      stopSpeaking();
+      try {
+        recorderRef.current = await startRecording();
+        setRecording(true);
+      } catch {
+        setError(isEn ? 'Microphone access denied.' : 'No se pudo acceder al micrófono.');
+      }
+    }
+  };
+
   const hangUp = () => {
+    stopSpeaking();
     setOutcome('lost');
     setPhase('ended');
   };
@@ -251,19 +313,30 @@ export default function SoloPractice({ onBack }) {
   return (
     <div className="app-container" style={{ alignItems: 'center', padding: '1rem', height: '100vh', boxSizing: 'border-box' }}>
       <div style={{ maxWidth: '640px', width: '100%', margin: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
-        {/* Header con lead + medidores */}
+        {/* Header tipo videollamada: avatar reactivo + medidores */}
         <div className="glass-panel" style={{ padding: '0.85rem 1rem', marginBottom: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
             <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowLeft size={18} /></button>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: '800', fontSize: '0.95rem' }}>{leadName}</div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                {scenario?.demographics?.role || ''}{persona ? ` · ${isEn ? persona.en : persona.es}` : ''}
-              </div>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {speechSupported() && (
+                <button onClick={() => { if (voiceOn) stopSpeaking(); setVoiceOn(v => !v); }} title={isEn ? 'Toggle voice' : 'Voz on/off'}
+                  style={{ background: voiceOn ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${voiceOn ? 'var(--success)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '0.6rem', padding: '0.45rem', color: voiceOn ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
+                  {voiceOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                </button>
+              )}
+              <button onClick={hangUp} title={isEn ? 'Hang up' : 'Colgar'} style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '0.6rem', padding: '0.45rem', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
+                <PhoneOff size={16} />
+              </button>
             </div>
-            <button onClick={hangUp} title={isEn ? 'Hang up' : 'Colgar'} style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '0.6rem', padding: '0.45rem', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
-              <PhoneOff size={16} />
-            </button>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.6rem' }}>
+            <BuyerAvatar
+              state={state}
+              speaking={speaking}
+              name={`${leadName}${persona ? ` · ${isEn ? persona.en : persona.es}` : ''}`}
+              isEn={isEn}
+              size={120}
+            />
           </div>
           <div style={{ display: 'flex', gap: '0.85rem' }}>
             {METERS.map(m => <Meter key={m.key} meter={m} value={state[m.key]} isEn={isEn} />)}
@@ -293,14 +366,29 @@ export default function SoloPractice({ onBack }) {
 
         {error && <p style={{ color: 'var(--danger)', fontSize: '0.8rem', margin: '0 0 0.5rem' }}>{error}</p>}
 
-        {/* Input */}
+        {/* Input: micrófono (push-to-talk) + texto */}
         <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {micSupported() && (
+            <button
+              onClick={toggleMic}
+              disabled={busy || transcribing}
+              title={isEn ? 'Push to talk' : 'Hablá'}
+              style={{
+                padding: '0 1rem', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', cursor: 'pointer',
+                background: recording ? 'var(--danger)' : 'rgba(255,255,255,0.05)',
+                border: `1px solid ${recording ? 'var(--danger)' : 'rgba(255,255,255,0.12)'}`,
+                color: 'white', animation: recording ? 'pulse 1s ease-in-out infinite' : 'none',
+              }}
+            >
+              {transcribing ? <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> : recording ? <Square size={18} /> : <Mic size={18} />}
+            </button>
+          )}
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder={isEn ? 'Type what you say…' : 'Escribí lo que decís…'}
-            disabled={busy}
+            placeholder={recording ? (isEn ? 'Listening…' : 'Escuchando…') : transcribing ? (isEn ? 'Transcribing…' : 'Transcribiendo…') : (isEn ? 'Type or tap the mic…' : 'Escribí o tocá el micrófono…')}
+            disabled={busy || recording || transcribing}
             style={{ flex: 1, padding: '0.75rem 1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'white', fontSize: '0.9rem', outline: 'none' }}
           />
           <button className="btn btn-primary" onClick={send} disabled={busy || !input.trim()} style={{ padding: '0 1.1rem', display: 'flex', alignItems: 'center' }}>
