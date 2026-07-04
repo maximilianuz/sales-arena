@@ -22,6 +22,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
+  const [gamification, setGamification] = useState(null); // { earned, teamSpirit }
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
 
@@ -64,6 +65,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error');
       setAnalysis(data.analysis);
+      setGamification(data.gamification || null);
       setSaved(true);
     } catch (e) {
       setError(e.message);
@@ -146,6 +148,28 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
                 </div>
               ))}
             </div>
+
+            {/* Comisión ganada + espíritu de equipo */}
+            {gamification && gamification.earned > 0 && (
+              <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(16,185,129,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(16,185,129,0.25)', textAlign: 'center' }}>
+                <div style={{ fontSize: '1.6rem', fontWeight: '900', color: 'var(--success)' }}>
+                  +${gamification.earned.toLocaleString('en-US')}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                  {isEn ? 'added to the Closer\'s commission account' : 'sumados a la cuenta de comisiones del Closer'}
+                </div>
+                {gamification.teamSpirit === 'bonus' && (
+                  <div style={{ fontSize: '0.8rem', color: 'var(--success)', fontWeight: '700', marginTop: '0.4rem' }}>
+                    🤝 {isEn ? '+10% team spirit — helped as Lead/Observer this week' : '+10% espíritu de equipo — ayudó como Lead/Observador esta semana'}
+                  </div>
+                )}
+                {gamification.teamSpirit === 'penalty' && (
+                  <div style={{ fontSize: '0.8rem', color: 'var(--danger)', fontWeight: '700', marginTop: '0.4rem' }}>
+                    ⚠️ {isEn ? '-15% — a week without helping as Lead/Observer. Support the team to recover the bonus!' : '-15% — una semana sin ayudar como Lead/Observador. ¡Apoyá al equipo para recuperar el bonus!'}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Tip próxima sesión */}
             <div style={{ padding: '1rem', background: 'rgba(245,158,11,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(245,158,11,0.2)' }}>

@@ -15,6 +15,9 @@ export default function LevelCard() {
   const isEn = i18n.language?.startsWith('en');
   const [stats, setStats] = useState(null);
   const [levelUp, setLevelUp] = useState(null); // tier al que acaba de ascender
+  // Timestamp estable por montaje (precisión de días → alcanza y el linter
+  // del compiler no permite Date.now() en render).
+  const [now] = useState(() => Date.now());
 
   useEffect(() => {
     const uid = auth.currentUser?.uid;
@@ -41,6 +44,14 @@ export default function LevelCard() {
   const total = stats?.totalEarnings || 0;
   const { tier, next, progress, toNext } = tierFromEarnings(total);
   const badges = earnedBadges(stats || {});
+
+  // Espíritu de equipo (espejo de la regla del servidor): tras 3 sesiones,
+  // ayudar como Lead/Observador en los últimos 7 días da +10%; si no, -15%.
+  const sinceSupport = stats?.lastSupportDate
+    ? Math.round((now - new Date(stats.lastSupportDate).getTime()) / 86400000)
+    : null;
+  const showSpirit = (stats?.sessionsCompleted || 0) >= 3;
+  const spiritActive = sinceSupport !== null && sinceSupport <= 7;
   const label = tierLabel(tier, i18n.language);
   const streak = stats?.streak || 0;
   const sessions = stats?.sessionsCompleted || 0;
@@ -98,6 +109,15 @@ export default function LevelCard() {
           </span>
         )}
       </div>
+
+      {/* Espíritu de equipo: recordatorio de ayudar como Lead/Observador */}
+      {showSpirit && (
+        <div style={{ marginTop: '0.6rem', fontSize: '0.75rem', fontWeight: '600', color: spiritActive ? 'var(--success)' : 'var(--accent)' }}>
+          {spiritActive
+            ? (isEn ? '🤝 Team spirit active: +10% on commissions' : '🤝 Espíritu de equipo activo: +10% en comisiones')
+            : (isEn ? '⚠️ Play Lead or Observer this week to avoid -15%' : '⚠️ Hacé de Lead u Observador esta semana para evitar el -15%')}
+        </div>
+      )}
 
       {/* Insignias ganadas (derivadas de stats, sin escritura extra) */}
       {badges.length > 0 && (

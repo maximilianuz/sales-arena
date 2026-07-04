@@ -16,6 +16,7 @@ import Leaderboard from './Leaderboard';
 import Scouting from './Scouting';
 import ScoutingModal from '../components/ScoutingModal';
 import LevelCard from '../components/LevelCard';
+import ProgressPath from '../components/ProgressPath';
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
@@ -271,6 +272,9 @@ export default function Lobby() {
 
       {/* ── Tarjeta de nivel / progreso (gamificación) ─────── */}
       <LevelCard />
+
+      {/* ── Camino del Closer (progresión Novato→Pro) ──────── */}
+      <ProgressPath />
 
       {/* ── Main card ──────────────────────────────────────── */}
       <div style={{

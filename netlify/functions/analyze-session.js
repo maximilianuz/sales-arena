@@ -199,6 +199,7 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
     let newTotalEarnings = null; // comisión acumulada tras esta sesión (para el cohorte)
     let sessionEarned = 0;       // comisión de esta sesión puntual
     let closerStats = null;      // stats resultantes del Closer (para el leaderboard)
+    let teamSpirit = 'neutral';  // bonus/penalty por ayudar (o no) como Lead/Observador
     try {
       const prev = (creditData && creditData.stats) || {};
       const rubricVals = rubric ? Object.values(rubric).filter(v => typeof v === 'number' && v > 0) : [];
@@ -216,6 +217,24 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
       }
 
       const today = new Date().toISOString().slice(0, 10);
+
+      // Espíritu de equipo: acá no hay lobos solitarios. Tras 3 sesiones de
+      // gracia (los novatos no se penalizan), si el Closer ayudó como Lead u
+      // Observador en los últimos 7 días → +10% de comisión; si hace más de
+      // una semana que no ayuda → -15%. Camaradería win-win: para subir en la
+      // tabla también hay que entrenar a los demás.
+      if ((prev.sessionsCompleted || 0) >= 3) {
+        const last = prev.lastSupportDate;
+        const daysSince = last ? Math.round((new Date(today) - new Date(last)) / 86400000) : Infinity;
+        if (daysSince <= 7) {
+          earned = Math.round(earned * 1.10);
+          teamSpirit = 'bonus';
+        } else {
+          earned = Math.round(earned * 0.85);
+          teamSpirit = 'penalty';
+        }
+      }
+
       let streak = 1;
       if (prev.lastSessionDate) {
         const diffDays = Math.round((new Date(today) - new Date(prev.lastSessionDate)) / 86400000);
@@ -269,6 +288,9 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
           await patchPath(`/users/${c.uid}/stats`, {
             supportPoints: (prevStats.supportPoints || 0) + c.pts,
             [sessKey]: (prevStats[sessKey] || 0) + 1,
+            // Marca de "ayudó hoy": activa el bonus de espíritu de equipo la
+            // próxima vez que ese usuario cierre como Closer.
+            lastSupportDate: new Date().toISOString().slice(0, 10),
             updatedAt: Date.now(),
           });
         } catch (e) {
@@ -302,6 +324,20 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
           totalEarnings: newTotalEarnings, // para mostrar el rango real en el torneo
           updatedAt: Date.now(),
         });
+        // Bucket diario → alimenta las tablas rodantes 7/30 días (estilo Skool).
+        const day = new Date().toISOString().slice(0, 10);
+        const prevDaily = (await getPath(`/leaderboard/daily/${day}/${creditUid}`)) || {};
+        await setPath(`/leaderboard/daily/${day}/${creditUid}`, {
+          name: displayName,
+          earnings: (prevDaily.earnings || 0) + sessionEarned,
+          closes: (prevDaily.closes || 0) + (closed ? 1 : 0),
+          totalEarnings: newTotalEarnings, // para el rango real en la tabla
+          updatedAt: Date.now(),
+        });
+        // Auto-purga: borra el bucket de hace 35 días (solo usamos ventanas de
+        // 7/30 → el nodo se mantiene liviano sin cron).
+        const cutoff = new Date(Date.now() - 35 * 86400000).toISOString().slice(0, 10);
+        await setPath(`/leaderboard/daily/${cutoff}`, null);
       } catch (e) {
         console.error("No se pudo actualizar el leaderboard:", e.message);
       }
@@ -334,7 +370,17 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
       }
     }
 
-    return { statusCode: 200, headers, body: JSON.stringify({ sessionId, analysis }) };
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        sessionId,
+        analysis,
+        // Info de gamificación para que la UI muestre lo ganado y el estado
+        // de espíritu de equipo (bonus/penalty/neutral).
+        gamification: { earned: sessionEarned, teamSpirit }
+      })
+    };
   } catch (err) {
     console.error("analyze-session error:", err);
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Error generando análisis." }) };
