@@ -8,7 +8,14 @@ import { getUserData } from './lib/firebaseAdmin.js';
 // debe agotar el límite de 1 sesión del plan free por cada mensaje.
 
 const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_MODEL = "llama-3.1-8b-instant";
+// El comprador usa un modelo MÁS GRANDE que la generación de escenarios: acá la
+// respuesta es corta (320 tokens) así que el 70b entra cómodo en los 10s de
+// Netlify, y a cambio actúa el personaje mucho mejor, razona sobre la técnica
+// del closer y respeta el JSON con más fiabilidad. La generación de escenarios
+// (salida larga ~2800 tokens) sigue en 8b para no pasarse del timeout. Además,
+// usar otro modelo separa el cupo de rate limit del de la generación.
+// Override con la env var ROLEPLAY_MODEL si hiciera falta.
+const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
 export const handler = async (event) => {
   const headers = {
@@ -46,7 +53,7 @@ export const handler = async (event) => {
   const trimmed = messages.slice(-16).filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'));
 
   const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
-  const model = process.env.AI_DEFAULT_MODEL || DEFAULT_MODEL;
+  const model = process.env.ROLEPLAY_MODEL || DEFAULT_MODEL;
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
