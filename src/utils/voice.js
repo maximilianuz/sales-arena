@@ -63,6 +63,7 @@ export async function transcribe(base64, mimeType, language = 'es') {
 }
 
 // Ajustes de voz por personalidad DISC → cada lead "suena" distinto.
+const PERSONALITY_ORDER = ['directivo', 'entusiasta', 'empatico', 'analitico'];
 function voiceProfile(personalityId) {
   switch (personalityId) {
     case 'directivo': return { rate: 1.12, pitch: 0.9 };  // rápido, grave, dominante
@@ -73,26 +74,42 @@ function voiceProfile(personalityId) {
   }
 }
 
-let cachedVoices = null;
-function pickVoice(langPrefix) {
-  const synth = window.speechSynthesis;
-  cachedVoices = cachedVoices || synth.getVoices();
-  const match = cachedVoices.filter(v => v.lang?.toLowerCase().startsWith(langPrefix));
-  return match[0] || null;
+// Hash estable de un string → entero pequeño. Sirve para que cada lead (por su
+// nombre) tenga una voz/tono propios de forma determinista.
+function hashString(s) {
+  let h = 0;
+  for (let i = 0; i < (s || '').length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
 }
 
-// Habla el texto con la voz del lead. Devuelve una promesa que resuelve al terminar.
-export function speak(text, { personalityId, language = 'es' } = {}) {
+let cachedVoices = null;
+// Elige una voz REAL del sistema. Con varias voces del idioma disponibles, cada
+// personalidad + lead cae en una distinta → variedad de timbres sin APIs.
+function pickVoice(langPrefix, personalityId, seed) {
+  const synth = window.speechSynthesis;
+  cachedVoices = (cachedVoices && cachedVoices.length) ? cachedVoices : synth.getVoices();
+  const match = cachedVoices.filter(v => v.lang?.toLowerCase().startsWith(langPrefix));
+  if (!match.length) return null;
+  const pIdx = Math.max(0, PERSONALITY_ORDER.indexOf(personalityId));
+  const idx = (pIdx + hashString(seed)) % match.length;
+  return match[idx];
+}
+
+// Habla el texto con la voz del lead. `seed` (ej. el nombre del lead) hace que
+// dos leads de la misma personalidad no suenen idénticos.
+export function speak(text, { personalityId, language = 'es', seed = '' } = {}) {
   return new Promise((resolve) => {
     if (!speechSupported() || !text) return resolve();
     const synth = window.speechSynthesis;
     synth.cancel(); // corta cualquier locución previa
     const u = new SpeechSynthesisUtterance(text);
     const prof = voiceProfile(personalityId);
+    // Micro-variación de tono por lead (±0.12) para dar más variedad de voces.
+    const jitter = ((hashString(seed) % 25) - 12) / 100;
     u.rate = prof.rate;
-    u.pitch = prof.pitch;
+    u.pitch = Math.max(0.5, Math.min(1.6, prof.pitch + jitter));
     u.lang = language.startsWith('en') ? 'en-US' : 'es-ES';
-    const v = pickVoice(language.startsWith('en') ? 'en' : 'es');
+    const v = pickVoice(language.startsWith('en') ? 'en' : 'es', personalityId, seed);
     if (v) u.voice = v;
     u.onend = () => resolve();
     u.onerror = () => resolve();

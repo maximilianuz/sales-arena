@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen } from 'lucide-react';
 import { auth } from '../utils/db';
 import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, initialBuyerState } from '../utils/roleplayClient';
 import { openingLine } from '../utils/buyerPrompt';
 import { getPersonality } from '../utils/leadPersonalities';
 import BuyerAvatar from '../components/BuyerAvatar';
+import SoloCoachPanel from '../components/SoloCoachPanel';
 import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices } from '../utils/voice';
 
 // Modo PRÁCTICA SOLO: el closer le vende a un comprador IA con estado real
@@ -54,6 +55,7 @@ export default function SoloPractice({ onBack }) {
   const [recording, setRecording] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const [showCoach, setShowCoach] = useState(false);
   const recorderRef = useRef(null);
   const scrollRef = useRef(null);
 
@@ -70,7 +72,8 @@ export default function SoloPractice({ onBack }) {
     if (!voiceOn || !reply) return;
     setSpeaking(true);
     try {
-      await speak(reply, { personalityId: (sc || scenario)?.personality, language: i18n.language });
+      const s = sc || scenario;
+      await speak(reply, { personalityId: s?.personality, language: i18n.language, seed: s?.demographics?.name || '' });
     } finally {
       setSpeaking(false);
     }
@@ -315,6 +318,10 @@ export default function SoloPractice({ onBack }) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
             <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowLeft size={18} /></button>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button onClick={() => setShowCoach(true)} title={isEn ? 'Closer guide' : 'Guía del closer'}
+                style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.35)', borderRadius: '0.6rem', padding: '0.45rem 0.7rem', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: '700' }}>
+                <BookOpen size={16} /> {isEn ? 'Guide' : 'Guía'}
+              </button>
               {speechSupported() && (
                 <button onClick={() => { if (voiceOn) stopSpeaking(); setVoiceOn(v => !v); }} title={isEn ? 'Toggle voice' : 'Voz on/off'}
                   style={{ background: voiceOn ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${voiceOn ? 'var(--success)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '0.6rem', padding: '0.45rem', color: voiceOn ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
@@ -393,6 +400,8 @@ export default function SoloPractice({ onBack }) {
           </button>
         </div>
       </div>
+
+      {showCoach && <SoloCoachPanel scenario={scenario} onClose={() => setShowCoach(false)} />}
     </div>
   );
 }
