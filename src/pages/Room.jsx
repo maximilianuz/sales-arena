@@ -22,8 +22,9 @@ import LeadCheckoutPanel from '../components/LeadCheckoutPanel';
 import CheckoutResultBanner from '../components/CheckoutResultBanner';
 import CloserCommandPanel from '../components/CloserCommandPanel';
 import RoleOnboarding from '../components/RoleOnboarding';
+import WorldClockPanel from '../components/WorldClockPanel';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
-import { Dices, X, Lock } from 'lucide-react';
+import { Dices, X, Lock, Globe } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
 import '../App.css';
 
@@ -34,6 +35,7 @@ export default function Room() {
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showClocks, setShowClocks] = useState(false);
   const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, registerLead, registerObserver, updateListeningLog } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
@@ -460,6 +462,13 @@ export default function Room() {
 
       <footer style={{ textAlign: 'center', padding: '2rem 1rem', marginTop: 'auto', fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
         <span>{t('room.madeWith')} <span className="heart-beat">❤️</span> {t('room.by')} <a href="https://maximilianoc.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>Maximiliano C.</a></span>
+        <button
+          className="btn btn-outline"
+          onClick={() => setShowClocks(true)}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+        >
+          <Globe size={15} /> {i18n.language?.startsWith('en') ? 'Time zones' : 'Husos horarios'}
+        </button>
         {isPaid && currentScenario && (
           <button
             className="btn btn-primary"
@@ -535,6 +544,10 @@ export default function Room() {
           stages={stagesEff}
           onClose={() => setShowAnalysis(false)}
         />
+      )}
+
+      {showClocks && (
+        <WorldClockPanel roomId={roomId} userName={userName} onClose={() => setShowClocks(false)} />
       )}
 
       {/* Banner de resultado del checkout visible para todos */}

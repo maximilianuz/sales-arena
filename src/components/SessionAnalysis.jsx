@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Save, Star, TrendingUp, TrendingDown, Lightbulb, X, Loader } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { auth } from '../utils/db';
+import MethodScores from './MethodScores';
 
 function ScoreBar({ label, value }) {
   const color = value >= 8 ? 'var(--success)' : value >= 6 ? 'var(--accent)' : 'var(--danger)';
@@ -124,6 +125,9 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
                 <ScoreBar key={key} label={scoreLabels[key] || key} value={val} />
               ))}
             </div>
+
+            {/* Radar de metodología del coach */}
+            <MethodScores scores={analysis.methodScores} />
 
             {/* Qué salió bien */}
             <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(16,185,129,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(16,185,129,0.2)' }}>

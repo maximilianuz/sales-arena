@@ -90,8 +90,29 @@ export const handler = async (event) => {
         : `\n\nTRANSCRIPT COMPLETO DE LA LLAMADA (fuente primaria de verdad — basá tus puntajes en lo que REALMENTE se dijo acá):\n${transcriptText}`)
     : '';
 
+  // Metodología del coach (DESTILADA y anónima — venta consultiva de alto valor).
+  // Fundamenta el feedback en ESTE método, no en consejos genéricos.
+  const methodologyEn = `COACH METHODOLOGY (ground your feedback in these principles; this is high-value consultative selling):
+- Diagnose before prescribing: never present price or solution until the prospect's trust and commitment are high (9-10/10).
+- Isolate the REAL objection vs. the excuse (be Exact, Concrete, Specific). The first objection is usually a smokescreen.
+- "Tennis" technique: return objections with a counter-question, without justifying or over-explaining; use tactical silence.
+- Detachment and relaxed confidence: lead the frame without anxiety to close ("we are the prize").
+- Continuous micro-closes and self-concluding questions that yield initiative to the prospect.
+- Facing complacency or low motivation, use reverse psychology / soft disqualification so the prospect defends their interest.
+- Appeal to the prospect's vision/emotion, not features/logic. Adapt to their profile (Driver / Enthusiast / Relator / Analyst).`;
+  const methodologyEs = `METODOLOGÍA DEL COACH (fundamentá el feedback en estos principios; es venta consultiva de alto valor):
+- Diagnosticar antes de recetar: no se presenta precio ni solución hasta que la confianza y el compromiso del prospecto son altos (9-10/10).
+- Aislar la objeción REAL vs. la excusa (Exacto, Concreto, Específico). La primera objeción suele ser humo.
+- Técnica de "tenis": devolver las objeciones con una contrapregunta, sin justificar ni sobre-explicar; usar silencio táctico.
+- Desapego y confianza relajada: liderar el marco sin ansiedad por cerrar ("el premio somos nosotros").
+- Micro-cierres continuos y preguntas auto-concluyentes que ceden la iniciativa al prospecto.
+- Ante complacencia o baja motivación, psicología inversa / descalificación suave para que el prospecto defienda su interés.
+- Apelar a la visión/emoción del prospecto, no a características/lógica. Adaptar al perfil (Directivo / Entusiasta / Empático / Analítico).`;
+
   const prompt = isEn
     ? `You are an expert sales coach. Analyze this sales roleplay session and provide structured feedback.
+
+${methodologyEn}
 
 LEAD PROFILE:
 - Name: ${scenario.demographics?.name || 'Unknown'}
@@ -124,11 +145,21 @@ Respond ONLY in valid JSON with this exact structure:
     "activeListening": <1-10>
   },
   "overallScore": <1-10>,
+  "methodScores": {
+    "frameControl": <0-10>,
+    "painDepth": <0-10>,
+    "objectionIsolation": <0-10>,
+    "detachment": <0-10>,
+    "microCommitments": <0-10>
+  },
   "wentWell": ["point 1", "point 2", "point 3"],
   "toImprove": ["point 1", "point 2", "point 3"],
-  "nextSessionTip": "One specific, actionable tip for the next session."
-}`
+  "nextSessionTip": "One specific, actionable tip for the next session, tied to the methodology above."
+}
+methodScores meaning: frameControl = led the frame with detachment (not needy); painDepth = reached the real/emotional pain, not the surface excuse; objectionIsolation = isolated the true objection with counter-questions instead of justifying; detachment = relaxed confidence without anxiety to close; microCommitments = embedded micro-closes and self-concluding questions.`
     : `Eres un coach experto en ventas consultivas. Analizá esta sesión de roleplay de ventas y dá feedback estructurado.
+
+${methodologyEs}
 
 PERFIL DEL LEAD:
 - Nombre: ${scenario.demographics?.name || 'Desconocido'}
@@ -161,10 +192,18 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
     "activeListening": <1-10>
   },
   "overallScore": <1-10>,
+  "methodScores": {
+    "frameControl": <0-10>,
+    "painDepth": <0-10>,
+    "objectionIsolation": <0-10>,
+    "detachment": <0-10>,
+    "microCommitments": <0-10>
+  },
   "wentWell": ["punto 1", "punto 2", "punto 3"],
   "toImprove": ["punto 1", "punto 2", "punto 3"],
-  "nextSessionTip": "Un tip específico y accionable para la próxima sesión."
-}`;
+  "nextSessionTip": "Un tip específico y accionable para la próxima sesión, atado a la metodología de arriba."
+}
+Significado de methodScores: frameControl = lideró el marco con desapego (sin necesidad); painDepth = llegó al dolor real/emocional, no a la excusa de superficie; objectionIsolation = aisló la objeción verdadera con contrapreguntas en vez de justificar; detachment = confianza relajada sin ansiedad por cerrar; microCommitments = metió micro-cierres y preguntas auto-concluyentes.`;
 
   try {
     const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;

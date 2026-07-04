@@ -9,6 +9,7 @@ import { getPersonality } from '../utils/leadPersonalities';
 import { getDefaultStages } from '../utils/defaultStages';
 import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
+import MethodScores from '../components/MethodScores';
 import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices } from '../utils/voice';
 
 // Modo PRÁCTICA SOLO: el closer le vende a un comprador IA con estado real
@@ -341,6 +342,7 @@ export default function SoloPractice({ onBack }) {
                   </div>
                 )}
               </div>
+              <MethodScores scores={analysis.methodScores} />
               {(analysis.toImprove || []).length > 0 && (
                 <div>
                   <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--danger)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{isEn ? 'To improve' : 'A mejorar'}</div>
