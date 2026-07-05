@@ -74,6 +74,21 @@ function voiceProfile(personalityId) {
   }
 }
 
+// Modificadores de prosodia por EMOCIÓN del turno (los emite la IA en `emotion`).
+// Se aplican SOBRE el perfil de personalidad → un directivo molesto no suena
+// igual que un empático molesto.
+const EMOTION_PROSODY = {
+  neutral:      { rate: 0,     pitch: 0,     volume: 1.0,  pauseMul: 1.0 },
+  interesado:   { rate: 0.02,  pitch: 0.06,  volume: 1.0,  pauseMul: 0.9 },
+  esceptico:    { rate: -0.06, pitch: -0.06, volume: 0.95, pauseMul: 1.25 }, // arrastra, deja silencios
+  molesto:      { rate: 0.09,  pitch: -0.09, volume: 1.0,  pauseMul: 0.7 },  // seco, cortante
+  entusiasmado: { rate: 0.12,  pitch: 0.14,  volume: 1.0,  pauseMul: 0.75 },
+  dudoso:       { rate: -0.12, pitch: 0.03,  volume: 0.9,  pauseMul: 1.5 },  // lento, con aire
+  apurado:      { rate: 0.2,   pitch: 0.02,  volume: 1.0,  pauseMul: 0.5 }
+};
+
+export const EMOTION_IDS = Object.keys(EMOTION_PROSODY);
+
 // Hash estable de un string → entero pequeño. Sirve para que cada lead (por su
 // nombre) tenga una voz/tono propios de forma determinista.
 function hashString(s) {
@@ -82,42 +97,101 @@ function hashString(s) {
   return Math.abs(h);
 }
 
+// Puntaje de calidad de una voz del sistema. Las voces "neural/natural/online"
+// (Edge, Chrome con Google, Siri mejoradas) suenan MUCHO más humanas que las
+// locales tipo eSpeak; hay que preferirlas siempre que existan.
+function voiceQuality(v) {
+  const n = (v.name || '').toLowerCase();
+  let score = 0;
+  if (/natural|neural|online/.test(n)) score += 5;
+  if (/google/.test(n)) score += 4;
+  if (/premium|enhanced|siri|paulina|mónica|monica|jorge|diego|luciana/.test(n)) score += 3;
+  if (v.localService === false) score += 2; // voces cloud > locales
+  return score;
+}
+
 let cachedVoices = null;
-// Elige una voz REAL del sistema. Con varias voces del idioma disponibles, cada
-// personalidad + lead cae en una distinta → variedad de timbres sin APIs.
+// Elige una voz REAL del sistema: primero filtra por idioma, luego se queda con
+// el grupo de MEJOR calidad disponible, y dentro de ese grupo la personalidad
+// + el lead (seed) eligen determinísticamente → timbres variados pero humanos.
 function pickVoice(langPrefix, personalityId, seed) {
   const synth = window.speechSynthesis;
   cachedVoices = (cachedVoices && cachedVoices.length) ? cachedVoices : synth.getVoices();
   const match = cachedVoices.filter(v => v.lang?.toLowerCase().startsWith(langPrefix));
   if (!match.length) return null;
+  const best = Math.max(...match.map(voiceQuality));
+  // Grupo de élite: las de mayor puntaje (tolerancia 1 para no quedarse con una sola).
+  const pool = match.filter(v => voiceQuality(v) >= Math.max(0, best - 1));
   const pIdx = Math.max(0, PERSONALITY_ORDER.indexOf(personalityId));
-  const idx = (pIdx + hashString(seed)) % match.length;
-  return match[idx];
+  const idx = (pIdx + hashString(seed)) % pool.length;
+  return pool[idx];
 }
 
-// Habla el texto con la voz del lead. `seed` (ej. el nombre del lead) hace que
-// dos leads de la misma personalidad no suenen idénticos.
-export function speak(text, { personalityId, language = 'es', seed = '' } = {}) {
-  return new Promise((resolve) => {
-    if (!speechSupported() || !text) return resolve();
-    const synth = window.speechSynthesis;
-    synth.cancel(); // corta cualquier locución previa
-    const u = new SpeechSynthesisUtterance(text);
-    const prof = voiceProfile(personalityId);
-    // Micro-variación de tono por lead (±0.12) para dar más variedad de voces.
-    const jitter = ((hashString(seed) % 25) - 12) / 100;
-    u.rate = prof.rate;
-    u.pitch = Math.max(0.5, Math.min(1.6, prof.pitch + jitter));
-    u.lang = language.startsWith('en') ? 'en-US' : 'es-ES';
-    const v = pickVoice(language.startsWith('en') ? 'en' : 'es', personalityId, seed);
-    if (v) u.voice = v;
-    u.onend = () => resolve();
-    u.onerror = () => resolve();
-    synth.speak(u);
-  });
+// Limpia el texto para locución: sin emojis, sin markdown, sin acotaciones
+// entre asteriscos — cosas que el TTS leería literalmente y matan la ilusión.
+function naturalizeForSpeech(text) {
+  return (text || '')
+    .replace(/\*[^*]*\*/g, '')                          // *suspira* → fuera (ya lo actúa la prosodia)
+    .replace(/[*_#>`~]/g, '')                            // markdown suelto
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '') // emojis
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+// Divide en oraciones respetando "..." (pausa dramática, no tres puntos finales).
+function splitSentences(text) {
+  const parts = text.split(/(?<=[.!?…])\s+/).map(s => s.trim()).filter(Boolean);
+  return parts.length ? parts : [text];
+}
+
+// Pausa entre oraciones según cómo termina la anterior (ms).
+function pauseAfter(sentence, mul) {
+  if (/\.\.\.$|…$/.test(sentence)) return 420 * mul;  // duda / pensamiento
+  if (/\?$/.test(sentence)) return 300 * mul;         // espera implícita
+  if (/!$/.test(sentence)) return 220 * mul;
+  return 180 * mul;
+}
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+let speakSession = 0; // token para cancelar locuciones multi-oración en curso
+
+// Habla el texto con la voz del lead, oración por oración y con la prosodia de
+// la emoción del turno. `seed` (ej. el nombre del lead) diferencia timbres.
+export async function speak(text, { personalityId, language = 'es', seed = '', emotion = 'neutral' } = {}) {
+  if (!speechSupported() || !text) return;
+  const session = ++speakSession;
+  const synth = window.speechSynthesis;
+  synth.cancel(); // corta cualquier locución previa
+
+  const prof = voiceProfile(personalityId);
+  const emo = EMOTION_PROSODY[emotion] || EMOTION_PROSODY.neutral;
+  const jitterBase = ((hashString(seed) % 25) - 12) / 100; // sello vocal del lead (±0.12)
+  const lang = language.startsWith('en') ? 'en-US' : 'es-ES';
+  const voice = pickVoice(language.startsWith('en') ? 'en' : 'es', personalityId, seed);
+
+  const sentences = splitSentences(naturalizeForSpeech(text));
+  for (let i = 0; i < sentences.length; i++) {
+    if (session !== speakSession) return; // llegó otra locución o un stop
+    const s = sentences[i];
+    // Micro-variación por oración (±3%) → rompe la monotonía robótica.
+    const drift = ((hashString(seed + i) % 7) - 3) / 100;
+    await new Promise((resolve) => {
+      const u = new SpeechSynthesisUtterance(s);
+      u.rate = Math.max(0.6, Math.min(1.8, prof.rate + emo.rate + drift));
+      u.pitch = Math.max(0.5, Math.min(1.6, prof.pitch + emo.pitch + jitterBase + drift));
+      u.volume = emo.volume;
+      u.lang = lang;
+      if (voice) u.voice = voice;
+      u.onend = resolve;
+      u.onerror = resolve;
+      synth.speak(u);
+    });
+    if (i < sentences.length - 1) await sleep(pauseAfter(s, emo.pauseMul));
+  }
 }
 
 export function stopSpeaking() {
+  speakSession++; // invalida cualquier bucle de oraciones en curso
   if (speechSupported()) window.speechSynthesis.cancel();
 }
 

@@ -112,12 +112,16 @@ export const handler = async (event) => {
     };
     const st = turn.state || {};
     const outcome = ['ongoing', 'closed', 'lost'].includes(turn.outcome) ? turn.outcome : 'ongoing';
+    // Emoción del turno: lista cerrada (define la prosodia de la voz y el chip en la UI).
+    const EMOTIONS = ['neutral', 'interesado', 'esceptico', 'molesto', 'entusiasmado', 'dudoso', 'apurado'];
+    const emotion = EMOTIONS.includes(turn.emotion) ? turn.emotion : 'neutral';
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         reply: typeof turn.reply === 'string' ? turn.reply : '...',
+        emotion,
         state: { temperature: clamp(st.temperature, 35), trust: clamp(st.trust, 25), patience: clamp(st.patience, 70) },
         revealedHiddenObjection: !!turn.revealedHiddenObjection,
         thought: typeof turn.thought === 'string' ? turn.thought : '',

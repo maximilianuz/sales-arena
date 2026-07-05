@@ -10,6 +10,18 @@ import { getDefaultStages } from '../utils/defaultStages';
 import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
 import MethodScores from '../components/MethodScores';
+
+// Expresión emocional del lead por turno (la emite la IA en `emotion`).
+// El emoji + etiqueta le dan al closer feedback inmediato de cómo cayó su técnica.
+const EMOTION_META = {
+  neutral:      { emoji: '😐', es: 'neutral', en: 'neutral' },
+  interesado:   { emoji: '🙂', es: 'interesado', en: 'interested' },
+  esceptico:    { emoji: '🤨', es: 'escéptico', en: 'skeptical' },
+  molesto:      { emoji: '😠', es: 'molesto', en: 'annoyed' },
+  entusiasmado: { emoji: '😄', es: 'entusiasmado', en: 'excited' },
+  dudoso:       { emoji: '😕', es: 'dudoso', en: 'hesitant' },
+  apurado:      { emoji: '⏱️', es: 'apurado', en: 'in a hurry' }
+};
 import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices } from '../utils/voice';
 
 // Modo PRÁCTICA SOLO: el closer le vende a un comprador IA con estado real
@@ -94,12 +106,12 @@ export default function SoloPractice({ onBack }) {
 
   // Reproduce la respuesta del lead con voz (si está activada) y anima el avatar.
   // (start/submitTurn se recrean cada render, así que capturan el voiceOn actual.)
-  const playBuyerVoice = async (reply, sc) => {
+  const playBuyerVoice = async (reply, sc, emotion = 'neutral') => {
     if (!voiceOn || !reply) return;
     setSpeaking(true);
     try {
       const s = sc || scenario;
-      await speak(reply, { personalityId: s?.personality, language: i18n.language, seed: s?.demographics?.name || '' });
+      await speak(reply, { personalityId: s?.personality, language: i18n.language, seed: s?.demographics?.name || '', emotion });
     } finally {
       setSpeaking(false);
     }
@@ -142,7 +154,7 @@ export default function SoloPractice({ onBack }) {
     try {
       const turn = await buyerTurn({ scenario, state, history: nextHistory, language: i18n.language, focusStage });
       setState(turn.state);
-      setMessages([...nextHistory, { role: 'assistant', content: turn.reply }]);
+      setMessages([...nextHistory, { role: 'assistant', content: turn.reply, emotion: turn.emotion }]);
       if (turn.thought) setThoughts(t => [...t, turn.thought]);
       if (turn.outcome === 'closed' || turn.outcome === 'lost') {
         setOutcome(turn.outcome);
@@ -150,7 +162,7 @@ export default function SoloPractice({ onBack }) {
         setBusy(false);
         return;
       }
-      playBuyerVoice(turn.reply);
+      playBuyerVoice(turn.reply, null, turn.emotion);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -423,11 +435,17 @@ export default function SoloPractice({ onBack }) {
         <div ref={scrollRef} className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '1rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
           {messages.map((m, i) => (
             <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
+              {m.role !== 'user' && m.emotion && m.emotion !== 'neutral' && (
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', margin: '0 0 0.2rem 0.3rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <span>{EMOTION_META[m.emotion]?.emoji}</span>
+                  <span style={{ fontStyle: 'italic' }}>{isEn ? EMOTION_META[m.emotion]?.en : EMOTION_META[m.emotion]?.es}</span>
+                </div>
+              )}
               <div style={{
-                padding: '0.6rem 0.85rem', borderRadius: '0.9rem', fontSize: '0.9rem', lineHeight: 1.4,
+                padding: '0.6rem 0.85rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: 1.4,
                 background: m.role === 'user' ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.06)',
-                color: 'white', borderBottomRightRadius: m.role === 'user' ? '0.2rem' : '0.9rem',
-                borderBottomLeftRadius: m.role === 'user' ? '0.9rem' : '0.2rem',
+                color: 'white', borderBottomRightRadius: m.role === 'user' ? '0.2rem' : '12px',
+                borderBottomLeftRadius: m.role === 'user' ? '12px' : '0.2rem',
               }}>
                 {m.content}
               </div>
