@@ -84,7 +84,7 @@ export default function Timer({ stages, activeStageIndex, timerState, updateTime
         <Clock size={16} /> {t('timer.title')}
       </div>
 
-      <div style={{ fontSize: '4.5rem', fontWeight: '800', fontFamily: 'monospace', color: isDanger ? 'var(--danger)' : 'white', textShadow: isDanger ? '0 0 20px rgba(255, 69, 58, 0.6)' : '0 0 20px rgba(255,255,255,0.2)', lineHeight: '1', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.05em' }}>
+      <div style={{ fontSize: '4.5rem', fontWeight: '600', fontFamily: 'monospace', color: isDanger ? 'var(--danger)' : 'white', textShadow: isDanger ? '0 0 20px rgba(255, 69, 58, 0.6)' : '0 0 20px rgba(255,255,255,0.2)', lineHeight: '1', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.05em' }}>
         {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
       </div>
 

@@ -10,7 +10,7 @@ function CoachRow({ Icon, color, label, text }) {
     <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'flex-start' }}>
       <Icon size={15} color={color} style={{ marginTop: '2px', flexShrink: 0 }} />
       <div>
-        <span style={{ fontSize: '0.7rem', fontWeight: '800', letterSpacing: '0.1em', textTransform: 'uppercase', color, display: 'block', marginBottom: '2px' }}>{label}</span>
+        <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color, display: 'block', marginBottom: '2px' }}>{label}</span>
         <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>{text}</span>
       </div>
     </div>
@@ -53,7 +53,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
           <div style={{ width: '28px', height: '28px', borderRadius: '0.5rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Target size={14} color="white" />
           </div>
-          <span style={{ fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a5b4fc' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a5b4fc' }}>
             {isEn ? `Stage ${activeStage.label}` : `Etapa ${activeStage.label}`}
           </span>
           <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'rgba(165,180,252,0.5)', fontFamily: 'monospace' }}>
@@ -78,7 +78,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
         <div style={{ background: `${persona.color}12`, border: `1px solid ${persona.color}40`, borderRadius: '1rem', padding: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
             <Fingerprint size={15} color={persona.color} />
-            <span style={{ fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.12em', textTransform: 'uppercase', color: persona.color }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', color: persona.color }}>
               {isEn ? 'Lead profile' : 'Perfil del lead'}: {persona.name}
             </span>
           </div>
@@ -107,7 +107,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
         <div style={{ background: 'rgba(48,209,88,0.06)', border: '1px solid rgba(48,209,88,0.2)', borderRadius: '1rem', padding: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <MessageSquare size={15} color="var(--success)" />
-            <span style={{ fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--success)' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--success)' }}>
               {isEn ? 'Your questions for this stage' : 'Tus preguntas para esta etapa'}
             </span>
           </div>

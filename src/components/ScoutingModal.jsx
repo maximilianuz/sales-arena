@@ -75,7 +75,7 @@ export default function ScoutingModal({ onClose }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
           <Briefcase size={20} color="var(--accent)" />
-          <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>
+          <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>
             {isEn ? 'Open to offers' : 'Abierto a ofertas'}
           </h2>
         </div>

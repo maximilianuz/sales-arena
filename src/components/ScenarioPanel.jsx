@@ -126,7 +126,7 @@ function LeadActorView({ scenario }) {
       {/* Identity */}
       <div style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.12),rgba(255,55,95,0.08))', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '1rem', padding: '1.125rem' }}>
         <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.4rem' }}>🎭 {isEn ? 'You are playing' : 'Vos sos'}</div>
-        <div style={{ fontSize: '1.35rem', fontWeight: '800', color: 'white', marginBottom: '0.15rem' }}>{scenario.demographics?.name}</div>
+        <div style={{ fontSize: '1.35rem', fontWeight: '600', color: 'white', marginBottom: '0.15rem' }}>{scenario.demographics?.name}</div>
         <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>{scenario.demographics?.role} · {scenario.demographics?.industry}{scenario.demographics?.age && ` · ${scenario.demographics.age} años`}</div>
       </div>
 
@@ -366,7 +366,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
     );
     return (
       <div className="glass-panel" style={{ flex: 1 }}>
-        <div style={{ fontSize: '0.68rem', fontWeight: '800', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(139,92,246,0.65)', marginBottom: '1rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ fontSize: '0.68rem', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(139,92,246,0.65)', marginBottom: '1rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           🎭 {isEn ? 'Your character' : 'Tu personaje'}
         </div>
         <LeadActorView scenario={currentScenario} />
@@ -384,7 +384,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <UserCircle size={14} color="rgba(100,210,255,0.7)" />
-          <span style={{ fontSize: '0.7rem', fontWeight: '800', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+          <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
             {currentScenario ? 'Buyer Persona' : (isEn ? 'Configure Scenario' : 'Configurar Escenario')}
           </span>
         </div>

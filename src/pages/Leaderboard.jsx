@@ -40,13 +40,13 @@ function LeaderRow({ rank, entry, isMe, isEn, lng }) {
       background: isMe ? 'rgba(100,210,255,0.12)' : 'transparent',
       border: isMe ? '1px solid rgba(100,210,255,0.4)' : '1px solid transparent',
     }}>
-      <div style={{ width: '32px', textAlign: 'center', fontSize: medal ? '1.25rem' : '0.9rem', fontWeight: '800', color: medal ? 'inherit' : 'var(--text-muted)' }}>
+      <div style={{ width: '32px', textAlign: 'center', fontSize: medal ? '1.25rem' : '0.9rem', fontWeight: '600', color: medal ? 'inherit' : 'var(--text-muted)' }}>
         {medal || rank}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {entry.country && <span style={{ marginRight: '0.35rem' }}>{flagEmoji(entry.country)}</span>}
-          {entry.name || 'Closer'} {isMe && <span style={{ fontSize: '0.72rem', color: 'var(--primary)', fontWeight: '800' }}>{isEn ? '(you)' : '(vos)'}</span>}
+          {entry.name || 'Closer'} {isMe && <span style={{ fontSize: '0.72rem', color: 'var(--primary)', fontWeight: '600' }}>{isEn ? '(you)' : '(vos)'}</span>}
         </div>
         <div style={{ fontSize: '0.72rem', fontWeight: '700', color: tier.color, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           {tierLabel(tier, lng)}
@@ -57,7 +57,7 @@ function LeaderRow({ rank, entry, isMe, isEn, lng }) {
           <CheckCircle2 size={13} /> {entry.closes}
         </div>
       )}
-      <div style={{ fontWeight: '900', fontSize: '1.05rem', color: 'white', fontVariantNumeric: 'tabular-nums' }}>
+      <div style={{ fontWeight: '700', fontSize: '1.05rem', color: 'white', fontVariantNumeric: 'tabular-nums' }}>
         {formatMoney(entry.earnings)}
       </div>
     </div>
@@ -114,7 +114,7 @@ export default function Leaderboard({ onBack }) {
           <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
           </button>
-          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', flex: 1 }}>
+          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '600', flex: 1 }}>
             {isEn ? '🏆 Leaderboard' : '🏆 Tabla de posiciones'}
           </h1>
         </div>

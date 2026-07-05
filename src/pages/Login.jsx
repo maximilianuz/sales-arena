@@ -59,7 +59,7 @@ export default function Login() {
             <ChessKnight size={38} color="white" strokeWidth={1.5} />
           </div>
           <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: '2.2rem', fontWeight: '900', margin: 0, letterSpacing: '-0.04em', background: 'linear-gradient(135deg,#fff 40%,#c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <h1 style={{ fontSize: '2.2rem', fontWeight: '700', margin: 0, letterSpacing: '-0.04em', background: 'linear-gradient(135deg,#fff 40%,#c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Sales Arena
             </h1>
             <p style={{ margin: '0.4rem 0 0', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(196,181,253,0.55)' }}>

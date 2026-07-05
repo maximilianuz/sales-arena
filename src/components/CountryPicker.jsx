@@ -39,7 +39,7 @@ export default function CountryPicker({ current, onClose, onSaved }) {
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={onClose}>
       <div className="glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', width: '100%', maxHeight: '80vh', display: 'flex', flexDirection: 'column', padding: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', flex: 1 }}>{isEn ? 'Your country' : 'Tu país'}</h2>
+          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600', flex: 1 }}>{isEn ? 'Your country' : 'Tu país'}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.6rem', border: '1px solid rgba(255,255,255,0.12)', marginBottom: '0.75rem' }}>

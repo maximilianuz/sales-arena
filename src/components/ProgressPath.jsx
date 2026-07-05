@@ -41,10 +41,10 @@ export default function ProgressPath() {
         onClick={() => setExpanded(!expanded)}
       >
         <Map size={16} color={level.color} />
-        <span style={{ fontWeight: '800', fontSize: '0.9rem', flex: 1 }}>
+        <span style={{ fontWeight: '600', fontSize: '0.9rem', flex: 1 }}>
           {isEn ? 'Closer path' : 'Camino del Closer'}
           <span style={{
-            marginLeft: '0.6rem', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
+            marginLeft: '0.6rem', fontSize: '0.7rem', fontWeight: '600', textTransform: 'uppercase',
             letterSpacing: '0.06em', color: level.color, background: `${level.color}1f`,
             border: `1px solid ${level.color}55`, padding: '0.12rem 0.5rem', borderRadius: '2rem',
           }}>
@@ -72,7 +72,7 @@ export default function ProgressPath() {
               border: `2px solid ${st.done ? 'var(--success)' : 'rgba(255,255,255,0.2)'}`,
               background: st.done ? 'var(--success)' : 'transparent',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.6rem', color: 'white', fontWeight: '900',
+              fontSize: '0.6rem', color: 'white', fontWeight: '700',
             }}>
               {st.done ? '✓' : ''}
             </span>

@@ -37,7 +37,7 @@ function SessionCard({ entry }) {
     <div className="glass-panel" style={{ marginBottom: '1rem', padding: '1.25rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
         <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: `color-mix(in srgb, ${color} 15%, transparent)`, border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <span style={{ fontSize: '1.2rem', fontWeight: '800', color }}>{score}</span>
+          <span style={{ fontSize: '1.2rem', fontWeight: '600', color }}>{score}</span>
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontWeight: '700', marginBottom: '0.15rem' }}>{scenario?.name || 'Lead'} — {scenario?.industry || ''}</div>
@@ -121,7 +121,7 @@ export default function History({ onBack }) {
           <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
           </button>
-          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', flex: 1 }}>
+          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '600', flex: 1 }}>
             {isEn ? '📈 My History' : '📈 Mi Historial'}
           </h1>
           {sessions.length > 0 && (
@@ -145,7 +145,7 @@ export default function History({ onBack }) {
               { label: isEn ? 'Best Score' : 'Mejor Score', value: `${Math.max(...sessions.map(s => s.analysis?.overallScore || 0))}/10` }
             ].map(stat => (
               <div key={stat.label} className="glass-panel" style={{ textAlign: 'center', padding: '1rem' }}>
-                <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)' }}>{stat.value}</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: '600', color: 'var(--primary)' }}>{stat.value}</div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{stat.label}</div>
               </div>
             ))}

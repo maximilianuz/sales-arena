@@ -86,7 +86,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
           <X size={20} />
         </button>
 
-        <h2 style={{ margin: '0 0 1.5rem', fontSize: '1.4rem', fontWeight: '800' }}>
+        <h2 style={{ margin: '0 0 1.5rem', fontSize: '1.4rem', fontWeight: '600' }}>
           {isEn ? '📊 Session Analysis' : '📊 Análisis de Sesión'}
         </h2>
 
@@ -108,7 +108,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
           <div>
             {/* Score general */}
             <div style={{ textAlign: 'center', marginBottom: '1.5rem', padding: '1.5rem', background: 'rgba(79,70,229,0.1)', borderRadius: '1rem', border: '1px solid rgba(79,70,229,0.2)' }}>
-              <div style={{ fontSize: '3.5rem', fontWeight: '800', color: analysis.overallScore >= 8 ? 'var(--success)' : analysis.overallScore >= 6 ? 'var(--accent)' : 'var(--danger)' }}>
+              <div style={{ fontSize: '3.5rem', fontWeight: '600', color: analysis.overallScore >= 8 ? 'var(--success)' : analysis.overallScore >= 6 ? 'var(--accent)' : 'var(--danger)' }}>
                 {analysis.overallScore}/10
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '0.25rem', marginTop: '0.25rem' }}>
@@ -156,7 +156,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
             {/* Comisión ganada + espíritu de equipo */}
             {gamification && gamification.earned > 0 && (
               <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(48,209,88,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(48,209,88,0.25)', textAlign: 'center' }}>
-                <div style={{ fontSize: '1.6rem', fontWeight: '900', color: 'var(--success)' }}>
+                <div style={{ fontSize: '1.6rem', fontWeight: '700', color: 'var(--success)' }}>
                   +${gamification.earned.toLocaleString('en-US')}
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>

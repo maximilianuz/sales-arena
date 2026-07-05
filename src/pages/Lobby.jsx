@@ -31,6 +31,17 @@ const ROLE_META = {
   Observador:  { icon: <Eye size={22} />, color: '#8b5cf6', gradient: 'linear-gradient(135deg,#8b5cf6,#ff375f)' }
 };
 
+// Encabezado de sección del Lobby: etiqueta uppercase + línea divisoria.
+// Organiza el dashboard en zonas claras (individual / herramientas / comunidad / equipo).
+function SectionLabel({ children }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.9rem' }}>
+      <span style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{children}</span>
+      <span style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
+    </div>
+  );
+}
+
 function FeatureButton({ icon, label, accent, onClick }) {
   const [hover, setHover] = useState(false);
   return (
@@ -237,67 +248,100 @@ export default function Lobby() {
         </div>
       </nav>
 
-      {/* ── Feature buttons (centered, premium) ───────────── */}
-      <div style={{
-        position: 'relative', zIndex: 1, marginTop: '4.5rem',
-        display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', width: '100%'
-      }}>
-        <FeatureButton
-          icon={<TargetIcon size={16} />}
-          label={isEn ? 'Practice solo' : 'Practicar solo'}
-          accent="48,209,88"
-          onClick={() => setShowSolo(true)}
-        />
-        <FeatureButton
-          icon={<FileText size={16} />}
-          label={isEn ? 'VIP Proposals' : 'Propuestas VIP'}
-          accent="94,92,230"
-          onClick={() => setShowProposals(true)}
-        />
-        {tier === 'trainer' && (
-          <FeatureButton
-            icon={<BarChart2 size={16} />}
-            label="Analytics"
-            accent="139,92,246"
-            onClick={() => setShowAnalytics(true)}
-          />
-        )}
-        {isPaid && (
-          <FeatureButton
-            icon={<History size={16} />}
-            label={isEn ? 'History' : 'Historial'}
-            accent="100,210,255"
-            onClick={() => setShowHistory(true)}
-          />
-        )}
-        <FeatureButton
-          icon={<Trophy size={16} />}
-          label={isEn ? 'Leaderboard' : 'Ranking'}
-          accent="255,159,10"
-          onClick={() => setShowLeaderboard(true)}
-        />
-        {tier === 'trainer' ? (
-          <FeatureButton
-            icon={<Briefcase size={16} />}
-            label={isEn ? 'Scouting' : 'Cantera'}
-            accent="255,55,95"
-            onClick={() => setShowScouting(true)}
-          />
-        ) : (
-          <FeatureButton
-            icon={<Briefcase size={16} />}
-            label={isEn ? 'Job offers' : 'Ofertas laborales'}
-            accent="255,55,95"
-            onClick={() => setShowScoutingModal(true)}
-          />
-        )}
+      {/* ── Marca (movida fuera de la tarjeta de salas) ────── */}
+      <div style={{ position: 'relative', zIndex: 1, marginTop: '4.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.7rem' }}>
+        <div style={{
+          width: '64px', height: '64px', borderRadius: '16px',
+          background: 'linear-gradient(135deg,#0a84ff 0%,#5e5ce6 55%,#4d4ad9 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.35)'
+        }}>
+          <ChessKnight size={36} color="white" strokeWidth={1.5} />
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontSize: '2.4rem', fontWeight: '700', margin: 0, lineHeight: 1, letterSpacing: '-0.03em', color: 'white' }}>
+            Sales Arena
+          </h1>
+          <p style={{ margin: '0.45rem 0 0', fontSize: '0.72rem', fontWeight: '600', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+            AI · Multiplayer · Roleplay
+          </p>
+        </div>
+      </div>
 
-        <FeatureButton
-          icon={<Users size={16} />}
-          label={isEn ? 'Join cohort' : 'Unirme a cohorte'}
-          accent="48,209,88"
-          onClick={() => setShowJoinCohort(true)}
-        />
+      {/* ── Sección: Entrená por tu cuenta ─────────────────── */}
+      <div style={{ position: 'relative', zIndex: 1, marginTop: '2.75rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
+        <SectionLabel>{isEn ? 'Train on your own' : 'Entrená por tu cuenta'}</SectionLabel>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <FeatureButton
+            icon={<TargetIcon size={16} />}
+            label={isEn ? 'Practice solo' : 'Practicar solo'}
+            accent="48,209,88"
+            onClick={() => setShowSolo(true)}
+          />
+          {isPaid && (
+            <FeatureButton
+              icon={<History size={16} />}
+              label={isEn ? 'History' : 'Historial'}
+              accent="100,210,255"
+              onClick={() => setShowHistory(true)}
+            />
+          )}
+          {tier === 'trainer' && (
+            <FeatureButton
+              icon={<BarChart2 size={16} />}
+              label="Analytics"
+              accent="139,92,246"
+              onClick={() => setShowAnalytics(true)}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* ── Sección: Herramientas de venta ─────────────────── */}
+      <div style={{ position: 'relative', zIndex: 1, marginTop: '2rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
+        <SectionLabel>{isEn ? 'Sales tools' : 'Herramientas de venta'}</SectionLabel>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <FeatureButton
+            icon={<FileText size={16} />}
+            label={isEn ? 'VIP Proposals' : 'Propuestas VIP'}
+            accent="94,92,230"
+            onClick={() => setShowProposals(true)}
+          />
+        </div>
+      </div>
+
+      {/* ── Sección: Comunidad y carrera ───────────────────── */}
+      <div style={{ position: 'relative', zIndex: 1, marginTop: '2rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
+        <SectionLabel>{isEn ? 'Community & career' : 'Comunidad y carrera'}</SectionLabel>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <FeatureButton
+            icon={<Trophy size={16} />}
+            label={isEn ? 'Leaderboard' : 'Ranking'}
+            accent="255,159,10"
+            onClick={() => setShowLeaderboard(true)}
+          />
+          {tier === 'trainer' ? (
+            <FeatureButton
+              icon={<Briefcase size={16} />}
+              label={isEn ? 'Scouting' : 'Cantera'}
+              accent="255,55,95"
+              onClick={() => setShowScouting(true)}
+            />
+          ) : (
+            <FeatureButton
+              icon={<Briefcase size={16} />}
+              label={isEn ? 'Job offers' : 'Ofertas laborales'}
+              accent="255,55,95"
+              onClick={() => setShowScoutingModal(true)}
+            />
+          )}
+          <FeatureButton
+            icon={<Users size={16} />}
+            label={isEn ? 'Join cohort' : 'Unirme a cohorte'}
+            accent="48,209,88"
+            onClick={() => setShowJoinCohort(true)}
+          />
+        </div>
       </div>
 
       {/* ── Tarjeta de nivel / progreso (gamificación) ─────── */}
@@ -306,57 +350,42 @@ export default function Lobby() {
       {/* ── Camino del Closer (progresión Novato→Pro) ──────── */}
       <ProgressPath />
 
+      {/* ── Sección: Sesión en equipo ──────────────────────── */}
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '720px', margin: '2.5rem auto 0', padding: '0 1rem', boxSizing: 'border-box' }}>
+        <SectionLabel>{isEn ? 'Team session' : 'Sesión en equipo'}</SectionLabel>
+      </div>
+
       {/* ── Main card ──────────────────────────────────────── */}
       <div style={{
-        margin: 'auto', marginTop: '1.5rem', maxWidth: '580px', width: '100%',
+        margin: 'auto', marginTop: '0.25rem', maxWidth: '720px', width: 'calc(100% - 2rem)',
         position: 'relative', zIndex: 1,
-        background: 'rgba(15,15,30,0.75)',
-        backdropFilter: 'blur(24px)',
-        borderRadius: '1.5rem',
+        background: 'var(--bg-card)',
+        backdropFilter: 'blur(12px)',
+        borderRadius: '14px',
         border: '1px solid rgba(255,255,255,0.07)',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(100,210,255,0.08)',
-        padding: '2.5rem 2.5rem 2rem',
+        boxShadow: 'var(--shadow-lg)',
+        padding: '2rem 2rem 1.75rem',
         animation: 'modalIn 0.4s ease-out'
       }}>
 
-        {/* Hero */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem', gap: '0.75rem' }}>
-          <div style={{
-            width: '72px', height: '72px', borderRadius: '1.25rem',
-            background: 'linear-gradient(135deg,#0a84ff 0%,#5e5ce6 55%,#4d4ad9 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 40px rgba(94,92,230,0.45), 0 8px 24px rgba(0,0,0,0.3)'
-          }}>
-            <ChessKnight size={40} color="white" strokeWidth={1.5} />
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <h1 style={{
-              fontSize: '2.8rem', fontWeight: '900', margin: 0, lineHeight: 1,
-              letterSpacing: '-0.04em',
-              background: 'linear-gradient(135deg, #fff 40%, #a5b4fc)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-            }}>
-              Sales Arena
-            </h1>
-            <p style={{
-              margin: '0.5rem 0 0', fontSize: '0.78rem', fontWeight: '700',
-              letterSpacing: '0.18em', textTransform: 'uppercase',
-              color: 'rgba(165,180,252,0.6)'
-            }}>
-              AI · Multiplayer · Roleplay
-            </p>
-          </div>
+        {/* Encabezado de la zona de equipo */}
+        <div style={{ marginBottom: '1.75rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 700, color: 'white' }}>
+            {isEn ? 'Create or join a room' : 'Creá o unite a una sala'}
+          </h2>
+          <p style={{ margin: '0.4rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+            {isEn
+              ? 'Live multiplayer role-plays with your team: Closer, Lead, Observer and Facilitator.'
+              : 'Role-plays multijugador en vivo con tu equipo: Closer, Lead, Observador y Facilitador.'}
+          </p>
         </div>
-
-        {/* Divider */}
-        <div style={{ height: '1px', background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent)', marginBottom: '2rem' }} />
 
         <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
 
           {/* Step 1 — Nombre */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>1</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>1</span>
               <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.yourName')}</label>
             </div>
             <input
@@ -369,7 +398,7 @@ export default function Lobby() {
           {/* Step 2 — Sala */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>2</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>2</span>
               <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.roomId')}</label>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -392,7 +421,7 @@ export default function Lobby() {
           {/* Step 3 — Rol */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>3</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>3</span>
               <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.chooseRole')}</label>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>

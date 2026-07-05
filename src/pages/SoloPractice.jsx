@@ -10,6 +10,18 @@ import { getDefaultStages } from '../utils/defaultStages';
 import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
 import MethodScores from '../components/MethodScores';
+
+// Expresión emocional del lead por turno (la emite la IA en `emotion`).
+// El emoji + etiqueta le dan al closer feedback inmediato de cómo cayó su técnica.
+const EMOTION_META = {
+  neutral:      { emoji: '😐', es: 'neutral', en: 'neutral' },
+  interesado:   { emoji: '🙂', es: 'interesado', en: 'interested' },
+  esceptico:    { emoji: '🤨', es: 'escéptico', en: 'skeptical' },
+  molesto:      { emoji: '😠', es: 'molesto', en: 'annoyed' },
+  entusiasmado: { emoji: '😄', es: 'entusiasmado', en: 'excited' },
+  dudoso:       { emoji: '😕', es: 'dudoso', en: 'hesitant' },
+  apurado:      { emoji: '⏱️', es: 'apurado', en: 'in a hurry' }
+};
 import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices } from '../utils/voice';
 
 // Modo PRÁCTICA SOLO: el closer le vende a un comprador IA con estado real
@@ -94,12 +106,19 @@ export default function SoloPractice({ onBack }) {
 
   // Reproduce la respuesta del lead con voz (si está activada) y anima el avatar.
   // (start/submitTurn se recrean cada render, así que capturan el voiceOn actual.)
-  const playBuyerVoice = async (reply, sc) => {
+  const playBuyerVoice = async (reply, sc, emotion = 'neutral') => {
     if (!voiceOn || !reply) return;
     setSpeaking(true);
     try {
       const s = sc || scenario;
-      await speak(reply, { personalityId: s?.personality, language: i18n.language, seed: s?.demographics?.name || '' });
+      const uid = auth.currentUser?.uid;
+      await speak(reply, {
+        uid,
+        personalityId: s?.personality,
+        language: i18n.language,
+        seed: s?.demographics?.name || '',
+        emotion
+      });
     } finally {
       setSpeaking(false);
     }
@@ -142,7 +161,7 @@ export default function SoloPractice({ onBack }) {
     try {
       const turn = await buyerTurn({ scenario, state, history: nextHistory, language: i18n.language, focusStage });
       setState(turn.state);
-      setMessages([...nextHistory, { role: 'assistant', content: turn.reply }]);
+      setMessages([...nextHistory, { role: 'assistant', content: turn.reply, emotion: turn.emotion }]);
       if (turn.thought) setThoughts(t => [...t, turn.thought]);
       if (turn.outcome === 'closed' || turn.outcome === 'lost') {
         setOutcome(turn.outcome);
@@ -150,7 +169,7 @@ export default function SoloPractice({ onBack }) {
         setBusy(false);
         return;
       }
-      playBuyerVoice(turn.reply);
+      playBuyerVoice(turn.reply, null, turn.emotion);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -245,7 +264,7 @@ export default function SoloPractice({ onBack }) {
           </button>
           <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎯</div>
-            <h1 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 0.75rem' }}>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: '600', margin: '0 0 0.75rem' }}>
               {isEn ? 'Solo practice — AI Buyer' : 'Práctica solo — Comprador IA'}
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.5, margin: '0 0 1.5rem' }}>
@@ -255,7 +274,7 @@ export default function SoloPractice({ onBack }) {
             </p>
             {/* Selector: llamada completa o una etapa suelta */}
             <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
                 {isEn ? 'What do you want to practice?' : '¿Qué querés practicar?'}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
@@ -295,7 +314,7 @@ export default function SoloPractice({ onBack }) {
         <div style={{ maxWidth: '560px', width: '100%', margin: 'auto' }}>
           <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', marginBottom: '1rem' }}>
             <div style={{ fontSize: '2.5rem' }}>{outcome === 'closed' ? '🤝' : outcome === 'timeout' ? '⏰' : '📞'}</div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0.5rem 0', color: outcome === 'closed' ? 'var(--success)' : 'var(--text-muted)' }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: '600', margin: '0.5rem 0', color: outcome === 'closed' ? 'var(--success)' : 'var(--text-muted)' }}>
               {outcome === 'closed'
                 ? (isEn ? 'Deal closed!' : '¡Trato cerrado!')
                 : outcome === 'timeout'
@@ -328,12 +347,12 @@ export default function SoloPractice({ onBack }) {
           {analysis && (
             <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1rem' }}>
               <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                <div style={{ fontSize: '3rem', fontWeight: '900', color: analysis.overallScore >= 8 ? 'var(--success)' : analysis.overallScore >= 6 ? 'var(--accent)' : 'var(--danger)' }}>
+                <div style={{ fontSize: '3rem', fontWeight: '700', color: analysis.overallScore >= 8 ? 'var(--success)' : analysis.overallScore >= 6 ? 'var(--accent)' : 'var(--danger)' }}>
                   {analysis.overallScore}/10
                 </div>
                 {analysis.gamification?.earned > 0 && (
                   <div>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--success)', fontWeight: '800', marginTop: '0.25rem' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--success)', fontWeight: '600', marginTop: '0.25rem' }}>
                       <Trophy size={16} /> +${analysis.gamification.earned.toLocaleString('en-US')}
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
@@ -423,11 +442,17 @@ export default function SoloPractice({ onBack }) {
         <div ref={scrollRef} className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '1rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
           {messages.map((m, i) => (
             <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
+              {m.role !== 'user' && m.emotion && m.emotion !== 'neutral' && (
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', margin: '0 0 0.2rem 0.3rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <span>{EMOTION_META[m.emotion]?.emoji}</span>
+                  <span style={{ fontStyle: 'italic' }}>{isEn ? EMOTION_META[m.emotion]?.en : EMOTION_META[m.emotion]?.es}</span>
+                </div>
+              )}
               <div style={{
-                padding: '0.6rem 0.85rem', borderRadius: '0.9rem', fontSize: '0.9rem', lineHeight: 1.4,
+                padding: '0.6rem 0.85rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: 1.4,
                 background: m.role === 'user' ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.06)',
-                color: 'white', borderBottomRightRadius: m.role === 'user' ? '0.2rem' : '0.9rem',
-                borderBottomLeftRadius: m.role === 'user' ? '0.9rem' : '0.2rem',
+                color: 'white', borderBottomRightRadius: m.role === 'user' ? '0.2rem' : '12px',
+                borderBottomLeftRadius: m.role === 'user' ? '12px' : '0.2rem',
               }}>
                 {m.content}
               </div>

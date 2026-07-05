@@ -79,7 +79,7 @@ export default function WorldClockPanel({ roomId, userName, onClose }) {
       <div className="glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '420px', width: '100%', maxHeight: '80vh', overflowY: 'auto', padding: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
           <Globe size={18} color="var(--primary)" />
-          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', flex: 1 }}>{isEn ? 'Time zones' : 'Husos horarios'}</h2>
+          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600', flex: 1 }}>{isEn ? 'Time zones' : 'Husos horarios'}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
         </div>
 
@@ -97,14 +97,14 @@ export default function WorldClockPanel({ roomId, userName, onClose }) {
               <span style={{ fontSize: '1.3rem', width: '26px', textAlign: 'center' }}>{r.country ? flagEmoji(r.country) : '🌐'}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: '700', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {r.name}{isMe && <span style={{ color: 'var(--primary)', fontSize: '0.72rem', fontWeight: '800' }}> {isEn ? '(you)' : '(vos)'}</span>}
+                  {r.name}{isMe && <span style={{ color: 'var(--primary)', fontSize: '0.72rem', fontWeight: '600' }}> {isEn ? '(you)' : '(vos)'}</span>}
                 </div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                   {r.country ? countryName(r.country, i18n.language) + ' · ' : ''}{r.tz}
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontWeight: '800', fontVariantNumeric: 'tabular-nums' }}>{localTime(r.tz, now)}</div>
+                <div style={{ fontWeight: '600', fontVariantNumeric: 'tabular-nums' }}>{localTime(r.tz, now)}</div>
                 {!isMe && diff !== 0 && (
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                     {diff > 0 ? '+' : ''}{diff}h {isEn ? 'vs you' : 'vs vos'}

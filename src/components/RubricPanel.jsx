@@ -24,7 +24,7 @@ export default function RubricPanel({ rubric, updateRubric, canScore }) {
           <ClipboardCheck size={18} color="var(--primary)" />
           <span style={{ fontWeight: '700', fontSize: '1rem' }}>{isEn ? 'Evaluation rubric' : 'Rúbrica de evaluación'}</span>
         </div>
-        {avg != null && <span style={{ fontWeight: '800', color: avgColor, fontSize: '1.1rem' }}>{avg}/5</span>}
+        {avg != null && <span style={{ fontWeight: '600', color: avgColor, fontSize: '1.1rem' }}>{avg}/5</span>}
       </div>
 
       {!canScore && (
