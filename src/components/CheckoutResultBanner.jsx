@@ -13,11 +13,11 @@ export default function CheckoutResultBanner({ checkout }) {
     <div style={{
       position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)',
       zIndex: 500, padding: '1rem 2rem', borderRadius: '2rem',
-      background: closed ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+      background: closed ? 'rgba(48,209,88,0.15)' : 'rgba(255,69,58,0.15)',
       border: `1px solid ${closed ? 'var(--success)' : 'var(--danger)'}`,
       backdropFilter: 'blur(12px)',
       display: 'flex', alignItems: 'center', gap: '0.75rem',
-      boxShadow: `0 8px 32px ${closed ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+      boxShadow: `0 8px 32px ${closed ? 'rgba(48,209,88,0.3)' : 'rgba(255,69,58,0.3)'}`,
       animation: 'modalIn 0.4s ease-out'
     }}>
       <span style={{ fontSize: '1.5rem' }}>{closed ? '🎉' : '😔'}</span>

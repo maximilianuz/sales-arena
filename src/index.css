@@ -1,34 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-
 :root {
-  /* Paleta de marca — alineada al favicon (celeste → púrpura → violeta) */
-  --primary: #863bff; /* Púrpura favicon */
-  --primary-hover: #7e14ff; /* Violeta profundo */
-  --primary-glow: rgba(134, 59, 255, 0.4);
-  --brand-cyan: #47bfff; /* Acento celeste del favicon */
+  /* Paleta refinada — colores de sistema estilo Apple (dark mode) */
+  --primary: #5e5ce6; /* systemIndigo */
+  --primary-hover: #4d4ad9;
+  --primary-glow: rgba(94, 92, 230, 0.35);
+  --brand-cyan: #0a84ff; /* systemBlue */
 
-  --secondary: #ec4899; /* Pink 500 — color semántico (objeciones) */
-  --secondary-hover: #db2777;
-  --secondary-glow: rgba(236, 72, 153, 0.4);
+  --secondary: #ff375f; /* systemPink — color semántico (objeciones) */
+  --secondary-hover: #e6314f;
+  --secondary-glow: rgba(255, 55, 95, 0.35);
 
-  --accent: #f59e0b; /* Amber 500 — urgencia */
-  --success: #10b981; /* Emerald 500 */
-  --success-glow: rgba(16, 185, 129, 0.3);
-  --danger: #ef4444; /* Red 500 */
-  
+  --accent: #ff9f0a; /* systemOrange — urgencia */
+  --success: #30d158; /* systemGreen */
+  --success-glow: rgba(48, 209, 88, 0.3);
+  --danger: #ff453a; /* systemRed */
+
   /* Deep Dark Theme */
-  --bg-dark: #09090b; /* Zinc 950 */
-  --bg-card: rgba(24, 24, 27, 0.65); /* Zinc 900 semi-transparent */
-  
-  --text-main: #f8fafc; /* Slate 50 */
-  --text-muted: #94a3b8; /* Slate 400 */
-  
-  /* Advanced Glassmorphism */
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-highlight: rgba(255, 255, 255, 0.15);
-  --glass-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-  
-  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  --bg-dark: #09090b;
+  --bg-card: rgba(24, 24, 27, 0.75);
+
+  --text-main: #f5f5f7; /* Gris claro Apple */
+  --text-muted: #98989d; /* systemGray Apple dark */
+
+  /* Superficies: sombras definidas en lugar de glassmorphism pesado */
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-highlight: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Escala de sombras */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.35);
+
+  /* Radios contenidos (Apple usa 10–14px) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+
+  /* Transición estándar */
+  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color-scheme: dark;
 }
 
@@ -43,9 +54,9 @@ body {
   background-color: var(--bg-dark);
   /* Animated Mesh Gradient Background */
   background-image:
-    radial-gradient(circle at 15% 50%, rgba(134, 59, 255, 0.13), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(71, 191, 255, 0.10), transparent 25%),
-    radial-gradient(circle at 50% 80%, rgba(126, 20, 255, 0.08), transparent 25%);
+    radial-gradient(circle at 15% 50%, rgba(94, 92, 230, 0.07), transparent 30%),
+    radial-gradient(circle at 85% 30%, rgba(10, 132, 255, 0.05), transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(94, 92, 230, 0.04), transparent 30%);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
@@ -91,7 +102,7 @@ body {
 
 /* Premium Buttons */
 .btn {
-  font-family: 'Outfit', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 600;
   font-size: 0.95rem;
   padding: 0.75rem 1.5rem;
@@ -157,7 +168,7 @@ body {
 
 /* Typography Refinements */
 h1, h2, h3, h4 {
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
@@ -183,7 +194,7 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
   border-color: var(--primary);
   background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 0 2px rgba(134, 59, 255, 0.25);
+  box-shadow: 0 0 0 2px rgba(94, 92, 230, 0.25);
 }
 
 select option {
@@ -229,7 +240,7 @@ input::placeholder, textarea::placeholder {
   padding: 2.25rem;
   width: 100%;
   max-width: 550px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(134, 59, 255, 0.1);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(94, 92, 230, 0.1);
   animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -267,11 +278,11 @@ input::placeholder, textarea::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Paleta original del favicon: celeste #47bfff → púrpura #863bff → violeta #7e14ff */
-  background: linear-gradient(135deg, #47bfff 0%, #863bff 55%, #7e14ff 100%);
+  /* Paleta original del favicon: celeste #0a84ff → púrpura #5e5ce6 → violeta #4d4ad9 */
+  background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 55%, #4d4ad9 100%);
   border-radius: 1rem;
   margin-bottom: 1rem;
-  box-shadow: 0 10px 25px rgba(134, 59, 255, 0.4);
+  box-shadow: 0 10px 25px rgba(94, 92, 230, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 80px;
   height: 80px;
@@ -280,6 +291,18 @@ input::placeholder, textarea::placeholder {
 
 .logo-container:hover {
   transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 15px 35px rgba(134, 59, 255, 0.6);
+  box-shadow: 0 15px 35px rgba(94, 92, 230, 0.6);
   filter: brightness(1.1);
+}
+
+/* ── Propuestas VIP: builder responsive ─────────────────────────────── */
+/* Dos columnas (form + preview) en desktop, una sola en mobile.        */
+.proposal-builder-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+  .proposal-builder-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -9,7 +9,7 @@ export default function PrivateInfoModal({ info, onClose }) {
       <div className="modal-content" style={{ maxWidth: '460px' }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '0.65rem', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '0.65rem', background: 'rgba(255,69,58,0.15)', border: '1px solid rgba(255,69,58,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <EyeOff size={18} color="var(--danger)" />
             </div>
             <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: '700' }}>{t('privateInfo.title')}</h2>
@@ -19,7 +19,7 @@ export default function PrivateInfoModal({ info, onClose }) {
           </button>
         </div>
 
-        <div style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '0.875rem', padding: '1.25rem', fontSize: '1.05rem', lineHeight: '1.6' }}>
+        <div style={{ background: 'rgba(255,69,58,0.06)', border: '1px solid rgba(255,69,58,0.2)', borderRadius: '0.875rem', padding: '1.25rem', fontSize: '1.05rem', lineHeight: '1.6' }}>
           {info ? info : <span style={{ color: 'var(--text-muted)' }}>{t('privateInfo.empty')}</span>}
         </div>
 

@@ -3,9 +3,9 @@ import { BarChart2, RotateCcw, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const INITIAL_QUESTIONS = [
-  { id: 1, question: "¿Encontró la objeción real?", options: [{ text: "Sí", votes: 0, color: "16,185,129" }, { text: "No", votes: 0, color: "239,68,68" }] },
-  { id: 2, question: "¿Quién tuvo el control?", options: [{ text: "Cliente", votes: 0, color: "236,72,153" }, { text: "Vendedor", votes: 0, color: "99,102,241" }] },
-  { id: 3, question: "¿Qué faltó?", options: [{ text: "Más preguntas", votes: 0, color: "245,158,11" }, { text: "Mejor escucha", votes: 0, color: "139,92,246" }, { text: "Mejor cierre", votes: 0, color: "6,182,212" }] }
+  { id: 1, question: "¿Encontró la objeción real?", options: [{ text: "Sí", votes: 0, color: "48,209,88" }, { text: "No", votes: 0, color: "255,69,58" }] },
+  { id: 2, question: "¿Quién tuvo el control?", options: [{ text: "Cliente", votes: 0, color: "255,55,95" }, { text: "Vendedor", votes: 0, color: "100,210,255" }] },
+  { id: 3, question: "¿Qué faltó?", options: [{ text: "Más preguntas", votes: 0, color: "255,159,10" }, { text: "Mejor escucha", votes: 0, color: "139,92,246" }, { text: "Mejor cierre", votes: 0, color: "6,182,212" }] }
 ];
 
 export default function VotingPanel({ isObserver, isFacilitator, questions = [], updateQuestions, activeStage }) {
@@ -26,13 +26,13 @@ export default function VotingPanel({ isObserver, isFacilitator, questions = [],
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <BarChart2 size={14} color="rgba(99,102,241,0.7)" />
+          <BarChart2 size={14} color="rgba(100,210,255,0.7)" />
           <span style={{ fontSize: '0.7rem', fontWeight: '800', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
             {t('voting.title')}
           </span>
         </div>
         {isFacilitator && (
-          <button onClick={handleReset} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.6rem', borderRadius: '0.5rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'rgba(239,68,68,0.7)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: '600' }}>
+          <button onClick={handleReset} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.6rem', borderRadius: '0.5rem', background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.2)', color: 'rgba(255,69,58,0.7)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: '600' }}>
             <RotateCcw size={11} /> {t('voting.reset')}
           </button>
         )}
@@ -40,7 +40,7 @@ export default function VotingPanel({ isObserver, isFacilitator, questions = [],
 
       {/* Active stage focus */}
       {activeStage && (
-        <div style={{ background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.18)', padding: '0.65rem 0.875rem', borderRadius: '0.625rem', marginBottom: '1.125rem', fontSize: '0.8rem' }}>
+        <div style={{ background: 'rgba(100,210,255,0.07)', border: '1px solid rgba(100,210,255,0.18)', padding: '0.65rem 0.875rem', borderRadius: '0.625rem', marginBottom: '1.125rem', fontSize: '0.8rem' }}>
           <span style={{ color: 'rgba(165,180,252,0.7)', fontWeight: '600' }}>{isEn ? 'Evaluating:' : 'Evaluando:'}</span>
           <span style={{ color: 'rgba(165,180,252,0.5)', marginLeft: '0.4rem' }}>{activeStage.label}</span>
         </div>

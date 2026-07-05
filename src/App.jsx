@@ -12,6 +12,9 @@ import './App.css';
 // lentas). Login queda estático porque es la primera pantalla y no debe parpadear.
 const Lobby = lazy(() => import('./pages/Lobby'));
 const Room = lazy(() => import('./pages/Room'));
+// Vista pública de propuestas VIP (/p/:id). Se carga solo cuando un prospecto
+// abre el link, y esquiva por completo el login (no necesita cuenta).
+const PublicProposal = lazy(() => import('./modules/proposals/PublicProposal'));
 
 function RouteFallback() {
   return (
@@ -54,6 +57,16 @@ function App() {
     const unsubscribe = subscribeToAuthState(setUser);
     return () => unsubscribe();
   }, []);
+
+  // Ruta pública: si la URL es /p/:id mostramos la propuesta sin pedir login.
+  // Va antes de cualquier chequeo de sesión para que el prospecto la vea directo.
+  if (window.location.pathname.startsWith('/p/')) {
+    return (
+      <Suspense fallback={<RouteFallback />}>
+        <PublicProposal />
+      </Suspense>
+    );
+  }
 
   if (user === undefined) {
     return (

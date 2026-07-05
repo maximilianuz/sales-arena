@@ -213,7 +213,7 @@ export default function TrainerAnalytics({ onBack }) {
         </div>
 
         {/* Cohort code card */}
-        <div className="glass-panel" style={{ marginBottom: '1.5rem', border: '1px solid rgba(99,102,241,0.3)', background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05))' }}>
+        <div className="glass-panel" style={{ marginBottom: '1.5rem', border: '1px solid rgba(100,210,255,0.3)', background: 'linear-gradient(135deg, rgba(100,210,255,0.08), rgba(139,92,246,0.05))' }}>
           <div style={{ fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(165,180,252,0.7)', marginBottom: '0.5rem' }}>
             {isEn ? 'Your cohort code' : 'Tu código de cohorte'}
           </div>
@@ -227,7 +227,7 @@ export default function TrainerAnalytics({ onBack }) {
               <div style={{ fontFamily: 'monospace', fontSize: '1.6rem', fontWeight: '800', letterSpacing: '0.1em', color: 'white', background: 'rgba(0,0,0,0.3)', padding: '0.5rem 1.25rem', borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.1)' }}>
                 {code || '···'}
               </div>
-              <button onClick={copyCode} disabled={!code} style={{ padding: '0.6rem 0.9rem', borderRadius: '0.75rem', background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'var(--success)' : 'rgba(255,255,255,0.1)'}`, color: copied ? 'var(--success)' : 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+              <button onClick={copyCode} disabled={!code} style={{ padding: '0.6rem 0.9rem', borderRadius: '0.75rem', background: copied ? 'rgba(48,209,88,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'var(--success)' : 'rgba(255,255,255,0.1)'}`, color: copied ? 'var(--success)' : 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
                 {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
                 {copied ? (isEn ? 'Copied' : 'Copiado') : (isEn ? 'Copy' : 'Copiar')}
               </button>

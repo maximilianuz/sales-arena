@@ -63,7 +63,7 @@ function SessionCard({ entry }) {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-            <div style={{ padding: '0.75rem', background: 'rgba(16,185,129,0.07)', borderRadius: '0.5rem', border: '1px solid rgba(16,185,129,0.15)' }}>
+            <div style={{ padding: '0.75rem', background: 'rgba(48,209,88,0.07)', borderRadius: '0.5rem', border: '1px solid rgba(48,209,88,0.15)' }}>
               <div style={{ color: 'var(--success)', fontWeight: '700', fontSize: '0.8rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <TrendingUp size={13} /> {isEn ? 'Went well' : 'Salió bien'}
               </div>
@@ -71,7 +71,7 @@ function SessionCard({ entry }) {
                 <div key={i} style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>✓ {item}</div>
               ))}
             </div>
-            <div style={{ padding: '0.75rem', background: 'rgba(239,68,68,0.07)', borderRadius: '0.5rem', border: '1px solid rgba(239,68,68,0.15)' }}>
+            <div style={{ padding: '0.75rem', background: 'rgba(255,69,58,0.07)', borderRadius: '0.5rem', border: '1px solid rgba(255,69,58,0.15)' }}>
               <div style={{ color: 'var(--danger)', fontWeight: '700', fontSize: '0.8rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <TrendingDown size={13} /> {isEn ? 'To improve' : 'A mejorar'}
               </div>
@@ -81,7 +81,7 @@ function SessionCard({ entry }) {
             </div>
           </div>
 
-          <div style={{ padding: '0.75rem', background: 'rgba(245,158,11,0.07)', borderRadius: '0.5rem', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', gap: '0.5rem' }}>
+          <div style={{ padding: '0.75rem', background: 'rgba(255,159,10,0.07)', borderRadius: '0.5rem', border: '1px solid rgba(255,159,10,0.15)', display: 'flex', gap: '0.5rem' }}>
             <Lightbulb size={15} color="var(--accent)" style={{ flexShrink: 0, marginTop: '2px' }} />
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{analysis.nextSessionTip}</span>
           </div>

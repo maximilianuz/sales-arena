@@ -7,7 +7,7 @@
 export const LEVELS = [
   { id: 'novato',     icon: '🌱', es: 'Novato',     en: 'Beginner',     color: '#94a3b8' },
   { id: 'intermedio', icon: '⚔️', es: 'Intermedio', en: 'Intermediate', color: '#22d3ee' },
-  { id: 'pro',        icon: '🦈', es: 'Pro',        en: 'Pro',          color: '#f59e0b' },
+  { id: 'pro',        icon: '🦈', es: 'Pro',        en: 'Pro',          color: '#ff9f0a' },
 ];
 
 // Pasos por nivel. `done` es un predicado sobre stats. `teamOnly`/`soloOnly`

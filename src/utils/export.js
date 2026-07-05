@@ -51,7 +51,7 @@ export function exportHistoryPDF(sessions, userEmail, isEn = false) {
 
   const rows = sessions.map(s => {
     const a = s.analysis || {};
-    const color = (a.overallScore || 0) >= 8 ? '#10b981' : (a.overallScore || 0) >= 6 ? '#f59e0b' : '#ef4444';
+    const color = (a.overallScore || 0) >= 8 ? '#30d158' : (a.overallScore || 0) >= 6 ? '#ff9f0a' : '#ff453a';
     return `<tr>
       <td>${dateStr(s.savedAt, isEn)}</td>
       <td>${esc(s.scenario?.name)} <span class="muted">· ${esc(s.scenario?.industry)}</span></td>
@@ -102,7 +102,7 @@ export function exportCohortPDF(students, trainerEmail, isEn = false) {
     const sessions = Object.values(st.sessions || {});
     const avg = sessions.length ? sessions.reduce((s, x) => s + (x.overallScore || 0), 0) / sessions.length : 0;
     const best = sessions.length ? Math.max(...sessions.map(s => s.overallScore || 0)) : '—';
-    const color = avg >= 8 ? '#10b981' : avg >= 6 ? '#f59e0b' : '#ef4444';
+    const color = avg >= 8 ? '#30d158' : avg >= 6 ? '#ff9f0a' : '#ff453a';
     return `<tr>
       <td>${esc(st.profile?.name)} <span class="muted">${esc(st.profile?.email || '')}</span></td>
       <td style="text-align:center">${sessions.length}</td>
@@ -141,13 +141,13 @@ function openPrintReport(title, subtitle, bodyHtml) {
     <style>
       * { box-sizing: border-box; }
       body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; color: #1a1a2e; margin: 0; padding: 40px; }
-      .header { display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #863bff; padding-bottom: 16px; margin-bottom: 8px; }
-      .logo { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg,#47bfff,#863bff,#7e14ff); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 20px; }
+      .header { display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #5e5ce6; padding-bottom: 16px; margin-bottom: 8px; }
+      .logo { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg,#0a84ff,#5e5ce6,#4d4ad9); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 20px; }
       h1 { font-size: 22px; margin: 0; }
       .subtitle { color: #666; font-size: 13px; margin: 2px 0 24px; }
       .stats { display: flex; gap: 16px; margin-bottom: 28px; }
       .stat { flex: 1; background: #f5f3ff; border: 1px solid #e5e0ff; border-radius: 12px; padding: 16px; text-align: center; }
-      .stat-num { font-size: 28px; font-weight: 800; color: #863bff; }
+      .stat-num { font-size: 28px; font-weight: 800; color: #5e5ce6; }
       .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
       table { width: 100%; border-collapse: collapse; font-size: 13px; }
       th { text-align: left; padding: 10px 12px; background: #f8f8fc; border-bottom: 2px solid #e5e0ff; color: #555; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }

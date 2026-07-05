@@ -8,7 +8,7 @@ export const TIERS = [
   { id: 'junior',  es: 'Junior Closer',  en: 'Junior Closer', min: 2000,   color: '#22d3ee' },
   { id: 'closer',  es: 'Closer',         en: 'Closer',        min: 8000,   color: '#34d399' },
   { id: 'senior',  es: 'Senior Closer',  en: 'Senior Closer', min: 25000,  color: '#a78bfa' },
-  { id: 'elite',   es: 'Closer Élite',   en: 'Elite Closer',  min: 60000,  color: '#f59e0b' },
+  { id: 'elite',   es: 'Closer Élite',   en: 'Elite Closer',  min: 60000,  color: '#ff9f0a' },
   { id: 'maestro', es: 'Maestro Closer', en: 'Master Closer', min: 150000, color: '#f43f5e' },
 ];
 

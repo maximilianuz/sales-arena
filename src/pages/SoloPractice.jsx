@@ -18,7 +18,7 @@ import { micSupported, speechSupported, startRecording, transcribe, speak, stopS
 // humanas → suma a la cuenta de comisiones y la gamificación.
 
 const METERS = [
-  { key: 'temperature', icon: Flame, es: 'Interés', en: 'Interest', color: '#f59e0b' },
+  { key: 'temperature', icon: Flame, es: 'Interés', en: 'Interest', color: '#ff9f0a' },
   { key: 'trust', icon: Shield, es: 'Confianza', en: 'Trust', color: '#22d3ee' },
   { key: 'patience', icon: Clock, es: 'Paciencia', en: 'Patience', color: '#a78bfa' },
 ];
@@ -352,7 +352,7 @@ export default function SoloPractice({ onBack }) {
                 </div>
               )}
               {analysis.nextSessionTip && (
-                <p style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(245,158,11,0.08)', borderRadius: '0.6rem', fontSize: '0.87rem', color: 'var(--text-muted)' }}>
+                <p style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(255,159,10,0.08)', borderRadius: '0.6rem', fontSize: '0.87rem', color: 'var(--text-muted)' }}>
                   💡 {analysis.nextSessionTip}
                 </p>
               )}
@@ -383,23 +383,23 @@ export default function SoloPractice({ onBack }) {
                 <Clock size={13} /> {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
               </span>
               {focusStage && (
-                <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.3)', padding: '0.15rem 0.5rem', borderRadius: '2rem' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.3)', padding: '0.15rem 0.5rem', borderRadius: '2rem' }}>
                   {focusStage.label}
                 </span>
               )}
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button onClick={() => setShowCoach(true)} title={isEn ? 'Closer guide' : 'Guía del closer'}
-                style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.35)', borderRadius: '0.6rem', padding: '0.45rem 0.7rem', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: '700' }}>
+                style={{ background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', borderRadius: '0.6rem', padding: '0.45rem 0.7rem', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: '700' }}>
                 <BookOpen size={16} /> {isEn ? 'Guide' : 'Guía'}
               </button>
               {speechSupported() && (
                 <button onClick={() => { if (voiceOn) stopSpeaking(); setVoiceOn(v => !v); }} title={isEn ? 'Toggle voice' : 'Voz on/off'}
-                  style={{ background: voiceOn ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${voiceOn ? 'var(--success)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '0.6rem', padding: '0.45rem', color: voiceOn ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
+                  style={{ background: voiceOn ? 'rgba(48,209,88,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${voiceOn ? 'var(--success)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '0.6rem', padding: '0.45rem', color: voiceOn ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
                   {voiceOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
                 </button>
               )}
-              <button onClick={hangUp} title={isEn ? 'Hang up' : 'Colgar'} style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '0.6rem', padding: '0.45rem', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
+              <button onClick={hangUp} title={isEn ? 'Hang up' : 'Colgar'} style={{ background: 'rgba(255,69,58,0.12)', border: '1px solid rgba(255,69,58,0.3)', borderRadius: '0.6rem', padding: '0.45rem', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
                 <PhoneOff size={16} />
               </button>
             </div>

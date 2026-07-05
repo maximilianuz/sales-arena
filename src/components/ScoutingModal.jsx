@@ -91,7 +91,7 @@ export default function ScoutingModal({ onClose }) {
           style={{
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '0.85rem 1rem', borderRadius: '0.75rem', cursor: 'pointer', marginBottom: '1rem',
-            background: openToWork ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.04)',
+            background: openToWork ? 'rgba(48,209,88,0.12)' : 'rgba(255,255,255,0.04)',
             border: `1px solid ${openToWork ? 'var(--success)' : 'rgba(255,255,255,0.1)'}`,
             color: 'white', fontWeight: '700', fontSize: '0.9rem'
           }}

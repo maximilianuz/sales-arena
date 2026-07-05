@@ -76,15 +76,15 @@ export default function Timer({ stages, activeStageIndex, timerState, updateTime
   return (
     <div className="glass-panel" style={{
       textAlign: 'center', marginBottom: '1.5rem',
-      border: isDanger ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid var(--glass-border)',
-      boxShadow: isDanger ? '0 0 30px rgba(239, 68, 68, 0.2)' : 'var(--glass-shadow)',
+      border: isDanger ? '1px solid rgba(255, 69, 58, 0.4)' : '1px solid var(--glass-border)',
+      boxShadow: isDanger ? '0 0 30px rgba(255, 69, 58, 0.2)' : 'var(--glass-shadow)',
       transition: 'all 0.5s ease'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: isDanger ? 'var(--danger)' : 'var(--text-muted)', marginBottom: '0.75rem', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '0.1em', fontWeight: '700' }}>
         <Clock size={16} /> {t('timer.title')}
       </div>
 
-      <div style={{ fontSize: '4.5rem', fontWeight: '800', fontFamily: 'monospace', color: isDanger ? 'var(--danger)' : 'white', textShadow: isDanger ? '0 0 20px rgba(239, 68, 68, 0.6)' : '0 0 20px rgba(255,255,255,0.2)', lineHeight: '1', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.05em' }}>
+      <div style={{ fontSize: '4.5rem', fontWeight: '800', fontFamily: 'monospace', color: isDanger ? 'var(--danger)' : 'white', textShadow: isDanger ? '0 0 20px rgba(255, 69, 58, 0.6)' : '0 0 20px rgba(255,255,255,0.2)', lineHeight: '1', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.05em' }}>
         {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
       </div>
 

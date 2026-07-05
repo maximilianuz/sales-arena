@@ -3,9 +3,9 @@ import { MessageSquare, CheckSquare, Target, RotateCcw, Activity, ShieldAlert } 
 import { useTranslation } from 'react-i18next';
 
 const MARKERS = [
-  { type: 'good',        emoji: '🟢', color: '16,185,129',  label: { es: 'Brillante',   en: 'Brilliant' } },
-  { type: 'opportunity', emoji: '🟡', color: '245,158,11',  label: { es: 'Oportunidad', en: 'Opportunity' } },
-  { type: 'error',       emoji: '🔴', color: '239,68,68',   label: { es: 'Error',        en: 'Error' } }
+  { type: 'good',        emoji: '🟢', color: '48,209,88',  label: { es: 'Brillante',   en: 'Brilliant' } },
+  { type: 'opportunity', emoji: '🟡', color: '255,159,10',  label: { es: 'Oportunidad', en: 'Opportunity' } },
+  { type: 'error',       emoji: '🔴', color: '255,69,58',   label: { es: 'Error',        en: 'Error' } }
 ];
 
 export default function DebriefPanel({ activeStageIndex, stages, roomNotes, updateNotes, isFacilitator }) {
@@ -123,7 +123,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
           </span>
         </div>
         {isFacilitator && (
-          <button onClick={clearDebrief} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.6rem', borderRadius: '0.5rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'rgba(239,68,68,0.7)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: '600' }}>
+          <button onClick={clearDebrief} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.6rem', borderRadius: '0.5rem', background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.2)', color: 'rgba(255,69,58,0.7)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: '600' }}>
             <RotateCcw size={11} /> {t('debrief.clear')}
           </button>
         )}
@@ -209,7 +209,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
                     background: isChecked ? 'var(--success)' : 'rgba(0,0,0,0.2)',
                     color: isChecked ? 'white' : 'var(--text-muted)',
                     border: isChecked ? 'none' : '1px solid var(--glass-border)',
-                    boxShadow: isChecked ? '0 0 10px rgba(16, 185, 129, 0.3)' : 'none',
+                    boxShadow: isChecked ? '0 0 10px rgba(48, 209, 88, 0.3)' : 'none',
                     transition: 'all 0.2s',
                     fontWeight: isChecked ? '600' : 'normal'
                   }}
@@ -275,14 +275,14 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
                 onBlur={handleBlurObjection}
                 readOnly={!updateNotes}
                 placeholder={updateNotes ? "¿Logró aislar la excusa falsa y encontrar la verdadera razón por la que no querían comprar?" : "Esperando notas del Observador..."}
-                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)' }}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(255, 159, 10, 0.05)', border: '1px solid rgba(255, 159, 10, 0.2)' }}
               />
             </div>
           </div>
 
           {/* EVALUACIÓN DEL LEAD */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(16, 185, 129, 0.3)', paddingBottom: '0.5rem' }}>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(48, 209, 88, 0.3)', paddingBottom: '0.5rem' }}>
               <Target size={18} /> Análisis del Lead
             </h3>
             
@@ -298,7 +298,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
                 onBlur={handleBlurLeadPain}
                 readOnly={!updateNotes}
                 placeholder={updateNotes ? "¿Cuál fue el verdadero dolor o motivación del Lead que pudiste detectar como observador?" : "Esperando notas del Observador..."}
-                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(48, 209, 88, 0.05)', border: '1px solid rgba(48, 209, 88, 0.2)' }}
               />
             </div>
 
@@ -314,7 +314,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
                 onBlur={handleBlurLeadSignals}
                 readOnly={!updateNotes}
                 placeholder={updateNotes ? "¿Qué señales de compra o de resistencia notaste en su voz/actitud?" : "Esperando notas del Observador..."}
-                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(48, 209, 88, 0.05)', border: '1px solid rgba(48, 209, 88, 0.2)' }}
               />
             </div>
 
@@ -330,7 +330,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
                 onBlur={handleBlurLeadObjection}
                 readOnly={!updateNotes}
                 placeholder={updateNotes ? "¿Por qué realmente puso objeciones? (ej. falta de confianza, miedo al riesgo, etc.)" : "Esperando notas del Observador..."}
-                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)' }}
+                style={{ flex: 1, minHeight: '60px', resize: 'none', background: !updateNotes ? 'rgba(0,0,0,0.1)' : 'rgba(48, 209, 88, 0.05)', border: '1px solid rgba(48, 209, 88, 0.2)' }}
               />
             </div>
           </div>
