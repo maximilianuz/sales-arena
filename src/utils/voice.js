@@ -114,14 +114,23 @@ let cachedVoices = null;
 // Elige una voz REAL del sistema: primero filtra por idioma, luego se queda con
 // el grupo de MEJOR calidad disponible, y dentro de ese grupo la personalidad
 // + el lead (seed) eligen determinísticamente → timbres variados pero humanos.
-function pickVoice(langPrefix, personalityId, seed) {
+const VOICE_NAME_FEMALE = /female|mujer|monica|paulina|helena|francisca|isabela|camila|lupe|penelope|sabina|elvira|conchita|lucia|mia|zira|sofia|laura|elena/i;
+const VOICE_NAME_MALE = /(^|\b)male\b|hombre|jorge|diego|carlos|juan|enrique|miguel|raul|pablo|andres|david|alvaro|arnau/i;
+
+function pickVoice(langPrefix, personalityId, seed, gender = 'male') {
   const synth = window.speechSynthesis;
   cachedVoices = (cachedVoices && cachedVoices.length) ? cachedVoices : synth.getVoices();
   const match = cachedVoices.filter(v => v.lang?.toLowerCase().startsWith(langPrefix));
   if (!match.length) return null;
-  const best = Math.max(...match.map(voiceQuality));
+  // Filtro de género: si hay voces identificables del género buscado, usarlas.
+  const wanted = gender === 'female' ? VOICE_NAME_FEMALE : VOICE_NAME_MALE;
+  const opposite = gender === 'female' ? VOICE_NAME_MALE : VOICE_NAME_FEMALE;
+  const genderMatch = match.filter(v => wanted.test(v.name || ''));
+  const nonOpposite = match.filter(v => !opposite.test(v.name || ''));
+  const base = genderMatch.length ? genderMatch : (nonOpposite.length ? nonOpposite : match);
+  const best = Math.max(...base.map(voiceQuality));
   // Grupo de élite: las de mayor puntaje (tolerancia 1 para no quedarse con una sola).
-  const pool = match.filter(v => voiceQuality(v) >= Math.max(0, best - 1));
+  const pool = base.filter(v => voiceQuality(v) >= Math.max(0, best - 1));
   const pIdx = Math.max(0, PERSONALITY_ORDER.indexOf(personalityId));
   const idx = (pIdx + hashString(seed)) % pool.length;
   return pool[idx];
@@ -153,6 +162,7 @@ function pauseAfter(sentence, mul) {
 }
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+let speakSession = 0; // token para cancelar locuciones en curso (Fish o synth)
 
 
 // Algunos navegadores cargan las voces async; precargar evita el primer turno mudo.
@@ -177,11 +187,25 @@ function getAudioCtx() {
   return audioCtx;
 }
 
-async function speakFishAudio(text, { uid, personalityId, language = 'es', emotion = 'neutral' } = {}) {
+// DEBE llamarse dentro de un gesto del usuario (click/touch): los navegadores
+// móviles bloquean AudioContext y speechSynthesis iniciados fuera de un gesto.
+// Sin esto, en el teléfono el lead queda MUDO aunque todo lo demás funcione.
+export function unlockAudio() {
+  try { getAudioCtx(); } catch { /* sin WebAudio */ }
+  try {
+    if (speechSupported()) {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      window.speechSynthesis.speak(u); // desbloquea synth en iOS/Android
+    }
+  } catch { /* no bloquea */ }
+}
+
+async function speakFishAudio(text, { uid, personalityId, language = 'es', emotion = 'neutral', gender = 'male' } = {}) {
   const res = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ uid, text, personalityId, language, emotion })
+    body: JSON.stringify({ uid, text, personalityId, language, emotion, gender })
   });
   const data = await res.json();
 
@@ -208,14 +232,14 @@ async function speakFishAudio(text, { uid, personalityId, language = 'es', emoti
 
 // Habla el texto: intenta Fish Audio primero, cae a SpeechSynthesis si falla.
 // `uid` es necesario para autenticar el llamado al proxy.
-export async function speak(text, { uid, personalityId, language = 'es', seed = '', emotion = 'neutral' } = {}) {
+export async function speak(text, { uid, personalityId, language = 'es', seed = '', emotion = 'neutral', gender = 'male' } = {}) {
   if (!text) return;
   const session = ++speakSession;
 
   // ── Intento 1: Fish Audio (voz neural con emoción) ──────────────────────────
   if (uid) {
     try {
-      await speakFishAudio(text, { uid, personalityId, language, emotion });
+      await speakFishAudio(text, { uid, personalityId, language, emotion, gender });
       return; // ✓ Fish Audio funcionó
     } catch (e) {
       if (session !== speakSession) return; // llegó otro speak() mientras esperaba
@@ -232,7 +256,7 @@ export async function speak(text, { uid, personalityId, language = 'es', seed = 
   const emo = EMOTION_PROSODY[emotion] || EMOTION_PROSODY.neutral;
   const jitterBase = ((hashString(seed) % 25) - 12) / 100;
   const lang = language.startsWith('en') ? 'en-US' : 'es-ES';
-  const voice = pickVoice(language.startsWith('en') ? 'en' : 'es', personalityId, seed);
+  const voice = pickVoice(language.startsWith('en') ? 'en' : 'es', personalityId, seed, gender);
 
   const sentences = splitSentences(naturalizeForSpeech(text));
   for (let i = 0; i < sentences.length; i++) {
@@ -258,7 +282,7 @@ export function stopSpeaking() {
   speakSession++;
   // Corta Fish Audio si está reproduciendo
   if (window._fishAudioSource) {
-    try { window._fishAudioSource.stop(); } catch (_) {}
+    try { window._fishAudioSource.stop(); } catch { /* ya detenido */ }
     window._fishAudioSource = null;
   }
   if (speechSupported()) window.speechSynthesis.cancel();
