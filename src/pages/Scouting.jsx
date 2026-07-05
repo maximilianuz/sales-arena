@@ -16,15 +16,15 @@ function ProspectCard({ p, isEn, lng }) {
         <div style={{
           width: '46px', height: '46px', borderRadius: '0.8rem', flexShrink: 0,
           background: `linear-gradient(135deg, ${tier.color}, ${tier.color}88)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', color: 'white', fontSize: '1.1rem'
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: 'white', fontSize: '1.1rem'
         }}>
           {(p.name || 'C')[0].toUpperCase()}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: '800' }}>{p.name || 'Closer'}</span>
+            <span style={{ fontWeight: '600' }}>{p.name || 'Closer'}</span>
             <span style={{
-              fontSize: '0.68rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em',
+              fontSize: '0.68rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em',
               color: tier.color, background: `${tier.color}1f`, border: `1px solid ${tier.color}55`,
               padding: '0.1rem 0.5rem', borderRadius: '2rem'
             }}>
@@ -33,7 +33,7 @@ function ProspectCard({ p, isEn, lng }) {
           </div>
           {p.headline && <div style={{ fontSize: '0.83rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{p.headline}</div>}
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.55rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            <span style={{ fontWeight: '800', color: 'white' }}>{formatMoney(p.totalEarnings || 0)}</span>
+            <span style={{ fontWeight: '600', color: 'white' }}>{formatMoney(p.totalEarnings || 0)}</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               <CheckCircle2 size={12} color="var(--success)" /> {p.closesCount || 0} {isEn ? 'closes' : 'cierres'}
             </span>
@@ -83,7 +83,7 @@ export default function Scouting({ onBack }) {
           <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
           </button>
-          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', flex: 1, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '600', flex: 1, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <Briefcase size={24} color="var(--accent)" /> {isEn ? 'Scouting' : 'Cantera'}
           </h1>
         </div>

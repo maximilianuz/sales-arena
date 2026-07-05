@@ -219,7 +219,7 @@ export default function PublicProposal() {
       {/* Botón flotante: contacto directo por WhatsApp desde cualquier punto */}
       {waLink && (
         <button onClick={() => onCta('whatsapp_float', waLink)} style={{
-          position: 'fixed', bottom: '1.4rem', right: '1.4rem', zIndex: 100,
+          position: 'fixed', bottom: 'calc(1.4rem + env(safe-area-inset-bottom, 0px))', right: '1.4rem', zIndex: 100,
           display: 'flex', alignItems: 'center', gap: '0.55rem',
           padding: '0.9rem 1.3rem', borderRadius: '2.5rem', border: 'none', cursor: 'pointer',
           background: '#25D366', color: 'white',

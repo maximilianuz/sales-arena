@@ -245,7 +245,7 @@ export default function SoloPractice({ onBack }) {
           </button>
           <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎯</div>
-            <h1 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 0.75rem' }}>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: '600', margin: '0 0 0.75rem' }}>
               {isEn ? 'Solo practice — AI Buyer' : 'Práctica solo — Comprador IA'}
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.5, margin: '0 0 1.5rem' }}>
@@ -255,7 +255,7 @@ export default function SoloPractice({ onBack }) {
             </p>
             {/* Selector: llamada completa o una etapa suelta */}
             <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
                 {isEn ? 'What do you want to practice?' : '¿Qué querés practicar?'}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
@@ -295,7 +295,7 @@ export default function SoloPractice({ onBack }) {
         <div style={{ maxWidth: '560px', width: '100%', margin: 'auto' }}>
           <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', marginBottom: '1rem' }}>
             <div style={{ fontSize: '2.5rem' }}>{outcome === 'closed' ? '🤝' : outcome === 'timeout' ? '⏰' : '📞'}</div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0.5rem 0', color: outcome === 'closed' ? 'var(--success)' : 'var(--text-muted)' }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: '600', margin: '0.5rem 0', color: outcome === 'closed' ? 'var(--success)' : 'var(--text-muted)' }}>
               {outcome === 'closed'
                 ? (isEn ? 'Deal closed!' : '¡Trato cerrado!')
                 : outcome === 'timeout'
@@ -328,12 +328,12 @@ export default function SoloPractice({ onBack }) {
           {analysis && (
             <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1rem' }}>
               <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                <div style={{ fontSize: '3rem', fontWeight: '900', color: analysis.overallScore >= 8 ? 'var(--success)' : analysis.overallScore >= 6 ? 'var(--accent)' : 'var(--danger)' }}>
+                <div style={{ fontSize: '3rem', fontWeight: '700', color: analysis.overallScore >= 8 ? 'var(--success)' : analysis.overallScore >= 6 ? 'var(--accent)' : 'var(--danger)' }}>
                   {analysis.overallScore}/10
                 </div>
                 {analysis.gamification?.earned > 0 && (
                   <div>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--success)', fontWeight: '800', marginTop: '0.25rem' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--success)', fontWeight: '600', marginTop: '0.25rem' }}>
                       <Trophy size={16} /> +${analysis.gamification.earned.toLocaleString('en-US')}
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>

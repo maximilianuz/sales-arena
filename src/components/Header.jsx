@@ -34,7 +34,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
             style={{ fontSize: '1.5rem', letterSpacing: '-0.02em', background: 'transparent', maxWidth: '300px' }}
           />
         ) : (
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '800', margin: 0, color: 'white', letterSpacing: '-0.02em' }}>{title}</h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '600', margin: 0, color: 'white', letterSpacing: '-0.02em' }}>{title}</h1>
         )}
 
         {role && (

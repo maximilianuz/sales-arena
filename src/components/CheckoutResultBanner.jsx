@@ -22,7 +22,7 @@ export default function CheckoutResultBanner({ checkout }) {
     }}>
       <span style={{ fontSize: '1.5rem' }}>{closed ? '🎉' : '😔'}</span>
       <div>
-        <div style={{ fontWeight: '800', color: closed ? 'var(--success)' : 'var(--danger)', fontSize: '1rem' }}>
+        <div style={{ fontWeight: '600', color: closed ? 'var(--success)' : 'var(--danger)', fontSize: '1rem' }}>
           {closed ? (isEn ? 'DEAL CLOSED' : 'TRATO CERRADO') : (isEn ? 'DEAL LOST' : 'TRATO PERDIDO')}
         </div>
         <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>

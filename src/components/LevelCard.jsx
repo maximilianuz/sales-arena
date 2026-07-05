@@ -96,11 +96,11 @@ export default function LevelCard() {
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: '900', fontSize: '1.9rem', color: 'white', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+            <span style={{ fontWeight: '700', fontSize: '1.9rem', color: 'white', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
               {formatMoney(total)}
             </span>
             <span style={{
-              fontSize: '0.72rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em',
+              fontSize: '0.72rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.06em',
               color: tier.color, background: `${tier.color}1f`, border: `1px solid ${tier.color}55`,
               padding: '0.15rem 0.6rem', borderRadius: '2rem',
             }}>
@@ -160,10 +160,10 @@ export default function LevelCard() {
           animation: 'levelUpPop 0.5s ease',
         }}>
           <div style={{ fontSize: '2rem', lineHeight: 1 }}>🎉</div>
-          <div style={{ fontWeight: '900', fontSize: '1.15rem', color: 'white', marginTop: '0.35rem' }}>
+          <div style={{ fontWeight: '700', fontSize: '1.15rem', color: 'white', marginTop: '0.35rem' }}>
             {isEn ? 'Rank up!' : '¡Subiste de rango!'}
           </div>
-          <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <div style={{ fontWeight: '600', fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             {tierLabel(levelUp, i18n.language)}
           </div>
           <style>{`@keyframes levelUpPop { 0% { opacity: 0; transform: scale(0.85); } 60% { transform: scale(1.03); } 100% { opacity: 1; transform: scale(1); } }`}</style>

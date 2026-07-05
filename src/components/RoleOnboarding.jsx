@@ -125,7 +125,7 @@ export default function RoleOnboarding({ role }) {
             {g.icon}
           </div>
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '800' }}>{g.title[isEn ? 'en' : 'es']}</h2>
+            <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '600' }}>{g.title[isEn ? 'en' : 'es']}</h2>
             <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>{g.subtitle[isEn ? 'en' : 'es']}</p>
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function RoleOnboarding({ role }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.75rem' }}>
           {g.steps[isEn ? 'en' : 'es'].map((step, i) => (
             <div key={i} style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
-              <span style={{ width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, background: `${g.color}22`, border: `1px solid ${g.color}55`, color: g.color, fontSize: '0.72rem', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1px' }}>{i + 1}</span>
+              <span style={{ width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, background: `${g.color}22`, border: `1px solid ${g.color}55`, color: g.color, fontSize: '0.72rem', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1px' }}>{i + 1}</span>
               <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.78)', lineHeight: '1.45' }}>{step}</span>
             </div>
           ))}

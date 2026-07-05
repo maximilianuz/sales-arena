@@ -57,7 +57,7 @@ function StageRow({ stage, isEn }) {
 function Section({ icon, title, children }) {
   return (
     <div style={{ marginBottom: '1.25rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)', fontWeight: '800', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)', fontWeight: '600', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
         {icon} {title}
       </div>
       {children}
@@ -81,7 +81,7 @@ export default function SoloCoachPanel({ scenario, onClose }) {
         style={{ width: '100%', maxWidth: '420px', height: '100%', overflowY: 'auto', borderRadius: 0, padding: '1.5rem 1.25rem' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', flex: 1 }}>{isEn ? '📋 Closer guide' : '📋 Guía del closer'}</h2>
+          <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600', flex: 1 }}>{isEn ? '📋 Closer guide' : '📋 Guía del closer'}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
         </div>
 
@@ -89,7 +89,7 @@ export default function SoloCoachPanel({ scenario, onClose }) {
         <Section icon={<Package size={15} />} title={isEn ? 'What you sell' : 'Qué vendés'}>
           <div style={{ padding: '0.75rem', background: 'rgba(48,209,88,0.07)', borderRadius: '0.6rem', border: '1px solid rgba(48,209,88,0.2)' }}>
             <div style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45 }}>{product}</div>
-            {price > 0 && <div style={{ marginTop: '0.4rem', fontWeight: '800', color: 'var(--success)' }}>USD {Number(price).toLocaleString('en-US')}</div>}
+            {price > 0 && <div style={{ marginTop: '0.4rem', fontWeight: '600', color: 'var(--success)' }}>USD {Number(price).toLocaleString('en-US')}</div>}
           </div>
         </Section>
 

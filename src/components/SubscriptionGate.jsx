@@ -117,7 +117,7 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
             </div>
           </div>
           <h1 style={{
-            fontSize: '2.5rem', fontWeight: '800', margin: 0,
+            fontSize: '2.5rem', fontWeight: '600', margin: 0,
             background: 'linear-gradient(to right, #ffffff, #a5b4fc)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
           }}>
@@ -160,7 +160,7 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
             <div style={{ color: 'var(--text-muted)', marginBottom: '0.75rem' }}><Lock size={28} /></div>
             <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700' }}>{t('subscription.freePlan.name')}</h2>
             <div style={{ marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '2.5rem', fontWeight: '800' }}>$0</span>
+              <span style={{ fontSize: '2.5rem', fontWeight: '600' }}>$0</span>
             </div>
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', flex: 1 }}>
               {t('subscription.freePlan.features', { returnObjects: true }).map(f => (
@@ -211,7 +211,7 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
                 <div style={{ color: plan.color, marginBottom: '0.75rem' }}>{plan.icon}</div>
                 <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem', fontWeight: '700' }}>{planName}</h2>
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <span style={{ fontSize: '2.5rem', fontWeight: '800' }}>${price}</span>
+                  <span style={{ fontSize: '2.5rem', fontWeight: '600' }}>${price}</span>
                   <span style={{ color: 'var(--text-muted)', marginLeft: '0.25rem' }}>
                     {billing === 'monthly' ? t('subscription.perMonth') : t('subscription.perYear')}
                   </span>
