@@ -26,9 +26,9 @@ const ProposalGenerator = lazy(() => import('../modules/proposals/ProposalGenera
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
-  Closer:      { icon: <TrendingUp size={22} />, color: '#10b981', gradient: 'linear-gradient(135deg,#10b981,#06b6d4)' },
-  Lead:        { icon: <Theater size={22} />, color: '#f59e0b', gradient: 'linear-gradient(135deg,#f59e0b,#ef4444)' },
-  Observador:  { icon: <Eye size={22} />, color: '#8b5cf6', gradient: 'linear-gradient(135deg,#8b5cf6,#ec4899)' }
+  Closer:      { icon: <TrendingUp size={22} />, color: '#30d158', gradient: 'linear-gradient(135deg,#30d158,#06b6d4)' },
+  Lead:        { icon: <Theater size={22} />, color: '#ff9f0a', gradient: 'linear-gradient(135deg,#ff9f0a,#ff453a)' },
+  Observador:  { icon: <Eye size={22} />, color: '#8b5cf6', gradient: 'linear-gradient(135deg,#8b5cf6,#ff375f)' }
 };
 
 function FeatureButton({ icon, label, accent, onClick }) {
@@ -136,7 +136,7 @@ export default function Lobby() {
       window.particlesJS("lobby-particles", {
         particles: {
           number: { value: 50, density: { enable: true, value_area: 900 } },
-          color: { value: ["#6366f1", "#10b981", "#8b5cf6"] },
+          color: { value: ["#6366f1", "#30d158", "#8b5cf6"] },
           shape: { type: "circle" },
           opacity: { value: 0.3 },
           size: { value: 2.5, random: true },
@@ -186,8 +186,8 @@ export default function Lobby() {
             <span style={{
               fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em',
               padding: '0.2rem 0.75rem', borderRadius: '2rem', textTransform: 'uppercase',
-              background: isPaid ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.06)',
-              border: isPaid ? '1px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.12)',
+              background: isPaid ? 'rgba(48,209,88,0.15)' : 'rgba(255,255,255,0.06)',
+              border: isPaid ? '1px solid rgba(48,209,88,0.4)' : '1px solid rgba(255,255,255,0.12)',
               color: isPaid ? 'var(--success)' : 'var(--text-muted)'
             }}>
               {isPaid ? '⚡ Pro' : isEn ? 'Free plan' : 'Plan Gratis'}
@@ -203,7 +203,7 @@ export default function Lobby() {
               background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
               color: 'white', border: 'none', padding: '0.35rem 0.9rem',
               borderRadius: '2rem', cursor: 'pointer', fontSize: '0.82rem',
-              fontWeight: '700', boxShadow: '0 4px 14px rgba(99,102,241,0.45)'
+              fontWeight: '700', boxShadow: '0 4px 14px rgba(100,210,255,0.45)'
             }}>
               <Zap size={13} /> {isEn ? 'Upgrade' : 'Mejorar Plan'}
             </button>
@@ -211,8 +211,8 @@ export default function Lobby() {
           <a href={isEn ? "/presentacion_en.html" : "/presentacion.html"} target="_blank" rel="noopener noreferrer"
             style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(16,185,129,0.1)', color: 'rgba(255,255,255,0.7)',
-              border: '1px solid rgba(16,185,129,0.35)', padding: '0.35rem 0.8rem',
+              background: 'rgba(48,209,88,0.1)', color: 'rgba(255,255,255,0.7)',
+              border: '1px solid rgba(48,209,88,0.35)', padding: '0.35rem 0.8rem',
               borderRadius: '2rem', cursor: 'pointer', textDecoration: 'none', fontSize: '0.82rem'
             }}>
             <BookOpen size={13} /> {isEn ? 'Guide' : 'Guía'}
@@ -228,7 +228,7 @@ export default function Lobby() {
           </select>
           <button onClick={signOutUser} title={isEn ? 'Sign out' : 'Cerrar sesión'}
             style={{
-              background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)',
+              background: 'rgba(255,69,58,0.07)', border: '1px solid rgba(255,69,58,0.2)',
               color: 'rgba(255,255,255,0.35)', borderRadius: '2rem', padding: '0.35rem 0.6rem',
               cursor: 'pointer', display: 'flex', alignItems: 'center', fontSize: '0.75rem', gap: '0.3rem'
             }}>
@@ -245,13 +245,13 @@ export default function Lobby() {
         <FeatureButton
           icon={<TargetIcon size={16} />}
           label={isEn ? 'Practice solo' : 'Practicar solo'}
-          accent="16,185,129"
+          accent="48,209,88"
           onClick={() => setShowSolo(true)}
         />
         <FeatureButton
           icon={<FileText size={16} />}
           label={isEn ? 'VIP Proposals' : 'Propuestas VIP'}
-          accent="134,59,255"
+          accent="94,92,230"
           onClick={() => setShowProposals(true)}
         />
         {tier === 'trainer' && (
@@ -266,28 +266,28 @@ export default function Lobby() {
           <FeatureButton
             icon={<History size={16} />}
             label={isEn ? 'History' : 'Historial'}
-            accent="99,102,241"
+            accent="100,210,255"
             onClick={() => setShowHistory(true)}
           />
         )}
         <FeatureButton
           icon={<Trophy size={16} />}
           label={isEn ? 'Leaderboard' : 'Ranking'}
-          accent="245,158,11"
+          accent="255,159,10"
           onClick={() => setShowLeaderboard(true)}
         />
         {tier === 'trainer' ? (
           <FeatureButton
             icon={<Briefcase size={16} />}
             label={isEn ? 'Scouting' : 'Cantera'}
-            accent="236,72,153"
+            accent="255,55,95"
             onClick={() => setShowScouting(true)}
           />
         ) : (
           <FeatureButton
             icon={<Briefcase size={16} />}
             label={isEn ? 'Job offers' : 'Ofertas laborales'}
-            accent="236,72,153"
+            accent="255,55,95"
             onClick={() => setShowScoutingModal(true)}
           />
         )}
@@ -295,7 +295,7 @@ export default function Lobby() {
         <FeatureButton
           icon={<Users size={16} />}
           label={isEn ? 'Join cohort' : 'Unirme a cohorte'}
-          accent="16,185,129"
+          accent="48,209,88"
           onClick={() => setShowJoinCohort(true)}
         />
       </div>
@@ -314,7 +314,7 @@ export default function Lobby() {
         backdropFilter: 'blur(24px)',
         borderRadius: '1.5rem',
         border: '1px solid rgba(255,255,255,0.07)',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.08)',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(100,210,255,0.08)',
         padding: '2.5rem 2.5rem 2rem',
         animation: 'modalIn 0.4s ease-out'
       }}>
@@ -323,9 +323,9 @@ export default function Lobby() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2.5rem', gap: '0.75rem' }}>
           <div style={{
             width: '72px', height: '72px', borderRadius: '1.25rem',
-            background: 'linear-gradient(135deg,#47bfff 0%,#863bff 55%,#7e14ff 100%)',
+            background: 'linear-gradient(135deg,#0a84ff 0%,#5e5ce6 55%,#4d4ad9 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 40px rgba(134,59,255,0.45), 0 8px 24px rgba(0,0,0,0.3)'
+            boxShadow: '0 0 40px rgba(94,92,230,0.45), 0 8px 24px rgba(0,0,0,0.3)'
           }}>
             <ChessKnight size={40} color="white" strokeWidth={1.5} />
           </div>
@@ -356,7 +356,7 @@ export default function Lobby() {
           {/* Step 1 — Nombre */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>1</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>1</span>
               <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.yourName')}</label>
             </div>
             <input
@@ -369,7 +369,7 @@ export default function Lobby() {
           {/* Step 2 — Sala */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>2</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>2</span>
               <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.roomId')}</label>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -383,7 +383,7 @@ export default function Lobby() {
                 <Shuffle size={18} />
               </button>
               <button type="button" onClick={copyRoomId} disabled={!roomId} title={isEn ? 'Copy ID' : 'Copiar ID'}
-                style={{ padding: '0.6rem 0.8rem', background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(16,185,129,0.5)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '0.75rem', cursor: 'pointer', color: copied ? 'var(--success)' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
+                style={{ padding: '0.6rem 0.8rem', background: copied ? 'rgba(48,209,88,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(48,209,88,0.5)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '0.75rem', cursor: 'pointer', color: copied ? 'var(--success)' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
                 {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
               </button>
             </div>
@@ -392,7 +392,7 @@ export default function Lobby() {
           {/* Step 3 — Rol */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>3</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '800', color: '#a5b4fc', flexShrink: 0 }}>3</span>
               <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.chooseRole')}</label>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
@@ -451,7 +451,7 @@ export default function Lobby() {
               border: canSubmit ? 'none' : '1px solid rgba(255,255,255,0.07)',
               borderRadius: '0.875rem', cursor: canSubmit ? 'pointer' : 'not-allowed',
               fontWeight: '700', fontSize: '1rem', letterSpacing: '0.02em',
-              boxShadow: canSubmit ? '0 8px 24px rgba(99,102,241,0.4)' : 'none',
+              boxShadow: canSubmit ? '0 8px 24px rgba(100,210,255,0.4)' : 'none',
               transition: 'all 0.3s ease',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
             }}

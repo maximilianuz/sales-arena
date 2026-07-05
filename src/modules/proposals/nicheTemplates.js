@@ -12,7 +12,7 @@ export const NICHES = [
     id: 'wellness',
     label: 'Wellness / Fitness',
     emoji: '🏋️',
-    accent: '16,185,129',
+    accent: '48,209,88',
     blurb: 'Coaches, gimnasios, nutrición, entrenadores.',
     template: {
       intro: 'Hola [nombre], vengo siguiendo [tu cuenta/tu marca] y veo que tenés una comunidad muy comprometida. El problema no es la audiencia: es que hoy no hay un sistema que convierta esas consultas en ventas cerradas. Te preparé esta propuesta con lo que detecté y cómo lo resolvería.',
@@ -36,7 +36,7 @@ export const NICHES = [
     id: 'coaching',
     label: 'Coaching / Infoproductos',
     emoji: '🎓',
-    accent: '134,59,255',
+    accent: '94,92,230',
     blurb: 'Mentores, creadores de cursos, formaciones high-ticket.',
     template: {
       intro: 'Hola [nombre], tu formación tiene una propuesta muy fuerte y una audiencia que confía en vos. Donde veo plata sobre la mesa es en el proceso de venta del programa high-ticket: hoy depende mucho de vos y no escala. Te dejo el detalle.',
@@ -60,7 +60,7 @@ export const NICHES = [
     id: 'b2b',
     label: 'B2B / SaaS',
     emoji: '💼',
-    accent: '71,191,255',
+    accent: '10,132,255',
     blurb: 'Software, servicios y ventas a empresas.',
     template: {
       intro: 'Hola [nombre], vi lo que están construyendo en [empresa] y el producto pinta sólido. Mi lectura es que el bottleneck no es el producto sino el pipeline: leads que entran y no avanzan por falta de un proceso de cierre consistente. Acá va mi propuesta.',
@@ -84,7 +84,7 @@ export const NICHES = [
     id: 'realestate',
     label: 'Inmobiliaria',
     emoji: '🏠',
-    accent: '245,158,11',
+    accent: '255,159,10',
     blurb: 'Desarrollos, brokers, inversión inmobiliaria.',
     template: {
       intro: 'Hola [nombre], el flujo de consultas que genera [tu desarrollo/tu cartera] es bueno, pero veo que muchas se enfrían antes de la visita o la reserva. Ahí es donde entro yo. Te dejo lo que detecté.',
@@ -108,7 +108,7 @@ export const NICHES = [
     id: 'ecommerce',
     label: 'E-commerce / Marcas',
     emoji: '🛍️',
-    accent: '236,72,153',
+    accent: '255,55,95',
     blurb: 'Tiendas, marcas de producto, DTC.',
     template: {
       intro: 'Hola [nombre], la marca comunica muy bien y el producto se nota cuidado. Donde veo oportunidad es en el ticket alto y la venta consultiva: hay clientes dispuestos a gastar más si alguien los acompaña en la decisión. Te muestro cómo.',
@@ -132,7 +132,7 @@ export const NICHES = [
     id: 'agency',
     label: 'Agencias / Servicios',
     emoji: '📈',
-    accent: '99,102,241',
+    accent: '100,210,255',
     blurb: 'Marketing, diseño, consultoría, freelancers.',
     template: {
       intro: 'Hola [nombre], los servicios de [tu agencia] tienen resultados que hablan solos. El problema clásico en agencias es que el que produce también tiene que vender, y eso frena el crecimiento. Ahí es donde yo aporto. Te dejo el detalle.',

@@ -7,7 +7,7 @@
 export const LEAD_PERSONALITIES = [
   {
     id: 'directivo',
-    es: 'El Directivo', en: 'The Driver', color: '#ef4444',
+    es: 'El Directivo', en: 'The Driver', color: '#ff453a',
     essenceEs: 'Orientado a resultados, impaciente y competitivo. Quiere control y ganar.',
     essenceEn: 'Results-driven, impatient and competitive. Wants control and to win.',
     connectEs: 'Mostrá confianza y andá al grano con un resultado en mente. Cumplidos sinceros y casos de éxito.',
@@ -35,7 +35,7 @@ export const LEAD_PERSONALITIES = [
   },
   {
     id: 'empatico',
-    es: 'El Empático', en: 'The Relator', color: '#10b981',
+    es: 'El Empático', en: 'The Relator', color: '#30d158',
     essenceEs: 'Relacional y sensible. Valora la confianza, la familia y sentirse cuidado. Decide despacio.',
     essenceEn: 'Relational and sensitive. Values trust, family and feeling cared for. Decides slowly.',
     connectEs: 'Sé cortés y cercano, bajá el tono de voz, hacé preguntas para que se abra y mostrá tu lado humano.',

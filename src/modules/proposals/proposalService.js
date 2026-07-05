@@ -38,7 +38,7 @@ export function emptyProposal(ownerName = '') {
     testimonials: [],          // [{ name, text }] prueba social
     ctaCalendly: '',
     ctaWhatsapp: '',
-    accent: '134,59,255',      // color de marca del closer (RGB sin envolver)
+    accent: '94,92,230',      // color de marca del closer (RGB sin envolver)
     status: 'draft'            // draft | sent
   };
 }

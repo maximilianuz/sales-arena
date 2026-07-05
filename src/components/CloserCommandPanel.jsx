@@ -44,10 +44,10 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
 
       {/* Stage mission card */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08))',
-        border: '1px solid rgba(99,102,241,0.3)',
+        background: 'linear-gradient(135deg, rgba(100,210,255,0.12), rgba(139,92,246,0.08))',
+        border: '1px solid rgba(100,210,255,0.3)',
         borderRadius: '1rem', padding: '1.25rem',
-        boxShadow: '0 0 24px rgba(99,102,241,0.1)'
+        boxShadow: '0 0 24px rgba(100,210,255,0.1)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
           <div style={{ width: '28px', height: '28px', borderRadius: '0.5rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -64,7 +64,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
           {activeStage.objective}
         </p>
         {activeStage.indicator && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', marginTop: '0.75rem', padding: '0.5rem 0.75rem', background: 'rgba(16,185,129,0.08)', borderRadius: '0.5rem', border: '1px solid rgba(16,185,129,0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', marginTop: '0.75rem', padding: '0.5rem 0.75rem', background: 'rgba(48,209,88,0.08)', borderRadius: '0.5rem', border: '1px solid rgba(48,209,88,0.2)' }}>
             <span style={{ color: 'var(--success)', fontSize: '0.8rem', marginTop: '1px' }}>✓</span>
             <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)', lineHeight: '1.4' }}>
               <strong style={{ color: 'var(--success)' }}>{isEn ? 'Win signal:' : 'Señal de éxito:'}</strong> {activeStage.indicator}
@@ -104,7 +104,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
 
       {/* Questions / script card: dinámicas del lead (IA) + consultivas curadas */}
       {((questions && questions.length > 0) || coaching?.socratic?.length > 0) && (
-        <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '1rem', padding: '1.25rem' }}>
+        <div style={{ background: 'rgba(48,209,88,0.06)', border: '1px solid rgba(48,209,88,0.2)', borderRadius: '1rem', padding: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <MessageSquare size={15} color="var(--success)" />
             <span style={{ fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--success)' }}>
@@ -135,7 +135,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
 
       {/* Quick lead intel — 4 fichas: objeción, miedo, cuándo se abre, qué le da confianza */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
-        <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
+        <div style={{ background: 'rgba(255,159,10,0.07)', border: '1px solid rgba(255,159,10,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
           <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.4rem' }}>
             {isEn ? 'Main objection' : 'Objeción principal'}
           </div>
@@ -143,7 +143,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
             "{currentScenario.visibleObjection}"
           </p>
         </div>
-        <div style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
+        <div style={{ background: 'rgba(255,69,58,0.07)', border: '1px solid rgba(255,69,58,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
           <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--danger)', marginBottom: '0.4rem' }}>
             {isEn ? 'Core fear' : 'Miedo central'}
           </div>
@@ -152,7 +152,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
           </p>
         </div>
         {currentScenario.behavioralCues?.opensUpWhen && (
-          <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
+          <div style={{ background: 'rgba(48,209,88,0.06)', border: '1px solid rgba(48,209,88,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
             <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.4rem' }}>
               {isEn ? 'Opens up when' : 'Se abre cuando'}
             </div>
@@ -162,7 +162,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
           </div>
         )}
         {currentScenario.psychology?.trustTrigger && (
-          <div style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
+          <div style={{ background: 'rgba(100,210,255,0.06)', border: '1px solid rgba(100,210,255,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
             <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a5b4fc', marginBottom: '0.4rem' }}>
               {isEn ? 'Builds trust' : 'Genera confianza'}
             </div>

@@ -87,7 +87,7 @@ export default function SoloCoachPanel({ scenario, onClose }) {
 
         {/* Qué vendés */}
         <Section icon={<Package size={15} />} title={isEn ? 'What you sell' : 'Qué vendés'}>
-          <div style={{ padding: '0.75rem', background: 'rgba(16,185,129,0.07)', borderRadius: '0.6rem', border: '1px solid rgba(16,185,129,0.2)' }}>
+          <div style={{ padding: '0.75rem', background: 'rgba(48,209,88,0.07)', borderRadius: '0.6rem', border: '1px solid rgba(48,209,88,0.2)' }}>
             <div style={{ fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: 1.45 }}>{product}</div>
             {price > 0 && <div style={{ marginTop: '0.4rem', fontWeight: '800', color: 'var(--success)' }}>USD {Number(price).toLocaleString('en-US')}</div>}
           </div>

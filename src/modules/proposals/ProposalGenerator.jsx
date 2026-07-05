@@ -14,12 +14,12 @@ import { VideoPlayer, ImageUploader } from './MediaComponents';
 
 // Paletas de marca que el closer puede elegir para su propuesta VIP.
 const ACCENTS = [
-  { rgb: '134,59,255', name: 'Violeta' },
-  { rgb: '16,185,129', name: 'Esmeralda' },
-  { rgb: '71,191,255', name: 'Celeste' },
-  { rgb: '236,72,153', name: 'Magenta' },
-  { rgb: '245,158,11', name: 'Ámbar' },
-  { rgb: '99,102,241', name: 'Índigo' }
+  { rgb: '94,92,230', name: 'Índigo' },
+  { rgb: '48,209,88', name: 'Verde' },
+  { rgb: '10,132,255', name: 'Azul' },
+  { rgb: '255,55,95', name: 'Rosa' },
+  { rgb: '255,159,10', name: 'Naranja' },
+  { rgb: '100,210,255', name: 'Teal' }
 ];
 
 // ── Tarjeta de propuesta en el dashboard ─────────────────────────────────────
@@ -41,13 +41,13 @@ function ProposalCard({ p, onEdit, onDelete, onDuplicate }) {
 
   return (
     <div style={{
-      background: 'rgba(15,15,30,0.6)', backdropFilter: 'blur(16px)',
-      border: `1px solid rgba(${p.accent},0.25)`, borderRadius: '1.1rem',
+      background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)',
+      border: `1px solid rgba(${p.accent},0.25)`, borderRadius: '12px',
       padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.9rem'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
         <div>
-          <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'white', lineHeight: 1.2 }}>
+          <div style={{ fontSize: '1.05rem', fontWeight: 600, color: 'white', lineHeight: 1.2 }}>
             {p.title || 'Sin título'}
           </div>
           <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
@@ -78,10 +78,10 @@ function ProposalCard({ p, onEdit, onDelete, onDuplicate }) {
           { icon: <TrendingUp size={14} />, val: `${conv}%`, label: 'Conversión' }
         ].map((m, i) => (
           <div key={i} style={{
-            flex: 1, background: 'rgba(255,255,255,0.04)', borderRadius: '0.7rem',
+            flex: 1, background: 'rgba(255,255,255,0.04)', borderRadius: '10px',
             padding: '0.55rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.06)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', color: `rgb(${p.accent})`, fontSize: '1.05rem', fontWeight: 800 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', color: `rgb(${p.accent})`, fontSize: '1.05rem', fontWeight: 600 }}>
               {m.icon}{m.val}
             </div>
             <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{m.label}</div>
@@ -91,7 +91,7 @@ function ProposalCard({ p, onEdit, onDelete, onDuplicate }) {
 
       {/* Acciones */}
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <button onClick={copy} style={btnStyle(copied ? '16,185,129' : p.accent, copied)}>
+        <button onClick={copy} style={btnStyle(copied ? '48,209,88' : p.accent, copied)}>
           {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
           {copied ? '¡Copiado!' : 'Copiar link VIP'}
         </button>
@@ -104,7 +104,7 @@ function ProposalCard({ p, onEdit, onDelete, onDuplicate }) {
         <button onClick={() => onDuplicate(p)} style={btnStyle('148,163,184')} title="Duplicar para otro prospecto">
           <Files size={14} />
         </button>
-        <button onClick={() => onDelete(p)} style={{ ...btnStyle('239,68,68'), marginLeft: 'auto' }}>
+        <button onClick={() => onDelete(p)} style={{ ...btnStyle('255,69,58'), marginLeft: 'auto' }}>
           <Trash2 size={14} />
         </button>
       </div>
@@ -115,10 +115,11 @@ function ProposalCard({ p, onEdit, onDelete, onDuplicate }) {
 function btnStyle(rgb, active = false) {
   return {
     display: 'flex', alignItems: 'center', gap: '0.35rem',
-    background: active ? `rgba(${rgb},0.18)` : `rgba(${rgb},0.1)`,
-    border: `1px solid rgba(${rgb},0.35)`, color: `rgb(${rgb})`,
-    padding: '0.45rem 0.8rem', borderRadius: '0.6rem', cursor: 'pointer',
-    fontSize: '0.8rem', fontWeight: 700, transition: 'all 0.2s'
+    background: active ? `rgba(${rgb},0.22)` : 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.06)', color: `rgb(${rgb})`,
+    padding: '8px 14px', borderRadius: '10px', cursor: 'pointer',
+    fontSize: '13px', fontWeight: 600,
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
   };
 }
 
@@ -136,7 +137,7 @@ function Field({ label, hint, children }) {
 
 const inputStyle = {
   background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)',
-  borderRadius: '0.6rem', padding: '0.65rem 0.8rem', color: 'var(--text-main)',
+  borderRadius: '10px', padding: '0.65rem 0.8rem', color: 'var(--text-main)',
   fontSize: '0.9rem', fontFamily: 'inherit', width: '100%', outline: 'none'
 };
 
@@ -331,7 +332,7 @@ function Builder({ initial, onBack, onSaved }) {
         <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <Eye size={13} /> Preview en vivo
         </div>
-        <div style={{ borderRadius: '1.2rem', overflow: 'hidden', border: `1px solid rgba(${p.accent},0.3)`, maxHeight: '80vh', overflowY: 'auto' }}>
+        <div style={{ borderRadius: '14px', overflow: 'hidden', border: `1px solid rgba(${p.accent},0.3)`, maxHeight: '80vh', overflowY: 'auto' }}>
           <ProposalPreview p={p} />
         </div>
       </div>
@@ -342,10 +343,11 @@ function Builder({ initial, onBack, onSaved }) {
 function bigBtn(rgb) {
   return {
     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-    background: `linear-gradient(135deg, rgb(${rgb}), rgba(${rgb},0.7))`,
-    border: 'none', color: 'white', padding: '0.85rem', borderRadius: '0.8rem',
-    cursor: 'pointer', fontSize: '0.9rem', fontWeight: 800,
-    boxShadow: `0 6px 20px rgba(${rgb},0.4)`
+    background: `rgb(${rgb})`,
+    border: 'none', color: 'white', padding: '12px 20px', borderRadius: '12px',
+    cursor: 'pointer', fontSize: '15px', fontWeight: 600,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
   };
 }
 
@@ -354,7 +356,7 @@ function Section({ title, icon, accent, children }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         {icon && <span style={{ color: `rgb(${accent})` }}>{icon}</span>}
-        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: 'white' }}>{title}</h3>
+        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: 'white' }}>{title}</h3>
       </div>
       {children}
     </div>
@@ -374,7 +376,7 @@ function ArrayEditor({ label, items, fields, placeholder1, placeholder2, accent,
             <input style={inputStyle} value={item[fields[1]]} placeholder={placeholder2}
               onChange={(e) => onChange(i, { ...item, [fields[1]]: e.target.value })} />
           </div>
-          <button onClick={() => onRemove(i)} style={{ ...btnStyle('239,68,68'), padding: '0.5rem' }}>
+          <button onClick={() => onRemove(i)} style={{ ...btnStyle('255,69,58'), padding: '0.5rem' }}>
             <Trash2 size={14} />
           </button>
         </div>
@@ -392,10 +394,10 @@ function GalleryEditor({ items, accent, onAdd, onCaption, onRemove }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
       {(items || []).map((img, i) => (
         <div key={i} style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
-          <img src={img.url} alt="" style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '0.5rem', border: `1px solid rgba(${accent},0.3)` }} />
+          <img src={img.url} alt="" style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px', border: `1px solid rgba(${accent},0.3)` }} />
           <input style={{ ...inputStyle, flex: 1 }} value={img.caption || ''} placeholder="Descripción (opcional)"
             onChange={(e) => onCaption(i, e.target.value)} />
-          <button onClick={() => onRemove(i)} style={{ ...btnStyle('239,68,68'), padding: '0.5rem' }}>
+          <button onClick={() => onRemove(i)} style={{ ...btnStyle('255,69,58'), padding: '0.5rem' }}>
             <Trash2 size={14} />
           </button>
         </div>
@@ -413,7 +415,7 @@ function ProposalPreview({ p }) {
   return (
     <div style={{ background: '#0a0a14', padding: '1.5rem', color: 'white' }}>
       {p.coverImage && (
-        <img src={p.coverImage} alt="" style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '0.7rem', marginBottom: '1rem' }} />
+        <img src={p.coverImage} alt="" style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
       )}
       {(p.ownerPhoto || p.ownerName) && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
@@ -429,7 +431,7 @@ function ProposalPreview({ p }) {
       <div style={{ fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: `rgb(${p.accent})`, fontWeight: 700 }}>
         Propuesta VIP {p.prospectName ? `· para ${p.prospectName}` : ''}
       </div>
-      <h1 style={{ fontSize: '1.6rem', fontWeight: 900, margin: '0.4rem 0 0', lineHeight: 1.15 }}>
+      <h1 style={{ fontSize: '1.6rem', fontWeight: 700, margin: '0.4rem 0 0', lineHeight: 1.15 }}>
         {p.title || 'Tu título aparecerá acá'}
       </h1>
       {p.intro && <p style={{ color: 'var(--text-muted)', marginTop: '0.8rem', fontSize: '0.9rem', lineHeight: 1.5 }}>{p.intro}</p>}
@@ -451,16 +453,16 @@ function ProposalPreview({ p }) {
       {p.gallery?.length > 0 && (
         <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.4rem' }}>
           {p.gallery.map((img, i) => (
-            <img key={i} src={img.url} alt={img.caption || ''} style={{ width: '100%', height: '70px', objectFit: 'cover', borderRadius: '0.4rem' }} />
+            <img key={i} src={img.url} alt={img.caption || ''} style={{ width: '100%', height: '70px', objectFit: 'cover', borderRadius: '8px' }} />
           ))}
         </div>
       )}
 
       {p.auditPoints?.length > 0 && (
         <div style={{ marginTop: '1.2rem' }}>
-          <div style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: '0.5rem' }}>Oportunidades detectadas</div>
+          <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>Oportunidades detectadas</div>
           {p.auditPoints.map((a, i) => a.title && (
-            <div key={i} style={{ padding: '0.6rem 0.8rem', background: `rgba(${p.accent},0.08)`, borderLeft: `3px solid rgb(${p.accent})`, borderRadius: '0.4rem', marginBottom: '0.5rem' }}>
+            <div key={i} style={{ padding: '0.6rem 0.8rem', background: `rgba(${p.accent},0.08)`, borderLeft: `3px solid rgb(${p.accent})`, borderRadius: '8px', marginBottom: '0.5rem' }}>
               <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{a.title}</div>
               {a.detail && <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{a.detail}</div>}
             </div>
@@ -469,17 +471,17 @@ function ProposalPreview({ p }) {
       )}
 
       {p.offer?.summary && (
-        <div style={{ marginTop: '1.2rem', padding: '1rem', borderRadius: '0.8rem', background: `linear-gradient(135deg, rgba(${p.accent},0.15), rgba(${p.accent},0.05))`, border: `1px solid rgba(${p.accent},0.3)` }}>
-          <div style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: '0.3rem' }}>La propuesta</div>
+        <div style={{ marginTop: '1.2rem', padding: '1rem', borderRadius: '12px', background: `linear-gradient(135deg, rgba(${p.accent},0.15), rgba(${p.accent},0.05))`, border: `1px solid rgba(${p.accent},0.3)` }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.3rem' }}>La propuesta</div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>{p.offer.summary}</p>
-          {p.offer.price && <div style={{ marginTop: '0.6rem', fontSize: '1.1rem', fontWeight: 900, color: `rgb(${p.accent})` }}>{p.offer.price}</div>}
+          {p.offer.price && <div style={{ marginTop: '0.6rem', fontSize: '1.1rem', fontWeight: 700, color: `rgb(${p.accent})` }}>{p.offer.price}</div>}
         </div>
       )}
 
       {(p.ctaCalendly || p.ctaWhatsapp) && (
         <div style={{ marginTop: '1.2rem', display: 'flex', gap: '0.5rem' }}>
-          {p.ctaCalendly && <div style={{ flex: 1, textAlign: 'center', padding: '0.7rem', borderRadius: '0.7rem', background: `rgb(${p.accent})`, fontWeight: 800, fontSize: '0.85rem' }}>Agendar llamada</div>}
-          {p.ctaWhatsapp && <div style={{ flex: 1, textAlign: 'center', padding: '0.7rem', borderRadius: '0.7rem', background: 'rgba(255,255,255,0.08)', fontWeight: 800, fontSize: '0.85rem' }}>WhatsApp</div>}
+          {p.ctaCalendly && <div style={{ flex: 1, textAlign: 'center', padding: '0.7rem', borderRadius: '10px', background: `rgb(${p.accent})`, fontWeight: 600, fontSize: '0.85rem' }}>Agendar llamada</div>}
+          {p.ctaWhatsapp && <div style={{ flex: 1, textAlign: 'center', padding: '0.7rem', borderRadius: '10px', background: 'rgba(255,255,255,0.08)', fontWeight: 600, fontSize: '0.85rem' }}>WhatsApp</div>}
         </div>
       )}
     </div>
@@ -496,7 +498,7 @@ function NichePicker({ onPick, onBack }) {
             <ArrowLeft size={14} /> Volver
           </button>
         </div>
-        <h1 style={{ margin: '1rem 0 0.3rem', fontSize: '1.6rem', fontWeight: 900 }}>¿A qué nicho apuntás?</h1>
+        <h1 style={{ margin: '1rem 0 0.3rem', fontSize: '1.6rem', fontWeight: 700 }}>¿A qué nicho apuntás?</h1>
         <p style={{ color: 'var(--text-muted)', margin: '0 0 1.8rem', fontSize: '0.9rem' }}>
           Elegí un punto de partida. Precargamos oportunidades, objeciones y encuadre típicos del rubro — después editás todo a gusto.
         </p>
@@ -505,8 +507,8 @@ function NichePicker({ onPick, onBack }) {
           {NICHES.map((n) => (
             <button key={n.id} onClick={() => onPick(n)} style={{
               textAlign: 'left', cursor: 'pointer', padding: '1.3rem',
-              background: 'rgba(15,15,30,0.6)', backdropFilter: 'blur(16px)',
-              border: `1px solid rgba(${n.accent},0.3)`, borderRadius: '1.1rem',
+              background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)',
+              border: `1px solid rgba(${n.accent},0.3)`, borderRadius: '12px',
               display: 'flex', flexDirection: 'column', gap: '0.5rem', transition: 'all 0.2s',
               color: 'white'
             }}
@@ -514,11 +516,11 @@ function NichePicker({ onPick, onBack }) {
               onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = `rgba(${n.accent},0.3)`; }}
             >
               <div style={{
-                width: '46px', height: '46px', borderRadius: '0.8rem', fontSize: '1.5rem',
+                width: '46px', height: '46px', borderRadius: '12px', fontSize: '1.5rem',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: `rgba(${n.accent},0.15)`, border: `1px solid rgba(${n.accent},0.3)`
               }}>{n.emoji}</div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800 }}>{n.label}</div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 600 }}>{n.label}</div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>{n.blurb}</div>
             </button>
           ))}
@@ -600,15 +602,15 @@ export default function ProposalGenerator({ onBack }) {
               <ArrowLeft size={14} /> Lobby
             </button>
             <div>
-              <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FileText size={22} color="#863bff" /> Propuestas VIP
+              <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileText size={22} color="#5e5ce6" /> Propuestas VIP
               </h1>
               <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                 Armá, enviá y medí tus propuestas de closing.
               </p>
             </div>
           </div>
-          <button onClick={openNew} style={bigBtn('134,59,255')}>
+          <button onClick={openNew} style={bigBtn('94,92,230')}>
             <Plus size={16} /> Nueva propuesta
           </button>
         </div>
@@ -617,13 +619,13 @@ export default function ProposalGenerator({ onBack }) {
         {loading ? (
           <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem' }}>Cargando…</p>
         ) : proposals.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', border: '1px dashed rgba(255,255,255,0.12)', borderRadius: '1.2rem' }}>
-            <Sparkles size={32} color="#863bff" style={{ marginBottom: '0.8rem' }} />
+          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', border: '1px dashed rgba(255,255,255,0.12)', borderRadius: '14px' }}>
+            <Sparkles size={32} color="#5e5ce6" style={{ marginBottom: '0.8rem' }} />
             <h3 style={{ margin: 0, color: 'white' }}>Todavía no tenés propuestas</h3>
             <p style={{ color: 'var(--text-muted)', margin: '0.4rem 0 1.2rem', fontSize: '0.88rem' }}>
               Creá tu primera propuesta VIP: con tu Loom, tus llamadas y un link para trackear.
             </p>
-            <button onClick={openNew} style={{ ...bigBtn('134,59,255'), margin: '0 auto' }}>
+            <button onClick={openNew} style={{ ...bigBtn('94,92,230'), margin: '0 auto' }}>
               <Plus size={16} /> Crear la primera
             </button>
           </div>

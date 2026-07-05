@@ -52,8 +52,8 @@ export default function CountryPicker({ current, onClose, onSaved }) {
           {list.map(c => (
             <button key={c.code} onClick={() => pick(c.code)} disabled={!!saving} style={{
               display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.55rem 0.6rem', borderRadius: '0.5rem',
-              background: current === c.code ? 'rgba(99,102,241,0.15)' : 'transparent',
-              border: current === c.code ? '1px solid rgba(99,102,241,0.4)' : '1px solid transparent',
+              background: current === c.code ? 'rgba(100,210,255,0.15)' : 'transparent',
+              border: current === c.code ? '1px solid rgba(100,210,255,0.4)' : '1px solid transparent',
               color: 'white', cursor: 'pointer', fontSize: '0.9rem', textAlign: 'left',
             }}>
               <span style={{ fontSize: '1.2rem' }}>{flagEmoji(c.code)}</span>

@@ -52,7 +52,7 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
                   fontSize: '0.85rem',
                   fontWeight: isActive ? '700' : '600',
                   cursor: setActiveStageIndex ? 'pointer' : 'default',
-                  background: locked ? 'rgba(0,0,0,0.3)' : isActive ? 'linear-gradient(135deg, var(--primary), #818cf8)' : (isPast ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-dark)'),
+                  background: locked ? 'rgba(0,0,0,0.3)' : isActive ? 'linear-gradient(135deg, var(--primary), #818cf8)' : (isPast ? 'rgba(48, 209, 88, 0.15)' : 'var(--bg-dark)'),
                   color: locked ? 'var(--text-muted)' : isActive ? 'white' : (isPast ? 'var(--success)' : 'var(--text-muted)'),
                   border: locked ? '1px dashed var(--glass-border)' : isActive ? '1px solid rgba(255,255,255,0.2)' : `1px solid ${isPast ? 'var(--success)' : 'var(--glass-border)'}`,
                   boxShadow: isActive ? '0 0 20px rgba(99, 102, 241, 0.4)' : 'none',
@@ -77,7 +77,7 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)', boxShadow: '0 0 10px var(--accent)' }} />
             {activeStage.label}
           </h3>
-          <div style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--accent)', padding: '0.35rem 0.85rem', borderRadius: '2rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', border: '1px solid rgba(245, 158, 11, 0.3)', fontWeight: '600' }}>
+          <div style={{ background: 'rgba(255, 159, 10, 0.1)', color: 'var(--accent)', padding: '0.35rem 0.85rem', borderRadius: '2rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', border: '1px solid rgba(255, 159, 10, 0.3)', fontWeight: '600' }}>
             ⏱️ {t('pipeline.suggestedTime')}: {activeStage.estimatedTime || 5} {t('pipeline.minutes')}
           </div>
           <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', marginBottom: '1rem' }}>
@@ -85,7 +85,7 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
               <strong style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}><Target size={14} /> {t('pipeline.objective')}</strong> 
               <span style={{ color: 'var(--text-muted)' }}>{activeStage.objective}</span>
             </div>
-            <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: '1rem', borderRadius: '0.75rem', flex: 1, border: '1px solid rgba(16, 185, 129, 0.2)', borderTop: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            <div style={{ background: 'rgba(48, 209, 88, 0.05)', padding: '1rem', borderRadius: '0.75rem', flex: 1, border: '1px solid rgba(48, 209, 88, 0.2)', borderTop: '1px solid rgba(48, 209, 88, 0.3)' }}>
               <strong style={{ color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}><CheckCircle2 size={14} /> {t('pipeline.success')}</strong> 
               <span style={{ color: 'var(--text-muted)' }}>{activeStage.indicator}</span>
             </div>

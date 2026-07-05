@@ -22,7 +22,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
   return (
     <header className="header-container" style={{ position: 'sticky', top: '1rem', zIndex: 50 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#47bfff 0%,#863bff 55%,#7e14ff 100%)', padding: '0.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 15px rgba(134, 59, 255, 0.3)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#0a84ff 0%,#5e5ce6 55%,#4d4ad9 100%)', padding: '0.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 15px rgba(94, 92, 230, 0.3)' }}>
           <ChessKnight size={24} color="white" strokeWidth={1.5} />
         </div>
         {onTitleChange ? (
@@ -47,7 +47,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
         {roomId && (
           <button 
             onClick={handleCopyId}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: copied ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: '2rem', border: `1px solid ${copied ? 'var(--success)' : 'var(--glass-border)'}`, fontSize: '0.85rem', color: copied ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', marginLeft: '0.5rem' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: copied ? 'rgba(48, 209, 88, 0.15)' : 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: '2rem', border: `1px solid ${copied ? 'var(--success)' : 'var(--glass-border)'}`, fontSize: '0.85rem', color: copied ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s', marginLeft: '0.5rem' }}
             title="Copiar ID de la sala"
           >
             {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
@@ -62,7 +62,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
           target="_blank" 
           rel="noopener noreferrer"
           className="btn btn-outline" 
-          style={{ border: '1px solid rgba(16, 185, 129, 0.5)', color: 'white', background: 'rgba(16, 185, 129, 0.1)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+          style={{ border: '1px solid rgba(48, 209, 88, 0.5)', color: 'white', background: 'rgba(48, 209, 88, 0.1)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
           title={i18n.language?.startsWith('en') ? "View Presentation" : "Ver Presentación"}
         >
           <BookOpen size={18} /> Dossier
@@ -85,14 +85,14 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
         </select>
 
         {onOpenSettings && (
-          <button className="btn btn-outline" onClick={onOpenSettings} style={{ border: '1px solid rgba(236, 72, 153, 0.5)', color: 'white', background: 'rgba(236, 72, 153, 0.1)' }}>
+          <button className="btn btn-outline" onClick={onOpenSettings} style={{ border: '1px solid rgba(255, 55, 95, 0.5)', color: 'white', background: 'rgba(255, 55, 95, 0.1)' }}>
             <Cpu size={18} /> {t('header.aiSettings')}
           </button>
         )}
         <button
           onClick={signOutUser}
           title={i18n.language?.startsWith('en') ? 'Sign out' : 'Cerrar sesión'}
-          style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: 'rgba(255,255,255,0.5)', borderRadius: '0.5rem', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.25)', color: 'rgba(255,255,255,0.5)', borderRadius: '0.5rem', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <LogOut size={16} />
         </button>

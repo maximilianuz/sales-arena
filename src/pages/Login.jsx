@@ -45,16 +45,16 @@ export default function Login() {
         margin: 'auto', maxWidth: '420px', width: '100%',
         background: 'rgba(15,15,30,0.75)', backdropFilter: 'blur(24px)',
         borderRadius: '1.5rem', border: '1px solid rgba(255,255,255,0.07)',
-        boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(134,59,255,0.08)',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(94,92,230,0.08)',
         padding: '2.5rem 2.25rem', animation: 'modalIn 0.4s ease-out'
       }}>
         {/* Hero */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', gap: '0.75rem' }}>
           <div style={{
             width: '68px', height: '68px', borderRadius: '1.25rem',
-            background: 'linear-gradient(135deg,#47bfff 0%,#863bff 55%,#7e14ff 100%)',
+            background: 'linear-gradient(135deg,#0a84ff 0%,#5e5ce6 55%,#4d4ad9 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 40px rgba(134,59,255,0.45), 0 8px 24px rgba(0,0,0,0.3)'
+            boxShadow: '0 0 40px rgba(94,92,230,0.45), 0 8px 24px rgba(0,0,0,0.3)'
           }}>
             <ChessKnight size={38} color="white" strokeWidth={1.5} />
           </div>
@@ -103,8 +103,8 @@ export default function Login() {
           <button type="submit" disabled={loading}
             style={{
               width: '100%', padding: '0.8rem', marginTop: '0.25rem', borderRadius: '0.875rem', cursor: 'pointer',
-              background: 'linear-gradient(135deg,#47bfff,#863bff 55%,#7e14ff)', color: 'white', border: 'none',
-              fontWeight: '700', fontSize: '0.95rem', boxShadow: '0 8px 24px rgba(134,59,255,0.4)',
+              background: 'linear-gradient(135deg,#0a84ff,#5e5ce6 55%,#4d4ad9)', color: 'white', border: 'none',
+              fontWeight: '700', fontSize: '0.95rem', boxShadow: '0 8px 24px rgba(94,92,230,0.4)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: loading ? 0.6 : 1
             }}>
             {mode === 'signup' ? (isEn ? 'Create account' : 'Crear cuenta') : (isEn ? 'Sign in' : 'Entrar')}

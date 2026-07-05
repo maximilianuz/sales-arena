@@ -97,11 +97,11 @@ export default function RolesPanel({ participants, setParticipants }) {
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 'bold' }}>{t('roles.seller')}</span>
           <strong style={{ fontSize: '0.95rem' }}>{roles.seller || '-'}</strong>
         </div>
-        <div style={{ background: 'rgba(236, 72, 153, 0.2)', padding: '0.5rem 0.75rem', borderRadius: '0.4rem', borderLeft: '3px solid var(--secondary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ background: 'rgba(255, 55, 95, 0.2)', padding: '0.5rem 0.75rem', borderRadius: '0.4rem', borderLeft: '3px solid var(--secondary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 'bold' }}>{t('roles.client')}</span>
           <strong style={{ fontSize: '0.95rem' }}>{roles.client || '-'}</strong>
         </div>
-        <div style={{ background: 'rgba(245, 158, 11, 0.2)', padding: '0.5rem 0.75rem', borderRadius: '0.4rem', borderLeft: '3px solid var(--accent)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ background: 'rgba(255, 159, 10, 0.2)', padding: '0.5rem 0.75rem', borderRadius: '0.4rem', borderLeft: '3px solid var(--accent)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 'bold' }}>{t('roles.observers')}</span>
           <strong style={{ fontSize: '0.95rem', textAlign: 'right', flex: 1, marginLeft: '1rem' }}>
             {roles.observers && roles.observers.length > 0 ? roles.observers.join(', ') : '-'}

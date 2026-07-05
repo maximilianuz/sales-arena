@@ -207,9 +207,9 @@ export default function Room() {
         <div
           role="alert"
           style={{
-            background: 'rgba(239, 68, 68, 0.14)',
+            background: 'rgba(255, 69, 58, 0.14)',
             color: 'var(--danger)',
-            borderBottom: '1px solid rgba(239, 68, 68, 0.3)',
+            borderBottom: '1px solid rgba(255, 69, 58, 0.3)',
             padding: '0.6rem 1rem',
             textAlign: 'center',
             fontSize: '0.85rem',
@@ -335,7 +335,7 @@ export default function Room() {
                   </button>
                 )}
                 {isFacilitator && roomData?.checkout?.enabled && !roomData?.checkout?.result && (
-                  <div style={{ fontSize: '0.82rem', color: 'var(--success)', textAlign: 'center', padding: '0.4rem 0.8rem', background: 'rgba(16,185,129,0.1)', borderRadius: '1rem', border: '1px solid rgba(16,185,129,0.3)' }}>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--success)', textAlign: 'center', padding: '0.4rem 0.8rem', background: 'rgba(48,209,88,0.1)', borderRadius: '1rem', border: '1px solid rgba(48,209,88,0.3)' }}>
                     ✅ {i18n.language?.startsWith('en') ? 'Closing phase active' : 'Fase de Cierre activa'}
                   </div>
                 )}

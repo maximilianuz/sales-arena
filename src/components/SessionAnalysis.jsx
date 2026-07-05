@@ -130,7 +130,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
             <MethodScores scores={analysis.methodScores} />
 
             {/* Qué salió bien */}
-            <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(16,185,129,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(16,185,129,0.2)' }}>
+            <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(48,209,88,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(48,209,88,0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: 'var(--success)', fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase' }}>
                 <TrendingUp size={16} /> {isEn ? 'What went well' : 'Qué salió bien'}
               </div>
@@ -142,7 +142,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
             </div>
 
             {/* Qué mejorar */}
-            <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(239,68,68,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(255,69,58,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(255,69,58,0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', color: 'var(--danger)', fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase' }}>
                 <TrendingDown size={16} /> {isEn ? 'To improve' : 'A mejorar'}
               </div>
@@ -155,7 +155,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
 
             {/* Comisión ganada + espíritu de equipo */}
             {gamification && gamification.earned > 0 && (
-              <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(16,185,129,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(16,185,129,0.25)', textAlign: 'center' }}>
+              <div style={{ marginBottom: '1rem', padding: '1rem', background: 'rgba(48,209,88,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(48,209,88,0.25)', textAlign: 'center' }}>
                 <div style={{ fontSize: '1.6rem', fontWeight: '900', color: 'var(--success)' }}>
                   +${gamification.earned.toLocaleString('en-US')}
                 </div>
@@ -176,7 +176,7 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
             )}
 
             {/* Tip próxima sesión */}
-            <div style={{ padding: '1rem', background: 'rgba(245,158,11,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(245,158,11,0.2)' }}>
+            <div style={{ padding: '1rem', background: 'rgba(255,159,10,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(255,159,10,0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--accent)', fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase' }}>
                 <Lightbulb size={16} /> {isEn ? 'Tip for next session' : 'Tip para la próxima sesión'}
               </div>

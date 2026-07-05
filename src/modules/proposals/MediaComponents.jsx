@@ -6,7 +6,7 @@ import { uploadImage } from './proposalService';
 // Player de video limpio: enmarca cualquier proveedor (Loom/YT/Vimeo/IG/archivo)
 // en un contenedor con bordes redondeados, sombra y un título opcional arriba.
 // Así la grabación queda prolija aunque el closer aparezca hablando dentro.
-export function VideoPlayer({ url, title, accent = '134,59,255' }) {
+export function VideoPlayer({ url, title, accent = '94,92,230' }) {
   const v = resolveVideo(url);
   if (!v) return null;
 
@@ -22,7 +22,7 @@ export function VideoPlayer({ url, title, accent = '134,59,255' }) {
   const frame = (
     <div style={{
       position: 'relative', paddingBottom: `${v.ratio}%`,
-      borderRadius: '0.9rem', overflow: 'hidden',
+      borderRadius: '12px', overflow: 'hidden',
       boxShadow: `0 12px 40px rgba(${accent},0.2)`,
       border: `1px solid rgba(${accent},0.25)`, background: '#000',
       maxWidth: v.maxWidth ? `${v.maxWidth}px` : '100%',
@@ -49,7 +49,7 @@ export function VideoPlayer({ url, title, accent = '134,59,255' }) {
 }
 
 // Uploader de imagen: sube a Storage y muestra preview. `round` para avatares.
-export function ImageUploader({ value, onChange, accent = '134,59,255', label = 'Subir imagen', round = false, height = 140 }) {
+export function ImageUploader({ value, onChange, accent = '94,92,230', label = 'Subir imagen', round = false, height = 140 }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const inputRef = useRef(null);

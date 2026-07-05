@@ -37,8 +37,8 @@ function LeaderRow({ rank, entry, isMe, isEn, lng }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '0.65rem 0.75rem',
       borderRadius: '0.75rem', marginBottom: '0.25rem',
-      background: isMe ? 'rgba(99,102,241,0.12)' : 'transparent',
-      border: isMe ? '1px solid rgba(99,102,241,0.4)' : '1px solid transparent',
+      background: isMe ? 'rgba(100,210,255,0.12)' : 'transparent',
+      border: isMe ? '1px solid rgba(100,210,255,0.4)' : '1px solid transparent',
     }}>
       <div style={{ width: '32px', textAlign: 'center', fontSize: medal ? '1.25rem' : '0.9rem', fontWeight: '800', color: medal ? 'inherit' : 'var(--text-muted)' }}>
         {medal || rank}
@@ -125,8 +125,8 @@ export default function Leaderboard({ onBack }) {
             <button key={t.id} onClick={() => setTab(t.id)} style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
               padding: '0.65rem', borderRadius: '0.75rem', cursor: 'pointer', fontWeight: '700', fontSize: '0.85rem',
-              background: tab === t.id ? 'linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.15))' : 'rgba(255,255,255,0.04)',
-              border: tab === t.id ? '1px solid rgba(99,102,241,0.5)' : '1px solid rgba(255,255,255,0.08)',
+              background: tab === t.id ? 'linear-gradient(135deg, rgba(100,210,255,0.25), rgba(139,92,246,0.15))' : 'rgba(255,255,255,0.04)',
+              border: tab === t.id ? '1px solid rgba(100,210,255,0.5)' : '1px solid rgba(255,255,255,0.08)',
               color: tab === t.id ? 'white' : 'var(--text-muted)',
             }}>
               {t.icon} {t.label}

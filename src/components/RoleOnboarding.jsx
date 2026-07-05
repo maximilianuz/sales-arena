@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 // instante qué tiene que hacer para que la práctica fluya.
 const GUIDES = {
   Facilitador: {
-    icon: <Target size={26} />, color: '#863bff',
+    icon: <Target size={26} />, color: '#5e5ce6',
     title: { es: 'Sos el Trainer', en: 'You are the Trainer' },
     subtitle: { es: 'Dirigís la sesión de entrenamiento', en: 'You direct the training session' },
     steps: {
@@ -28,7 +28,7 @@ const GUIDES = {
     }
   },
   Closer: {
-    icon: <TrendingUp size={26} />, color: '#10b981',
+    icon: <TrendingUp size={26} />, color: '#30d158',
     title: { es: 'Sos el Closer', en: 'You are the Closer' },
     subtitle: { es: 'El vendedor: tu misión es cerrar la venta', en: 'The salesperson: your mission is to close' },
     steps: {
@@ -49,7 +49,7 @@ const GUIDES = {
     }
   },
   Lead: {
-    icon: <Theater size={26} />, color: '#f59e0b',
+    icon: <Theater size={26} />, color: '#ff9f0a',
     title: { es: 'Sos el Lead', en: 'You are the Lead' },
     subtitle: { es: 'El cliente: tu trabajo es actuar el personaje', en: 'The client: your job is to act the character' },
     steps: {

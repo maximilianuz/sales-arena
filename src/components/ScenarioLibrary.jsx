@@ -58,7 +58,7 @@ export default function ScenarioLibrary({ mode, currentScenario, currentConfig, 
 
         {/* Save section */}
         {mode === 'save' && currentScenario && (
-          <div style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '0.875rem', padding: '1rem', marginBottom: '1.25rem' }}>
+          <div style={{ background: 'rgba(100,210,255,0.08)', border: '1px solid rgba(100,210,255,0.2)', borderRadius: '0.875rem', padding: '1rem', marginBottom: '1.25rem' }}>
             <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(165,180,252,0.7)', marginBottom: '0.6rem' }}>
               {isEn ? 'Save current scenario' : 'Guardar escenario actual'}
             </div>
@@ -110,11 +110,11 @@ export default function ScenarioLibrary({ mode, currentScenario, currentConfig, 
                 </div>
               </div>
               {mode === 'load' && (
-                <button onClick={(e) => { e.stopPropagation(); onLoad(item.scenario); }} style={{ padding: '0.4rem 0.7rem', borderRadius: '0.5rem', background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.78rem', fontWeight: '600' }}>
+                <button onClick={(e) => { e.stopPropagation(); onLoad(item.scenario); }} style={{ padding: '0.4rem 0.7rem', borderRadius: '0.5rem', background: 'rgba(100,210,255,0.15)', border: '1px solid rgba(100,210,255,0.3)', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.78rem', fontWeight: '600' }}>
                   <Play size={13} /> {isEn ? 'Load' : 'Cargar'}
                 </button>
               )}
-              <button onClick={(e) => handleDelete(item.id, e)} style={{ padding: '0.4rem', borderRadius: '0.5rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'rgba(239,68,68,0.7)', cursor: 'pointer', display: 'flex' }}>
+              <button onClick={(e) => handleDelete(item.id, e)} style={{ padding: '0.4rem', borderRadius: '0.5rem', background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.2)', color: 'rgba(255,69,58,0.7)', cursor: 'pointer', display: 'flex' }}>
                 <Trash2 size={14} />
               </button>
             </div>
