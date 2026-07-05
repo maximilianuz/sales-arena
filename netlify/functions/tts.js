@@ -106,16 +106,23 @@ export const handler = async (event) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
 
-    const res = await fetch(FISH_TTS_URL, {
+    // El header `model` es REQUERIDO por /v1/tts (422 sin él — causa raíz del
+    // silencio en producción). s2.1-pro-free es gratis; si el plan no lo admite,
+    // reintentamos una vez con s2-pro.
+    const doFetch = (model) => fetch(FISH_TTS_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'Accept': 'audio/mpeg'
+        'model': model
       },
       body: JSON.stringify(fishPayload),
       signal: controller.signal
     });
+    let res = await doFetch(process.env.FISH_MODEL || 's2.1-pro-free');
+    if (!res.ok && [400, 402, 404, 422].includes(res.status)) {
+      res = await doFetch('s2-pro');
+    }
 
     clearTimeout(timeout);
 

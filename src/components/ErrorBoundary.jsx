@@ -77,10 +77,10 @@ class ErrorBoundary extends React.Component {
             <button style={styles.primaryBtn} onClick={this.handleRetry}>{t.retry}</button>
             <button style={styles.ghostBtn} onClick={this.handleReload}>{t.reload}</button>
           </div>
-          {isDev && this.state.error && (
+          {this.state.error && (
             <details style={styles.details}>
               <summary style={styles.summary}>{t.details}</summary>
-              <pre style={styles.pre}>{String(this.state.error?.stack || this.state.error)}</pre>
+              <pre style={styles.pre}>{isDev ? String(this.state.error?.stack || this.state.error) : String(this.state.error?.message || this.state.error)}</pre>
             </details>
           )}
         </div>

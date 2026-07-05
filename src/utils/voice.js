@@ -1,4 +1,5 @@
 import { auth } from './db';
+import { inferGender } from './genderFromName';
 
 // Utilidades de voz para el modo práctica solo (web).
 //  - Grabación push-to-talk con MediaRecorder → base64.
