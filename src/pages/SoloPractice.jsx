@@ -22,7 +22,8 @@ const EMOTION_META = {
   dudoso:       { emoji: '😕', es: 'dudoso', en: 'hesitant' },
   apurado:      { emoji: '⏱️', es: 'apurado', en: 'in a hurry' }
 };
-import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices } from '../utils/voice';
+import { micSupported, speechSupported, startRecording, transcribe, speak, stopSpeaking, warmUpVoices, unlockAudio } from '../utils/voice';
+import { inferGender } from '../utils/genderFromName';
 
 // Modo PRÁCTICA SOLO: el closer le vende a un comprador IA con estado real
 // (temperatura/confianza/paciencia), capa oculta y consecuencias (puede cortar).
@@ -117,7 +118,8 @@ export default function SoloPractice({ onBack }) {
         personalityId: s?.personality,
         language: i18n.language,
         seed: s?.demographics?.name || '',
-        emotion
+        emotion,
+        gender: inferGender(s?.demographics?.name || '')
       });
     } finally {
       setSpeaking(false);
@@ -178,6 +180,7 @@ export default function SoloPractice({ onBack }) {
   };
 
   const send = () => {
+    unlockAudio(); // gesto del usuario → desbloquea audio en móvil
     const text = input.trim();
     if (!text) return;
     setInput('');
@@ -204,6 +207,7 @@ export default function SoloPractice({ onBack }) {
     } else {
       stopSpeaking();
       try {
+        unlockAudio(); // gesto del usuario → desbloquea audio en móvil
         recorderRef.current = await startRecording();
         setRecording(true);
       } catch {
@@ -413,7 +417,7 @@ export default function SoloPractice({ onBack }) {
                 <BookOpen size={16} /> {isEn ? 'Guide' : 'Guía'}
               </button>
               {speechSupported() && (
-                <button onClick={() => { if (voiceOn) stopSpeaking(); setVoiceOn(v => !v); }} title={isEn ? 'Toggle voice' : 'Voz on/off'}
+                <button onClick={() => { unlockAudio(); if (voiceOn) stopSpeaking(); setVoiceOn(v => !v); }} title={isEn ? 'Toggle voice' : 'Voz on/off'}
                   style={{ background: voiceOn ? 'rgba(48,209,88,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${voiceOn ? 'var(--success)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '0.6rem', padding: '0.45rem', color: voiceOn ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
                   {voiceOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
                 </button>

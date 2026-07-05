@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 import { createAvatar } from '@dicebear/core';
 import { avataaars } from '@dicebear/collection';
+import { inferGender } from '../utils/genderFromName';
+
+// Peinados/vello facial coherentes por género (opciones válidas de avataaars).
+const TOPS_MALE = ['shortFlat', 'shortRound', 'shortWaved', 'theCaesar', 'theCaesarAndSidePart', 'sides'];
+const TOPS_FEMALE = ['longButNotTooLong', 'straight01', 'straight02', 'straightAndStrand', 'bob', 'bigHair', 'curly'];
 
 // Avatar ILUSTRADO y REACTIVO del comprador IA. Usa DiceBear (librería offline,
 // sin API ni tokens): genera una persona ilustrada estable por lead (semilla =
@@ -41,14 +46,17 @@ export default function BuyerAvatar({ state, speaking = false, name = '', seed =
   const expr = expressionFor({ temperature: t, trust: tr, patience: p });
 
   // Regeneramos el SVG solo cuando cambia el lead o su expresión (barato).
+  const gender = inferGender(name || seed);
   const uri = useMemo(() => createAvatar(avataaars, {
     seed: seed || name || 'lead',
     mouth: [expr.mouth],
     eyebrows: [expr.eyebrows],
     eyes: [expr.eyes],
+    top: gender === 'female' ? TOPS_FEMALE : TOPS_MALE,
+    facialHairProbability: gender === 'female' ? 0 : 35,
     backgroundColor: [],
     radius: 50,
-  }).toDataUri(), [seed, name, expr.mouth, expr.eyebrows, expr.eyes]);
+  }).toDataUri(), [seed, name, gender, expr.mouth, expr.eyebrows, expr.eyes]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>

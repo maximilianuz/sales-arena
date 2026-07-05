@@ -27,22 +27,24 @@ const EMOTION_TAGS = {
 // emotion tags; solo pierde la consistencia de timbre entre turnos).
 const VOICE_MODELS = {
   es: {
-    // Directivo: hombre, tono firme y seguro, acento latinoamericano
-    directivo:  'a3e44b1f7a274991977b4e7eb3ca46bc',
-    // Entusiasta: voz energética, dinámica
-    entusiasta:  null,
-    // Empático: voz cálida, pausada
-    empatico:    null,
-    // Analítico: voz neutra, medida
-    analitico:   null
+    male: {
+      directivo:  'a3e44b1f7a274991977b4e7eb3ca46bc', // firme, acento latam
+      entusiasta: null, empatico: null, analitico: null
+    },
+    female: { directivo: null, entusiasta: null, empatico: null, analitico: null }
   },
   en: {
-    directivo:   null,
-    entusiasta:  null,
-    empatico:    null,
-    analitico:   null
+    male:   { directivo: null, entusiasta: null, empatico: null, analitico: null },
+    female: { directivo: null, entusiasta: null, empatico: null, analitico: null }
   }
 };
+
+// Sin voice model asignado, un descriptor libre orienta el timbre de S2.1 Pro
+// (género + acento). Se combina con el tag de emoción del turno.
+function voiceDescriptor(lang, gender) {
+  if (lang === 'es') return gender === 'female' ? '[voz femenina latinoamericana natural]' : '[voz masculina latinoamericana natural]';
+  return gender === 'female' ? '[natural female voice]' : '[natural male voice]';
+}
 
 export const handler = async (event) => {
   const headers = {
@@ -61,7 +63,7 @@ export const handler = async (event) => {
   try { body = JSON.parse(event.body || '{}'); }
   catch { return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
 
-  const { uid, text, personalityId, language = 'es', emotion = 'neutral' } = body;
+  const { uid, text, personalityId, language = 'es', emotion = 'neutral', gender = 'male' } = body;
 
   if (!uid) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Se requiere autenticación.' }) };
   if (!text || typeof text !== 'string' || text.trim().length === 0)
@@ -76,11 +78,14 @@ export const handler = async (event) => {
   const langPrefix = (language || 'es').startsWith('en') ? 'en' : 'es';
   const emotionTag = EMOTION_TAGS[emotion] || '';
 
-  // Obtener voice_id del modelo de personaje si existe
-  const voiceId = VOICE_MODELS[langPrefix]?.[personalityId] || null;
+  // Obtener voice_id del modelo de personaje (por idioma + género) si existe
+  const g = gender === 'female' ? 'female' : 'male';
+  const voiceId = VOICE_MODELS[langPrefix]?.[g]?.[personalityId] || null;
 
-  // Incrustar el tag de emoción al inicio del texto (S2.1 Pro lo interpreta)
-  const taggedText = emotionTag ? `${emotionTag} ${text.trim()}` : text.trim();
+  // Tags al inicio del texto (S2.1 Pro los interpreta): género/acento + emoción.
+  // El descriptor de voz solo hace falta cuando NO hay voice model fijo.
+  const prefix = [voiceId ? '' : voiceDescriptor(langPrefix, g), emotionTag].filter(Boolean).join(' ');
+  const taggedText = prefix ? `${prefix} ${text.trim()}` : text.trim();
 
   // Payload para Fish Audio S2.1 Pro
   const fishPayload = {
