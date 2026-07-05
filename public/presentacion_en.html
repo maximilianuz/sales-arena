@@ -3,197 +3,172 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sales Arena - Role-Plays</title>
+    <title>Sales Arena — The Arena awaits</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/black.min.css" id="theme">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
-        body { background-color: #0d0d12; margin: 0; overflow: hidden; font-family: 'Outfit', sans-serif; }
+        :root { --indigo: #5e5ce6; --blue: #0a84ff; --pink: #ff375f; --green: #30d158; --orange: #ff9f0a; }
+        body { background-color: #09090b; margin: 0; overflow: hidden;
+               font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif; }
         #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; }
-        
-        .reveal { font-family: 'Outfit', sans-serif !important; z-index: 1; background: transparent !important; }
+
+        .reveal { font-family: inherit !important; z-index: 1; background: transparent !important; }
         .reveal .slide-background { background: transparent !important; }
-        
-        /* Para asegurar que el texto sea muy legible sobre el fondo interactivo */
         .reveal .slides section {
-            background: rgba(10, 10, 15, 0.85);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.08);
-            backdrop-filter: blur(8px);
+            background: rgba(9, 9, 11, 0.88);
+            padding: 34px; border-radius: 14px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+            border: 1px solid rgba(255,255,255,0.07);
+            backdrop-filter: blur(10px);
         }
-        
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
-            font-family: 'Outfit', sans-serif !important;
-            font-weight: 600 !important;
-            letter-spacing: -0.02em;
+        .reveal h1, .reveal h2, .reveal h3 { font-family: inherit !important; font-weight: 700 !important; letter-spacing: -0.03em; }
+        .reveal h1 { font-size: 2.6em; }
+        .reveal h2 {
+            font-size: 2em;
+            background: linear-gradient(135deg, var(--blue), var(--indigo));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;
         }
-        
-        .reveal h2 { 
-            color: #4CAF50; 
-            font-size: 2.2em; 
-            background: linear-gradient(135deg, #4CAF50, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-        
-        .reveal p, .reveal li {
-            font-weight: 300;
-            color: #e2e8f0;
-            line-height: 1.5;
-            letter-spacing: 0.01em;
-        }
-        
-        .reveal strong { font-weight: 500; color: #ffffff; }
-        .highlight { color: #FF9800; font-weight: 500; }
+        .reveal p, .reveal li { font-weight: 400; color: #e5e5ea; line-height: 1.55; }
+        .reveal strong { font-weight: 600; color: #ffffff; }
+        .reveal .small { font-size: 0.62em; color: #98989d; }
+        .cine { font-size: 1.35em; font-weight: 300; color: #f5f5f7; line-height: 1.5; }
+        .punch { font-size: 1.7em; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+        .hl-i { color: var(--indigo); font-weight: 600; }
+        .hl-b { color: var(--blue); font-weight: 600; }
+        .hl-p { color: var(--pink); font-weight: 600; }
+        .hl-g { color: var(--green); font-weight: 600; }
+        .hl-o { color: var(--orange); font-weight: 600; }
+        .tag { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 0.5em;
+               letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600;
+               border: 1px solid rgba(94,92,230,0.5); color: #a5a4f5; margin-bottom: 18px; }
+        .role-card { text-align: left; font-size: 0.85em; }
     </style>
 </head>
 <body>
-    <!-- Contenedor del fondo interactivo -->
     <div id="particles-js"></div>
 
     <div class="reveal">
         <div class="slides">
-            
+
+            <!-- COLD OPEN -->
+            <section data-transition="fade">
+                <p class="tag">Sales Arena</p>
+                <p class="cine">Every closer knows that moment.</p>
+                <p class="cine fragment">The call was going great. The lead was hot.</p>
+                <p class="cine fragment">And then they said: <strong>"Let me think about it."</strong></p>
+                <p class="punch fragment" style="margin-top: 30px;">And you never heard from them again.</p>
+            </section>
+
+            <section data-transition="fade">
+                <p class="cine">That sale wasn't lost on the call.</p>
+                <p class="punch fragment">It was lost in the training you never did.</p>
+                <p class="cine fragment" style="margin-top: 26px;">The best in the world don't improvise under pressure.<br>
+                <strong>They rehearse pressure until it stops being pressure.</strong></p>
+            </section>
+
+            <!-- LA PROMESA -->
+            <section>
+                <h2>🏟️ Welcome to the Arena</h2>
+                <p class="cine">A simulator where you <span class="hl-i">fight real sales battles</span> against buyers with memory, moods and hidden objections —<br>without burning <strong>a single real lead</strong>.</p>
+                <p class="fragment cine" style="margin-top: 22px;">Here you can fail a thousand times.<br><strong>So you never fail when it counts.</strong></p>
+            </section>
+
+            <!-- EL RIVAL -->
+            <section>
+                <h2>🧠 Your opponent: an AI that acts</h2>
+                <p class="cine">It's not a chatbot answering questions.</p>
+                <ul style="font-size: 0.85em; margin-top: 14px;">
+                    <li class="fragment">It has a <span class="hl-b">personality</span> (driver, enthusiast, empathetic, analytical) and <strong>speaks with real voice and emotions</strong>: it gets excited, hesitates, gets annoyed.</li>
+                    <li class="fragment">It hides a <span class="hl-p">real objection</span> behind the one it tells you. Just like real leads.</li>
+                    <li class="fragment">It has <span class="hl-o">temperature, trust and patience</span> — and you win or lose them with every line.</li>
+                    <li class="fragment">It can <strong>buy from you</strong>... or <strong>hang up on you</strong>.</li>
+                </ul>
+            </section>
+
+            <!-- MODO SOLO -->
+            <section>
+                <h2>🎯 Mode 1: Solo practice</h2>
+                <p class="cine">Your private gym. Open 24/7.</p>
+                <ul style="font-size: 0.85em; margin-top: 14px;">
+                    <li class="fragment">Pick a level and industry → the AI generates a <strong>unique prospect</strong> with a story, a problem and a budget.</li>
+                    <li class="fragment">Sell by text or <span class="hl-g">with your voice</span>. The lead talks back, in whatever mood you put them in.</li>
+                    <li class="fragment">At the end: a <strong>methodology breakdown</strong>, a score, and exactly what to fix next time.</li>
+                </ul>
+                <p class="fragment small" style="margin-top: 16px;">Lobby → "Practice solo". Your first fight starts in 10 seconds.</p>
+            </section>
+
+            <!-- MODO EQUIPO -->
+            <section>
+                <h2>🎬 Mode 2: The team Arena</h2>
+                <p class="cine">Four roles. One call. Everyone learns.</p>
+                <div class="role-card">
+                    <p class="fragment">🧑‍💼 <span class="hl-b">THE CLOSER</span> — the protagonist. Sees only what they would see in real life. Their mission: <strong>close</strong>.</p>
+                    <p class="fragment">🎭 <span class="hl-p">THE LEAD</span> — plays the buyer following the AI's secret script. The better they act, the more the team learns.</p>
+                    <p class="fragment">🕵️ <span class="hl-g">THE OBSERVER</span> — sees EVERYTHING: the hidden layer, the lead's inner thoughts. Grades live and votes.</p>
+                    <p class="fragment">🎛️ <span class="hl-o">THE FACILITATOR</span> — the movie director. Pauses, changes stages... and fires <strong>surprise events</strong> when nobody expects them.</p>
+                </div>
+            </section>
+
+            <!-- EVENTOS SORPRESA -->
             <section data-transition="zoom">
-                <h2>🏟️ Sales Arena</h2>
-                <h3 class="fragment fade-up">Master your sales skills</h3>
-                <p class="fragment fade-up">Ultra-realistic Role-Plays to take your negotiations to the next level.</p>
-            </section>
-            
-            <section>
-                <h2>💡 What is Sales Arena?</h2>
-                <p class="fragment fade-up">It's your professional training ground.</p>
-                <p class="fragment fade-up">A dynamic designed to simulate real-world sales scenarios.</p>
-                <p class="fragment fade-up highlight"><strong>Golden Rule:</strong> Total immersion. It's forbidden to say "in real life I would say...". Just say it directly!</p>
+                <p class="tag">Surprise event</p>
+                <p class="cine">You're winning. The close is two sentences away.</p>
+                <p class="punch fragment">And the lead's business partner walks in:<br>"Who is this? Hang up, we have an emergency."</p>
+                <p class="cine fragment" style="margin-top: 24px;">What do you do? <strong>That</strong> is what separates a salesperson from a closer.</p>
             </section>
 
+            <!-- STAKES -->
             <section>
-                <h2>⚙️ Usage Dynamics</h2>
-                <ol>
-                    <li class="fragment fade-up"><strong>🎬 Preparation:</strong> Define scenario and objective.</li>
-                    <li class="fragment fade-up"><strong>🎭 Assignment:</strong> Closer, Lead, Observer.</li>
-                    <li class="fragment fade-up"><strong>⚔️ The Arena:</strong> Uninterrupted simulation.</li>
-                    <li class="fragment fade-up"><strong>📊 Retrospective:</strong> Feedback and areas for improvement.</li>
-                </ol>
+                <h2>🏆 Here, something is at stake</h2>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment"><span class="hl-o">Leaderboard</span> — every session counts. Climb the board and let them know who closes.</li>
+                    <li class="fragment"><span class="hl-p">Scouting</span> — trainers scout here. Your fight history is your <strong>live CV</strong>: real job offers are waiting.</li>
+                    <li class="fragment"><span class="hl-i">VIP Proposals</span> — when you're ready for real leads: personalized proposals with video, open tracking and direct WhatsApp. <strong>You know who opened it, and when.</strong></li>
+                </ul>
             </section>
 
+            <!-- REGLAS DE ORO -->
             <section>
-                <h2>🖥️ How to use the App</h2>
-                <ol style="font-size: 0.8em; text-align: left;">
-                    <li class="fragment fade-up"><strong>Create Room:</strong> The organizer generates an ID in the Lobby and shares it.</li>
-                    <li class="fragment fade-up"><strong>Join:</strong> Everyone enters the same ID and chooses their role.</li>
-                    <li class="fragment fade-up"><strong>Configure:</strong> The Facilitator picks the sales scenario.</li>
-                    <li class="fragment fade-up"><strong>Simulate:</strong> Start the timer (⏱️) and begin the Role-Play.</li>
-                    <li class="fragment fade-up"><strong>Vote:</strong> When finished, use the feedback panel to evaluate.</li>
-                </ol>
+                <h2>⚡ The 3 rules of the Arena</h2>
+                <p class="fragment cine">1. <strong>Act for real.</strong> If the lead gives the sale away, nobody learns anything.</p>
+                <p class="fragment cine">2. <strong>Lose without excuses.</strong> Every defeat in here is worth more than ten easy closes out there.</p>
+                <p class="fragment cine">3. <strong>Come back tomorrow.</strong> Champions don't train once.</p>
             </section>
 
-            <section>
-                <section>
-                    <h2>🧑‍💼 Role 1: The Closer</h2>
-                    <p class="fragment fade-up"><em>The Protagonist</em></p>
-                    <p class="fragment fade-up"><strong>Objective:</strong> Guide the conversation towards the close.</p>
-                    <p class="fragment fade-up">👇 (Swipe down)</p>
-                </section>
-                <section>
-                    <h2>Closer Interpretation</h2>
-                    <ul>
-                        <li class="fragment fade-up">Absolute immersion in the character.</li>
-                        <li class="fragment fade-up">Active listening to the client (don't read a script).</li>
-                        <li class="fragment fade-up">Handling real objections.</li>
-                        <li class="fragment fade-up">Leadership and time management.</li>
-                    </ul>
-                </section>
-            </section>
-
-            <section>
-                <section>
-                    <h2>🧑‍💻 Role 2: The Lead</h2>
-                    <p class="fragment fade-up"><em>The Challenger</em></p>
-                    <p class="fragment fade-up"><strong>Objective:</strong> Authentically represent the prospect.</p>
-                    <p class="fragment fade-up">👇 (Swipe down)</p>
-                </section>
-                <section>
-                    <h2>Lead Interpretation</h2>
-                    <ul>
-                        <li class="fragment fade-up">Adopt an archetype (busy, skeptical...).</li>
-                        <li class="fragment fade-up">Realistic toughness: don't give away the sale, but don't be stubborn without reason.</li>
-                        <li class="fragment fade-up">Bring day-to-day objections to the table.</li>
-                    </ul>
-                    <p class="fragment fade-up highlight">Your job is to make them think and work for it.</p>
-                </section>
-            </section>
-
-            <section>
-                <section>
-                    <h2>🕵️‍♂️ Role 3: The Observer</h2>
-                    <p class="fragment fade-up"><em>The Strategist</em></p>
-                    <p class="fragment fade-up"><strong>Objective:</strong> Provide actionable feedback.</p>
-                    <p class="fragment fade-up">👇 (Swipe down)</p>
-                </section>
-                <section>
-                    <h2>Observer Interpretation</h2>
-                    <ul>
-                        <li class="fragment fade-up"><strong>Silent mode:</strong> Do not intervene during the simulation.</li>
-                        <li class="fragment fade-up"><strong>Take notes on:</strong> Tone of voice, posture, quality of questions.</li>
-                        <li class="fragment fade-up"><strong>Sandwich Technique:</strong> Positive Comment -> Area for Improvement -> Positive Comment.</li>
-                    </ul>
-                </section>
-            </section>
-
-            <section>
-                <h2>🏆 The 3 Golden Rules</h2>
-                <ol>
-                    <li class="fragment fade-up"><strong>Mistakes are the path:</strong> Losing a sale here generates learning.</li>
-                    <li class="fragment fade-up"><strong>Absolute seriousness:</strong> Nervous laughter breaks the simulation.</li>
-                    <li class="fragment fade-up"><strong>Criticize the process, not the person.</strong></li>
-                </ol>
-            </section>
-
+            <!-- FINAL CTA -->
             <section data-transition="zoom">
-                <h2>🚀 Ready to enter?</h2>
-                <p class="fragment fade-up">Transform practice into real results.</p>
-                <p class="fragment fade-up"><br>If you have any questions or suggestions:</p>
-                <h3 class="fragment fade-up">🌐 <a href="https://maximilianoc.netlify.app/" target="_blank">maximilianoc.netlify.app</a></h3>
+                <p class="tag">Your moment</p>
+                <p class="cine">On the other side of this screen there is a version of you<br>that no objection can freeze.</p>
+                <p class="punch fragment" style="margin-top: 26px;">The only distance between you and them<br>is the fights you haven't fought yet.</p>
+                <h1 class="fragment" style="margin-top: 34px;">🥊 Enter the Arena.</h1>
+                <p class="fragment small">Close this tab → "Practice solo". Now.</p>
             </section>
+
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         Reveal.initialize({
-            hash: true,
-            transition: 'fade',
-            transitionSpeed: 'slow',
-            controls: true,
-            progress: true,
-            center: true,
-            width: 1024, height: 850, margin: 0.08, minScale: 0.2, maxScale: 2.0
+            hash: true, controls: true, progress: true, center: true,
+            transition: 'slide', backgroundTransition: 'fade'
         });
 
         particlesJS("particles-js", {
             "particles": {
                 "number": { "value": 70, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": ["#4CAF50", "#3b82f6", "#10b981"] },
+                "color": { "value": ["#5e5ce6", "#0a84ff", "#30d158"] },
                 "shape": { "type": "circle" },
-                "opacity": { "value": 0.4 },
+                "opacity": { "value": 0.5, "random": true },
                 "size": { "value": 3, "random": true },
-                "line_linked": { "enable": true, "distance": 150, "color": "#4CAF50", "opacity": 0.2, "width": 1.5 },
-                "move": { 
-                    "enable": true, 
-                    "speed": 1.5, 
-                    "direction": "top",
-                    "random": true, 
-                    "straight": false, 
-                    "out_mode": "out", 
-                    "bounce": false 
+                "line_linked": { "enable": true, "distance": 150, "color": "#5e5ce6", "opacity": 0.2, "width": 1.5 },
+                "move": {
+                    "enable": true, "speed": 1.5, "direction": "top",
+                    "random": true, "straight": false, "out_mode": "out", "bounce": false
                 }
             },
             "interactivity": {
