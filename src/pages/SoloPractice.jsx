@@ -111,7 +111,14 @@ export default function SoloPractice({ onBack }) {
     setSpeaking(true);
     try {
       const s = sc || scenario;
-      await speak(reply, { personalityId: s?.personality, language: i18n.language, seed: s?.demographics?.name || '', emotion });
+      const uid = auth.currentUser?.uid;
+      await speak(reply, {
+        uid,
+        personalityId: s?.personality,
+        language: i18n.language,
+        seed: s?.demographics?.name || '',
+        emotion
+      });
     } finally {
       setSpeaking(false);
     }

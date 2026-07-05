@@ -153,36 +153,100 @@ function pauseAfter(sentence, mul) {
 }
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-let speakSession = 0; // token para cancelar locuciones multi-oración en curso
 
-// Habla el texto con la voz del lead, oración por oración y con la prosodia de
-// la emoción del turno. `seed` (ej. el nombre del lead) diferencia timbres.
-export async function speak(text, { personalityId, language = 'es', seed = '', emotion = 'neutral' } = {}) {
-  if (!speechSupported() || !text) return;
+
+// Algunos navegadores cargan las voces async; precargar evita el primer turno mudo.
+export function warmUpVoices() {
+  if (!speechSupported()) return;
+  cachedVoices = window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = () => { cachedVoices = window.speechSynthesis.getVoices(); };
+}
+
+// ─── Fish Audio TTS (motor principal) ────────────────────────────────────────
+// Llama al proxy serverless /api/tts, recibe MP3 base64, lo decodifica y
+// lo reproduce como AudioBuffer. Si falla (red, timeout, créditos), cae
+// automáticamente a SpeechSynthesis del navegador — el roleplay nunca se rompe.
+
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx || audioCtx.state === 'closed') {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  // Algunos navegadores suspenden el contexto hasta interacción del usuario.
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+async function speakFishAudio(text, { uid, personalityId, language = 'es', emotion = 'neutral' } = {}) {
+  const res = await fetch('/api/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid, text, personalityId, language, emotion })
+  });
+  const data = await res.json();
+
+  // El servidor devuelve { fallback: true } cuando Fish falla → caemos a synth
+  if (!res.ok || data.fallback || !data.audio) throw new Error('fish_unavailable');
+
+  // Decodificar base64 → ArrayBuffer → AudioBuffer → reproducir
+  const binary = atob(data.audio);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+  const ctx = getAudioCtx();
+  const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
+  return new Promise((resolve) => {
+    const source = ctx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(ctx.destination);
+    source.onended = resolve;
+    source.start(0);
+    // Guardamos referencia para poder cortar con stopSpeaking()
+    window._fishAudioSource = source;
+  });
+}
+
+// Habla el texto: intenta Fish Audio primero, cae a SpeechSynthesis si falla.
+// `uid` es necesario para autenticar el llamado al proxy.
+export async function speak(text, { uid, personalityId, language = 'es', seed = '', emotion = 'neutral' } = {}) {
+  if (!text) return;
   const session = ++speakSession;
+
+  // ── Intento 1: Fish Audio (voz neural con emoción) ──────────────────────────
+  if (uid) {
+    try {
+      await speakFishAudio(text, { uid, personalityId, language, emotion });
+      return; // ✓ Fish Audio funcionó
+    } catch (e) {
+      if (session !== speakSession) return; // llegó otro speak() mientras esperaba
+      console.info('[voice] Fish Audio no disponible, usando SpeechSynthesis:', e.message);
+    }
+  }
+
+  // ── Fallback: SpeechSynthesis con prosodia emocional ───────────────────────
+  if (!speechSupported()) return;
   const synth = window.speechSynthesis;
-  synth.cancel(); // corta cualquier locución previa
+  synth.cancel();
 
   const prof = voiceProfile(personalityId);
   const emo = EMOTION_PROSODY[emotion] || EMOTION_PROSODY.neutral;
-  const jitterBase = ((hashString(seed) % 25) - 12) / 100; // sello vocal del lead (±0.12)
+  const jitterBase = ((hashString(seed) % 25) - 12) / 100;
   const lang = language.startsWith('en') ? 'en-US' : 'es-ES';
   const voice = pickVoice(language.startsWith('en') ? 'en' : 'es', personalityId, seed);
 
   const sentences = splitSentences(naturalizeForSpeech(text));
   for (let i = 0; i < sentences.length; i++) {
-    if (session !== speakSession) return; // llegó otra locución o un stop
+    if (session !== speakSession) return;
     const s = sentences[i];
-    // Micro-variación por oración (±3%) → rompe la monotonía robótica.
     const drift = ((hashString(seed + i) % 7) - 3) / 100;
     await new Promise((resolve) => {
       const u = new SpeechSynthesisUtterance(s);
-      u.rate = Math.max(0.6, Math.min(1.8, prof.rate + emo.rate + drift));
-      u.pitch = Math.max(0.5, Math.min(1.6, prof.pitch + emo.pitch + jitterBase + drift));
+      u.rate   = Math.max(0.6, Math.min(1.8, prof.rate + emo.rate + drift));
+      u.pitch  = Math.max(0.5, Math.min(1.6, prof.pitch + emo.pitch + jitterBase + drift));
       u.volume = emo.volume;
-      u.lang = lang;
+      u.lang   = lang;
       if (voice) u.voice = voice;
-      u.onend = resolve;
+      u.onend  = resolve;
       u.onerror = resolve;
       synth.speak(u);
     });
@@ -191,13 +255,11 @@ export async function speak(text, { personalityId, language = 'es', seed = '', e
 }
 
 export function stopSpeaking() {
-  speakSession++; // invalida cualquier bucle de oraciones en curso
+  speakSession++;
+  // Corta Fish Audio si está reproduciendo
+  if (window._fishAudioSource) {
+    try { window._fishAudioSource.stop(); } catch (_) {}
+    window._fishAudioSource = null;
+  }
   if (speechSupported()) window.speechSynthesis.cancel();
-}
-
-// Algunos navegadores cargan las voces async; precargar evita el primer turno mudo.
-export function warmUpVoices() {
-  if (!speechSupported()) return;
-  cachedVoices = window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged = () => { cachedVoices = window.speechSynthesis.getVoices(); };
 }
