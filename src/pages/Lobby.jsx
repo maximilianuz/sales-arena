@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Shuffle, Copy, ChessKnight, BookOpen, Smartphone,
   Zap, History, Target, TrendingUp, Theater, Eye,
-  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase, Target as TargetIcon
+  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase, Target as TargetIcon,
+  FileText
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
@@ -20,6 +21,8 @@ import ProgressPath from '../components/ProgressPath';
 // Carga diferida: SoloPractice arrastra la librería de avatares (DiceBear); solo
 // se baja cuando el usuario abre "Practicar solo".
 const SoloPractice = lazy(() => import('./SoloPractice'));
+// Generador de Propuestas VIP: módulo aparte que se abre desde el Lobby.
+const ProposalGenerator = lazy(() => import('../modules/proposals/ProposalGenerator'));
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
@@ -73,6 +76,7 @@ export default function Lobby() {
   const [showScouting, setShowScouting] = useState(false);
   const [showScoutingModal, setShowScoutingModal] = useState(false);
   const [showSolo, setShowSolo] = useState(false);
+  const [showProposals, setShowProposals] = useState(false);
   const [showJoinCohort, setShowJoinCohort] = useState(false);
   const [cohortCodeInput, setCohortCodeInput] = useState('');
   const [joinMsg, setJoinMsg] = useState('');
@@ -161,6 +165,11 @@ export default function Lobby() {
       <SoloPractice onBack={() => setShowSolo(false)} />
     </Suspense>
   );
+  if (showProposals) return (
+    <Suspense fallback={<div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}><p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Loading…' : 'Cargando…'}</p></div>}>
+      <ProposalGenerator onBack={() => setShowProposals(false)} />
+    </Suspense>
+  );
 
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '1.5rem 1rem 3rem' }}>
@@ -238,6 +247,12 @@ export default function Lobby() {
           label={isEn ? 'Practice solo' : 'Practicar solo'}
           accent="16,185,129"
           onClick={() => setShowSolo(true)}
+        />
+        <FeatureButton
+          icon={<FileText size={16} />}
+          label={isEn ? 'VIP Proposals' : 'Propuestas VIP'}
+          accent="134,59,255"
+          onClick={() => setShowProposals(true)}
         />
         {tier === 'trainer' && (
           <FeatureButton

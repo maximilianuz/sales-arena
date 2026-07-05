@@ -283,3 +283,15 @@ input::placeholder, textarea::placeholder {
   box-shadow: 0 15px 35px rgba(134, 59, 255, 0.6);
   filter: brightness(1.1);
 }
+
+/* ── Propuestas VIP: builder responsive ─────────────────────────────── */
+/* Dos columnas (form + preview) en desktop, una sola en mobile.        */
+.proposal-builder-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+  .proposal-builder-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

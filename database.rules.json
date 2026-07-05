@@ -61,6 +61,30 @@
         }
       }
     },
+    "proposals": {
+      ".read": false,
+      "$proposalId": {
+        ".read": true,
+        ".write": "auth != null && (!data.exists() || data.child('ownerUid').val() === auth.uid) && (!newData.exists() || newData.child('ownerUid').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['ownerUid', 'title'])"
+      }
+    },
+    "proposalIndex": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "proposalEvents": {
+      "$proposalId": {
+        ".read": "auth != null && root.child('proposals').child($proposalId).child('ownerUid').val() === auth.uid",
+        ".write": "auth != null && root.child('proposals').child($proposalId).child('ownerUid').val() === auth.uid && !newData.exists()",
+        "$eventId": {
+          ".write": "!data.exists()",
+          ".validate": "newData.hasChildren(['t', 'ts'])"
+        }
+      }
+    },
     "$other": {
       ".read": false,
       ".write": false
