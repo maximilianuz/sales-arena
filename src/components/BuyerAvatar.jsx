@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { createAvatar } from '@dicebear/core';
 import { avataaars } from '@dicebear/collection';
 import { inferGender } from '../utils/genderFromName';
+import { getSpeechLevel } from '../utils/voice';
 
 // Peinados/vello facial coherentes por género (opciones válidas de avataaars).
 const TOPS_MALE = ['shortFlat', 'shortRound', 'shortWaved', 'theCaesar', 'theCaesarAndSidePart', 'sides'];
@@ -38,25 +39,79 @@ function expressionFor({ temperature: t, trust: tr, patience: p }) {
   return { eyebrows: 'defaultNatural', mouth: 'default', eyes: 'default' };
 }
 
-export default function BuyerAvatar({ state, speaking = false, name = '', seed = '', isEn = false, size = 130 }) {
+// Emoción del turno (la emite la IA) → expresión facial. Es MÁS específica que
+// el estado (medidores): cuando el lead reacciona a la última frase, la cara lo
+// muestra. Si es 'neutral', dejamos que mande el estado ambiente.
+const EMOTION_EXPR = {
+  interesado:   { eyebrows: 'raisedExcited', mouth: 'default',   eyes: 'default' },
+  esceptico:    { eyebrows: 'flatNatural',   mouth: 'serious',   eyes: 'squint' },
+  molesto:      { eyebrows: 'angry',         mouth: 'serious',   eyes: 'squint' },
+  entusiasmado: { eyebrows: 'raisedExcited', mouth: 'smile',     eyes: 'happy' },
+  dudoso:       { eyebrows: 'sadConcerned',  mouth: 'concerned', eyes: 'side' },
+  apurado:      { eyebrows: 'flatNatural',   mouth: 'serious',   eyes: 'default' },
+};
+
+export default function BuyerAvatar({ state, speaking = false, emotion = 'neutral', name = '', seed = '', isEn = false, size = 130 }) {
   const t = state?.temperature ?? 35;
   const tr = state?.trust ?? 25;
   const p = state?.patience ?? 70;
   const glow = tempColor(t);
-  const expr = expressionFor({ temperature: t, trust: tr, patience: p });
+  // La emoción del turno manda; si es neutral, cae al estado ambiente.
+  const expr = (emotion && emotion !== 'neutral' && EMOTION_EXPR[emotion])
+    || expressionFor({ temperature: t, trust: tr, patience: p });
 
-  // Regeneramos el SVG solo cuando cambia el lead o su expresión (barato).
+  // Pre-generamos 4 variantes de boca por expresión: reposo (la emocional) + 3
+  // niveles de apertura para "hablar". Cejas/ojos quedan fijos → sólo cambia la
+  // boca, que es lo barato de intercambiar frame a frame (swap de <img src>).
   const gender = inferGender(name || seed);
-  const uri = useMemo(() => createAvatar(avataaars, {
-    seed: seed || name || 'lead',
-    mouth: [expr.mouth],
-    eyebrows: [expr.eyebrows],
-    eyes: [expr.eyes],
-    top: gender === 'female' ? TOPS_FEMALE : TOPS_MALE,
-    facialHairProbability: gender === 'female' ? 0 : 35,
-    backgroundColor: [],
-    radius: 50,
-  }).toDataUri(), [seed, name, gender, expr.mouth, expr.eyebrows, expr.eyes]);
+  const uris = useMemo(() => {
+    const base = {
+      seed: seed || name || 'lead',
+      eyebrows: [expr.eyebrows],
+      eyes: [expr.eyes],
+      top: gender === 'female' ? TOPS_FEMALE : TOPS_MALE,
+      facialHairProbability: gender === 'female' ? 0 : 35,
+      backgroundColor: [],
+      radius: 50,
+    };
+    const make = (mouth) => createAvatar(avataaars, { ...base, mouth: [mouth] }).toDataUri();
+    return {
+      rest: make(expr.mouth),   // en silencio: la boca de la emoción
+      closed: make('serious'),  // hablando, entre palabras
+      mid: make('default'),     // apertura media
+      wide: make('screamOpen'), // pico de volumen
+    };
+  }, [seed, name, gender, expr.eyebrows, expr.eyes, expr.mouth]);
+
+  // Mientras habla, leemos la amplitud real del audio (getSpeechLevel) por frame
+  // y elegimos el nivel de apertura de boca. Si no hay amplitud (fallback del TTS
+  // del navegador), hacemos un "flap" creíble por tiempo. Sólo re-render cuando
+  // cambia el nivel (0/1/2) → nada de 60 renders/seg.
+  const [mouthBucket, setMouthBucket] = useState(-1); // -1 = reposo
+  const bucketRef = useRef(-1);
+  useEffect(() => {
+    // En reposo no tocamos el estado: `uri` cae a rest porque speaking es false.
+    if (!speaking) return;
+    let raf = 0;
+    bucketRef.current = -1;
+    const startT = performance.now();
+    const loop = () => {
+      let v = getSpeechLevel();
+      if (v <= 0.001) {
+        const s = (performance.now() - startT) / 1000;
+        v = 0.18 + 0.22 * Math.abs(Math.sin(s * 9)); // flap ~1.4Hz
+      }
+      const b = v < 0.10 ? 0 : v < 0.28 ? 1 : 2;
+      if (b !== bucketRef.current) { bucketRef.current = b; setMouthBucket(b); }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [speaking]);
+
+  const uri = (speaking && mouthBucket >= 0)
+    ? (mouthBucket === 2 ? uris.wide : mouthBucket === 1 ? uris.mid : uris.closed)
+    : uris.rest;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>

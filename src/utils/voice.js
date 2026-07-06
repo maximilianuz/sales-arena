@@ -1,5 +1,4 @@
 import { auth } from './db';
-import { inferGender } from './genderFromName';
 
 // Utilidades de voz para el modo práctica solo (web).
 //  - Grabación push-to-talk con MediaRecorder → base64.
@@ -178,6 +177,13 @@ export function warmUpVoices() {
 // lo reproduce como AudioBuffer. Si falla (red, timeout, créditos), cae
 // automáticamente a SpeechSynthesis del navegador — el roleplay nunca se rompe.
 
+// Nivel de amplitud (0..1) de la voz que se está reproduciendo AHORA. Lo alimenta
+// un AnalyserNode durante la reproducción de Fish Audio; el avatar lo lee por
+// frame para mover los labios sincronizados con lo que realmente suena. Con el
+// fallback de SpeechSynthesis queda en 0 (el avatar hace un "flap" por tiempo).
+let speechLevel = 0;
+export function getSpeechLevel() { return speechLevel; }
+
 let audioCtx = null;
 function getAudioCtx() {
   if (!audioCtx || audioCtx.state === 'closed') {
@@ -223,9 +229,25 @@ async function speakFishAudio(text, { uid, personalityId, language = 'es', emoti
   return new Promise((resolve) => {
     const source = ctx.createBufferSource();
     source.buffer = audioBuffer;
-    source.connect(ctx.destination);
-    source.onended = resolve;
+    // Analizador en la cadena (source → analyser → destino): mide la envolvente
+    // de la voz en tiempo real para mover los labios del avatar al ritmo real.
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    analyser.connect(ctx.destination);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    let raf = 0;
+    const tick = () => {
+      analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) { const v = (data[i] - 128) / 128; sum += v * v; }
+      speechLevel = Math.min(1, Math.sqrt(sum / data.length) * 3); // RMS amplificado
+      raf = requestAnimationFrame(tick);
+    };
+    const finish = () => { if (raf) cancelAnimationFrame(raf); speechLevel = 0; resolve(); };
+    source.onended = finish;
     source.start(0);
+    tick();
     // Guardamos referencia para poder cortar con stopSpeaking()
     window._fishAudioSource = source;
   });
@@ -281,6 +303,7 @@ export async function speak(text, { uid, personalityId, language = 'es', seed = 
 
 export function stopSpeaking() {
   speakSession++;
+  speechLevel = 0; // labios en reposo
   // Corta Fish Audio si está reproduciendo
   if (window._fishAudioSource) {
     try { window._fishAudioSource.stop(); } catch { /* ya detenido */ }

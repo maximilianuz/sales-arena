@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen, Shuffle, Package, ChevronDown, ChevronUp } from 'lucide-react';
 import { auth } from '../utils/db';
 import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, initialBuyerState } from '../utils/roleplayClient';
 import { openingLine } from '../utils/buyerPrompt';
 import { getDefaultStages } from '../utils/defaultStages';
+import { INDUSTRY_CATEGORIES, randomIndustryValue } from '../utils/industries';
 import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
 import MethodScores from '../components/MethodScores';
@@ -34,6 +35,13 @@ const METERS = [
   { key: 'trust', icon: Shield, es: 'Confianza', en: 'Trust', color: '#22d3ee' },
   { key: 'patience', icon: Clock, es: 'Paciencia', en: 'Patience', color: '#a78bfa' },
 ];
+
+// Estilo base compartido de los botones de acción del header en vivo (Coach / voz /
+// colgar): misma forma, tamaño y tipografía; cada botón solo cambia el color de acento.
+const HEADER_BTN = {
+  borderRadius: '0.6rem', padding: '0.45rem 0.65rem', cursor: 'pointer',
+  display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: '700',
+};
 
 function Meter({ meter, value, isEn }) {
   const Icon = meter.icon;
@@ -68,10 +76,28 @@ export default function SoloPractice({ onBack }) {
   const [voiceOn, setVoiceOn] = useState(speechSupported());
   const [recording, setRecording] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [leadEmotion, setLeadEmotion] = useState('neutral'); // emoción del último turno → cara del avatar
   const [transcribing, setTranscribing] = useState(false);
   const [showCoach, setShowCoach] = useState(false);
+  // Producto a vender: visible al arrancar (clima) y colapsable para no tapar el chat.
+  const [showProduct, setShowProduct] = useState(true);
   // Foco: 'all' = llamada completa; o el id de una etapa para practicarla suelta.
   const [focusStageId, setFocusStageId] = useState('all');
+  // Config del lead (las MISMAS opciones que tiene el Trainer en el room): el
+  // closer arma su propio prospecto y el producto que le toca vender se genera
+  // en base a esto. Mismo shape que ScenarioPanel → mismo escenario/estructura.
+  // Se persiste en localStorage para no reconfigurar en cada llamada.
+  const [genConfig, setGenConfig] = useState(() => {
+    const defaults = { level: 'Intermedio', theme: 'Aleatorio (Sorpréndeme)', leadTemperature: 'Templado', targetObjection: 'Aleatoria (Sorpréndeme)' };
+    try {
+      const saved = JSON.parse(localStorage.getItem('soloLeadConfig'));
+      if (saved && typeof saved === 'object') return { ...defaults, ...saved };
+    } catch { /* sin config previa */ }
+    return defaults;
+  });
+  useEffect(() => {
+    try { localStorage.setItem('soloLeadConfig', JSON.stringify(genConfig)); } catch { /* storage no disponible */ }
+  }, [genConfig]);
   const [elapsed, setElapsed] = useState(0); // segundos de llamada
   const recorderRef = useRef(null);
   const scrollRef = useRef(null);
@@ -131,8 +157,14 @@ export default function SoloPractice({ onBack }) {
     setPhase('loading');
     setError('');
     try {
-      // Reusamos el generador de escenarios del room (personalidad DISC incluida).
-      const sc = await generateAIScenario(null, null, null, { level: 'intermedio', theme: '', leadTemperature: 'tibio', targetObjection: 'Aleatoria (Sorpréndeme)' }, [], i18n.language);
+      // Reusamos el generador de escenarios del room (personalidad DISC incluida)
+      // con la config que armó el closer → mismo escenario/producto que en la web.
+      const sc = await generateAIScenario(null, null, null, {
+        level: genConfig.level,
+        theme: genConfig.theme,
+        leadTemperature: genConfig.leadTemperature,
+        targetObjection: genConfig.targetObjection,
+      }, [], i18n.language);
       if (!sc || typeof sc !== 'object') throw new Error(isEn ? 'Could not generate the buyer.' : 'No se pudo generar el comprador.');
       setScenario(sc);
 
@@ -142,6 +174,8 @@ export default function SoloPractice({ onBack }) {
       setState(initialBuyerState());
       setMessages([{ role: 'assistant', content: greet }]);
       setThoughts([]);
+      setLeadEmotion('neutral');
+      setShowProduct(true);
       setElapsed(0);
       setPhase('live');
       playBuyerVoice(greet, sc);
@@ -162,6 +196,7 @@ export default function SoloPractice({ onBack }) {
       const turn = await buyerTurn({ scenario, state, history: nextHistory, language: i18n.language, focusStage });
       setState(turn.state);
       setMessages([...nextHistory, { role: 'assistant', content: turn.reply, emotion: turn.emotion }]);
+      setLeadEmotion(turn.emotion || 'neutral');
       if (turn.thought) setThoughts(t => [...t, turn.thought]);
       if (turn.outcome === 'closed' || turn.outcome === 'lost') {
         setOutcome(turn.outcome);
@@ -220,6 +255,17 @@ export default function SoloPractice({ onBack }) {
     setPhase('ended');
   };
 
+  // Salir al lobby abandonando la llamada. Si hay conversación en curso pedimos
+  // confirmación: sin esto, un click accidental descartaba toda la sesión sin
+  // puntuar (justo al lado del botón de colgar, que sí lleva al scoring).
+  const leaveCall = () => {
+    if (messages.length > 1 && !window.confirm(isEn
+      ? 'Leave the call? It will be discarded without scoring. Use "Hang up" to end and score it.'
+      : '¿Salir de la llamada? Se descarta sin puntuar. Usá "Colgar" para terminarla y puntuarla.')) return;
+    stopSpeaking();
+    onBack();
+  };
+
   // Scoring del transcript con la misma rúbrica (analyze-session extendido).
   const scoreSession = async () => {
     setScoring(true);
@@ -244,6 +290,8 @@ export default function SoloPractice({ onBack }) {
           productPrice: scenario?.productPrice,
           language: i18n.language || 'es',
           soloMode: true,
+          // Si practicó una fase suelta, el scoring puntúa solo lo relevante.
+          focusStage: focusStage ? focusStage.label : null,
         })
       });
       const data = await res.json();
@@ -258,6 +306,38 @@ export default function SoloPractice({ onBack }) {
 
   // ── Intro ────────────────────────────────────────────────────────────────
   if (phase === 'intro' || phase === 'loading') {
+    // Mismas opciones que el Trainer (ScenarioPanel): dificultad y temperatura.
+    // `m` = multiplicador de recompensa (debe coincidir con analyze-session): así
+    // el closer ve el trade-off riesgo/recompensa ANTES de elegir.
+    const LEVELS = isEn
+      ? [{ v: 'Principiante', l: '🟢 Beginner', d: 'Friendly', m: 0.8 }, { v: 'Intermedio', l: '🟡 Intermediate', d: 'Skeptical', m: 1.0 }, { v: 'Avanzado', l: '🔴 Advanced', d: 'Hostile', m: 1.4 }]
+      : [{ v: 'Principiante', l: '🟢 Principiante', d: 'Amigable', m: 0.8 }, { v: 'Intermedio', l: '🟡 Intermedio', d: 'Escéptico', m: 1.0 }, { v: 'Avanzado', l: '🔴 Avanzado', d: 'Hostil', m: 1.4 }];
+    const TEMPS = isEn
+      ? [{ v: 'Frío', l: '🧊 Cold', d: "Doesn't know you", m: 1.15 }, { v: 'Templado', l: '☀️ Warm', d: 'Saw your ad', m: 1.0 }, { v: 'Caliente', l: '🔥 Hot', d: 'Referral', m: 0.9 }]
+      : [{ v: 'Frío', l: '🧊 Frío', d: 'No te conoce', m: 1.15 }, { v: 'Templado', l: '☀️ Templado', d: 'Vio tu anuncio', m: 1.0 }, { v: 'Caliente', l: '🔥 Caliente', d: 'Referido', m: 0.9 }];
+    // Objeción principal que enfrentará el closer (misma idea que el Trainer).
+    const OBJECTIONS = [
+      { v: 'Aleatoria (Sorpréndeme)', l: isEn ? '🎲 Surprise me' : '🎲 Sorpréndeme' },
+      { v: 'Lo tengo que pensar', l: isEn ? '“I need to think about it”' : '“Lo tengo que pensar”' },
+      { v: 'Me parece caro', l: isEn ? '“It’s too expensive”' : '“Me parece caro”' },
+      { v: 'No tengo el dinero', l: isEn ? '“I don’t have the money”' : '“No tengo el dinero”' },
+      { v: 'No tengo tiempo', l: isEn ? '“I don’t have time”' : '“No tengo tiempo”' },
+      { v: 'Socio / Pareja', l: isEn ? '“I have to ask my partner”' : '“Lo consulto con mi socio/pareja”' },
+      { v: 'No confío en mí mismo', l: isEn ? '“I don’t trust myself”' : '“No confío en mí mismo”' },
+      { v: 'No confío en ustedes', l: isEn ? '“I don’t trust you”' : '“No confío en ustedes”' },
+      { v: 'Excusas Rápidas (One-Liners)', l: isEn ? 'Quick excuses (one-liners)' : 'Excusas rápidas (one-liners)' },
+    ];
+    const randomizeLead = () => {
+      const levels = ['Principiante', 'Intermedio', 'Avanzado', 'Avanzado'];
+      const temps = ['Frío', 'Frío', 'Templado', 'Caliente'];
+      setGenConfig(c => ({
+        ...c,
+        theme: randomIndustryValue(),
+        level: levels[Math.floor(Math.random() * levels.length)],
+        leadTemperature: temps[Math.floor(Math.random() * temps.length)],
+        targetObjection: 'Aleatoria (Sorpréndeme)',
+      }));
+    };
     return (
       <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
         <div style={{ maxWidth: '520px', width: '100%' }}>
@@ -274,6 +354,85 @@ export default function SoloPractice({ onBack }) {
                 ? 'A real, skeptical prospect with hidden objections and a mood that shifts with your technique. Earn their trust — or lose the call. Scored on the same rubric as team sessions.'
                 : 'Un prospecto real y escéptico, con objeciones ocultas y un ánimo que cambia según tu técnica. Ganate su confianza — o perdé la llamada. Se puntúa con la misma rúbrica que las sesiones en equipo.'}
             </p>
+            {/* Config del lead: las mismas opciones que el Trainer. El closer
+                arma su prospecto y el producto a vender se genera en base a esto. */}
+            <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)' }}>
+                  {isEn ? 'Build your lead' : 'Armá tu lead'}
+                </div>
+                <button onClick={randomizeLead} disabled={phase === 'loading'} title={isEn ? 'Random' : 'Aleatorio'}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.3rem 0.6rem', borderRadius: '2rem', cursor: 'pointer', fontSize: '0.72rem', fontWeight: '700', background: 'rgba(255,159,10,0.1)', color: 'var(--accent)', border: '1px solid rgba(255,159,10,0.3)' }}>
+                  <Shuffle size={12} /> 🎲
+                </button>
+              </div>
+
+              {/* Industria / rubro */}
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+                {isEn ? 'Industry' : 'Rubro / Industria'}
+              </label>
+              <select value={genConfig.theme} onChange={e => setGenConfig(c => ({ ...c, theme: e.target.value }))}
+                style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.04)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.88rem', fontFamily: 'inherit', cursor: 'pointer', marginBottom: '0.85rem' }}>
+                <optgroup label={isEn ? 'Random' : 'Aleatorio'}>
+                  <option value="Aleatorio (Sorpréndeme)">{isEn ? '🎲 Surprise me' : '🎲 Sorpréndeme'}</option>
+                </optgroup>
+                {INDUSTRY_CATEGORIES.map((cat) => (
+                  <optgroup key={cat.es} label={isEn ? cat.en : cat.es}>
+                    {cat.items.map((it) => (
+                      <option key={it.es} value={it.es}>{isEn ? it.en : it.es}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+
+              {/* Dificultad */}
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+                {isEn ? 'Difficulty' : 'Dificultad'}
+              </label>
+              <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
+                {LEVELS.map(l => {
+                  const active = genConfig.level === l.v;
+                  return (
+                    <button type="button" key={l.v} onClick={() => setGenConfig(c => ({ ...c, level: l.v }))}
+                      style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(100,210,255,0.6)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(100,210,255,0.15)' : 'rgba(255,255,255,0.02)' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{l.l}</div>
+                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{l.d}</div>
+                      <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: l.m > 1 ? 'var(--accent)' : l.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{l.m}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Temperatura */}
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+                {isEn ? 'Lead Temperature' : 'Temperatura'}
+              </label>
+              <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
+                {TEMPS.map(t => {
+                  const active = genConfig.leadTemperature === t.v;
+                  return (
+                    <button type="button" key={t.v} onClick={() => setGenConfig(c => ({ ...c, leadTemperature: t.v }))}
+                      style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(255,159,10,0.5)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(255,159,10,0.1)' : 'rgba(255,255,255,0.02)' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{t.l}</div>
+                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{t.d}</div>
+                      <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: t.m > 1 ? 'var(--accent)' : t.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{t.m}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Objeción principal a enfrentar */}
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+                {isEn ? 'Main objection' : 'Objeción principal'}
+              </label>
+              <select value={genConfig.targetObjection} onChange={e => setGenConfig(c => ({ ...c, targetObjection: e.target.value }))}
+                style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.04)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.88rem', fontFamily: 'inherit', cursor: 'pointer' }}>
+                {OBJECTIONS.map(o => (
+                  <option key={o.v} value={o.v}>{o.l}</option>
+                ))}
+              </select>
+            </div>
+
             {/* Selector: llamada completa o una etapa suelta */}
             <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
               <div style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
@@ -356,9 +515,21 @@ export default function SoloPractice({ onBack }) {
                   <div>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--success)', fontWeight: '600', marginTop: '0.25rem' }}>
                       <Trophy size={16} /> +${analysis.gamification.earned.toLocaleString('en-US')}
+                      {analysis.gamification.difficultyMult && analysis.gamification.difficultyMult !== 1 && (
+                        <span style={{ fontSize: '0.72rem', fontWeight: '700', color: analysis.gamification.difficultyMult > 1 ? 'var(--accent)' : 'var(--text-muted)', background: 'rgba(255,159,10,0.12)', border: '1px solid rgba(255,159,10,0.3)', borderRadius: '2rem', padding: '0.1rem 0.5rem' }}>
+                          {genConfig.level} ×{analysis.gamification.difficultyMult}
+                        </span>
+                      )}
+                      {analysis.gamification.tempMult && analysis.gamification.tempMult !== 1 && (
+                        <span style={{ fontSize: '0.72rem', fontWeight: '700', color: analysis.gamification.tempMult > 1 ? 'var(--accent)' : 'var(--text-muted)', background: 'rgba(255,159,10,0.12)', border: '1px solid rgba(255,159,10,0.3)', borderRadius: '2rem', padding: '0.1rem 0.5rem' }}>
+                          {genConfig.leadTemperature} ×{analysis.gamification.tempMult}
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                      {isEn ? 'Solo practice earns half — real sessions with people are worth more.' : 'La práctica solo acredita la mitad — las sesiones reales con gente valen más.'}
+                      {isEn
+                        ? 'Solo practice earns half — real sessions with people are worth more. Harder leads pay more.'
+                        : 'La práctica solo acredita la mitad — las sesiones reales con gente valen más. Los leads más difíciles pagan más.'}
                     </div>
                   </div>
                 )}
@@ -399,7 +570,7 @@ export default function SoloPractice({ onBack }) {
         <div className="glass-panel" style={{ padding: '0.85rem 1rem', marginBottom: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><ArrowLeft size={18} /></button>
+              <button onClick={leaveCall} title={isEn ? 'Back to lobby' : 'Volver al lobby'} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}><ArrowLeft size={18} /></button>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', fontWeight: '700', color: elapsed >= MAX_SECONDS - 300 ? 'var(--danger)' : 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
                 <Clock size={13} /> {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
               </span>
@@ -410,17 +581,18 @@ export default function SoloPractice({ onBack }) {
               )}
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button onClick={() => setShowCoach(true)} title={isEn ? 'Closer guide' : 'Guía del closer'}
-                style={{ background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', borderRadius: '0.6rem', padding: '0.45rem 0.7rem', color: 'var(--primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: '700' }}>
-                <BookOpen size={16} /> {isEn ? 'Guide' : 'Guía'}
+              <button onClick={() => setShowCoach(true)} title={isEn ? 'Closer coach' : 'Coach del closer'}
+                style={{ ...HEADER_BTN, background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', color: 'var(--primary)' }}>
+                <BookOpen size={16} /> {isEn ? 'Coach' : 'Coach'}
               </button>
               {speechSupported() && (
                 <button onClick={() => { unlockAudio(); if (voiceOn) stopSpeaking(); setVoiceOn(v => !v); }} title={isEn ? 'Toggle voice' : 'Voz on/off'}
-                  style={{ background: voiceOn ? 'rgba(48,209,88,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${voiceOn ? 'var(--success)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '0.6rem', padding: '0.45rem', color: voiceOn ? 'var(--success)' : 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
+                  style={{ ...HEADER_BTN, background: voiceOn ? 'rgba(48,209,88,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${voiceOn ? 'var(--success)' : 'rgba(255,255,255,0.15)'}`, color: voiceOn ? 'var(--success)' : 'var(--text-muted)' }}>
                   {voiceOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
                 </button>
               )}
-              <button onClick={hangUp} title={isEn ? 'Hang up' : 'Colgar'} style={{ background: 'rgba(255,69,58,0.12)', border: '1px solid rgba(255,69,58,0.3)', borderRadius: '0.6rem', padding: '0.45rem', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}>
+              <button onClick={hangUp} title={isEn ? 'Hang up' : 'Colgar'}
+                style={{ ...HEADER_BTN, background: 'rgba(255,69,58,0.12)', border: '1px solid rgba(255,69,58,0.3)', color: 'var(--danger)' }}>
                 <PhoneOff size={16} />
               </button>
             </div>
@@ -432,6 +604,7 @@ export default function SoloPractice({ onBack }) {
             <BuyerAvatar
               state={state}
               speaking={speaking}
+              emotion={leadEmotion}
               name={leadName}
               seed={leadName}
               isEn={isEn}
@@ -442,6 +615,24 @@ export default function SoloPractice({ onBack }) {
             {METERS.map(m => <Meter key={m.key} meter={m} value={state[m.key]} isEn={isEn} />)}
           </div>
         </div>
+
+        {/* Producto a vender: le da clima al closer (qué ofrece). Empieza abierto y
+            se puede colapsar. El "cómo" (perfil del lead, etapas) sigue en la Guía. */}
+        {scenario?.productToSell && (
+          <div className="glass-panel" style={{ padding: showProduct ? '0.75rem 0.9rem' : '0.5rem 0.9rem', marginBottom: '0.75rem', border: '1px solid rgba(48,209,88,0.25)', background: 'rgba(48,209,88,0.06)' }}>
+            <button onClick={() => setShowProduct(v => !v)} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: 0, color: 'inherit' }}>
+              <Package size={14} color="var(--success)" />
+              <span style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--success)' }}>{isEn ? 'What you sell' : 'Qué vendés'}</span>
+              {scenario.productPrice > 0 && (
+                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--success)' }}>· USD {Number(scenario.productPrice).toLocaleString('en-US')}</span>
+              )}
+              <span style={{ marginLeft: 'auto', display: 'flex', color: 'var(--text-muted)' }}>{showProduct ? <ChevronUp size={15} /> : <ChevronDown size={15} />}</span>
+            </button>
+            {showProduct && (
+              <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.45 }}>{scenario.productToSell}</p>
+            )}
+          </div>
+        )}
 
         {/* Mensajes */}
         <div ref={scrollRef} className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '1rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
@@ -503,7 +694,7 @@ export default function SoloPractice({ onBack }) {
         </div>
       </div>
 
-      {showCoach && <SoloCoachPanel scenario={scenario} onClose={() => setShowCoach(false)} />}
+      {showCoach && <SoloCoachPanel onClose={() => setShowCoach(false)} />}
     </div>
   );
 }
