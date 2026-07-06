@@ -16,7 +16,7 @@ export const handler = async (event) => {
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
-  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid, closerName, leadUid, observers, transcript, soloMode } = body;
+  const { uid, scenario, debriefNotes, votingResults, rubric, listeningLog, stages, sessionDurationMinutes, language = 'es', productPrice, commissionPct, closed, closerUid, closerName, leadUid, observers, transcript, soloMode, focusStage } = body;
 
   if (!uid || !scenario) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
@@ -90,6 +90,16 @@ export const handler = async (event) => {
         : `\n\nTRANSCRIPT COMPLETO DE LA LLAMADA (fuente primaria de verdad — basá tus puntajes en lo que REALMENTE se dijo acá):\n${transcriptText}`)
     : '';
 
+  // Práctica ENFOCADA (modo solo): el closer entrenó una sola fase (ej. "Apertura").
+  // Sin esto, el modelo lo penaliza por no llegar al cierre y baja el promedio
+  // injustamente. Le pedimos que puntúe solo lo relevante a esa fase.
+  const focusStageLabel = typeof focusStage === 'string' ? focusStage.trim() : '';
+  const focusBlock = focusStageLabel
+    ? (isEn
+        ? `\n\nFOCUSED DRILL: The closer practiced ONLY the "${focusStageLabel}" phase — NOT the full call. Score ONLY the dimensions relevant to that phase and do NOT penalize them for not reaching later phases (e.g., closing). overallScore must reflect performance WITHIN this phase; for dimensions that don't apply, give a neutral score based on the overall interaction instead of a low one.`
+        : `\n\nPRÁCTICA ENFOCADA: el closer entrenó SOLO la fase "${focusStageLabel}" — NO la llamada completa. Puntuá SOLO las dimensiones relevantes a esa fase y NO lo penalices por no llegar a fases posteriores (ej. cierre). overallScore debe reflejar el desempeño DENTRO de esta fase; para las dimensiones que no aplican, dale un puntaje neutro basado en la interacción, no uno bajo.`)
+    : '';
+
   // Metodología del coach (DESTILADA y anónima — venta consultiva de alto valor).
   // Fundamenta el feedback en ESTE método, no en consejos genéricos.
   const methodologyEn = `COACH METHODOLOGY (ground your feedback in these principles; this is high-value consultative selling):
@@ -117,6 +127,7 @@ ${methodologyEn}
 LEAD PROFILE:
 - Name: ${scenario.demographics?.name || 'Unknown'}
 - Industry: ${scenario.demographics?.industry || 'Unknown'}
+- Difficulty: ${scenario.level || 'Unknown'} (Beginner=friendly, Intermediate=skeptical, Advanced=hostile — use this to calibrate what a strong performance looks like, but score the closer's technique objectively)
 - Main objection: ${scenario.visibleObjection || 'None'}
 
 SESSION DATA:
@@ -135,6 +146,7 @@ ${rubricText}
 OBSERVER ACTIVE-LISTENING LOG (real signals captured from the call — use to ground your feedback):
 ${listeningBlock}
 ${transcriptBlock}
+${focusBlock}
 
 Respond ONLY in valid JSON with this exact structure:
 {
@@ -164,6 +176,7 @@ ${methodologyEs}
 PERFIL DEL LEAD:
 - Nombre: ${scenario.demographics?.name || 'Desconocido'}
 - Industria: ${scenario.demographics?.industry || 'Desconocida'}
+- Dificultad: ${scenario.level || 'Desconocida'} (Principiante=amigable, Intermedio=escéptico, Avanzado=hostil — usala para calibrar qué es un buen desempeño, pero puntuá la técnica del closer de forma objetiva)
 - Objeción principal: ${scenario.visibleObjection || 'Ninguna'}
 
 DATOS DE SESIÓN:
@@ -182,6 +195,7 @@ ${rubricText}
 BITÁCORA DE ESCUCHA ACTIVA DEL OBSERVADOR (señales reales capturadas de la llamada — usalas para fundamentar tu feedback):
 ${listeningBlock}
 ${transcriptBlock}
+${focusBlock}
 
 Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
 {
@@ -253,6 +267,10 @@ Significado de methodScores: frameControl = lideró el marco con desapego (sin n
     let sessionEarned = 0;       // comisión de esta sesión puntual
     let closerStats = null;      // stats resultantes del Closer (para el leaderboard)
     let teamSpirit = 'neutral';  // bonus/penalty por ayudar (o no) como Lead/Observador
+    let difficulty = null;       // nivel del escenario (para mostrar el multiplicador)
+    let difficultyMultOut = 1.0; // multiplicador de recompensa aplicado por dificultad
+    let temperature = null;      // temperatura del lead (para mostrar su multiplicador)
+    let tempMultOut = 1.0;       // multiplicador de recompensa por temperatura
     try {
       const prev = (creditData && creditData.stats) || {};
       const rubricVals = rubric ? Object.values(rubric).filter(v => typeof v === 'number' && v > 0) : [];
@@ -273,6 +291,26 @@ Significado de methodScores: frameControl = lideró el marco con desapego (sin n
       // personas (lead/observador humanos): entrenás, pero no reemplaza la
       // presión de una llamada real. Se acredita la mitad.
       if (soloMode) earned = Math.round(earned * 0.5);
+
+      // Dificultad del escenario: no es lo mismo cerrar un lead amigable de
+      // práctica que uno escéptico o abiertamente hostil. Escalamos la RECOMPENSA
+      // (no el overallScore, que mide la técnica objetiva del closer). Si el
+      // escenario no trae nivel (sesiones viejas), multiplicador neutro = 1.
+      const DIFFICULTY_MULT = { principiante: 0.8, intermedio: 1.0, avanzado: 1.4 };
+      const level = String(scenario?.level || body.difficulty || '').toLowerCase();
+      const difficultyMult = DIFFICULTY_MULT[level] || 1.0;
+
+      // La temperatura también pesa: cerrar un lead FRÍO (no te conoce, escéptico)
+      // es más difícil que uno CALIENTE (referido, ya urgido) → paga distinto.
+      const TEMP_MULT = { 'frío': 1.15, 'frio': 1.15, 'templado': 1.0, 'caliente': 0.9 };
+      const temp = String(scenario?.leadTemperature || body.leadTemperature || '').toLowerCase();
+      const tempMult = TEMP_MULT[temp] || 1.0;
+
+      earned = Math.round(earned * difficultyMult * tempMult);
+      difficulty = level || null;
+      difficultyMultOut = difficultyMult;
+      temperature = temp || null;
+      tempMultOut = tempMult;
 
       const today = new Date().toISOString().slice(0, 10);
 
@@ -440,7 +478,7 @@ Significado de methodScores: frameControl = lideró el marco con desapego (sin n
         analysis,
         // Info de gamificación para que la UI muestre lo ganado y el estado
         // de espíritu de equipo (bonus/penalty/neutral).
-        gamification: { earned: sessionEarned, teamSpirit, solo: !!soloMode }
+        gamification: { earned: sessionEarned, teamSpirit, solo: !!soloMode, difficulty, difficultyMult: difficultyMultOut, temperature, tempMult: tempMultOut }
       })
     };
   } catch (err) {

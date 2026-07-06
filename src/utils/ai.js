@@ -153,6 +153,10 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
   const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 2800);
   if (scenario && typeof scenario === 'object') {
     scenario.personality = personality.id;
+    // Guardamos la dificultad/temperatura elegidas: el scoring las usa para
+    // escalar la recompensa (cerrar un lead hostil vale más que uno amigable).
+    scenario.level = config.level || null;
+    scenario.leadTemperature = config.leadTemperature || null;
     // Si hay producto real, lo estampamos EXACTO (no dependemos del modelo).
     if (realProduct) {
       scenario.productToSell = `${realProduct.name} — ${realProduct.description} (USD ${realProduct.price})`;
