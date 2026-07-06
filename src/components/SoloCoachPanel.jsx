@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { X, Package, UserCheck, ListChecks, ChevronDown, ChevronUp, Lightbulb } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
 import { getStageCoaching } from '../utils/coachingKnowledge';
-import { getPersonality, personalityView } from '../utils/leadPersonalities';
+import { LEAD_PERSONALITIES, personalityView } from '../utils/leadPersonalities';
 
-// Guía del closer para el modo práctica solo: le da lo mismo que ve cuando hay
-// más personas — qué producto vende, cómo venderle a ESTE lead (según su DISC) y
-// la estructura de la venta con sugerencias por etapa. Todo del KB curado (sin
-// tokens de IA). Se abre como panel lateral para no tapar el chat.
+// Guía del closer para el modo práctica solo: qué producto vende, la chuleta de
+// los 4 perfiles DISC (SIN revelar cuál es este lead — eso lo descubre
+// conversando) y la estructura de la venta con sugerencias por etapa. Todo del
+// KB curado (sin tokens de IA). Se abre como panel lateral para no tapar el chat.
 
 function StageRow({ stage, isEn }) {
   const [open, setOpen] = useState(false);
@@ -69,7 +69,6 @@ export default function SoloCoachPanel({ scenario, onClose }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const stages = getDefaultStages(i18n.language);
-  const pv = personalityView(getPersonality(scenario?.personality), i18n.language);
   const product = scenario?.productToSell || (isEn ? 'Your high-ticket offer' : 'Tu oferta high ticket');
   const price = scenario?.productPrice;
 
@@ -93,18 +92,30 @@ export default function SoloCoachPanel({ scenario, onClose }) {
           </div>
         </Section>
 
-        {/* Cómo venderle a este lead (DISC) */}
-        {pv && (
-          <Section icon={<UserCheck size={15} />} title={isEn ? `Sell to this lead · ${pv.name}` : `Venderle a este lead · ${pv.name}`}>
-            <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <div><strong style={{ color: pv.color }}>{isEn ? 'Essence: ' : 'Esencia: '}</strong>{pv.essence}</div>
-              <div><strong style={{ color: 'var(--success)' }}>{isEn ? 'Connect: ' : 'Conectá: '}</strong>{pv.connect}</div>
-              <div><strong style={{ color: 'var(--accent)' }}>{isEn ? 'Close: ' : 'Cerrá: '}</strong>{pv.close}</div>
-              <div><strong style={{ color: 'var(--danger)' }}>{isEn ? 'Avoid: ' : 'Evitá: '}</strong>{pv.avoid}</div>
-              <div><strong>{isEn ? 'Tone: ' : 'Tono: '}</strong>{pv.tone}</div>
-            </div>
-          </Section>
-        )}
+        {/* Chuleta de los 4 perfiles DISC — NO revela cuál es este lead:
+            el closer lo diagnostica escuchando cómo habla y adapta su técnica. */}
+        <Section icon={<UserCheck size={15} />} title={isEn ? 'Identify their profile (and adapt)' : 'Identificá su perfil (y adaptate)'}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>
+            {isEn
+              ? 'Every lead is one of these 4. Listen to HOW they talk, spot which one you got, and sell their way:'
+              : 'Todo lead es uno de estos 4. Escuchá CÓMO habla, detectá cuál te tocó y vendele a su manera:'}
+          </p>
+          {LEAD_PERSONALITIES.map(p => {
+            const v = personalityView(p, i18n.language);
+            if (!v) return null;
+            return (
+              <div key={p.id} style={{ marginBottom: '0.6rem', padding: '0.6rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div style={{ fontWeight: '700', fontSize: '0.82rem', color: v.color, marginBottom: '0.25rem' }}>{v.name}</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <div><strong style={{ color: 'var(--text-main)' }}>{isEn ? 'Sounds like: ' : 'Suena así: '}</strong>{v.essence}</div>
+                  <div><strong style={{ color: 'var(--success)' }}>{isEn ? 'Connect: ' : 'Conectá: '}</strong>{v.connect}</div>
+                  <div><strong style={{ color: 'var(--accent)' }}>{isEn ? 'Close: ' : 'Cerrá: '}</strong>{v.close}</div>
+                  <div><strong style={{ color: 'var(--danger)' }}>{isEn ? 'Avoid: ' : 'Evitá: '}</strong>{v.avoid}</div>
+                </div>
+              </div>
+            );
+          })}
+        </Section>
 
         {/* Estructura de la venta */}
         <Section icon={<ListChecks size={15} />} title={isEn ? 'Structure to follow' : 'Estructura a seguir'}>

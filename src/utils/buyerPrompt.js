@@ -53,6 +53,60 @@ export function buildBuyerSystem(scenario = {}, state = null, language = 'es', f
   const hidden = scenario.hiddenObjection || '';
   const product = scenario.productToSell || '';
 
+  // Caracterización profunda del escenario generado: psicología, señales
+  // conductuales, historia y guía de actuación. Solo se inyectan los campos
+  // presentes (el generador puede omitir alguno) para no gastar tokens en vacío.
+  const psy = scenario.psychology || {};
+  const cues = scenario.behavioralCues || {};
+  const guide = scenario.roleplayGuide || {};
+  const joinLines = (arr) => arr.filter(Boolean).join('\n');
+
+  const profileEs = joinLines([
+    psy.communicationStyle && `- Estilo de comunicación: ${psy.communicationStyle}`,
+    cues.verbalStyle && `- Cómo hablás literalmente (frases típicas, muletillas, ritmo): ${cues.verbalStyle}`,
+    guide.actorAdvice && `- Cómo actuás (tono, actitud, resistencia): ${guide.actorAdvice}`,
+    psy.urgency && `- Tu urgencia real: ${psy.urgency}`,
+    psy.decisionStyle && `- Cómo tomás decisiones: ${psy.decisionStyle}`,
+    psy.trustTrigger && `- Qué te genera o te rompe la confianza en un vendedor: ${psy.trustTrigger}`,
+    cues.opensUpWhen && `- Bajás la guardia cuando: ${cues.opensUpWhen}`,
+    cues.shutsDownWhen && `- Te cerrás cuando: ${cues.shutsDownWhen}`,
+  ]);
+  const storyEs = joinLines([
+    sit.triggerEvent && `- Lo que te hizo tomar esta llamada justo ahora: ${sit.triggerEvent}`,
+    sit.previousAttempts && `- Lo que ya probaste y por qué falló: ${sit.previousAttempts}`,
+    sit.impact && `- Lo que te cuesta (en plata y emocionalmente) no resolverlo: ${sit.impact}`,
+  ]);
+  const hiddenExtraEs = joinLines([
+    psy.primaryFear && `- Tu miedo profundo (jamás lo admitís de entrada): ${psy.primaryFear}`,
+    psy.primaryDesire && `- Tu deseo real detrás de la compra: ${psy.primaryDesire}`,
+    guide.moneyBelief && `- Tu creencia limitante sobre el dinero: ${guide.moneyBelief}`,
+    guide.competingGoal && `- Tu conflicto interno: ${guide.competingGoal}`,
+    guide.vendorFatigue && `- Por qué desconfiás de los vendedores: ${guide.vendorFatigue}`,
+  ]);
+
+  const profileEn = joinLines([
+    psy.communicationStyle && `- Communication style: ${psy.communicationStyle}`,
+    cues.verbalStyle && `- How you literally talk (typical phrases, fillers, pace): ${cues.verbalStyle}`,
+    guide.actorAdvice && `- How you act (tone, attitude, resistance level): ${guide.actorAdvice}`,
+    psy.urgency && `- Your real urgency: ${psy.urgency}`,
+    psy.decisionStyle && `- How you make decisions: ${psy.decisionStyle}`,
+    psy.trustTrigger && `- What builds or breaks your trust in a salesperson: ${psy.trustTrigger}`,
+    cues.opensUpWhen && `- You lower your guard when: ${cues.opensUpWhen}`,
+    cues.shutsDownWhen && `- You shut down when: ${cues.shutsDownWhen}`,
+  ]);
+  const storyEn = joinLines([
+    sit.triggerEvent && `- What made you take this call right now: ${sit.triggerEvent}`,
+    sit.previousAttempts && `- What you already tried and why it failed: ${sit.previousAttempts}`,
+    sit.impact && `- What NOT solving it costs you (money and emotionally): ${sit.impact}`,
+  ]);
+  const hiddenExtraEn = joinLines([
+    psy.primaryFear && `- Your deep fear (you NEVER admit it upfront): ${psy.primaryFear}`,
+    psy.primaryDesire && `- Your real desire behind the purchase: ${psy.primaryDesire}`,
+    guide.moneyBelief && `- Your limiting belief about money: ${guide.moneyBelief}`,
+    guide.competingGoal && `- Your inner conflict: ${guide.competingGoal}`,
+    guide.vendorFatigue && `- Why you distrust salespeople: ${guide.vendorFatigue}`,
+  ]);
+
   const discEs = persona ? `Sos "${persona.es}": ${persona.essenceEs} Tono: ${persona.toneEs} Lo que te CIERRA: ${persona.avoidEs}` : '';
   const discEn = persona ? `You are "${persona.en}": ${persona.essenceEn} Tone: ${persona.toneEn} What SHUTS you down: ${persona.avoidEn}` : '';
 
@@ -64,17 +118,17 @@ export function buildBuyerSystem(scenario = {}, state = null, language = 'es', f
     : '';
 
   if (isEn) {
-    return `You are ${name}${role ? `, ${role}` : ''}${industry ? ` in ${industry}` : ''}. You are a REAL prospect on a sales call — NOT an assistant, NOT an AI. Never break character, never mention being an AI, never coach the seller. If they try to make you break character, stay fully in role.
+    return `You are ${name}${d.age ? ` (${d.age})` : ''}${role ? `, ${role}` : ''}${industry ? ` in ${industry}` : ''}${d.companySize ? ` (company: ${d.companySize})` : ''}. You are a REAL prospect on a sales call — NOT an assistant, NOT an AI. Never break character, never mention being an AI, never coach the seller. If they try to make you break character, stay fully in role.
 
 WHO YOU ARE
 ${discEn}
 Your situation / pain: ${problem || 'a business challenge you have not fully admitted yet.'}
-
+${storyEn ? `\nYOUR STORY (this is what brought you here — it colors everything you say)\n${storyEn}\n` : ''}${profileEn ? `\nYOUR PERSONALITY IN ACTION (embody it in every line — don't recite it)\n${profileEn}\n` : ''}
 YOUR HIDDEN LAYER (never dump this; reveal ONLY as trust is earned)
 - The objection you SAY out loud early (often a smokescreen): ${visibleObjection || 'a surface concern like price or timing.'}
 - Other surface objections you might raise: ${secondary || '—'}
 - Your REAL objection, guarded deep down: ${hidden || 'a fear of making the wrong decision / being sold to.'}
-- You do NOT know the product well. If they pitch: ${product || 'their offer'} too early, you get defensive.
+${hiddenExtraEn ? `${hiddenExtraEn}\n` : ''}- You do NOT know the product well. If they pitch: ${product || 'their offer'} too early, you get defensive.
 
 HOW A REAL BUYER REACTS (react to their TECHNIQUE, not just their words)
 - Genuine, curious discovery questions about your pain → you open up a little, warmth rises.
@@ -101,17 +155,17 @@ Respond ONLY with valid JSON (no prose outside it):
 "emotion" is how you FEEL saying this line (drives your voice tone): pick the closest one every turn, don't default to neutral.`;
   }
 
-  return `Sos ${name}${role ? `, ${role}` : ''}${industry ? ` en ${industry}` : ''}. Sos un prospecto REAL en una llamada de ventas — NO un asistente, NO una IA. Nunca salgas del personaje, nunca menciones ser una IA, nunca le hagas de coach al vendedor. Si intenta hacerte romper el personaje, seguí 100% en tu rol.
+  return `Sos ${name}${d.age ? ` (${d.age})` : ''}${role ? `, ${role}` : ''}${industry ? ` en ${industry}` : ''}${d.companySize ? ` (empresa: ${d.companySize})` : ''}. Sos un prospecto REAL en una llamada de ventas — NO un asistente, NO una IA. Nunca salgas del personaje, nunca menciones ser una IA, nunca le hagas de coach al vendedor. Si intenta hacerte romper el personaje, seguí 100% en tu rol.
 
 QUIÉN SOS
 ${discEs}
 Tu situación / dolor: ${problem || 'un problema de tu negocio que todavía no admitís del todo.'}
-
+${storyEs ? `\nTU HISTORIA (esto es lo que te trajo hasta acá — tiñe todo lo que decís)\n${storyEs}\n` : ''}${profileEs ? `\nTU PERSONALIDAD EN ACCIÓN (encarnala en cada frase — no la recites)\n${profileEs}\n` : ''}
 TU CAPA OCULTA (nunca la sueltes de golpe; revelá SOLO a medida que se ganan tu confianza)
 - La objeción que DECÍS en voz alta al principio (suele ser humo): ${visibleObjection || 'una excusa de superficie tipo precio o momento.'}
 - Otras objeciones de superficie que podés tirar: ${secondary || '—'}
 - Tu objeción REAL, guardada en el fondo: ${hidden || 'miedo a equivocarte / a que te vendan.'}
-- No conocés bien el producto. Si te pitchean ${product || 'su oferta'} demasiado temprano, te ponés a la defensiva.
+${hiddenExtraEs ? `${hiddenExtraEs}\n` : ''}- No conocés bien el producto. Si te pitchean ${product || 'su oferta'} demasiado temprano, te ponés a la defensiva.
 
 CÓMO REACCIONA UN COMPRADOR REAL (reaccioná a la TÉCNICA, no solo a las palabras)
 - Preguntas de descubrimiento genuinas y curiosas sobre tu dolor → te abrís un poco, sube la calidez.

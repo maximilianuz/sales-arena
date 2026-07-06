@@ -5,7 +5,6 @@ import { auth } from '../utils/db';
 import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, initialBuyerState } from '../utils/roleplayClient';
 import { openingLine } from '../utils/buyerPrompt';
-import { getPersonality } from '../utils/leadPersonalities';
 import { getDefaultStages } from '../utils/defaultStages';
 import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
@@ -126,7 +125,6 @@ export default function SoloPractice({ onBack }) {
     }
   };
 
-  const persona = scenario ? getPersonality(scenario.personality) : null;
   const leadName = scenario?.demographics?.name || (isEn ? 'Prospect' : 'Prospecto');
 
   const start = async () => {
@@ -428,10 +426,13 @@ export default function SoloPractice({ onBack }) {
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.6rem' }}>
+            {/* Solo el nombre: la personalidad DISC y los rasgos NO se muestran
+                al closer — los tiene que descubrir conversando (como en la
+                vida real). El análisis final sí los evalúa. */}
             <BuyerAvatar
               state={state}
               speaking={speaking}
-              name={`${leadName}${persona ? ` · ${isEn ? persona.en : persona.es}` : ''}`}
+              name={leadName}
               seed={leadName}
               isEn={isEn}
               size={120}
