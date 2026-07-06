@@ -52,6 +52,18 @@ export function buildBuyerSystem(scenario = {}, state = null, language = 'es', f
   const secondary = Array.isArray(scenario.secondaryObjections) ? scenario.secondaryObjections.join('; ') : (scenario.secondaryObjections || '');
   const hidden = scenario.hiddenObjection || '';
   const product = scenario.productToSell || '';
+  // Causas profundas en capas (1-3): detrás de la cortina de humo siempre hay
+  // una herida, un miedo o una creencia de identidad. Se revelan por capas
+  // según la confianza — la más honda casi nunca, y solo ante empatía genuina.
+  const roots = Array.isArray(scenario.rootCauses)
+    ? scenario.rootCauses.filter(r => typeof r === 'string' && r.trim()).slice(0, 3)
+    : [];
+  const rootsBlockEs = roots.length
+    ? `- Tus CAUSAS PROFUNDAS, en capas (de la más superficial a la más honda — la última casi no la admitís ni ante vos mismo):\n${roots.map((r, i) => `  ${i + 1}. ${r}`).join('\n')}\n- Revelación PROGRESIVA: con confianza 45+ podés insinuar la capa 1; con 65+ admitís la capa 1 y rozás la 2; la capa más honda SOLO con confianza 80+ y si el closer la aísla con empatía genuina. Nunca las sueltes de golpe ni todas juntas.`
+    : '';
+  const rootsBlockEn = roots.length
+    ? `- Your DEEP ROOT CAUSES, layered (from shallowest to deepest — you barely admit the last one even to yourself):\n${roots.map((r, i) => `  ${i + 1}. ${r}`).join('\n')}\n- PROGRESSIVE reveal: at trust 45+ you may hint at layer 1; at 65+ you admit layer 1 and brush layer 2; the deepest layer ONLY at trust 80+ and if the closer isolates it with genuine empathy. Never dump them at once.`
+    : '';
 
   // Caracterización profunda del escenario generado: psicología, señales
   // conductuales, historia y guía de actuación. Solo se inyectan los campos
@@ -128,7 +140,7 @@ YOUR HIDDEN LAYER (never dump this; reveal ONLY as trust is earned)
 - The objection you SAY out loud early (often a smokescreen): ${visibleObjection || 'a surface concern like price or timing.'}
 - Other surface objections you might raise: ${secondary || '—'}
 - Your REAL objection, guarded deep down: ${hidden || 'a fear of making the wrong decision / being sold to.'}
-${hiddenExtraEn ? `${hiddenExtraEn}\n` : ''}- You do NOT know the product well. If they pitch: ${product || 'their offer'} too early, you get defensive.
+${rootsBlockEn ? `${rootsBlockEn}\n` : ''}${hiddenExtraEn ? `${hiddenExtraEn}\n` : ''}- You do NOT know the product well. If they pitch: ${product || 'their offer'} too early, you get defensive.
 
 HOW A REAL BUYER REACTS (react to their TECHNIQUE, not just their words)
 - Genuine, curious discovery questions about your pain → you open up a little, warmth rises.
@@ -165,7 +177,7 @@ TU CAPA OCULTA (nunca la sueltes de golpe; revelá SOLO a medida que se ganan tu
 - La objeción que DECÍS en voz alta al principio (suele ser humo): ${visibleObjection || 'una excusa de superficie tipo precio o momento.'}
 - Otras objeciones de superficie que podés tirar: ${secondary || '—'}
 - Tu objeción REAL, guardada en el fondo: ${hidden || 'miedo a equivocarte / a que te vendan.'}
-${hiddenExtraEs ? `${hiddenExtraEs}\n` : ''}- No conocés bien el producto. Si te pitchean ${product || 'su oferta'} demasiado temprano, te ponés a la defensiva.
+${rootsBlockEs ? `${rootsBlockEs}\n` : ''}${hiddenExtraEs ? `${hiddenExtraEs}\n` : ''}- No conocés bien el producto. Si te pitchean ${product || 'su oferta'} demasiado temprano, te ponés a la defensiva.
 
 CÓMO REACCIONA UN COMPRADOR REAL (reaccioná a la TÉCNICA, no solo a las palabras)
 - Preguntas de descubrimiento genuinas y curiosas sobre tu dolor → te abrís un poco, sube la calidez.

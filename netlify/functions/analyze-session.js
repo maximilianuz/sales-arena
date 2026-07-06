@@ -128,7 +128,10 @@ LEAD PROFILE:
 - Name: ${scenario.demographics?.name || 'Unknown'}
 - Industry: ${scenario.demographics?.industry || 'Unknown'}
 - Difficulty: ${scenario.level || 'Unknown'} (Beginner=friendly, Intermediate=skeptical, Advanced=hostile — use this to calibrate what a strong performance looks like, but score the closer's technique objectively)
-- Main objection: ${scenario.visibleObjection || 'None'}
+- Stated objection (SMOKESCREEN): ${scenario.visibleObjection || 'None'}
+- REAL hidden objection: ${scenario.hiddenObjection || 'Unknown'}
+- Deep root causes (layered, deepest last): ${Array.isArray(scenario.rootCauses) && scenario.rootCauses.length ? scenario.rootCauses.join(' | ') : '—'}
+IMPORTANT: weigh heavily HOW DEEP the closer got. Staying on the smokescreen = low painDepth/objectionIsolation; uncovering the real objection or a root cause = high. Mention in the feedback which layer they reached and which one they left untouched.
 
 SESSION DATA:
 - Duration: ${sessionDurationMinutes || 'Unknown'} minutes
@@ -177,7 +180,10 @@ PERFIL DEL LEAD:
 - Nombre: ${scenario.demographics?.name || 'Desconocido'}
 - Industria: ${scenario.demographics?.industry || 'Desconocida'}
 - Dificultad: ${scenario.level || 'Desconocida'} (Principiante=amigable, Intermedio=escéptico, Avanzado=hostil — usala para calibrar qué es un buen desempeño, pero puntuá la técnica del closer de forma objetiva)
-- Objeción principal: ${scenario.visibleObjection || 'Ninguna'}
+- Objeción declarada (CORTINA DE HUMO): ${scenario.visibleObjection || 'Ninguna'}
+- Objeción REAL oculta: ${scenario.hiddenObjection || 'Desconocida'}
+- Causas profundas (en capas, la más honda al final): ${Array.isArray(scenario.rootCauses) && scenario.rootCauses.length ? scenario.rootCauses.join(' | ') : '—'}
+IMPORTANTE: ponderá fuerte QUÉ TAN HONDO llegó el closer. Quedarse en la cortina de humo = painDepth/objectionIsolation bajos; destapar la objeción real o una causa raíz = altos. Mencioná en el feedback hasta qué capa llegó y cuál dejó sin tocar.
 
 DATOS DE SESIÓN:
 - Duración: ${sessionDurationMinutes || 'Desconocida'} minutos

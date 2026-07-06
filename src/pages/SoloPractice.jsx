@@ -729,6 +729,27 @@ export default function SoloPractice({ onBack }) {
               </div>
             )}
 
+            {/* La cebolla completa: objeción real + causas profundas en capas.
+                Se revela SOLO al terminar — el coaching es ver qué tan hondo
+                llegaste (o qué te quedó sin destapar). No aplica a "Ser Lead". */}
+            {mode !== 'lead' && (scenario?.hiddenObjection || (Array.isArray(scenario?.rootCauses) && scenario.rootCauses.length > 0)) && (
+              <div style={{ textAlign: 'left', marginTop: '1rem', padding: '1rem', background: 'rgba(255,55,95,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(255,55,95,0.22)' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--secondary)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                  🧅 {isEn ? 'What was really underneath' : 'Lo que había detrás de verdad'}
+                </div>
+                {scenario?.hiddenObjection && (
+                  <p style={{ margin: '0 0 0.5rem', fontSize: '0.88rem', color: 'var(--text-main)', fontStyle: 'italic' }}>
+                    “{scenario.hiddenObjection}”
+                  </p>
+                )}
+                {(scenario?.rootCauses || []).filter(r => typeof r === 'string' && r.trim()).map((r, i) => (
+                  <div key={i} style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                    {i + 1}. {r}
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Técnicas del closer experto — el botín de aprendizaje de los modos
                 "Ser Lead" y "Observador" (sin puntaje: acá se aprende mirando). */}
             {mode !== 'closer' && techniques.length > 0 && (

@@ -481,9 +481,10 @@ export default function Room() {
       </footer>
 
       {showPrivateInfo && currentScenario && (
-        <PrivateInfoModal 
-          info={currentScenario.hiddenObjection} 
-          onClose={() => setShowPrivateInfo(false)} 
+        <PrivateInfoModal
+          info={currentScenario.hiddenObjection}
+          rootCauses={currentScenario.rootCauses}
+          onClose={() => setShowPrivateInfo(false)}
         />
       )}
 
