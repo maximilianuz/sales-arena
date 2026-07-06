@@ -132,9 +132,12 @@ export default function SoloPractice({ onBack }) {
 
   // Reproduce la respuesta del lead con voz (si está activada) y anima el avatar.
   // (start/submitTurn se recrean cada render, así que capturan el voiceOn actual.)
-  const playBuyerVoice = async (reply, sc, emotion = 'neutral') => {
-    if (!voiceOn || !reply) return;
-    setSpeaking(true);
+  // `onStart` se dispara cuando la voz EMPIEZA a sonar (no al pedir el TTS): la
+  // UI revela el texto recién ahí → burbuja, boca y audio quedan sincronizados.
+  const playBuyerVoice = async (reply, sc, emotion = 'neutral', onStart) => {
+    let revealed = false;
+    const reveal = () => { if (!revealed) { revealed = true; onStart?.(); } };
+    if (!voiceOn || !reply) { reveal(); return; }
     try {
       const s = sc || scenario;
       const uid = auth.currentUser?.uid;
@@ -144,9 +147,11 @@ export default function SoloPractice({ onBack }) {
         language: i18n.language,
         seed: s?.demographics?.name || '',
         emotion,
-        gender: inferGender(s?.demographics?.name || '')
+        gender: inferGender(s?.demographics?.name || ''),
+        onStart: () => { reveal(); setSpeaking(true); }
       });
     } finally {
+      reveal(); // si el TTS falló antes de arrancar, el texto no se pierde
       setSpeaking(false);
     }
   };
@@ -172,13 +177,18 @@ export default function SoloPractice({ onBack }) {
       // → esquiva el rate limit de Groq free). Se adapta a la etapa elegida.
       const greet = openingLine(sc, i18n.language, focusStageId);
       setState(initialBuyerState());
-      setMessages([{ role: 'assistant', content: greet }]);
+      setMessages([]);
       setThoughts([]);
       setLeadEmotion('neutral');
       setShowProduct(true);
       setElapsed(0);
       setPhase('live');
-      playBuyerVoice(greet, sc);
+      // El saludo aparece cuando la voz arranca (mismo sync que los turnos).
+      setBusy(true);
+      playBuyerVoice(greet, sc, 'neutral', () => {
+        setMessages([{ role: 'assistant', content: greet }]);
+        setBusy(false);
+      });
     } catch (e) {
       setError(e.message);
       setPhase('intro');
@@ -195,19 +205,23 @@ export default function SoloPractice({ onBack }) {
     try {
       const turn = await buyerTurn({ scenario, state, history: nextHistory, language: i18n.language, focusStage });
       setState(turn.state);
-      setMessages([...nextHistory, { role: 'assistant', content: turn.reply, emotion: turn.emotion }]);
-      setLeadEmotion(turn.emotion || 'neutral');
       if (turn.thought) setThoughts(t => [...t, turn.thought]);
+      // La burbuja se agrega cuando la voz ARRANCA (no cuando llega el JSON):
+      // así el texto no le gana al audio. Mientras tanto sigue "está pensando…".
+      const reveal = () => {
+        setMessages([...nextHistory, { role: 'assistant', content: turn.reply, emotion: turn.emotion }]);
+        setLeadEmotion(turn.emotion || 'neutral');
+        setBusy(false);
+      };
       if (turn.outcome === 'closed' || turn.outcome === 'lost') {
+        reveal();
         setOutcome(turn.outcome);
         setPhase('ended');
-        setBusy(false);
         return;
       }
-      playBuyerVoice(turn.reply, null, turn.emotion);
+      playBuyerVoice(turn.reply, null, turn.emotion, reveal);
     } catch (e) {
       setError(e.message);
-    } finally {
       setBusy(false);
     }
   };

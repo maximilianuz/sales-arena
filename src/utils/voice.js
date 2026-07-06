@@ -208,7 +208,7 @@ export function unlockAudio() {
   } catch { /* no bloquea */ }
 }
 
-async function speakFishAudio(text, { uid, personalityId, language = 'es', emotion = 'neutral', gender = 'male' } = {}) {
+async function speakFishAudio(text, { uid, personalityId, language = 'es', emotion = 'neutral', gender = 'male', onStart } = {}) {
   const res = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -246,6 +246,7 @@ async function speakFishAudio(text, { uid, personalityId, language = 'es', emoti
     };
     const finish = () => { if (raf) cancelAnimationFrame(raf); speechLevel = 0; resolve(); };
     source.onended = finish;
+    onStart?.(); // el audio arranca AHORA: la UI recién acá revela el texto
     source.start(0);
     tick();
     // Guardamos referencia para poder cortar con stopSpeaking()
@@ -255,14 +256,19 @@ async function speakFishAudio(text, { uid, personalityId, language = 'es', emoti
 
 // Habla el texto: intenta Fish Audio primero, cae a SpeechSynthesis si falla.
 // `uid` es necesario para autenticar el llamado al proxy.
-export async function speak(text, { uid, personalityId, language = 'es', seed = '', emotion = 'neutral', gender = 'male' } = {}) {
+export async function speak(text, { uid, personalityId, language = 'es', seed = '', emotion = 'neutral', gender = 'male', onStart } = {}) {
   if (!text) return;
   const session = ++speakSession;
+
+  // `onStart` se dispara UNA vez, cuando la voz realmente empieza a sonar (no
+  // durante el fetch del TTS). La UI lo usa para revelar el texto en sincronía.
+  let started = false;
+  const fireStart = () => { if (!started) { started = true; try { onStart?.(); } catch { /* callback de UI */ } } };
 
   // ── Intento 1: Fish Audio (voz neural con emoción) ──────────────────────────
   if (uid) {
     try {
-      await speakFishAudio(text, { uid, personalityId, language, emotion, gender });
+      await speakFishAudio(text, { uid, personalityId, language, emotion, gender, onStart: fireStart });
       return; // ✓ Fish Audio funcionó
     } catch (e) {
       if (session !== speakSession) return; // llegó otro speak() mientras esperaba
@@ -282,6 +288,7 @@ export async function speak(text, { uid, personalityId, language = 'es', seed = 
   const voice = pickVoice(language.startsWith('en') ? 'en' : 'es', personalityId, seed, gender);
 
   const sentences = splitSentences(naturalizeForSpeech(text));
+  fireStart(); // el synth arranca ya (sin fetch): revelar texto ahora
   for (let i = 0; i < sentences.length; i++) {
     if (session !== speakSession) return;
     const s = sentences[i];
