@@ -116,7 +116,9 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
 }
 
 // ─── Lead Actor View ──────────────────────────────────────────────────────────
-function LeadActorView({ scenario }) {
+// Exportada: la reusa el modo "Ser Lead" de la práctica individual (misma ficha
+// de personaje que ve el Lead humano en las salas grupales).
+export function LeadActorView({ scenario }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const [showSecondary, setShowSecondary] = useState(false);

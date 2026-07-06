@@ -1,5 +1,6 @@
 import { auth } from './db';
 import { buildBuyerSystem, initialBuyerState } from './buyerPrompt';
+import { buildCloserSystem } from './closerPrompt';
 
 // Cliente del COMPRADOR IA. Cada turno reconstruye el system prompt con el
 // estado actual (temperatura/confianza/paciencia) y lo manda junto con el
@@ -7,21 +8,32 @@ import { buildBuyerSystem, initialBuyerState } from './buyerPrompt';
 
 export { initialBuyerState };
 
-// history: [{ role: 'user'|'assistant', content }]. Devuelve el turno del lead.
-export async function buyerTurn({ scenario, state, history, language = 'es', focusStage = null }) {
-  const system = buildBuyerSystem(scenario, state, language, focusStage);
+async function roleplayTurn(system, history) {
   const res = await fetch('/api/roleplay-turn', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       uid: auth.currentUser?.uid,
       system,
-      // Solo role+content: los mensajes de la UI llevan campos extra (emotion)
-      // que la API de la IA rechaza.
+      // Solo role+content: los mensajes de la UI llevan campos extra (emotion,
+      // technique) que la API de la IA rechaza.
       messages: (history || []).map(m => ({ role: m.role, content: m.content }))
     })
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Error en el turno');
-  return data; // { reply, state, revealedHiddenObjection, thought, outcome }
+  return data;
+}
+
+// history: [{ role: 'user'|'assistant', content }] donde user = closer.
+// Devuelve el turno del lead: { reply, emotion, state, thought, outcome }.
+export async function buyerTurn({ scenario, state, history, language = 'es', focusStage = null }) {
+  return roleplayTurn(buildBuyerSystem(scenario, state, language, focusStage), history);
+}
+
+// Turno del CLOSER IA experto (modos "Ser Lead" / "Observador"). En el history
+// user = líneas del LEAD y assistant = líneas del closer. Devuelve
+// { reply, thought (= técnica aplicada), outcome }.
+export async function closerTurn({ scenario, history, language = 'es', stages = [] }) {
+  return roleplayTurn(buildCloserSystem(scenario, language, stages), history);
 }

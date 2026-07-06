@@ -1,15 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen, Shuffle, Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen, Shuffle, Package, ChevronDown, ChevronUp, Lock, Lightbulb, Pause, Play, Theater, TrendingUp } from 'lucide-react';
 import { auth } from '../utils/db';
 import { generateAIScenario } from '../utils/ai';
-import { buyerTurn, initialBuyerState } from '../utils/roleplayClient';
+import { buyerTurn, closerTurn, initialBuyerState } from '../utils/roleplayClient';
 import { openingLine } from '../utils/buyerPrompt';
+import { closerOpeningLine, getCloserName } from '../utils/closerPrompt';
 import { getDefaultStages } from '../utils/defaultStages';
+import { getStageCoaching } from '../utils/coachingKnowledge';
 import { INDUSTRY_CATEGORIES, randomIndustryValue } from '../utils/industries';
+import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
 import MethodScores from '../components/MethodScores';
+import { LeadActorView } from '../components/ScenarioPanel';
 
 // Expresión emocional del lead por turno (la emite la IA en `emotion`).
 // El emoji + etiqueta le dan al closer feedback inmediato de cómo cayó su técnica.
@@ -42,6 +46,27 @@ const HEADER_BTN = {
   borderRadius: '0.6rem', padding: '0.45rem 0.65rem', cursor: 'pointer',
   display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: '700',
 };
+
+// Plan FREE: siempre bloqueado practicar la llamada completa, la Cualificación y
+// el Cierre (que incluye el manejo de objeciones). Es la misma limitación que la
+// sesión grupal: evita que una persona rote correos gratis y entrene el ciclo
+// completo sin abonar. El resto de las etapas quedan libres como gancho.
+const FREE_LOCKED_STAGES = ['all', 'cualificacion_diagnostico', 'cierre_transicion'];
+
+// Heurística del apuntador: "en qué etapa va la llamada" según la cantidad de
+// turnos del closer (índice sobre la lista ordenada de 6 etapas). Aproximada a
+// propósito — orienta, no dirige.
+function stageIdxForTurns(c) {
+  if (c < 2) return 0;
+  if (c < 6) return 1;
+  if (c < 8) return 2;
+  if (c < 9) return 3;
+  if (c < 12) return 4;
+  return 5;
+}
+
+// Pausa auxiliar del modo Observador (ritmo de lectura entre turnos IA vs IA).
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
 function Meter({ meter, value, isEn }) {
   const Icon = meter.icon;
@@ -81,6 +106,18 @@ export default function SoloPractice({ onBack }) {
   const [showCoach, setShowCoach] = useState(false);
   // Producto a vender: visible al arrancar (clima) y colapsable para no tapar el chat.
   const [showProduct, setShowProduct] = useState(true);
+  // Modo de práctica: 'closer' (vendés vos, el clásico) | 'lead' (te llama un
+  // closer experto y vos sos el cliente) | 'observer' (mirás un partido IA vs IA
+  // como un partido de tenis). Los modos lead/observer enseñan la metodología
+  // desde el otro lado del teléfono — reusan la ficha y el motor del modo grupal.
+  const [mode, setMode] = useState('closer');
+  const [paused, setPaused] = useState(false); // observador: pausar el partido
+  const pausedRef = useRef(false);
+  const runIdRef = useRef(0); // invalida el loop del observador al salir/reiniciar
+  const [showCharacter, setShowCharacter] = useState(false); // "Ser Lead": ficha del personaje
+  const [techniques, setTechniques] = useState([]); // técnicas que aplicó el closer experto
+  const [prompterOn, setPrompterOn] = useState(true); // apuntador para el closer principiante
+  const { isFree, openPlans } = useSubscriptionContext() || {};
   // Foco: 'all' = llamada completa; o el id de una etapa para practicarla suelta.
   const [focusStageId, setFocusStageId] = useState('all');
   // Config del lead (las MISMAS opciones que tiene el Trainer en el room): el
@@ -98,13 +135,22 @@ export default function SoloPractice({ onBack }) {
   useEffect(() => {
     try { localStorage.setItem('soloLeadConfig', JSON.stringify(genConfig)); } catch { /* storage no disponible */ }
   }, [genConfig]);
+
+  // Al desmontar, invalidar cualquier partido IA vs IA en curso.
+  useEffect(() => () => { runIdRef.current++; }, []);
   const [elapsed, setElapsed] = useState(0); // segundos de llamada
   const recorderRef = useRef(null);
   const scrollRef = useRef(null);
 
   const MAX_SECONDS = 60 * 60; // tope duro de 60 minutos
   const stagesList = getDefaultStages(i18n.language);
-  const focusStage = focusStageId === 'all' ? null : (stagesList.find(s => s.id === focusStageId) || null);
+  // Foco EFECTIVO: si el plan free apunta a una opción bloqueada (default 'all'
+  // o selección vieja), se degrada a Apertura. Es un derivado (no estado): se
+  // re-aplica en cada render → no hay forma de esquivarlo (anti multi-cuentas).
+  const effectiveFocusId = (mode === 'closer' && isFree && FREE_LOCKED_STAGES.includes(focusStageId))
+    ? 'apertura_rapport'
+    : focusStageId;
+  const focusStage = effectiveFocusId === 'all' ? null : (stagesList.find(s => s.id === effectiveFocusId) || null);
 
   useEffect(() => { warmUpVoices(); }, []);
   useEffect(() => () => stopSpeaking(), []); // cortar la voz al desmontar
@@ -157,6 +203,84 @@ export default function SoloPractice({ onBack }) {
   };
 
   const leadName = scenario?.demographics?.name || (isEn ? 'Prospect' : 'Prospecto');
+  const closerName = getCloserName(i18n.language);
+
+  // Voz del CLOSER experto (modo "Ser Lead"): timbre cálido/consultivo fijo,
+  // distinto del lead. Mismo patrón de sync que playBuyerVoice (texto al sonar).
+  const playCloserVoice = async (reply, onStart) => {
+    let revealed = false;
+    const reveal = () => { if (!revealed) { revealed = true; onStart?.(); } };
+    if (!voiceOn || !reply) { reveal(); return; }
+    try {
+      await speak(reply, {
+        uid: auth.currentUser?.uid,
+        personalityId: 'empatico',
+        language: i18n.language,
+        seed: closerName,
+        emotion: 'neutral',
+        gender: 'male',
+        onStart: () => { reveal(); setSpeaking(true); }
+      });
+    } finally {
+      reveal();
+      setSpeaking(false);
+    }
+  };
+
+  // ── Modo Observador: partido IA vs IA (closer experto vs comprador) ────────
+  // Corre como loop cancelable (runId) con pausa. Sin voz: el ritmo lo marca un
+  // delay de lectura entre turnos, y cada llamada al modelo va espaciada para
+  // no chocar el rate limit de Groq.
+  const runObserver = async (sc, runId) => {
+    const transcript = []; // {role:'closer'|'lead', content, technique?, emotion?}
+    let buyerState = initialBuyerState();
+    const push = (m) => { transcript.push(m); setMessages([...transcript]); };
+    const alive = () => runId === runIdRef.current;
+    const holdWhilePaused = async () => { while (alive() && pausedRef.current) await wait(300); };
+
+    push({ role: 'closer', content: closerOpeningLine(sc, i18n.language) });
+
+    const MAX_MSGS = 22; // tope del partido: suficiente para ver el arco completo
+    try {
+      while (alive() && transcript.length < MAX_MSGS) {
+        await holdWhilePaused();
+        if (!alive()) return;
+        // Turno del LEAD (para buyerTurn: user = closer, assistant = lead)
+        setBusy(true);
+        const bHist = transcript.map(m => ({ role: m.role === 'closer' ? 'user' : 'assistant', content: m.content }));
+        const bt = await buyerTurn({ scenario: sc, state: buyerState, history: bHist, language: i18n.language });
+        if (!alive()) return;
+        buyerState = bt.state;
+        setState(bt.state);
+        if (bt.thought) setThoughts(t => [...t, bt.thought]);
+        push({ role: 'lead', content: bt.reply, emotion: bt.emotion });
+        setLeadEmotion(bt.emotion || 'neutral');
+        setBusy(false);
+        if (bt.outcome === 'closed' || bt.outcome === 'lost') {
+          setOutcome(bt.outcome);
+          setPhase('ended');
+          return;
+        }
+        await wait(2600);
+        await holdWhilePaused();
+        if (!alive()) return;
+
+        // Turno del CLOSER experto (para closerTurn: user = lead, assistant = closer)
+        setBusy(true);
+        const cHist = transcript.map(m => ({ role: m.role === 'lead' ? 'user' : 'assistant', content: m.content }));
+        const ct = await closerTurn({ scenario: sc, history: cHist, language: i18n.language, stages: stagesList });
+        if (!alive()) return;
+        push({ role: 'closer', content: ct.reply, technique: ct.thought || '' });
+        if (ct.thought) setTechniques(t => [...t, ct.thought]);
+        setBusy(false);
+        if (ct.outcome === 'lost') { setOutcome('lost'); setPhase('ended'); return; }
+        await wait(2600);
+      }
+      if (alive()) { setOutcome(null); setPhase('ended'); }
+    } catch (e) {
+      if (alive()) { setError(e.message); setBusy(false); }
+    }
+  };
 
   const start = async () => {
     setPhase('loading');
@@ -164,31 +288,50 @@ export default function SoloPractice({ onBack }) {
     try {
       // Reusamos el generador de escenarios del room (personalidad DISC incluida)
       // con la config que armó el closer → mismo escenario/producto que en la web.
+      // Le pasamos las etapas: así pipelineQuestions trae preguntas salvavidas
+      // POR etapa, personalizadas a este lead — alimentan el apuntador en vivo.
       const sc = await generateAIScenario(null, null, null, {
         level: genConfig.level,
         theme: genConfig.theme,
         leadTemperature: genConfig.leadTemperature,
         targetObjection: genConfig.targetObjection,
-      }, [], i18n.language);
+      }, stagesList, i18n.language);
       if (!sc || typeof sc !== 'object') throw new Error(isEn ? 'Could not generate the buyer.' : 'No se pudo generar el comprador.');
       setScenario(sc);
 
-      // Saludo de apertura SIN IA (evita un 2º pedido grande en el mismo minuto
-      // → esquiva el rate limit de Groq free). Se adapta a la etapa elegida.
-      const greet = openingLine(sc, i18n.language, focusStageId);
+      // Reset común de la llamada.
       setState(initialBuyerState());
       setMessages([]);
       setThoughts([]);
+      setTechniques([]);
       setLeadEmotion('neutral');
       setShowProduct(true);
       setElapsed(0);
+      setPaused(false);
+      pausedRef.current = false;
+      const runId = ++runIdRef.current;
       setPhase('live');
-      // El saludo aparece cuando la voz arranca (mismo sync que los turnos).
-      setBusy(true);
-      playBuyerVoice(greet, sc, 'neutral', () => {
-        setMessages([{ role: 'assistant', content: greet }]);
-        setBusy(false);
-      });
+
+      if (mode === 'lead') {
+        // "Ser Lead": te llama el closer experto — abre él (saludo sin IA).
+        const greet = closerOpeningLine(sc, i18n.language);
+        setBusy(true);
+        playCloserVoice(greet, () => {
+          setMessages([{ role: 'assistant', content: greet, technique: '' }]);
+          setBusy(false);
+        });
+      } else if (mode === 'observer') {
+        runObserver(sc, runId); // partido IA vs IA, cancelable por runId
+      } else {
+        // Saludo de apertura SIN IA (evita un 2º pedido grande en el mismo minuto
+        // → esquiva el rate limit de Groq free). Se adapta a la etapa elegida.
+        const greet = openingLine(sc, i18n.language, effectiveFocusId);
+        setBusy(true);
+        playBuyerVoice(greet, sc, 'neutral', () => {
+          setMessages([{ role: 'assistant', content: greet }]);
+          setBusy(false);
+        });
+      }
     } catch (e) {
       setError(e.message);
       setPhase('intro');
@@ -203,6 +346,23 @@ export default function SoloPractice({ onBack }) {
     setMessages(nextHistory);
     setBusy(true);
     try {
+      if (mode === 'lead') {
+        // Vos sos el LEAD: responde el closer experto (en el history user = lead).
+        const turn = await closerTurn({ scenario, history: nextHistory, language: i18n.language, stages: stagesList });
+        if (turn.thought) setTechniques(t => [...t, turn.thought]);
+        const reveal = () => {
+          setMessages([...nextHistory, { role: 'assistant', content: turn.reply, technique: turn.thought || '' }]);
+          setBusy(false);
+        };
+        if (turn.outcome === 'closed' || turn.outcome === 'lost') {
+          reveal();
+          setOutcome(turn.outcome);
+          setPhase('ended');
+          return;
+        }
+        playCloserVoice(turn.reply, reveal);
+        return;
+      }
       const turn = await buyerTurn({ scenario, state, history: nextHistory, language: i18n.language, focusStage });
       setState(turn.state);
       if (turn.thought) setThoughts(t => [...t, turn.thought]);
@@ -264,18 +424,22 @@ export default function SoloPractice({ onBack }) {
   };
 
   const hangUp = () => {
+    runIdRef.current++; // corta el partido IA vs IA si estaba corriendo
     stopSpeaking();
-    setOutcome('lost');
+    setOutcome(mode === 'observer' ? null : 'lost');
     setPhase('ended');
+    setBusy(false);
   };
 
   // Salir al lobby abandonando la llamada. Si hay conversación en curso pedimos
   // confirmación: sin esto, un click accidental descartaba toda la sesión sin
-  // puntuar (justo al lado del botón de colgar, que sí lleva al scoring).
+  // puntuar (justo al lado del botón de colgar, que sí lleva al scoring). Solo
+  // aplica al modo closer — lead/observador no puntúan.
   const leaveCall = () => {
-    if (messages.length > 1 && !window.confirm(isEn
+    if (mode === 'closer' && messages.length > 1 && !window.confirm(isEn
       ? 'Leave the call? It will be discarded without scoring. Use "Hang up" to end and score it.'
       : '¿Salir de la llamada? Se descarta sin puntuar. Usá "Colgar" para terminarla y puntuarla.')) return;
+    runIdRef.current++;
     stopSpeaking();
     onBack();
   };
@@ -317,6 +481,22 @@ export default function SoloPractice({ onBack }) {
       setScoring(false);
     }
   };
+
+  // ── Apuntador (modo closer): etapa estimada + pregunta salvavidas ─────────
+  // Rotación: cambia cada 2 turnos del closer (ayuda sin dictar la llamada).
+  // Fuente: pipelineQuestions del escenario (personalizadas a ESTE lead) y, si
+  // faltan, las preguntas socráticas del KB curado.
+  const closerTurnsCount = messages.filter(m => m.role === 'user').length;
+  const promptStage = focusStage || stagesList[Math.min(stageIdxForTurns(closerTurnsCount), stagesList.length - 1)] || stagesList[0];
+  const scenarioTips = Array.isArray(scenario?.pipelineQuestions?.[promptStage?.id])
+    ? scenario.pipelineQuestions[promptStage.id].filter(q => typeof q === 'string' && q.trim())
+    : [];
+  const promptPool = scenarioTips.length ? scenarioTips : (getStageCoaching(promptStage?.id, isEn ? 'en' : 'es')?.socratic || []);
+  const promptTip = promptPool.length ? promptPool[Math.floor(closerTurnsCount / 2) % promptPool.length] : '';
+  // Quién "está pensando" según el modo (indicador bajo los mensajes).
+  const thinkingName = mode === 'lead' ? closerName
+    : mode === 'observer' ? (messages[messages.length - 1]?.role === 'closer' ? leadName : closerName)
+    : leadName;
 
   // ── Intro ────────────────────────────────────────────────────────────────
   if (phase === 'intro' || phase === 'loading') {
@@ -364,10 +544,36 @@ export default function SoloPractice({ onBack }) {
               {isEn ? 'Solo practice — AI Buyer' : 'Práctica solo — Comprador IA'}
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.5, margin: '0 0 1.5rem' }}>
-              {isEn
-                ? 'A real, skeptical prospect with hidden objections and a mood that shifts with your technique. Earn their trust — or lose the call. Scored on the same rubric as team sessions.'
-                : 'Un prospecto real y escéptico, con objeciones ocultas y un ánimo que cambia según tu técnica. Ganate su confianza — o perdé la llamada. Se puntúa con la misma rúbrica que las sesiones en equipo.'}
+              {mode === 'lead'
+                ? (isEn
+                  ? 'Step into the buyer\'s shoes: an expert AI closer calls YOU. Feel the technique from the other side — resist, object, and watch how a pro handles you.'
+                  : 'Ponete en la piel del cliente: un closer experto IA te llama a VOS. Sentí la técnica desde el otro lado — resistí, objetá y mirá cómo te maneja un pro.')
+                : mode === 'observer'
+                  ? (isEn
+                    ? 'Watch an expert AI closer face an AI buyer, like a tennis match. Each closer line shows the technique used — learn by watching.'
+                    : 'Mirá a un closer experto IA enfrentar a un comprador IA, como un partido de tenis. Cada línea del closer muestra la técnica usada — aprendé mirando.')
+                  : (isEn
+                    ? 'A real, skeptical prospect with hidden objections and a mood that shifts with your technique. Earn their trust — or lose the call. Scored on the same rubric as team sessions.'
+                    : 'Un prospecto real y escéptico, con objeciones ocultas y un ánimo que cambia según tu técnica. Ganate su confianza — o perdé la llamada. Se puntúa con la misma rúbrica que las sesiones en equipo.')}
             </p>
+
+            {/* Selector de rol: cómo querés practicar hoy */}
+            <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1.5rem' }}>
+              {[
+                { id: 'closer', icon: <TrendingUp size={14} />, l: isEn ? 'Be the Closer' : 'Ser Closer', d: isEn ? 'You sell' : 'Vendés vos' },
+                { id: 'lead', icon: <Theater size={14} />, l: isEn ? 'Be the Lead' : 'Ser Lead', d: isEn ? 'A pro calls you' : 'Te llama un pro' },
+                { id: 'observer', icon: <Eye size={14} />, l: isEn ? 'Watch' : 'Observar', d: isEn ? 'AI vs AI match' : 'Partido IA vs IA' },
+              ].map(m => {
+                const active = mode === m.id;
+                return (
+                  <button type="button" key={m.id} onClick={() => setMode(m.id)}
+                    style={{ flex: 1, padding: '0.6rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(139,92,246,0.65)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(139,92,246,0.16)' : 'rgba(255,255,255,0.02)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', fontSize: '0.82rem', fontWeight: '700' }}>{m.icon} {m.l}</div>
+                    <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.15rem' }}>{m.d}</div>
+                  </button>
+                );
+              })}
+            </div>
             {/* Config del lead: las mismas opciones que el Trainer. El closer
                 arma su prospecto y el producto a vender se genera en base a esto. */}
             <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
@@ -447,7 +653,10 @@ export default function SoloPractice({ onBack }) {
               </select>
             </div>
 
-            {/* Selector: llamada completa o una etapa suelta */}
+            {/* Selector: llamada completa o una etapa suelta (solo modo closer).
+                Free: llamada completa, Cualificación y Cierre/Objeciones van con
+                candado → abren el modal de planes (igual límite que lo grupal). */}
+            {mode === 'closer' && (
             <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
               <div style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
                 {isEn ? 'What do you want to practice?' : '¿Qué querés practicar?'}
@@ -455,26 +664,37 @@ export default function SoloPractice({ onBack }) {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                 {[{ id: 'all', label: isEn ? '📞 Full call (up to 60 min)' : '📞 Llamada completa (hasta 60 min)' },
                   ...stagesList.map(s => ({ id: s.id, label: s.label }))].map(opt => {
-                  const active = focusStageId === opt.id;
+                  const active = effectiveFocusId === opt.id;
+                  const locked = isFree && FREE_LOCKED_STAGES.includes(opt.id);
                   return (
-                    <button key={opt.id} onClick={() => setFocusStageId(opt.id)} style={{
-                      padding: '0.45rem 0.75rem', borderRadius: '2rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '700',
-                      background: active ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${active ? 'transparent' : 'rgba(255,255,255,0.12)'}`,
-                      color: active ? 'white' : 'var(--text-muted)',
-                    }}>
-                      {opt.label}
+                    <button key={opt.id} onClick={() => locked ? openPlans?.() : setFocusStageId(opt.id)}
+                      title={locked ? (isEn ? 'Requires a paid plan' : 'Requiere plan pago') : undefined}
+                      style={{
+                        padding: '0.45rem 0.75rem', borderRadius: '2rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '700',
+                        display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                        background: active ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.05)',
+                        border: `1px solid ${active ? 'transparent' : 'rgba(255,255,255,0.12)'}`,
+                        color: active ? 'white' : locked ? 'rgba(255,255,255,0.3)' : 'var(--text-muted)',
+                        opacity: locked ? 0.75 : 1,
+                      }}>
+                      {locked && <Lock size={11} />} {opt.label}
                     </button>
                   );
                 })}
               </div>
+              {isFree && (
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                  🔒 {isEn ? 'Full call, Qualification and Closing/Objections are Pro features.' : 'Llamada completa, Cualificación y Cierre/Objeciones son funciones Pro.'}
+                </div>
+              )}
             </div>
+            )}
 
             {error && <p style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '1rem' }}>{error}</p>}
             <button className="btn btn-primary btn-large" onClick={start} disabled={phase === 'loading'} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
               {phase === 'loading'
-                ? <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> {isEn ? 'Generating buyer...' : 'Generando comprador...'}</>
-                : <><Phone size={18} /> {isEn ? 'Start the call' : 'Iniciar la llamada'}</>}
+                ? <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> {mode === 'lead' ? (isEn ? 'Generating your character...' : 'Generando tu personaje...') : mode === 'observer' ? (isEn ? 'Setting up the match...' : 'Armando el partido...') : (isEn ? 'Generating buyer...' : 'Generando comprador...')}</>
+                : <><Phone size={18} /> {mode === 'lead' ? (isEn ? 'Take the call' : 'Recibir la llamada') : mode === 'observer' ? (isEn ? 'Watch the match' : 'Ver el partido') : (isEn ? 'Start the call' : 'Iniciar la llamada')}</>}
             </button>
           </div>
         </div>
@@ -509,7 +729,20 @@ export default function SoloPractice({ onBack }) {
               </div>
             )}
 
-            {!analysis && (
+            {/* Técnicas del closer experto — el botín de aprendizaje de los modos
+                "Ser Lead" y "Observador" (sin puntaje: acá se aprende mirando). */}
+            {mode !== 'closer' && techniques.length > 0 && (
+              <div style={{ textAlign: 'left', marginTop: '1rem', padding: '1rem', background: 'rgba(100,210,255,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(100,210,255,0.2)' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                  🎯 {isEn ? 'Techniques the expert closer used' : 'Técnicas que usó el closer experto'}
+                </div>
+                {[...new Set(techniques)].map((tq, i) => (
+                  <div key={i} style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>→ {tq}</div>
+                ))}
+              </div>
+            )}
+
+            {mode === 'closer' && !analysis && (
               <button className="btn btn-primary" onClick={scoreSession} disabled={scoring} style={{ width: '100%', marginTop: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                 {scoring
                   ? <><Loader size={16} style={{ animation: 'spin 1s linear infinite' }} /> {isEn ? 'Scoring...' : 'Puntuando...'}</>
@@ -567,7 +800,7 @@ export default function SoloPractice({ onBack }) {
 
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <button className="btn btn-outline" onClick={onBack} style={{ flex: 1 }}>{isEn ? 'Back to lobby' : 'Volver al lobby'}</button>
-            <button className="btn btn-primary" onClick={() => { setPhase('intro'); setScenario(null); setMessages([]); setThoughts([]); setAnalysis(null); setOutcome(null); setElapsed(0); setState(initialBuyerState()); }} style={{ flex: 1 }}>
+            <button className="btn btn-primary" onClick={() => { runIdRef.current++; setPhase('intro'); setScenario(null); setMessages([]); setThoughts([]); setTechniques([]); setAnalysis(null); setOutcome(null); setElapsed(0); setPaused(false); pausedRef.current = false; setState(initialBuyerState()); }} style={{ flex: 1 }}>
               {isEn ? 'New call' : 'Nueva llamada'}
             </button>
           </div>
@@ -595,11 +828,26 @@ export default function SoloPractice({ onBack }) {
               )}
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button onClick={() => setShowCoach(true)} title={isEn ? 'Closer coach' : 'Coach del closer'}
-                style={{ ...HEADER_BTN, background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', color: 'var(--primary)' }}>
-                <BookOpen size={16} /> {isEn ? 'Coach' : 'Coach'}
-              </button>
-              {speechSupported() && (
+              {mode === 'closer' && (
+                <button onClick={() => setShowCoach(true)} title={isEn ? 'Closer coach' : 'Coach del closer'}
+                  style={{ ...HEADER_BTN, background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', color: 'var(--primary)' }}>
+                  <BookOpen size={16} /> {isEn ? 'Coach' : 'Coach'}
+                </button>
+              )}
+              {mode === 'lead' && (
+                <button onClick={() => setShowCharacter(true)} title={isEn ? 'Your character sheet' : 'Tu ficha de personaje'}
+                  style={{ ...HEADER_BTN, background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)', color: '#a78bfa' }}>
+                  <Theater size={16} /> {isEn ? 'My character' : 'Mi personaje'}
+                </button>
+              )}
+              {mode === 'observer' && (
+                <button onClick={() => { const np = !pausedRef.current; pausedRef.current = np; setPaused(np); }}
+                  title={paused ? (isEn ? 'Resume' : 'Continuar') : (isEn ? 'Pause' : 'Pausar')}
+                  style={{ ...HEADER_BTN, background: paused ? 'rgba(48,209,88,0.12)' : 'rgba(255,159,10,0.12)', border: `1px solid ${paused ? 'rgba(48,209,88,0.4)' : 'rgba(255,159,10,0.35)'}`, color: paused ? 'var(--success)' : 'var(--accent)' }}>
+                  {paused ? <><Play size={16} /> {isEn ? 'Resume' : 'Continuar'}</> : <><Pause size={16} /> {isEn ? 'Pause' : 'Pausar'}</>}
+                </button>
+              )}
+              {mode !== 'observer' && speechSupported() && (
                 <button onClick={() => { unlockAudio(); if (voiceOn) stopSpeaking(); setVoiceOn(v => !v); }} title={isEn ? 'Toggle voice' : 'Voz on/off'}
                   style={{ ...HEADER_BTN, background: voiceOn ? 'rgba(48,209,88,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${voiceOn ? 'var(--success)' : 'rgba(255,255,255,0.15)'}`, color: voiceOn ? 'var(--success)' : 'var(--text-muted)' }}>
                   {voiceOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
@@ -612,27 +860,66 @@ export default function SoloPractice({ onBack }) {
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.6rem' }}>
-            {/* Solo el nombre: la personalidad DISC y los rasgos NO se muestran
-                al closer — los tiene que descubrir conversando (como en la
-                vida real). El análisis final sí los evalúa. */}
-            <BuyerAvatar
-              state={state}
-              speaking={speaking}
-              emotion={leadEmotion}
-              name={leadName}
-              seed={leadName}
-              isEn={isEn}
-              size={120}
-            />
+            {/* Modo closer/observador: el comprador (solo el nombre — la
+                personalidad DISC se descubre conversando). Modo lead: el que
+                habla es el CLOSER experto que te está llamando. */}
+            {mode === 'lead' ? (
+              <BuyerAvatar
+                state={{ temperature: 65, trust: 70, patience: 85 }}
+                speaking={speaking}
+                name={closerName}
+                seed={`closer-${closerName}`}
+                isEn={isEn}
+                size={120}
+                subtitle={isEn ? 'Expert closer' : 'Closer experto'}
+              />
+            ) : (
+              <BuyerAvatar
+                state={state}
+                speaking={speaking}
+                emotion={leadEmotion}
+                name={leadName}
+                seed={leadName}
+                isEn={isEn}
+                size={120}
+              />
+            )}
           </div>
-          <div style={{ display: 'flex', gap: '0.85rem' }}>
-            {METERS.map(m => <Meter key={m.key} meter={m} value={state[m.key]} isEn={isEn} />)}
-          </div>
+          {/* Medidores del comprador: en modo lead no aplican (el comprador sos vos). */}
+          {mode !== 'lead' && (
+            <div style={{ display: 'flex', gap: '0.85rem' }}>
+              {METERS.map(m => <Meter key={m.key} meter={m} value={state[m.key]} isEn={isEn} />)}
+            </div>
+          )}
         </div>
 
+        {/* Apuntador del closer: tiempo nítido + etapa estimada + sugerencia tipo
+            prompter (rota cada 2 turnos — ayuda al principiante sin dictarle). */}
+        {mode === 'closer' && (
+          <div className="glass-panel" style={{ padding: '0.55rem 0.9rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+            <span style={{ fontWeight: '800', fontSize: '1.05rem', fontVariantNumeric: 'tabular-nums', color: elapsed >= MAX_SECONDS - 300 ? 'var(--danger)' : 'white', flexShrink: 0 }}>
+              {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
+            </span>
+            <span style={{ fontSize: '0.68rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(100,210,255,0.1)', border: '1px solid rgba(100,210,255,0.25)', padding: '0.15rem 0.5rem', borderRadius: '2rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
+              {promptStage?.label}
+            </span>
+            {prompterOn && promptTip && (
+              <span style={{ flex: 1, fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.3 }}>
+                💡 “{promptTip}”
+              </span>
+            )}
+            {!prompterOn && <span style={{ flex: 1 }} />}
+            <button onClick={() => setPrompterOn(v => !v)} title={isEn ? 'Prompter on/off' : 'Apuntador on/off'}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: prompterOn ? 'var(--accent)' : 'rgba(255,255,255,0.25)', display: 'flex', flexShrink: 0, padding: 0 }}>
+              <Lightbulb size={16} />
+            </button>
+          </div>
+        )}
+
         {/* Producto a vender: le da clima al closer (qué ofrece). Empieza abierto y
-            se puede colapsar. El "cómo" (perfil del lead, etapas) sigue en la Guía. */}
-        {scenario?.productToSell && (
+            se puede colapsar. En modo lead NO se muestra: vos sos el cliente y el
+            producto te lo tiene que presentar el closer experto. */}
+        {mode !== 'lead' && scenario?.productToSell && (
           <div className="glass-panel" style={{ padding: showProduct ? '0.75rem 0.9rem' : '0.5rem 0.9rem', marginBottom: '0.75rem', border: '1px solid rgba(48,209,88,0.25)', background: 'rgba(48,209,88,0.06)' }}>
             <button onClick={() => setShowProduct(v => !v)} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: 0, color: 'inherit' }}>
               <Package size={14} color="var(--success)" />
@@ -650,34 +937,58 @@ export default function SoloPractice({ onBack }) {
 
         {/* Mensajes */}
         <div ref={scrollRef} className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '1rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-          {messages.map((m, i) => (
-            <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
-              {m.role !== 'user' && m.emotion && m.emotion !== 'neutral' && (
-                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', margin: '0 0 0.2rem 0.3rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <span>{EMOTION_META[m.emotion]?.emoji}</span>
-                  <span style={{ fontStyle: 'italic' }}>{isEn ? EMOTION_META[m.emotion]?.en : EMOTION_META[m.emotion]?.es}</span>
+          {messages.map((m, i) => {
+            // Derecha = quien "vende" o el humano: user (closer/lead humano) y el
+            // closer del partido IA vs IA. Izquierda = el comprador.
+            const right = m.role === 'user' || m.role === 'closer';
+            return (
+              <div key={i} style={{ alignSelf: right ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
+                {/* Nombres en el partido IA vs IA (tenis): quién habla en cada lado */}
+                {mode === 'observer' && (
+                  <div style={{ fontSize: '0.64rem', fontWeight: '700', color: 'var(--text-muted)', margin: `0 0.3rem 0.15rem`, textAlign: right ? 'right' : 'left', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {m.role === 'closer' ? `${closerName} · Closer` : leadName}
+                  </div>
+                )}
+                {/* Técnica aplicada por el closer experto (aprendizaje en vivo) */}
+                {m.technique && (
+                  <div style={{ fontSize: '0.66rem', fontWeight: '700', color: '#a5b4fc', margin: '0 0.3rem 0.2rem', textAlign: 'right' }}>
+                    🎯 {m.technique}
+                  </div>
+                )}
+                {!right && m.emotion && m.emotion !== 'neutral' && (
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', margin: '0 0 0.2rem 0.3rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span>{EMOTION_META[m.emotion]?.emoji}</span>
+                    <span style={{ fontStyle: 'italic' }}>{isEn ? EMOTION_META[m.emotion]?.en : EMOTION_META[m.emotion]?.es}</span>
+                  </div>
+                )}
+                <div style={{
+                  padding: '0.6rem 0.85rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: 1.4,
+                  background: right ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.06)',
+                  color: 'white', borderBottomRightRadius: right ? '0.2rem' : '12px',
+                  borderBottomLeftRadius: right ? '12px' : '0.2rem',
+                }}>
+                  {m.content}
                 </div>
-              )}
-              <div style={{
-                padding: '0.6rem 0.85rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: 1.4,
-                background: m.role === 'user' ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.06)',
-                color: 'white', borderBottomRightRadius: m.role === 'user' ? '0.2rem' : '12px',
-                borderBottomLeftRadius: m.role === 'user' ? '12px' : '0.2rem',
-              }}>
-                {m.content}
               </div>
-            </div>
-          ))}
+            );
+          })}
           {busy && (
             <div style={{ alignSelf: 'flex-start', color: 'var(--text-muted)', fontSize: '0.85rem', fontStyle: 'italic', padding: '0.4rem 0.85rem' }}>
-              {leadName} {isEn ? 'is thinking…' : 'está pensando…'}
+              {thinkingName} {isEn ? 'is thinking…' : 'está pensando…'}
+            </div>
+          )}
+          {mode === 'observer' && paused && !busy && (
+            <div style={{ alignSelf: 'center', color: 'var(--accent)', fontSize: '0.8rem', fontWeight: '700', padding: '0.3rem 0.85rem' }}>
+              ⏸ {isEn ? 'Match paused' : 'Partido en pausa'}
             </div>
           )}
         </div>
 
         {error && <p style={{ color: 'var(--danger)', fontSize: '0.8rem', margin: '0 0 0.5rem' }}>{error}</p>}
 
-        {/* Input: micrófono (push-to-talk) + texto */}
+        {/* Input: micrófono (push-to-talk) + texto. En observador no hay input:
+            solo mirás el partido (pausa/colgar en el header). */}
+        {mode !== 'observer' && (
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           {micSupported() && (
             <button
@@ -698,7 +1009,7 @@ export default function SoloPractice({ onBack }) {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder={recording ? (isEn ? 'Listening…' : 'Escuchando…') : transcribing ? (isEn ? 'Transcribing…' : 'Transcribiendo…') : (isEn ? 'Type or tap the mic…' : 'Escribí o tocá el micrófono…')}
+            placeholder={recording ? (isEn ? 'Listening…' : 'Escuchando…') : transcribing ? (isEn ? 'Transcribing…' : 'Transcribiendo…') : mode === 'lead' ? (isEn ? `Answer as ${leadName}…` : `Respondé como ${leadName}…`) : (isEn ? 'Type or tap the mic…' : 'Escribí o tocá el micrófono…')}
             disabled={busy || recording || transcribing}
             style={{ flex: 1, padding: '0.75rem 1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'white', fontSize: '0.9rem', outline: 'none' }}
           />
@@ -706,9 +1017,24 @@ export default function SoloPractice({ onBack }) {
             <Send size={18} />
           </button>
         </div>
+        )}
       </div>
 
       {showCoach && <SoloCoachPanel onClose={() => setShowCoach(false)} />}
+
+      {/* "Ser Lead": tu ficha de personaje — la MISMA vista que ve el Lead humano
+          en las salas grupales (LeadActorView). Panel lateral, no tapa el chat. */}
+      {showCharacter && scenario && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', justifyContent: 'flex-end' }} onClick={() => setShowCharacter(false)}>
+          <div className="glass-panel" onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '420px', height: '100%', overflowY: 'auto', borderRadius: 0, padding: '1.5rem 1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600', flex: 1 }}>🎭 {isEn ? 'Your character' : 'Tu personaje'}</h2>
+              <button onClick={() => setShowCharacter(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem' }}>✕</button>
+            </div>
+            <LeadActorView scenario={scenario} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

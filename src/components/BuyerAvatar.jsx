@@ -51,7 +51,9 @@ const EMOTION_EXPR = {
   apurado:      { eyebrows: 'flatNatural',   mouth: 'serious',   eyes: 'default' },
 };
 
-export default function BuyerAvatar({ state, speaking = false, emotion = 'neutral', name = '', seed = '', isEn = false, size = 130 }) {
+// `subtitle`: texto fijo bajo el nombre (reemplaza el mood dinámico — lo usa el
+// modo "Ser Lead" para mostrar "Closer experto" en vez del ánimo del comprador).
+export default function BuyerAvatar({ state, speaking = false, emotion = 'neutral', name = '', seed = '', isEn = false, size = 130, subtitle = '' }) {
   const t = state?.temperature ?? 35;
   const tr = state?.trust ?? 25;
   const p = state?.patience ?? 70;
@@ -127,8 +129,8 @@ export default function BuyerAvatar({ state, speaking = false, emotion = 'neutra
       </div>
       <div style={{ textAlign: 'center' }}>
         {name && <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>{name}</div>}
-        <div style={{ fontSize: '0.72rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: glow }}>
-          {moodLabel({ temperature: t, trust: tr, patience: p }, isEn)}
+        <div style={{ fontSize: '0.72rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: subtitle ? 'var(--text-muted)' : glow }}>
+          {subtitle || moodLabel({ temperature: t, trust: tr, patience: p }, isEn)}
         </div>
       </div>
     </div>

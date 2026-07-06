@@ -4,7 +4,7 @@ import {
   Shuffle, Copy, ChessKnight, BookOpen, Smartphone,
   Zap, History, Target, TrendingUp, Theater, Eye,
   ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase, Target as TargetIcon,
-  FileText
+  FileText, Lock
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
@@ -31,12 +31,15 @@ const ROLE_META = {
   Observador:  { icon: <Eye size={22} />, color: '#8b5cf6', gradient: 'linear-gradient(135deg,#8b5cf6,#ff375f)' }
 };
 
-// Encabezado de sección del Lobby: etiqueta uppercase + línea divisoria.
-// Organiza el dashboard en zonas claras (individual / herramientas / comunidad / equipo).
-function SectionLabel({ children }) {
+// Encabezado de sección del Lobby: etiqueta uppercase + chip opcional + línea.
+// El chip (badge) distingue de un vistazo lo INDIVIDUAL de lo GRUPAL.
+function SectionLabel({ children, badge, badgeAccent = '139,92,246' }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.9rem' }}>
       <span style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{children}</span>
+      {badge && (
+        <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.12rem 0.55rem', borderRadius: '2rem', background: `rgba(${badgeAccent},0.12)`, border: `1px solid rgba(${badgeAccent},0.35)`, color: `rgb(${badgeAccent})`, whiteSpace: 'nowrap' }}>{badge}</span>
+      )}
       <span style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
     </div>
   );
@@ -270,7 +273,9 @@ export default function Lobby() {
 
       {/* ── Sección: Entrená por tu cuenta ─────────────────── */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2.75rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
-        <SectionLabel>{isEn ? 'Train on your own' : 'Entrená por tu cuenta'}</SectionLabel>
+        <SectionLabel badge={isEn ? '👤 1 player' : '👤 1 jugador'} badgeAccent="48,209,88">
+          {isEn ? 'Individual practice' : 'Práctica individual'}
+        </SectionLabel>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <FeatureButton
             icon={<TargetIcon size={16} />}
@@ -301,11 +306,12 @@ export default function Lobby() {
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
         <SectionLabel>{isEn ? 'Sales tools' : 'Herramientas de venta'}</SectionLabel>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* Propuestas VIP: función Pro — para free abre el modal de planes. */}
           <FeatureButton
-            icon={<FileText size={16} />}
-            label={isEn ? 'VIP Proposals' : 'Propuestas VIP'}
+            icon={isFree ? <Lock size={16} /> : <FileText size={16} />}
+            label={(isEn ? 'VIP Proposals' : 'Propuestas VIP') + (isFree ? ' 🔒' : '')}
             accent="94,92,230"
-            onClick={() => setShowProposals(true)}
+            onClick={() => (isFree ? openPlans?.() : setShowProposals(true))}
           />
         </div>
       </div>
@@ -352,7 +358,9 @@ export default function Lobby() {
 
       {/* ── Sección: Sesión en equipo ──────────────────────── */}
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '720px', margin: '2.5rem auto 0', padding: '0 1rem', boxSizing: 'border-box' }}>
-        <SectionLabel>{isEn ? 'Team session' : 'Sesión en equipo'}</SectionLabel>
+        <SectionLabel badge={isEn ? '👥 Multiplayer' : '👥 Multijugador'} badgeAccent="139,92,246">
+          {isEn ? 'Group practice' : 'Práctica grupal'}
+        </SectionLabel>
       </div>
 
       {/* ── Main card ──────────────────────────────────────── */}
