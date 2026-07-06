@@ -40,7 +40,8 @@ ${realProduct ? `- PRODUCTO FIJO que el Closer vende (usá EXACTAMENTE este, NO 
 
 PRINCIPIOS DE REALISMO (críticos):
 - Personas de verdad, con contradicciones. NO asumas que todos son CEOs; adaptá al rubro (empleados, freelancers, estudiantes, dueños chicos, etc.).
-- La objeción visible casi NUNCA es la razón real. La razón oculta viene de una herida, un miedo o una creencia de identidad.
+- La objeción visible casi NUNCA es la razón real: es una cortina de humo. Detrás SIEMPRE hay 1 a 3 CAUSAS PROFUNDAS en capas (herida del pasado, miedo, creencia de identidad) — la más honda casi no se admite ni ante uno mismo.
+- Variá el TIPO de objeciones según la persona: estructurales (postergación automática), defensivas (recuperar control), de herida (ya me fue mal antes) y de identidad (no sé si soy capaz). Las secundarias NO deben ser todas del mismo tipo ni las típicas de manual: inventá las que ESTE lead diría.
 - Dale una historia: un evento detonante que lo trajo a esta llamada, un intento previo que falló, y una consecuencia concreta si no cambia.
 - Comportamiento conversacional específico: cómo habla, qué lo hace abrirse y qué lo hace cerrarse. Esto debe ser accionable para quien lo actúa.
 - Evitá clichés y frases genéricas. Que suene a una persona real, no a un manual.
@@ -74,9 +75,10 @@ Devolvé ÚNICAMENTE un objeto JSON válido con esta estructura EXACTA:
   },
   "productToSell": "1-2 párrafos: producto/servicio High Ticket que el Closer debe ofrecer, con nombre, características clave y PRECIO de USD 1500 o más (nunca menos de 1500)",
   "productPrice": <número entero en USD SIN símbolos ni texto, igual al precio del producto, 1500 o más>,
-  "visibleObjection": "La excusa fácil que dirá primero",
-  "secondaryObjections": ["", ""],
+  "visibleObjection": "La excusa fácil que dirá primero (cortina de humo)",
+  "secondaryObjections": ["objeciones de TIPOS variados (estructural/defensiva/herida/identidad), propias de ESTE lead"],
   "hiddenObjection": "La verdadera razón oculta (para el Trainer), conectada al miedo y a la herida",
+  "rootCauses": ["1 a 3 causas PROFUNDAS en capas, de la más superficial a la más honda. Cada una en 1 frase con su tipo entre corchetes. Ej: '[Herida] Pagó USD 3.000 a una agencia que desapareció y nunca se lo contó a su esposa', '[Identidad] En el fondo cree que no es de los que logran esto'"],
   "roleplayGuide": {
     "moneyBelief": "Creencia limitante sobre el dinero, 1 frase",
     "competingGoal": "Conflicto interno (quiere X pero teme Y), 1 frase",

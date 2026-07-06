@@ -148,9 +148,9 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     realProduct
   });
 
-  // 2800 tokens de salida acomoda los campos nuevos (behavioralCues, decisionStyle,
-  // triggerEvent) sin acercarse al límite de 6000 TPM.
-  const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 2800);
+  // 3000 tokens de salida acomoda los campos nuevos (behavioralCues, decisionStyle,
+  // triggerEvent, rootCauses) sin acercarse al límite de 6000 TPM.
+  const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 3000);
   if (scenario && typeof scenario === 'object') {
     scenario.personality = personality.id;
     // Guardamos la dificultad/temperatura elegidas: el scoring las usa para
