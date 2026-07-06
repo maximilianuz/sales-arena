@@ -50,7 +50,12 @@ export const handler = async (event) => {
 
   // Recortamos el historial: los últimos ~16 turnos alcanzan para coherencia y
   // mantienen los tokens bajos (límite 6000 TPM del free tier + 10s de Netlify).
-  const trimmed = messages.slice(-16).filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'));
+  // IMPORTANTE: mapeamos a {role, content} pelado — los clientes guardan campos
+  // extra en los mensajes (p. ej. "emotion" para el chip de la UI) y la API de
+  // Groq valida el esquema estricto y rechaza propiedades desconocidas con 400.
+  const trimmed = messages.slice(-16)
+    .filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'))
+    .map(m => ({ role: m.role, content: m.content }));
 
   const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
   const model = process.env.ROLEPLAY_MODEL || DEFAULT_MODEL;
