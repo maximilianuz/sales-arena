@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Arena — The Arena awaits</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
@@ -18,133 +18,194 @@
         .reveal { font-family: inherit !important; z-index: 1; background: transparent !important; }
         .reveal .slide-background { background: transparent !important; }
         .reveal .slides section {
-            background: rgba(9, 9, 11, 0.88);
-            padding: 34px; border-radius: 14px;
+            background: rgba(9, 9, 11, 0.9);
+            padding: 30px; border-radius: 14px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.55);
             border: 1px solid rgba(255,255,255,0.07);
             backdrop-filter: blur(10px);
+            box-sizing: border-box;
         }
         .reveal h1, .reveal h2, .reveal h3 { font-family: inherit !important; font-weight: 700 !important; letter-spacing: -0.03em; }
-        .reveal h1 { font-size: 2.6em; }
+        .reveal h1 { font-size: 2.4em; }
         .reveal h2 {
-            font-size: 2em;
+            font-size: 1.8em;
+            color: #7aa8ff; /* fallback when gradient text is unsupported */
             background: linear-gradient(135deg, var(--blue), var(--indigo));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block;
         }
-        .reveal p, .reveal li { font-weight: 400; color: #e5e5ea; line-height: 1.55; }
+        .reveal h2 .emoji { -webkit-text-fill-color: initial; }
+        .reveal p, .reveal li { font-weight: 400; color: #e5e5ea; line-height: 1.5; }
         .reveal strong { font-weight: 600; color: #ffffff; }
-        .reveal .small { font-size: 0.62em; color: #98989d; }
-        .cine { font-size: 1.35em; font-weight: 300; color: #f5f5f7; line-height: 1.5; }
-        .punch { font-size: 1.7em; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+        .reveal .small { font-size: 0.6em; color: #98989d; }
+        .cine { font-size: 1.25em; font-weight: 300; color: #f5f5f7; line-height: 1.45; }
+        .punch { font-size: 1.55em; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
         .hl-i { color: var(--indigo); font-weight: 600; }
         .hl-b { color: var(--blue); font-weight: 600; }
         .hl-p { color: var(--pink); font-weight: 600; }
         .hl-g { color: var(--green); font-weight: 600; }
         .hl-o { color: var(--orange); font-weight: 600; }
-        .tag { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 0.5em;
+        .tag { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 0.48em;
                letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600;
-               border: 1px solid rgba(94,92,230,0.5); color: #a5a4f5; margin-bottom: 18px; }
-        .role-card { text-align: left; font-size: 0.85em; }
+               border: 1px solid rgba(94,92,230,0.5); color: #a5a4f5; margin-bottom: 14px; }
+        .role-card { text-align: left; font-size: 0.8em; }
+        .steps { text-align: left; font-size: 0.78em; margin: 14px auto 0; max-width: 860px; }
+        .steps p { margin: 0.55em 0; }
+        .step-n { display: inline-flex; align-items: center; justify-content: center;
+                  width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--indigo);
+                  color: #fff; font-weight: 700; font-size: 0.85em; margin-right: 10px; flex-shrink: 0; }
+        .cta-btn { display: inline-block; margin-top: 24px; padding: 14px 38px; border-radius: 999px;
+                   background: linear-gradient(135deg, var(--indigo), var(--blue)); color: #fff !important;
+                   font-weight: 700; font-size: 0.75em; text-decoration: none !important;
+                   box-shadow: 0 10px 30px rgba(94,92,230,0.45); }
+        .open-app { position: fixed; top: 14px; right: 14px; z-index: 50; padding: 8px 18px;
+                    border-radius: 999px; background: rgba(94,92,230,0.9); color: #fff;
+                    font-size: 13px; font-weight: 600; text-decoration: none;
+                    font-family: inherit; box-shadow: 0 6px 18px rgba(0,0,0,0.4); }
+
+        /* Small screens: no letter left behind */
+        @media (max-width: 640px) {
+            .reveal .slides section { padding: 18px; }
+            .reveal h1 { font-size: 1.9em; }
+            .reveal h2 { font-size: 1.45em; }
+            .cine { font-size: 1.05em; }
+            .punch { font-size: 1.25em; }
+            .role-card, .steps { font-size: 0.72em; }
+        }
     </style>
 </head>
 <body>
     <div id="particles-js"></div>
+    <a class="open-app" href="/">Open the app →</a>
 
     <div class="reveal">
         <div class="slides">
 
-            <!-- COLD OPEN -->
+            <!-- ATTENTION · cold open -->
             <section data-transition="fade">
                 <p class="tag">Sales Arena</p>
                 <p class="cine">Every closer knows that moment.</p>
                 <p class="cine fragment">The call was going great. The lead was hot.</p>
                 <p class="cine fragment">And then they said: <strong>"Let me think about it."</strong></p>
-                <p class="punch fragment" style="margin-top: 30px;">And you never heard from them again.</p>
+                <p class="punch fragment" style="margin-top: 26px;">And you never heard from them again.</p>
             </section>
 
             <section data-transition="fade">
                 <p class="cine">That sale wasn't lost on the call.</p>
                 <p class="punch fragment">It was lost in the training you never did.</p>
-                <p class="cine fragment" style="margin-top: 26px;">The best in the world don't improvise under pressure.<br>
-                <strong>They rehearse pressure until it stops being pressure.</strong></p>
+                <p class="cine fragment" style="margin-top: 22px;">The best in the world don't improvise under pressure.<br>
+                <strong>They rehearse the pressure until it stops being pressure.</strong></p>
             </section>
 
-            <!-- LA PROMESA -->
+            <!-- INTEREST · the promise -->
             <section>
-                <h2>🏟️ Welcome to the Arena</h2>
-                <p class="cine">A simulator where you <span class="hl-i">fight real sales battles</span> against buyers with memory, moods and hidden objections —<br>without burning <strong>a single real lead</strong>.</p>
-                <p class="fragment cine" style="margin-top: 22px;">Here you can fail a thousand times.<br><strong>So you never fail when it counts.</strong></p>
+                <h2><span class="emoji">🏟️</span> Welcome to the Arena</h2>
+                <p class="cine">A simulator where you <span class="hl-i">fight real sales</span> against buyers with memory, moods and hidden objections —<br>without burning <strong>a single real lead</strong>.</p>
+                <p class="fragment cine" style="margin-top: 18px;">Here you can fail a thousand times.<br><strong>So you don't fail when it counts.</strong></p>
             </section>
 
-            <!-- EL RIVAL -->
+            <!-- INTEREST · the rival -->
             <section>
-                <h2>🧠 Your opponent: an AI that acts</h2>
-                <p class="cine">It's not a chatbot answering questions.</p>
-                <ul style="font-size: 0.85em; margin-top: 14px;">
-                    <li class="fragment">It has a <span class="hl-b">personality</span> (driver, enthusiast, empathetic, analytical) and <strong>speaks with real voice and emotions</strong>: it gets excited, hesitates, gets annoyed.</li>
+                <h2><span class="emoji">🧠</span> Your rival: an AI that acts</h2>
+                <p class="cine">It's not a chatbot that answers questions.</p>
+                <ul style="font-size: 0.8em; margin-top: 12px;">
+                    <li class="fragment">It has a <span class="hl-b">personality</span> (driver, enthusiast, empathetic, analytical) and <strong>speaks with a real voice and real emotions</strong>: it gets excited, hesitates, gets annoyed.</li>
                     <li class="fragment">It hides a <span class="hl-p">real objection</span> behind the one it tells you. Just like real leads.</li>
-                    <li class="fragment">It has <span class="hl-o">temperature, trust and patience</span> — and you win or lose them with every line.</li>
+                    <li class="fragment">It has <span class="hl-o">temperature, trust and patience</span> — and you win or lose them with every sentence.</li>
                     <li class="fragment">It can <strong>buy from you</strong>... or <strong>hang up on you</strong>.</li>
                 </ul>
             </section>
 
-            <!-- MODO SOLO -->
+            <!-- INTEREST · modes -->
             <section>
-                <h2>🎯 Mode 1: Solo practice</h2>
+                <h2><span class="emoji">🎯</span> Mode 1: Practice solo</h2>
                 <p class="cine">Your private gym. Open 24/7.</p>
-                <ul style="font-size: 0.85em; margin-top: 14px;">
+                <ul style="font-size: 0.8em; margin-top: 12px;">
                     <li class="fragment">Pick a level and industry → the AI generates a <strong>unique prospect</strong> with a story, a problem and a budget.</li>
-                    <li class="fragment">Sell by text or <span class="hl-g">with your voice</span>. The lead talks back, in whatever mood you put them in.</li>
-                    <li class="fragment">At the end: a <strong>methodology breakdown</strong>, a score, and exactly what to fix next time.</li>
+                    <li class="fragment">Sell by text or <span class="hl-g">with your voice</span>. The lead talks back, in whatever mood it's in.</li>
+                    <li class="fragment">Train <strong>one specific stage</strong> (opening, objections, closing) or the full sale.</li>
                 </ul>
-                <p class="fragment small" style="margin-top: 16px;">Lobby → "Practice solo". Your first fight starts in 10 seconds.</p>
             </section>
 
-            <!-- MODO EQUIPO -->
             <section>
-                <h2>🎬 Mode 2: The team Arena</h2>
+                <h2><span class="emoji">🎬</span> Mode 2: The team Arena</h2>
                 <p class="cine">Four roles. One call. Everyone learns.</p>
                 <div class="role-card">
-                    <p class="fragment">🧑‍💼 <span class="hl-b">THE CLOSER</span> — the protagonist. Sees only what they would see in real life. Their mission: <strong>close</strong>.</p>
+                    <p class="fragment">🧑‍💼 <span class="hl-b">THE CLOSER</span> — the protagonist. Sees only what they'd see in real life. Their mission: <strong>close</strong>.</p>
                     <p class="fragment">🎭 <span class="hl-p">THE LEAD</span> — plays the buyer following the AI's secret script. The better they act, the more the team learns.</p>
-                    <p class="fragment">🕵️ <span class="hl-g">THE OBSERVER</span> — sees EVERYTHING: the hidden layer, the lead's inner thoughts. Grades live and votes.</p>
-                    <p class="fragment">🎛️ <span class="hl-o">THE FACILITATOR</span> — the movie director. Pauses, changes stages... and fires <strong>surprise events</strong> when nobody expects them.</p>
+                    <p class="fragment">🕵️ <span class="hl-g">THE OBSERVER</span> — sees EVERYTHING: the hidden layer, the lead's thoughts. Scores live with a rubric and a listening log.</p>
+                    <p class="fragment">🎛️ <span class="hl-o">THE FACILITATOR</span> — the movie director. Pauses, switches stages... and fires <strong>surprise events</strong> when nobody expects them.</p>
                 </div>
             </section>
 
-            <!-- EVENTOS SORPRESA -->
+            <!-- DESIRE · surprise event -->
             <section data-transition="zoom">
                 <p class="tag">Surprise event</p>
                 <p class="cine">You're winning. The close is two sentences away.</p>
-                <p class="punch fragment">And the lead's business partner walks in:<br>"Who is this? Hang up, we have an emergency."</p>
-                <p class="cine fragment" style="margin-top: 24px;">What do you do? <strong>That</strong> is what separates a salesperson from a closer.</p>
+                <p class="punch fragment">And the lead's business partner storms in:<br>"Who is this? Hang up, we have an emergency."</p>
+                <p class="cine fragment" style="margin-top: 20px;">What do you do? <strong>That</strong> is what separates a salesperson from a closer.</p>
             </section>
 
-            <!-- STAKES -->
+            <!-- DESIRE · the analysis -->
             <section>
-                <h2>🏆 Here, something is at stake</h2>
-                <ul style="font-size: 0.85em;">
-                    <li class="fragment"><span class="hl-o">Leaderboard</span> — every session counts. Climb the board and let them know who closes.</li>
-                    <li class="fragment"><span class="hl-p">Scouting</span> — trainers scout here. Your fight history is your <strong>live CV</strong>: real job offers are waiting.</li>
-                    <li class="fragment"><span class="hl-i">VIP Proposals</span> — when you're ready for real leads: personalized proposals with video, open tracking and direct WhatsApp. <strong>You know who opened it, and when.</strong></li>
+                <h2><span class="emoji">🩺</span> At the end, the truth</h2>
+                <p class="cine">Every session ends with a <strong>methodology analysis</strong>:</p>
+                <ul style="font-size: 0.8em; margin-top: 12px;">
+                    <li class="fragment">A <span class="hl-i">5-metric radar</span>: frame control, pain depth, objection isolation, detachment and micro-commitments.</li>
+                    <li class="fragment">What went well, what to improve, and <strong>one concrete tip</strong> for your next fight.</li>
+                    <li class="fragment">If you closed, the <span class="hl-g">commission in play-dollars</span> hits your account and lifts you up the ranking.</li>
+                </ul>
+                <p class="fragment small" style="margin-top: 12px;">Solo practice earns 0.5× — real fights with your team are worth double.</p>
+            </section>
+
+            <!-- DESIRE · stakes -->
+            <section>
+                <h2><span class="emoji">🏆</span> Something real is at stake</h2>
+                <ul style="font-size: 0.8em;">
+                    <li class="fragment"><span class="hl-o">World ranking</span> — every session counts, with your flag next to your name. Let them know who closes.</li>
+                    <li class="fragment"><span class="hl-p">The Scouting pool</span> — trainers scout here. Your fight history is your <strong>live CV</strong>: real job offers are waiting.</li>
+                    <li class="fragment"><span class="hl-i">VIP Proposals</span> — when you're ready for real leads: proposals with video, open tracking and direct WhatsApp. <strong>You know who opened it, and when.</strong></li>
                 </ul>
             </section>
 
-            <!-- REGLAS DE ORO -->
+            <!-- ACTION · solo guide -->
             <section>
-                <h2>⚡ The 3 rules of the Arena</h2>
-                <p class="fragment cine">1. <strong>Act for real.</strong> If the lead gives the sale away, nobody learns anything.</p>
-                <p class="fragment cine">2. <strong>Lose without excuses.</strong> Every defeat in here is worth more than ten easy closes out there.</p>
-                <p class="fragment cine">3. <strong>Come back tomorrow.</strong> Champions don't train once.</p>
+                <h2><span class="emoji">🥊</span> Your first fight, in 3 steps</h2>
+                <div class="steps">
+                    <p class="fragment"><span class="step-n">1</span><strong>Sign up</strong> — email or Google. Pick your flag on your level card.</p>
+                    <p class="fragment"><span class="step-n">2</span>In the Lobby tap <span class="hl-b">"Practice solo"</span> — choose industry, level and (optionally) one specific stage.</p>
+                    <p class="fragment"><span class="step-n">3</span>When you finish, tap <span class="hl-g">"Analyze"</span> — read your radar, save the tip, come back tomorrow.</p>
+                </div>
+                <p class="fragment small" style="margin-top: 14px;">From the door to the first round: under 60 seconds.</p>
             </section>
 
-            <!-- FINAL CTA -->
+            <!-- ACTION · team guide -->
+            <section>
+                <h2><span class="emoji">🎬</span> The team Arena, in 4 steps</h2>
+                <div class="steps">
+                    <p class="fragment"><span class="step-n">1</span><strong>Create a room</strong> from the Lobby and share the code with your team.</p>
+                    <p class="fragment"><span class="step-n">2</span>Everyone <strong>picks a role</strong>: Closer, Lead, Observer or Facilitator.</p>
+                    <p class="fragment"><span class="step-n">3</span>The Facilitator generates the scenario and starts the call. The <span class="hl-b">🌐 Time zones</span> button shows everyone's local time.</p>
+                    <p class="fragment"><span class="step-n">4</span>After hanging up: <span class="hl-g">"Analyze & Save"</span> — the commission goes to the Closer and everyone sees the radar.</p>
+                </div>
+            </section>
+
+            <!-- ACTION · mobile -->
+            <section>
+                <h2><span class="emoji">📱</span> Take it with you</h2>
+                <p class="cine">The Arena also lives on your phone.</p>
+                <ul style="font-size: 0.8em; margin-top: 12px;">
+                    <li class="fragment"><strong>Android:</strong> download the app and train on the bus, in line, anywhere.</li>
+                    <li class="fragment"><strong>iPhone / PC:</strong> open the web app and use "Add to Home Screen" — it works like a native app.</li>
+                    <li class="fragment">Same account, same ranking, same lead voice. <strong>Your progress follows you.</strong></li>
+                </ul>
+            </section>
+
+            <!-- ACTION · final CTA -->
             <section data-transition="zoom">
                 <p class="tag">Your moment</p>
-                <p class="cine">On the other side of this screen there is a version of you<br>that no objection can freeze.</p>
-                <p class="punch fragment" style="margin-top: 26px;">The only distance between you and them<br>is the fights you haven't fought yet.</p>
-                <h1 class="fragment" style="margin-top: 34px;">🥊 Enter the Arena.</h1>
-                <p class="fragment small">Close this tab → "Practice solo". Now.</p>
+                <p class="cine">On the other side of this screen there's a version of you<br>that never freezes at an objection.</p>
+                <p class="punch fragment" style="margin-top: 22px;">The only distance between you and them<br>is the fights you haven't fought yet.</p>
+                <a class="fragment cta-btn" href="/">🥊 Enter the Arena — Practice solo</a>
             </section>
 
         </div>
@@ -155,6 +216,8 @@
     <script>
         Reveal.initialize({
             hash: true, controls: true, progress: true, center: true,
+            width: 1000, height: 720, margin: 0.06,
+            minScale: 0.2, maxScale: 1.6,
             transition: 'slide', backgroundTransition: 'fade'
         });
 
