@@ -10,25 +10,33 @@
       "$uid": {
         ".read": "$uid === auth.uid",
         "subscriptionStatus": {
-          ".write": "$uid === auth.uid && newData.val() === 'free'"
+          ".write": "$uid === auth.uid"
         },
         "country": {
-          ".write": "$uid === auth.uid && (newData.isString() && newData.val().length <= 2)"
-        },
-        "subscriptionPlan": { ".write": false },
-        "sessionsUsed": { ".write": false },
-        "subscriptionExpiry": { ".write": false },
-        "subscriptionProvider": { ".write": false },
-        "history": {
-          "$sessionId": {
-            ".read": "$uid === auth.uid",
-            ".write": false
-          }
-        },
-        "library": {
           ".write": "$uid === auth.uid"
+        },
+        "subscriptionPlan": {
+          ".write": false
+        },
+        "sessionsUsed": {
+          ".write": false
+        },
+        "subscriptionExpiry": {
+          ".write": false
+        },
+        "subscriptionProvider": {
+          ".write": false
         }
       }
+    },
+    "history": {
+      "$sessionId": {
+        ".read": "$uid === auth.uid",
+        ".write": false
+      }
+    },
+    "library": {
+      ".write": "$uid === auth.uid"
     },
     "cohorts": {
       "$trainerUid": {
@@ -48,25 +56,19 @@
       "profiles": {
         "$uid": {
           ".read": "$uid === auth.uid",
-          ".write": false
+          ".write": "$uid === auth.uid"
         }
       }
     },
     "telemetry": {
-      ".read": false,
-      "$day": {
-        "$entry": {
-          ".write": "auth != null",
-          ".validate": "newData.hasChild('type')"
-        }
-      }
+      ".write": "auth != null",
+      ".validate": "newData.hasChild('type')"
     },
     "proposals": {
-      ".read": false,
+      ".read": true,
       "$proposalId": {
-        ".read": true,
-        ".write": "auth != null && (!data.exists() || data.child('ownerUid').val() === auth.uid) && (!newData.exists() || newData.child('ownerUid').val() === auth.uid)",
-        ".validate": "newData.hasChildren(['ownerUid', 'title'])"
+        ".write": "data.child('ownerUid').val() === auth.uid || newData.child('ownerUid').val() === auth.uid",
+        ".validate": "newData.hasChild('ownerUid') && newData.hasChild('title')"
       }
     },
     "proposalIndex": {
@@ -77,12 +79,9 @@
     },
     "proposalEvents": {
       "$proposalId": {
-        ".read": "auth != null && root.child('proposals').child($proposalId).child('ownerUid').val() === auth.uid",
-        ".write": "auth != null && root.child('proposals').child($proposalId).child('ownerUid').val() === auth.uid && !newData.exists()",
-        "$eventId": {
-          ".write": "!data.exists()",
-          ".validate": "newData.hasChildren(['t', 'ts'])"
-        }
+        ".read": "root.child('proposals').child($proposalId).child('ownerUid').val() === auth.uid",
+        ".write": "!newData.exists()",
+        ".validate": "newData.hasChild('t') && newData.hasChild('ts')"
       }
     },
     "$other": {
