@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard, Lock } from 'lucide-react';
+import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard, Lock, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { signOutUser, activateFreeplan } from '../utils/auth';
+
+// Métodos de pago habilitados. Por ahora SOLO cripto (NOWPayments) está
+// configurado; tarjeta y MercadoPago quedan "Próximamente" hasta cargar sus
+// credenciales. Flipear a true cuando estén las env vars correspondientes.
+const PROVIDERS_ENABLED = { crypto: true, stripe: false, mercadopago: false };
+// Mail al que llegan los pedidos de acceso Closer/Pro. Mientras no haya cobro
+// automático (o como alternativa a cripto), el admin los otorga a mano.
+const ACCESS_REQUEST_EMAIL = 'contacto.maximilianoc@gmail.com';
 
 const PLAN_META = [
   {
@@ -26,6 +34,7 @@ const PLAN_META = [
 
 export default function SubscriptionGate({ user, children, isActive, isLoading, onClose }) {
   const { t, i18n } = useTranslation();
+  const isEn = i18n.language?.startsWith('en');
   const [billing, setBilling] = useState('yearly');
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
@@ -235,34 +244,36 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
                   ))}
                 </ul>
 
-                {/* Botones de pago */}
+                {/* Pago: por ahora solo CRIPTO está activo (NOWPayments). Tarjeta
+                    y MercadoPago quedan "Próximamente". Además, "Pedir acceso por
+                    mail" para el otorgamiento manual del admin (aceptando mail). */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => handleCheckout(planId, 'stripe')}
-                    disabled={!!loadingPlan}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                  {PROVIDERS_ENABLED.crypto && (
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleCheckout(planId, 'crypto')}
+                      disabled={!!loadingPlan}
+                      style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                    >
+                      <Bitcoin size={16} />
+                      {loadingPlan === `${planId}_crypto` ? t('subscription.redirecting') : (isEn ? 'Pay with crypto' : 'Pagar con cripto')}
+                    </button>
+                  )}
+                  {!PROVIDERS_ENABLED.stripe && (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.55rem', borderRadius: '0.75rem', border: '1px dashed rgba(255,255,255,0.14)', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                      <CreditCard size={15} /> {isEn ? 'Card & more — coming soon' : 'Tarjeta y más — próximamente'}
+                    </div>
+                  )}
+                  {/* Pedir acceso: ícono de sobre (sin exponer el correo). Abre el
+                      mail al admin con el plan + el mail de la cuenta pre-cargados. */}
+                  <a
+                    href={`mailto:${ACCESS_REQUEST_EMAIL}?subject=${encodeURIComponent(`${isEn ? 'Access request' : 'Pedido de acceso'} — ${planName}`)}&body=${encodeURIComponent(`${isEn ? 'My account email' : 'Mail de mi cuenta'}: ${user.email}`)}`}
+                    title={isEn ? 'Request access by email' : 'Pedir acceso por mail'}
+                    aria-label={isEn ? 'Request access by email' : 'Pedir acceso por mail'}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginTop: '0.1rem', padding: '0.45rem', borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.12)', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600 }}
                   >
-                    <CreditCard size={16} />
-                    {loadingPlan === `${planId}_stripe` ? t('subscription.redirecting') : t('subscription.payCard')}
-                  </button>
-                  <button
-                    className="btn btn-outline"
-                    onClick={() => handleCheckout(planId, 'mercadopago')}
-                    disabled={!!loadingPlan}
-                    style={{ width: '100%' }}
-                  >
-                    {loadingPlan === `${planId}_mercadopago` ? t('subscription.redirecting') : t('subscription.payMP')}
-                  </button>
-                  <button
-                    className="btn btn-outline"
-                    onClick={() => handleCheckout(planId, 'crypto')}
-                    disabled={!!loadingPlan}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                  >
-                    <Bitcoin size={16} />
-                    {loadingPlan === `${planId}_crypto` ? t('subscription.redirecting') : t('subscription.payCrypto')}
-                  </button>
+                    <Mail size={15} /> {isEn ? 'Request access' : 'Pedir acceso'}
+                  </a>
                 </div>
               </div>
             );

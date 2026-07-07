@@ -6,6 +6,9 @@ import { signInWithGoogle, registerWithEmail, signInWithEmail } from '../utils/a
 export default function Login() {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
+  // URL absoluta de descarga del APK (para el QR): origin + /descargar-app, que
+  // el redirect de netlify.toml resuelve al APK más nuevo de GitHub Releases.
+  const appDownloadUrl = (typeof window !== 'undefined' ? window.location.origin : 'https://sales-arena.netlify.app') + '/descargar-app';
   const [mode, setMode] = useState('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -125,28 +128,32 @@ export default function Login() {
         </div>
       </div>
 
-      {/* App móvil: el QR vive SOLO acá (pantalla inicial) — grande y claro. */}
+      {/* App Android: el QR vive SOLO acá (pantalla inicial). Apunta a
+          /descargar-app → redirect (netlify.toml) al APK más nuevo publicado en
+          GitHub Releases del repo móvil. Absoluto (window.location.origin) para
+          que se pueda escanear con la cámara del celular. */}
       <div style={{
         marginTop: '1.25rem', background: 'rgba(15,15,30,0.75)', backdropFilter: 'blur(24px)',
         borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.07)',
         padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', gap: '1.25rem', boxSizing: 'border-box'
       }}>
-        <a href="https://sales-arena-mobile.netlify.app/" target="_blank" rel="noopener noreferrer"
+        <a href="/descargar-app" target="_blank" rel="noopener noreferrer"
           style={{ background: 'white', padding: '0.45rem', borderRadius: '0.65rem', display: 'inline-block', flexShrink: 0 }}>
           <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=https://sales-arena-mobile.netlify.app/&ecc=H"
-            alt="QR App Móvil" style={{ display: 'block', width: '96px', height: '96px' }}
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=96x96&ecc=H&data=${encodeURIComponent(appDownloadUrl)}`}
+            alt={isEn ? 'QR to download the Android app' : 'QR para descargar la app Android'}
+            style={{ display: 'block', width: '96px', height: '96px' }}
           />
         </a>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.3rem' }}>
             <Smartphone size={16} color="#a5b4fc" />
-            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'white' }}>{isEn ? 'Mobile App' : 'App Móvil'}</span>
+            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'white' }}>{isEn ? 'Android App' : 'App Android'}</span>
           </div>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: 1.45 }}>
             {isEn
-              ? 'Scan the QR to join sessions from your phone as Lead or Observer.'
-              : 'Escaneá el QR para participar desde tu celular como Lead u Observador.'}
+              ? 'Scan the QR with your phone to download and install the app, and train from anywhere.'
+              : 'Escaneá el QR con tu celular para descargar e instalar la app y entrenar desde donde estés.'}
           </p>
         </div>
       </div>
