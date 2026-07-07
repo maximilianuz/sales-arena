@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChessKnight, Mail, Lock, ArrowRight } from 'lucide-react';
+import { ChessKnight, Mail, Lock, ArrowRight, Smartphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { signInWithGoogle, registerWithEmail, signInWithEmail } from '../utils/auth';
 
@@ -41,8 +41,8 @@ export default function Login() {
         </select>
       </div>
 
+      <div style={{ margin: 'auto', maxWidth: '420px', width: '100%' }}>
       <div style={{
-        margin: 'auto', maxWidth: '420px', width: '100%',
         background: 'rgba(15,15,30,0.75)', backdropFilter: 'blur(24px)',
         borderRadius: '1.5rem', border: '1px solid rgba(255,255,255,0.07)',
         boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(94,92,230,0.08)',
@@ -123,6 +123,33 @@ export default function Login() {
             </span>
           )}
         </div>
+      </div>
+
+      {/* App móvil: el QR vive SOLO acá (pantalla inicial) — grande y claro. */}
+      <div style={{
+        marginTop: '1.25rem', background: 'rgba(15,15,30,0.75)', backdropFilter: 'blur(24px)',
+        borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.07)',
+        padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', gap: '1.25rem', boxSizing: 'border-box'
+      }}>
+        <a href="https://sales-arena-mobile.netlify.app/" target="_blank" rel="noopener noreferrer"
+          style={{ background: 'white', padding: '0.45rem', borderRadius: '0.65rem', display: 'inline-block', flexShrink: 0 }}>
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=https://sales-arena-mobile.netlify.app/&ecc=H"
+            alt="QR App Móvil" style={{ display: 'block', width: '96px', height: '96px' }}
+          />
+        </a>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.3rem' }}>
+            <Smartphone size={16} color="#a5b4fc" />
+            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'white' }}>{isEn ? 'Mobile App' : 'App Móvil'}</span>
+          </div>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: 1.45 }}>
+            {isEn
+              ? 'Scan the QR to join sessions from your phone as Lead or Observer.'
+              : 'Escaneá el QR para participar desde tu celular como Lead u Observador.'}
+          </p>
+        </div>
+      </div>
       </div>
     </div>
   );

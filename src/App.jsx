@@ -29,7 +29,9 @@ function GatedRoutes({ user }) {
   const hasAccess = (isActive || isFree) && !showPlans;
 
   return (
-    <SubscriptionGate user={user} isActive={hasAccess} isLoading={isLoading} onClose={closePlans}>
+    // onClose solo cuando el usuario abrió planes manualmente (showPlans): en el
+    // primer ingreso (sin plan elegido) no hay "volver" — debe elegir un plan.
+    <SubscriptionGate user={user} isActive={hasAccess} isLoading={isLoading} onClose={showPlans ? closePlans : undefined}>
       <BrowserRouter>
         <Suspense fallback={<RouteFallback />}>
           <Routes>

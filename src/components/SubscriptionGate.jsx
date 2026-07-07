@@ -67,8 +67,12 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Payment error');
       window.location.href = data.checkoutUrl;
-    } catch (e) {
-      setError(e.message);
+    } catch {
+      // Pasarelas todavía no configuradas (o caídas): mensaje amable en vez del
+      // error técnico — que el usuario arranque gratis y pague cuando estén.
+      setError(i18n.language?.startsWith('en')
+        ? 'Payments are almost ready. Start with the Free plan — you can upgrade any time.'
+        : 'Los pagos están casi listos. Empezá con el plan Gratis — podés mejorar tu plan en cualquier momento.');
       setLoadingPlan(null);
     }
   };

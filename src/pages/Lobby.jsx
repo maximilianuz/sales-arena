@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Shuffle, Copy, ChessKnight, BookOpen, Smartphone,
+  Shuffle, Copy, ChessKnight, BookOpen,
   Zap, History, Target, TrendingUp, Theater, Eye,
   ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase, Target as TargetIcon,
   FileText, Lock
@@ -99,6 +99,16 @@ export default function Lobby() {
   const [role, setRole] = useState('');
   const [roomId, setRoomId] = useState('');
   const [copied, setCopied] = useState(false);
+  // Espacio de trabajo: '' = todavía no eligió (muestra las 2 tarjetas grandes),
+  // 'individual' | 'team'. Se persiste para aterrizar siempre donde trabaja,
+  // con un switcher para cambiar. Así no se ve TODO en una misma pantalla.
+  const [workspace, setWorkspace] = useState(() => {
+    try { return localStorage.getItem('lobbyWorkspace') || ''; } catch { return ''; }
+  });
+  const chooseWorkspace = (w) => {
+    setWorkspace(w);
+    try { localStorage.setItem('lobbyWorkspace', w); } catch { /* sin storage */ }
+  };
 
   const isEn = i18n.language?.startsWith('en');
 
@@ -271,8 +281,58 @@ export default function Lobby() {
         </div>
       </div>
 
-      {/* ── Sección: Entrená por tu cuenta ─────────────────── */}
+      {/* ── Elegí tu espacio: Individual o Equipos ──────────
+          Primera vez: dos tarjetas grandes. Después: switcher de pestañas.
+          Solo se muestra el contenido del espacio elegido. */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2.75rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
+        {!workspace ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+            {[
+              { id: 'individual', icon: <TargetIcon size={26} />, accent: '48,209,88', title: isEn ? 'Individual Work' : 'Trabajo Individual', desc: isEn ? 'Practice against the AI buyer at your own pace: as closer, lead or observer.' : 'Practicá contra el comprador IA a tu ritmo: como closer, lead u observador.' },
+              { id: 'team', icon: <Users size={26} />, accent: '139,92,246', title: isEn ? 'Team Work' : 'Trabajo en Equipos', desc: isEn ? 'Live multiplayer role-plays with your team: Closer, Lead, Observer and Facilitator.' : 'Role-plays multijugador en vivo con tu equipo: Closer, Lead, Observador y Facilitador.' },
+            ].map(c => (
+              <button key={c.id} onClick={() => chooseWorkspace(c.id)} style={{
+                textAlign: 'left', cursor: 'pointer', padding: '1.5rem 1.4rem', borderRadius: '1.1rem',
+                background: `linear-gradient(160deg, rgba(${c.accent},0.13), rgba(15,15,30,0.6))`,
+                border: `1px solid rgba(${c.accent},0.35)`, color: 'white', font: 'inherit',
+                boxShadow: '0 8px 28px rgba(0,0,0,0.35)',
+              }}>
+                <div style={{ width: '46px', height: '46px', borderRadius: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, rgb(${c.accent}), rgba(${c.accent},0.55))`, marginBottom: '0.8rem', boxShadow: `0 4px 14px rgba(${c.accent},0.4)`, color: 'white' }}>
+                  {c.icon}
+                </div>
+                <div style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.3rem' }}>{c.title}</div>
+                <div style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>{c.desc}</div>
+                <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: `rgb(${c.accent})` }}>
+                  {isEn ? 'Enter' : 'Entrar'} <ArrowRight size={14} />
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(0,0,0,0.25)', borderRadius: '0.9rem', padding: '0.3rem', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {[
+              { id: 'individual', l: isEn ? '👤 Individual Work' : '👤 Trabajo Individual' },
+              { id: 'team', l: isEn ? '👥 Team Work' : '👥 Trabajo en Equipos' },
+            ].map(tab => {
+              const active = workspace === tab.id;
+              return (
+                <button key={tab.id} onClick={() => chooseWorkspace(tab.id)} style={{
+                  flex: 1, padding: '0.6rem 0.5rem', borderRadius: '0.65rem', cursor: 'pointer', font: 'inherit',
+                  fontSize: '0.88rem', fontWeight: 700, border: 'none',
+                  background: active ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'transparent',
+                  color: active ? 'white' : 'var(--text-muted)',
+                }}>
+                  {tab.l}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {workspace === 'individual' && (<>
+      {/* ── Sección: Práctica individual ───────────────────── */}
+      <div style={{ position: 'relative', zIndex: 1, marginTop: '2rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
         <SectionLabel badge={isEn ? '👤 1 player' : '👤 1 jugador'} badgeAccent="48,209,88">
           {isEn ? 'Individual practice' : 'Práctica individual'}
         </SectionLabel>
@@ -341,12 +401,6 @@ export default function Lobby() {
               onClick={() => setShowScoutingModal(true)}
             />
           )}
-          <FeatureButton
-            icon={<Users size={16} />}
-            label={isEn ? 'Join cohort' : 'Unirme a cohorte'}
-            accent="48,209,88"
-            onClick={() => setShowJoinCohort(true)}
-          />
         </div>
       </div>
 
@@ -355,12 +409,23 @@ export default function Lobby() {
 
       {/* ── Camino del Closer (progresión Novato→Pro) ──────── */}
       <ProgressPath />
+      </>)}
 
+      {workspace === 'team' && (<>
       {/* ── Sección: Sesión en equipo ──────────────────────── */}
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '720px', margin: '2.5rem auto 0', padding: '0 1rem', boxSizing: 'border-box' }}>
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '720px', margin: '2rem auto 0', padding: '0 1rem', boxSizing: 'border-box' }}>
         <SectionLabel badge={isEn ? '👥 Multiplayer' : '👥 Multijugador'} badgeAccent="139,92,246">
           {isEn ? 'Group practice' : 'Práctica grupal'}
         </SectionLabel>
+        {/* Cohorte: pertenece al mundo grupal (código del trainer → progreso compartido) */}
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <FeatureButton
+            icon={<Users size={16} />}
+            label={isEn ? 'Join cohort' : 'Unirme a cohorte'}
+            accent="48,209,88"
+            onClick={() => setShowJoinCohort(true)}
+          />
+        </div>
       </div>
 
       {/* ── Main card ──────────────────────────────────────── */}
@@ -498,38 +563,7 @@ export default function Lobby() {
           </button>
         </form>
       </div>
-
-      {/* ── Mobile app QR ──────────────────────────────────── */}
-      <div style={{
-        marginTop: '1.5rem', maxWidth: '580px', width: '100%',
-        position: 'relative', zIndex: 1,
-        background: 'rgba(15,15,30,0.55)', backdropFilter: 'blur(16px)',
-        borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.05)',
-        padding: '1.25rem 1.75rem',
-        display: 'flex', alignItems: 'center', gap: '1.5rem'
-      }}>
-        <a href="https://sales-arena-mobile.netlify.app/" target="_blank" rel="noopener noreferrer"
-          style={{ background: 'white', padding: '0.5rem', borderRadius: '0.65rem', display: 'inline-block', position: 'relative', flexShrink: 0 }}>
-          <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://sales-arena-mobile.netlify.app/&ecc=H"
-            alt="QR" style={{ display: 'block', width: '80px', height: '80px' }}
-          />
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: 'white', padding: '3px', borderRadius: '3px', display: 'flex' }}>
-            <ChessKnight size={20} color="black" strokeWidth={2} />
-          </div>
-        </a>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <Smartphone size={16} color="rgba(165,180,252,0.7)" />
-            <span style={{ fontWeight: '700', color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
-              {isEn ? 'Mobile App' : 'App Móvil'}
-            </span>
-          </div>
-          <p style={{ margin: 0, color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', lineHeight: '1.4' }}>
-            {isEn ? 'Scan to participate from your phone as Lead or Observer.' : 'Escaneá para participar desde tu celular como Lead u Observador.'}
-          </p>
-        </div>
-      </div>
+      </>)}
 
       {/* ── Join cohort modal ──────────────────────────────── */}
       {showScoutingModal && <ScoutingModal onClose={() => setShowScoutingModal(false)} />}

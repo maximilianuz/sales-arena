@@ -1,201 +1,173 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sales Arena - Technical Dossier</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/black.min.css" id="theme">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body { background-color: #0d0d12; margin: 0; overflow: hidden; font-family: 'Outfit', sans-serif; }
-        #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; }
-        .reveal { background: transparent !important; z-index: 1; font-family: 'Outfit', sans-serif !important; }
-        .reveal .slide-background { background: transparent !important; }
-        .reveal .slides section {
-            background: rgba(10, 10, 15, 0.85);
-            padding: 30px; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(8px);
-        }
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4 { 
-            font-family: 'Outfit', sans-serif !important;
-            font-weight: 600 !important;
-            letter-spacing: -0.02em;
-        }
-        .reveal h2 { 
-            font-size: 2.2em; 
-            background: linear-gradient(135deg, #4CAF50, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-        .reveal h3 { color: #3b82f6; font-size: 1.5em; margin-bottom: 0.5em; }
-        .reveal h4 { color: #10b981; font-size: 1.2em; margin-top: 1em; font-weight: 500 !important; }
-        .reveal p, .reveal li { 
-            font-size: 0.85em; 
-            line-height: 1.5; 
-            text-align: left; 
-            font-weight: 300;
-            color: #e2e8f0;
-        }
-        .reveal strong { font-weight: 500; color: #ffffff; }
-        .highlight { color: #FF9800; font-weight: 500; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Arena — Group Session Dossier</title>
+<style>
+  /* App palette (src/index.css) */
+  :root {
+    --primary: #5e5ce6;
+    --secondary: #ff375f;
+    --accent: #ff9f0a;
+    --success: #30d158;
+    --danger: #ff453a;
+    --bg-dark: #09090b;
+    --bg-card: rgba(24, 24, 27, 0.75);
+    --text-muted: #98989d;
+    --border: rgba(255, 255, 255, 0.08);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg-dark); color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    /* Fluid type: auto-adjusts to every screen */
+    font-size: clamp(15px, 1.5vw + 10px, 17px);
+    background-image: radial-gradient(ellipse at top, rgba(94,92,230,0.12), transparent 55%);
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 3rem) clamp(1rem, 4vw, 1.5rem) 4rem; }
+  header { text-align: center; margin-bottom: clamp(2rem, 5vw, 3rem); }
+  h1 {
+    font-size: clamp(1.7rem, 5vw, 2.6rem); font-weight: 700; letter-spacing: -0.03em; margin: 0 0 0.4rem;
+    background: linear-gradient(135deg, #fff 40%, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .kicker { font-size: clamp(0.62rem, 1.8vw, 0.72rem); font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(196,181,253,0.6); }
+  .lead { color: var(--text-muted); max-width: 560px; margin: 0.75rem auto 0; font-size: clamp(0.88rem, 2vw, 0.98rem); }
+  h2 {
+    font-size: clamp(1.15rem, 3.2vw, 1.45rem); font-weight: 700; letter-spacing: -0.01em;
+    margin: clamp(2rem, 5vw, 2.75rem) 0 0.9rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  h2 .n {
+    width: 1.7em; height: 1.7em; flex-shrink: 0; border-radius: 0.5em; display: inline-flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--primary), #8b5cf6); font-size: 0.72em; font-weight: 800;
+  }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: clamp(0.9rem, 2.5vw, 1.25rem); margin-bottom: 0.75rem; backdrop-filter: blur(10px); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.75rem; }
+  .role { border-top: 3px solid var(--c, var(--primary)); }
+  .role h3 { margin: 0 0 0.3rem; font-size: 1rem; color: var(--c, var(--primary)); }
+  .role p { margin: 0; font-size: 0.86rem; color: var(--text-muted); }
+  ol.steps { padding-left: 0; list-style: none; counter-reset: step; margin: 0; }
+  ol.steps li { position: relative; padding: 0 0 1rem 2.6rem; counter-increment: step; }
+  ol.steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 0.05rem;
+    width: 1.8rem; height: 1.8rem; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: rgba(94,92,230,0.18); border: 1px solid rgba(94,92,230,0.5); color: #c4b5fd; font-weight: 700; font-size: 0.85rem;
+  }
+  ol.steps li::after { content: ''; position: absolute; left: 0.88rem; top: 2rem; bottom: 0.2rem; width: 1px; background: rgba(94,92,230,0.25); }
+  ol.steps li:last-child::after { display: none; }
+  ol.steps b { display: block; margin-bottom: 0.15rem; }
+  ol.steps span { color: var(--text-muted); font-size: 0.88rem; }
+  .stage { display: flex; gap: 0.7rem; align-items: baseline; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+  .stage:last-child { border-bottom: none; }
+  .stage .num { color: var(--primary); font-weight: 800; flex-shrink: 0; width: 1.2rem; }
+  .stage b { display: block; }
+  .stage small { color: var(--text-muted); }
+  .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.12rem 0.55rem; border-radius: 2rem; margin-right: 0.35rem; }
+  .tag.humo { background: rgba(255,159,10,0.15); color: var(--accent); border: 1px solid rgba(255,159,10,0.35); }
+  .tag.real { background: rgba(255,55,95,0.15); color: var(--secondary); border: 1px solid rgba(255,55,95,0.35); }
+  .onion { border-left: 3px solid var(--secondary); padding: 0.6rem 0.9rem; background: rgba(255,55,95,0.06); border-radius: 0 0.6rem 0.6rem 0; margin-top: 0.6rem; font-size: 0.88rem; color: var(--text-muted); }
+  .kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; }
+  .kpi div { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.7rem 0.85rem; }
+  .kpi b { color: var(--success); display: block; font-size: 0.95rem; }
+  .kpi small { color: var(--text-muted); font-size: 0.78rem; line-height: 1.35; display: block; }
+  ul.clean { margin: 0; padding-left: 1.1rem; }
+  ul.clean li { margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.9rem; }
+  ul.clean li b { color: #fff; }
+  footer { text-align: center; margin-top: 3rem; color: var(--text-muted); font-size: 0.8rem; }
+  a.back {
+    display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1rem; color: #c4b5fd; text-decoration: none;
+    font-weight: 600; font-size: 0.85rem; border: 1px solid rgba(94,92,230,0.4); padding: 0.45rem 1.1rem; border-radius: 2rem;
+  }
+</style>
 </head>
 <body>
-    <div id="particles-js"></div>
+<div class="wrap">
 
-    <div class="reveal">
-        <div class="slides">
-            
-            <!-- Cover -->
-            <section data-transition="zoom">
-                <h2>⚙️ Technical Dossier</h2>
-                <h3 class="fragment fade-up">Advanced Operations Manual</h3>
-                <p class="fragment fade-up" style="text-align: center;">AI Configuration, Pipelines, and Strategic Tools for Roles.</p>
-            </section>
-            
-            <!-- Scenario and API Setup -->
-            <section>
-                <section>
-                    <h2>🔌 Technical Setup (Facilitator)</h2>
-                    <p class="fragment fade-up">The control panel allows you to orchestrate the AI simulation with surgical precision.</p>
-                    <p class="fragment fade-up text-center">👇 (Swipe down)</p>
-                </section>
-                <section>
-                    <h3>Scenario & Context</h3>
-                    <ul>
-                        <li class="fragment fade-up"><strong>Product/Price:</strong> Define what is sold and its value. This calibrates the difficulty of the close.</li>
-                        <li class="fragment fade-up"><strong>Lead's Context:</strong> Create information asymmetry. Give the Lead (Human or AI) a realistic background (industry, company size, hidden pains).</li>
-                        <li class="fragment fade-up"><strong>Initial Objections:</strong> Force the Lead to throw specific smokescreens ("It's expensive", "I have no time") to evaluate the Closer's reaction.</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>AI Integration (API)</h3>
-                    <ul>
-                        <li class="fragment fade-up"><strong>API Key & URL:</strong> Sales Arena supports any endpoint compatible with OpenAI. Data is saved locally.</li>
-                        <li class="fragment fade-up"><strong>Cloud Models:</strong> By default, it uses <em>meta/llama-3.1-8b-instruct</em> via Nvidia, but you can inject OpenAI keys or other providers.</li>
-                        <li class="fragment fade-up highlight"><strong>Ollama (Local):</strong> To run local models without latency, use <code>http://localhost:11434/v1</code>. ⚠️ Vital: Start Ollama with <code>OLLAMA_ORIGINS="*"</code> to prevent CORS blocking in the browser.</li>
-                    </ul>
-                </section>
-            </section>
+  <header>
+    <div class="kicker">Sales Arena · Internal manual</div>
+    <h1>⚙️ Group Session Dossier</h1>
+    <p class="lead">Everything each role needs to run a High Ticket sales role-play as a team. Simple, to the point, always at hand.</p>
+  </header>
 
-            <!-- The Pipeline -->
-            <section>
-                <section>
-                    <h2>📊 The Consultative Pipeline</h2>
-                    <p class="fragment fade-up">The 6-stage methodology every Closer must follow and every Observer must evaluate.</p>
-                    <p class="fragment fade-up text-center">👇 (Swipe down)</p>
-                </section>
-                <section>
-                    <h3>Stages 1 to 3: The Diagnosis</h3>
-                    <ol>
-                        <li class="fragment fade-up"><strong>1. Opening / Rapport:</strong> Connect before convincing. Validate without condescension.<br><span class="highlight">Indicator:</span> The lead lowers their guard.</li>
-                        <li class="fragment fade-up"><strong>2. Qualification:</strong> Diagnose using the checklist: Real reason, Origin, Present Pain, Time Gap, and Trust.<br><span class="highlight">Indicator:</span> The lead admits emotional exhaustion.</li>
-                        <li class="fragment fade-up"><strong>3. Opportunity Cost:</strong> Make visible the price of taking no action. "How much do you lose per month by staying like this?".<br><span class="highlight">Indicator:</span> Explicit urgency.</li>
-                    </ol>
-                </section>
-                <section>
-                    <h3>Stages 4 to 6: The Close</h3>
-                    <ol start="4">
-                        <li class="fragment fade-up"><strong>4. Recapitulation:</strong> Organize the lead's mental chaos by summarizing their pains and goals to generate dissonance.<br><span class="highlight">Indicator:</span> The lead says "That is exactly what happens to me".</li>
-                        <li class="fragment fade-up"><strong>5. Presentation:</strong> Show the logical map of the vehicle anchored to emotion. Explain program phases.<br><span class="highlight">Indicator:</span> Visualizes success with your product.</li>
-                        <li class="fragment fade-up"><strong>6. Close:</strong> Intention micro-close, investment reveal, and handling objections from Identity (not haggling).</li>
-                    </ol>
-                </section>
-            </section>
-
-            <!-- Tools for the Lead -->
-            <section>
-                <section>
-                    <h2>🎭 Tools for the LEAD</h2>
-                    <p class="fragment fade-up">Your goal is to <strong>simulate realistic friction</strong>. Use these guidelines to play the prospect:</p>
-                    <p class="fragment fade-up text-center">👇 (Swipe down)</p>
-                </section>
-                <section>
-                    <h2>🎭 Tools for the LEAD</h2>
-                    <div class="grid-2">
-                        <div>
-                            <h4 class="fragment fade-up">Awareness Level</h4>
-                            <ul style="font-size: 0.9em">
-                                <li class="fragment fade-up">Unaware (Doesn't know they have a problem).</li>
-                                <li class="fragment fade-up">Problem Aware (But not aware of your solution).</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="fragment fade-up">Personality Archetypes</h4>
-                            <ul style="font-size: 0.9em">
-                                <li class="fragment fade-up"><strong>The Skeptic:</strong> Short answers, demands proof.</li>
-                                <li class="fragment fade-up"><strong>The Rambler:</strong> Talks a lot, avoids the point.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-                <section>
-                    <h2>🎭 Tools for the LEAD</h2>
-                    <h4 class="fragment fade-up">The Game of Toughness</h4>
-                    <p class="fragment fade-up" style="font-size: 0.8em">Start with "smokescreen" (superficial) objections. Only reveal your <strong>real pain</strong> if the Closer manages to build rapport and asks the right questions. If the Closer seems to be reading a script, get defensive.</p>
-                </section>
-            </section>
-
-            <!-- Tools for the Observer -->
-            <section>
-                <section>
-                    <h2>🕵️‍♂️ Tools for the OBSERVER</h2>
-                    <p class="fragment fade-up">You are not a spectator, you are the <strong>quality control analyst</strong>.</p>
-                    <p class="fragment fade-up text-center">👇 (Swipe down)</p>
-                </section>
-                <section>
-                    <h2>🕵️‍♂️ Tools for the OBSERVER</h2>
-                    <h4 class="fragment fade-up">5-Point Operational Checklist:</h4>
-                    <ul style="font-size: 0.85em">
-                        <li class="fragment fade-up"><strong>1. Rapport Level:</strong> Did they build rapport before interrogating? Did they validate emotions?</li>
-                        <li class="fragment fade-up"><strong>2. Real vs Superficial Pain:</strong> Did they stay on the symptom or dig into the real cause of frustration?</li>
-                        <li class="fragment fade-up"><strong>3. Value Gap:</strong> Did they make the Lead express their 'Opportunity Cost'?</li>
-                        <li class="fragment fade-up"><strong>4. Recapitulation:</strong> Did they organize the Lead's chaos and summarize the situation before pitching?</li>
-                        <li class="fragment fade-up"><strong>5. Objection Isolation:</strong> Did they try to convince with logic at the first excuse, or did they dig to find the hidden objection?</li>
-                    </ul>
-                </section>
-            </section>
-            
-            <section data-transition="zoom">
-                <h2>🚀 Sales Arena</h2>
-                <h3 class="fragment fade-up">The gold standard in simulation.</h3>
-                <p class="fragment fade-up"><br>Return to the room to start practicing.</p>
-            </section>
-        </div>
+  <h2><span class="n">1</span> The 4 roles</h2>
+  <div class="grid">
+    <div class="card role" style="--c:#6366f1;">
+      <h3>🎯 Facilitator / Trainer</h3>
+      <p>Runs the session: generates the lead, controls the stage timer, sees the <b>Private Info</b> (real objection and root causes), fires surprise events and leads the debrief.</p>
     </div>
+    <div class="card role" style="--c:#30d158;">
+      <h3>📈 Closer</h3>
+      <p>The one practicing the sale. They only see the product and the lead's name — everything else is discovered by asking. The call gets scored and earns fictional commission.</p>
+    </div>
+    <div class="card role" style="--c:#ff9f0a;">
+      <h3>🎭 Lead</h3>
+      <p>Plays the prospect with their <b>character sheet</b>: who they are, their pain, their visible objection and how to talk. The mission is realistic friction, not over-cooperating.</p>
+    </div>
+    <div class="card role" style="--c:#8b5cf6;">
+      <h3>👁 Observer</h3>
+      <p>Watches the "match" and captures the truth: <b>1-5 rubric</b> (rapport, real pain, value gap, recap, isolation) and the <b>listening log</b> (key quotes, decisive moment).</p>
+    </div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.js"></script>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        Reveal.initialize({
-            hash: true, transition: 'fade', transitionSpeed: 'slow',
-            controls: true, progress: true, center: true,
-            width: 1024, height: 850, margin: 0.08, minScale: 0.2, maxScale: 2.0
-        });
+  <h2><span class="n">2</span> Session flow</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><b>Create the room</b><span>The Trainer creates the room and shares the ID. Everyone joins with their role (phones work too, as Lead or Observer).</span></li>
+      <li><b>Generate the lead</b><span>Industry, difficulty (Beginner/Intermediate/Advanced), temperature (Cold/Warm/Hot) and objection — or the business's real product. The AI builds identity, psychology, backstory and DISC personality.</span></li>
+      <li><b>Live role-play</b><span>Closer vs. Lead through the 6 pipeline stages, with a per-stage timer. The Trainer can fire a surprise event; the team can open votes.</span></li>
+      <li><b>Observer capture</b><span>Rubric + listening log during the call. It's direct human observation — the final analysis weighs it heavily.</span></li>
+      <li><b>Analysis & commission</b><span>The AI analyzes everything with the methodology rubric → 1-10 score, fictional commission, streak and global/monthly leaderboard.</span></li>
+    </ol>
+  </div>
 
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 70, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": ["#4CAF50", "#3b82f6", "#10b981"] },
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.4 },
-                "size": { "value": 3, "random": true },
-                "line_linked": { "enable": true, "distance": 150, "color": "#4CAF50", "opacity": 0.2, "width": 1.5 },
-                "move": { "enable": true, "speed": 1.5, "direction": "top", "random": true, "straight": false, "out_mode": "out", "bounce": false }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
-                "modes": { "grab": { "distance": 180, "line_linked": { "opacity": 0.6 } }, "push": { "particles_nb": 3 } }
-            },
-            "retina_detect": true
-        });
-    </script>
+  <h2><span class="n">3</span> The objection onion</h2>
+  <div class="card">
+    <p style="margin:0 0 0.5rem;"><span class="tag humo">Smokescreen</span> What the lead SAYS first: "I need to think about it", "it's too expensive"…</p>
+    <p style="margin:0 0 0.5rem;"><span class="tag real">Real objection</span> The guarded reason that only surfaces once the closer earns trust.</p>
+    <div class="onion">
+      🧅 Underneath there are <b>1 to 3 layered root causes</b> — [Wound] they got scammed before, [Fear] of failing again, [Identity] "I'm not the kind who pulls this off". The lead reveals them one at a time, as trust grows. The Trainer sees them in <b>Private Info</b>; the final analysis measures <b>how deep the closer got</b>.
+    </div>
+  </div>
+
+  <h2><span class="n">4</span> The consultative pipeline (6 stages)</h2>
+  <div class="card">
+    <div class="stage"><span class="num">1</span><div><b>Opening / Rapport</b><small>Connect before convincing. Signal: their guard drops.</small></div></div>
+    <div class="stage"><span class="num">2</span><div><b>Qualification</b><small>Diagnose real pain, desire and urgency. Signal: they admit emotional burnout.</small></div></div>
+    <div class="stage"><span class="num">3</span><div><b>Opportunity Cost</b><small>The price of staying the same. Signal: explicit urgency.</small></div></div>
+    <div class="stage"><span class="num">4</span><div><b>Recap</b><small>Order their mental chaos. Signal: "that's exactly what's happening to me".</small></div></div>
+    <div class="stage"><span class="num">5</span><div><b>Presentation</b><small>The vehicle's map anchored to their emotion. Signal: they picture themselves inside.</small></div></div>
+    <div class="stage"><span class="num">6</span><div><b>Close</b><small>Micro-close, investment and objections from identity (not haggling).</small></div></div>
+  </div>
+
+  <h2><span class="n">5</span> Scoring & commissions</h2>
+  <div class="card">
+    <div class="kpi">
+      <div><b>Close → commission</b><small>Product price × configured % (10% by default).</small></div>
+      <div><b>No close → credit</b><small>Practice still pays based on the score.</small></div>
+      <div><b>Difficulty</b><small>Beginner ×0.8 · Intermediate ×1.0 · Advanced ×1.4</small></div>
+      <div><b>Temperature</b><small>Cold ×1.15 · Warm ×1.0 · Hot ×0.9</small></div>
+      <div><b>Team spirit</b><small>Helped as Lead/Observer this week: +10%. Over a week without helping: −15%.</small></div>
+      <div><b>Leaderboard</b><small>All-time global + monthly tournament that resets to zero.</small></div>
+    </div>
+  </div>
+
+  <h2><span class="n">6</span> Quick tools per role</h2>
+  <div class="card">
+    <ul class="clean">
+      <li><b>Trainer:</b> Private Info (real objection + root causes), regenerate scenario, scenario library, surprise event, cohorts and student analytics.</li>
+      <li><b>Lead:</b> character sheet (how you talk, what opens you up, what shuts you down) + backup objection arsenal.</li>
+      <li><b>Observer:</b> 1-5 rubric, active-listening log and team votes.</li>
+      <li><b>Closer:</b> pipeline with lifesaver questions per stage and the product to sell always visible.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Sales Arena · Internal dossier — individual practice (vs. the AI buyer) has its own guide inside "Practice solo".<br>
+    <a class="back" href="javascript:history.back()">← Back to the room</a>
+  </footer>
+
+</div>
 </body>
 </html>
