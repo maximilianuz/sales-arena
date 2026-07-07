@@ -1,0 +1,8 @@
+{
+  "name": "sales-arena-functions",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "sharp": "^0.35.3"
+  }
+}
