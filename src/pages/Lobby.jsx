@@ -563,8 +563,40 @@ export default function Lobby() {
           </button>
         </form>
       </div>
+claude/zen-goldstine-617004
       </>)}
-
+      {/* ── Mobile app QR ──────────────────────────────────── */}
+      <div style={{
+        marginTop: '1.5rem', maxWidth: '580px', width: '100%',
+        position: 'relative', zIndex: 1,
+        background: 'rgba(15,15,30,0.55)', backdropFilter: 'blur(16px)',
+        borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.05)',
+        padding: '1.25rem 1.75rem',
+        display: 'flex', alignItems: 'center', gap: '1.5rem'
+      }}>
+        <a href="/descargar-app" target="_blank" rel="noopener noreferrer"
+          style={{ background: 'white', padding: '0.5rem', borderRadius: '0.65rem', display: 'inline-block', position: 'relative', flexShrink: 0 }}>
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent((typeof window !== 'undefined' ? window.location.origin : 'https://sales-arena.netlify.app') + '/descargar-app')}&ecc=H`}
+            alt="QR" style={{ display: 'block', width: '80px', height: '80px' }}
+          />
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: 'white', padding: '3px', borderRadius: '3px', display: 'flex' }}>
+            <ChessKnight size={20} color="black" strokeWidth={2} />
+          </div>
+        </a>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <Smartphone size={16} color="rgba(165,180,252,0.7)" />
+            <span style={{ fontWeight: '700', color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
+              {isEn ? 'Android App' : 'App Android'}
+            </span>
+          </div>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', lineHeight: '1.4' }}>
+            {isEn ? 'Scan with your phone to download the APK and train anywhere.' : 'Escaneá con tu celular para descargar el APK y entrenar donde quieras.'}
+          </p>
+        </div>
+      </div>
+ main
       {/* ── Join cohort modal ──────────────────────────────── */}
       {showScoutingModal && <ScoutingModal onClose={() => setShowScoutingModal(false)} />}
 
