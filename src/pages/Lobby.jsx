@@ -508,10 +508,10 @@ export default function Lobby() {
         padding: '1.25rem 1.75rem',
         display: 'flex', alignItems: 'center', gap: '1.5rem'
       }}>
-        <a href="https://sales-arena-mobile.netlify.app/" target="_blank" rel="noopener noreferrer"
+        <a href="/descargar-app" target="_blank" rel="noopener noreferrer"
           style={{ background: 'white', padding: '0.5rem', borderRadius: '0.65rem', display: 'inline-block', position: 'relative', flexShrink: 0 }}>
           <img
-            src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://sales-arena-mobile.netlify.app/&ecc=H"
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent((typeof window !== 'undefined' ? window.location.origin : 'https://sales-arena.netlify.app') + '/descargar-app')}&ecc=H`}
             alt="QR" style={{ display: 'block', width: '80px', height: '80px' }}
           />
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: 'white', padding: '3px', borderRadius: '3px', display: 'flex' }}>
@@ -522,11 +522,11 @@ export default function Lobby() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
             <Smartphone size={16} color="rgba(165,180,252,0.7)" />
             <span style={{ fontWeight: '700', color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
-              {isEn ? 'Mobile App' : 'App Móvil'}
+              {isEn ? 'Android App' : 'App Android'}
             </span>
           </div>
           <p style={{ margin: 0, color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem', lineHeight: '1.4' }}>
-            {isEn ? 'Scan to participate from your phone as Lead or Observer.' : 'Escaneá para participar desde tu celular como Lead u Observador.'}
+            {isEn ? 'Scan with your phone to download the APK and train anywhere.' : 'Escaneá con tu celular para descargar el APK y entrenar donde quieras.'}
           </p>
         </div>
       </div>
