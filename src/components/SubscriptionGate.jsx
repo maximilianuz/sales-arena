@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard, Lock } from 'lucide-react';
+import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard, Lock, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { signOutUser, activateFreeplan } from '../utils/auth';
 
@@ -9,7 +9,7 @@ import { signOutUser, activateFreeplan } from '../utils/auth';
 const PROVIDERS_ENABLED = { crypto: true, stripe: false, mercadopago: false };
 // Mail al que llegan los pedidos de acceso Closer/Pro. Mientras no haya cobro
 // automático (o como alternativa a cripto), el admin los otorga a mano.
-const ACCESS_REQUEST_EMAIL = 'community.argen.manager@gmail.com';
+const ACCESS_REQUEST_EMAIL = 'contacto.maximilianoc@gmail.com';
 
 const PLAN_META = [
   {
@@ -264,11 +264,15 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
                       <CreditCard size={15} /> {isEn ? 'Card & more — coming soon' : 'Tarjeta y más — próximamente'}
                     </div>
                   )}
+                  {/* Pedir acceso: ícono de sobre (sin exponer el correo). Abre el
+                      mail al admin con el plan + el mail de la cuenta pre-cargados. */}
                   <a
                     href={`mailto:${ACCESS_REQUEST_EMAIL}?subject=${encodeURIComponent(`${isEn ? 'Access request' : 'Pedido de acceso'} — ${planName}`)}&body=${encodeURIComponent(`${isEn ? 'My account email' : 'Mail de mi cuenta'}: ${user.email}`)}`}
-                    style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--primary)', textDecoration: 'underline', marginTop: '0.1rem' }}
+                    title={isEn ? 'Request access by email' : 'Pedir acceso por mail'}
+                    aria-label={isEn ? 'Request access by email' : 'Pedir acceso por mail'}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', marginTop: '0.1rem', padding: '0.45rem', borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.12)', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600 }}
                   >
-                    {isEn ? 'Request access by email' : 'Pedir acceso por mail'}
+                    <Mail size={15} /> {isEn ? 'Request access' : 'Pedir acceso'}
                   </a>
                 </div>
               </div>
