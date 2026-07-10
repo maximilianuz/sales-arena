@@ -38,8 +38,11 @@ function stateGuidance(state, isEn) {
 
 // Construye el system prompt del comprador para un turno dado. `focusStage` (opcional)
 // = { label, objective } cuando el closer eligió practicar UNA sola etapa.
-export function buildBuyerSystem(scenario = {}, state = null, language = 'es', focusStage = null) {
+// `exchangeCount` = cuántas veces habló el closer (profundidad de la llamada):
+// evita que el lead compre en 10 minutos — una decisión high-ticket lleva tiempo.
+export function buildBuyerSystem(scenario = {}, state = null, language = 'es', focusStage = null, exchangeCount = 0) {
   const isEn = typeof language === 'string' && language.startsWith('en');
+  const early = exchangeCount < 15; // todavía en descubrimiento/consideración
   const d = scenario.demographics || {};
   const sit = scenario.currentSituation || {};
   const persona = getPersonality(scenario.personality);
@@ -153,7 +156,11 @@ ${focusEn}
 CURRENT STATE — behave accordingly this turn:
 ${stateGuidance(state, true)}
 
-You may decide to buy ONLY if temperature is high, your real objection was genuinely handled, and they ask for the commitment. You may END the call if pushed badly or patience/temperature hit zero.
+PACING (this is a HIGH-TICKET call — real ones take 45-60 min and MANY back-and-forths). You are on exchange #${exchangeCount}.
+${early
+  ? '- You are STILL in discovery/consideration. Do NOT output outcome "closed" yet — a real person never commits thousands of dollars this early. Keep peeling objections and doubts layer by layer; if the closer tries to close now, slow it down ("let me understand this better first…") and raise the next concern.'
+  : '- Enough ground has been covered that a decision is plausible IF it was truly earned. Still, do not fold easily.'}
+You may decide to buy ONLY after a thorough conversation where trust is very high (80+), your REAL objection AND its root cause were genuinely resolved, and they clearly asked for the commitment. You may END the call if pushed badly or patience/temperature hit zero.
 
 Respond ONLY with valid JSON (no prose outside it):
 {
@@ -190,7 +197,11 @@ ${focusEs}
 ESTADO ACTUAL — comportate en consecuencia este turno:
 ${stateGuidance(state, false)}
 
-Podés decidir comprar SOLO si la temperatura está alta, tu objeción real fue realmente resuelta, y te piden el compromiso. Podés CORTAR la llamada si te presionan mal o la paciencia/temperatura llegan a cero.
+RITMO (esto es una llamada HIGH-TICKET — las reales duran 45-60 min y MUCHAS idas y vueltas). Vas por el intercambio #${exchangeCount}.
+${early
+  ? '- Todavía estás en descubrimiento/consideración. NO devuelvas outcome "closed" aún — una persona real no compromete miles de dólares tan temprano. Seguí destapando objeciones y dudas capa por capa; si el closer intenta cerrar ahora, frenalo ("dejame entender bien esto primero…") y sacá la próxima objeción.'
+  : '- Ya se recorrió suficiente como para que una decisión sea plausible SI se la ganó de verdad. Igual, no aflojes fácil.'}
+Podés decidir comprar SOLO tras una conversación a fondo donde la confianza esté muy alta (80+), tu objeción REAL y su causa raíz hayan sido realmente resueltas, y te pidan el compromiso con claridad. Podés CORTAR la llamada si te presionan mal o la paciencia/temperatura llegan a cero.
 
 Respondé ÚNICAMENTE con JSON válido (nada de texto afuera):
 {

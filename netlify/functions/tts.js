@@ -63,7 +63,19 @@ export const handler = async (event) => {
   try { body = JSON.parse(event.body || '{}'); }
   catch { return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
 
-  const { uid, text, personalityId, language = 'es', emotion = 'neutral', gender = 'male' } = body;
+  const { uid, text, personalityId, language = 'es', emotion = 'neutral', gender = 'male', seed = '' } = body;
+
+  // Hash estable del seed (nombre del lead) → entero determinista. Sin voice
+  // model fijo, S2.1 Pro generaría un timbre distinto en cada turno; fijar el
+  // seed hace que la MISMA persona suene igual toda la llamada (la emoción, que
+  // va por tag aparte, sí varía el tono). 0 = sin seed (Fish elige libre).
+  const seedInt = (() => {
+    const s = String(seed || '');
+    if (!s) return 0;
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return Math.abs(h) % 2147483647;
+  })();
 
   if (!uid) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Se requiere autenticación.' }) };
   if (!text || typeof text !== 'string' || text.trim().length === 0)
@@ -96,6 +108,9 @@ export const handler = async (event) => {
     normalize: true,
     latency: 'normal'
   };
+
+  // Seed determinista → timbre estable por lead entre turnos (clave del realismo).
+  if (seedInt) fishPayload.seed = seedInt;
 
   // Si hay un voice model configurado, lo usamos como referencia
   if (voiceId) {

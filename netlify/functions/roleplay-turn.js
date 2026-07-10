@@ -116,7 +116,15 @@ export const handler = async (event) => {
       return Number.isFinite(v) ? Math.max(0, Math.min(100, Math.round(v))) : def;
     };
     const st = turn.state || {};
-    const outcome = ['ongoing', 'closed', 'lost'].includes(turn.outcome) ? turn.outcome : 'ongoing';
+    let outcome = ['ongoing', 'closed', 'lost'].includes(turn.outcome) ? turn.outcome : 'ongoing';
+    // Piso duro anti-cierre-express: una venta high-ticket no se cierra en pocos
+    // intercambios. Si el modelo devuelve "closed" demasiado temprano (o con
+    // confianza baja), lo forzamos a seguir la llamada. ~24 mensajes ≈ 12 turnos
+    // de cada lado. El realismo lo trae el prompt; esto es la red de seguridad.
+    const msgCount = Array.isArray(messages) ? messages.length : 0;
+    if (outcome === 'closed' && (msgCount < 24 || clamp(st.trust, 25) < 75)) {
+      outcome = 'ongoing';
+    }
     // Emoción del turno: lista cerrada (define la prosodia de la voz y el chip en la UI).
     const EMOTIONS = ['neutral', 'interesado', 'esceptico', 'molesto', 'entusiasmado', 'dudoso', 'apurado'];
     const emotion = EMOTIONS.includes(turn.emotion) ? turn.emotion : 'neutral';

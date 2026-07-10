@@ -28,7 +28,10 @@ async function roleplayTurn(system, history) {
 // history: [{ role: 'user'|'assistant', content }] donde user = closer.
 // Devuelve el turno del lead: { reply, emotion, state, thought, outcome }.
 export async function buyerTurn({ scenario, state, history, language = 'es', focusStage = null }) {
-  return roleplayTurn(buildBuyerSystem(scenario, state, language, focusStage), history);
+  // Cuántas veces habló el closer = profundidad de la llamada (el lead no debe
+  // cerrar en 10 min: una decisión high-ticket lleva muchas idas y vueltas).
+  const exchangeCount = (history || []).filter(m => m.role === 'user').length;
+  return roleplayTurn(buildBuyerSystem(scenario, state, language, focusStage, exchangeCount), history);
 }
 
 // Turno del CLOSER IA experto (modos "Ser Lead" / "Observador"). En el history
