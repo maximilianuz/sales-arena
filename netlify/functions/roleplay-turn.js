@@ -1,21 +1,10 @@
 import { getUserData } from './lib/firebaseAdmin.js';
+import { llmChat } from './lib/llm.js';
 
-// Un turno del COMPRADOR IA (modo práctica solo). Recibe el system prompt del
-// buyer (construido en el cliente con buyerPrompt.js) + el historial de la
-// conversación, y devuelve la respuesta estructurada del lead. NO toca los
-// contadores de sesión: el "consumo" de la práctica solo es la generación del
-// escenario (que ya pasa por /api/generate) — el chat en sí es liviano y no
-// debe agotar el límite de 1 sesión del plan free por cada mensaje.
-
-const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-// El comprador usa un modelo MÁS GRANDE que la generación de escenarios: acá la
-// respuesta es corta (320 tokens) así que el 70b entra cómodo en los 10s de
-// Netlify, y a cambio actúa el personaje mucho mejor, razona sobre la técnica
-// del closer y respeta el JSON con más fiabilidad. La generación de escenarios
-// (salida larga ~2800 tokens) sigue en 8b para no pasarse del timeout. Además,
-// usar otro modelo separa el cupo de rate limit del de la generación.
-// Override con la env var ROLEPLAY_MODEL si hiciera falta.
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+// Un turno del COMPRADOR IA. Recibe el system prompt del buyer + el historial y
+// devuelve la respuesta estructurada del lead. El modelo/proveedor (y sus
+// respaldos) viven en lib/llm.js — tier 'smart' = modelo potente (70b por
+// defecto) para actuar el personaje y razonar sobre la técnica del closer.
 
 export const handler = async (event) => {
   const headers = {
@@ -57,51 +46,17 @@ export const handler = async (event) => {
     .filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'))
     .map(m => ({ role: m.role, content: m.content }));
 
-  const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
-  const model = process.env.ROLEPLAY_MODEL || DEFAULT_MODEL;
-
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 9000);
   try {
-    const callOnce = () => fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: "system", content: system }, ...trimmed],
-        temperature: 0.85, // variación natural, sin desbordar el personaje
-        max_tokens: 320,   // respuesta hablada corta + JSON de estado
-        response_format: { type: "json_object" }
-      }),
-      signal: controller.signal
+    // Cadena de proveedores (tier 'smart' = modelo potente para el diálogo). Si el
+    // principal está agotado (429/límite), salta al de respaldo en vez de esperar.
+    const { content } = await llmChat({
+      tier: 'smart',
+      messages: [{ role: "system", content: system }, ...trimmed],
+      temperature: 0.85,
+      max_tokens: 320,
+      timeoutMs: 8000,
+      budgetMs: 9000,
     });
-
-    let upstream = await callOnce();
-    // Rate limit de Groq (6000 TPM en free): suele pedir esperar <1s. Reintentamos
-    // una vez dentro del presupuesto de 10s de Netlify en vez de fallarle al usuario.
-    if (upstream.status === 429) {
-      let waitMs = 1200;
-      try {
-        const rl = await upstream.clone().json();
-        const m = /try again in ([\d.]+)\s*s/i.exec(rl?.error?.message || '');
-        if (m) waitMs = Math.min(Math.ceil(parseFloat(m[1]) * 1000) + 300, 4000);
-      } catch { /* usar default */ }
-      await sleep(waitMs);
-      upstream = await callOnce();
-    }
-
-    const data = await upstream.json();
-    if (!upstream.ok) {
-      const message = data?.error?.message || data?.message || "Error en la API de IA.";
-      return { statusCode: upstream.status, headers, body: JSON.stringify({ error: message }) };
-    }
-
-    const content = data?.choices?.[0]?.message?.content;
-    if (typeof content !== 'string') {
-      return { statusCode: 502, headers, body: JSON.stringify({ error: "Respuesta vacía de la IA." }) };
-    }
 
     let turn;
     try {
@@ -134,9 +89,11 @@ export const handler = async (event) => {
       })
     };
   } catch (error) {
-    const isTimeout = error.name === 'AbortError';
-    return { statusCode: isTimeout ? 504 : 502, headers, body: JSON.stringify({ error: isTimeout ? "timeout_upstream" : "Error al contactar la IA." }) };
-  } finally {
-    clearTimeout(timer);
+    const isTimeout = /timeout/i.test(error.message || '');
+    return {
+      statusCode: error.allFailed ? 429 : (isTimeout ? 504 : 502),
+      headers,
+      body: JSON.stringify({ error: error.allFailed ? "El servicio de IA está saturado en todos los proveedores. Probá en unos segundos." : (isTimeout ? "timeout_upstream" : "Error al contactar la IA.") })
+    };
   }
 };
