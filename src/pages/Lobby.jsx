@@ -221,7 +221,7 @@ export default function Lobby() {
       <div id="lobby-particles" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
 
       {/* ── Top navigation bar ─────────────────────────────── */}
-      <nav style={{
+      <nav className="lobby-nav" style={{
         position: 'absolute', top: '1rem', left: '1rem', right: '1rem', zIndex: 10,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}>
