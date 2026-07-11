@@ -17,10 +17,13 @@ const db = admin.database();
 
 export default async (req, res) => {
   try {
-    const { uid } = req.body;
+    const uid = req.queryStringParameters?.uid;
 
     if (!uid) {
-      return res.status(400).json({ error: 'UID required' });
+      return res.status(400).json({
+        error: 'UID required as query parameter',
+        example: '/.netlify/functions/check-admin-status?uid=V8AGEhfnCzRppu4tHf2PqTgRVWY2'
+      });
     }
 
     // Check if user exists in admin/admins/{uid}
@@ -34,9 +37,10 @@ export default async (req, res) => {
     return res.status(200).json({
       uid,
       isAdmin,
-      message: isAdmin ? 'User is admin' : 'User is NOT admin',
+      message: isAdmin ? '✓ User IS admin' : '✗ User is NOT admin',
       allAdminUids: Object.keys(allAdmins),
-      adminData: isAdmin ? snapshot.val() : null
+      adminData: isAdmin ? snapshot.val() : null,
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
     console.error('Error checking admin status:', error);
