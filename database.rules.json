@@ -94,8 +94,11 @@
         }
       },
       "admins": {
-        ".read": "auth != null && root.child('admin').child('admins').child(auth.uid).exists()",
-        ".write": false
+        ".read": "auth != null",
+        "$uid": {
+          ".read": "auth.uid === $uid || root.child('admin').child('admins').child(auth.uid).exists()",
+          ".write": false
+        }
       }
     },
     "$other": {
