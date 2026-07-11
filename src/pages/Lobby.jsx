@@ -1,16 +1,17 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ref, onValue } from 'firebase/database';
 import {
   Shuffle, Copy, ChessKnight, BookOpen,
   Zap, History, Target, TrendingUp, Theater, Eye,
   ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase, Target as TargetIcon,
-  FileText, Lock
+  FileText, Lock, Shield
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import { signOutUser } from '../utils/auth';
 import { joinCohort } from '../utils/cohort';
-import { auth } from '../utils/db';
+import { auth, db } from '../utils/db';
 import HistoryPage from './History';
 import TrainerAnalytics from './TrainerAnalytics';
 import Leaderboard from './Leaderboard';
@@ -23,6 +24,8 @@ import ProgressPath from '../components/ProgressPath';
 const SoloPractice = lazy(() => import('./SoloPractice'));
 // Generador de Propuestas VIP: módulo aparte que se abre desde el Lobby.
 const ProposalGenerator = lazy(() => import('../modules/proposals/ProposalGenerator'));
+// Panel de Administración: solo para admins
+const AdminPanel = lazy(() => import('./AdminPanel'));
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
@@ -91,6 +94,7 @@ export default function Lobby() {
   const [showScoutingModal, setShowScoutingModal] = useState(false);
   const [showSolo, setShowSolo] = useState(false);
   const [showProposals, setShowProposals] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const [showJoinCohort, setShowJoinCohort] = useState(false);
   const [cohortCodeInput, setCohortCodeInput] = useState('');
   const [joinMsg, setJoinMsg] = useState('');
@@ -99,6 +103,7 @@ export default function Lobby() {
   const [role, setRole] = useState('');
   const [roomId, setRoomId] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   // Espacio de trabajo: '' = todavía no eligió (muestra las 2 tarjetas grandes),
   // 'individual' | 'team'. Se persiste para aterrizar siempre donde trabaja,
   // con un switcher para cambiar. Así no se ve TODO en una misma pantalla.
@@ -156,6 +161,17 @@ export default function Lobby() {
   };
 
   useEffect(() => {
+    if (!auth.currentUser) return;
+    const adminRef = ref(db, `admin/admins/${auth.currentUser.uid}`);
+    const unsub = onValue(adminRef, (snap) => {
+      setIsAdmin(snap.exists());
+    }, () => {
+      setIsAdmin(false);
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
     if (window.particlesJS) {
       window.particlesJS("lobby-particles", {
         particles: {
@@ -194,6 +210,11 @@ export default function Lobby() {
       <ProposalGenerator onBack={() => setShowProposals(false)} />
     </Suspense>
   );
+  if (showAdmin && isAdmin) return (
+    <Suspense fallback={<div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}><p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Loading…' : 'Cargando…'}</p></div>}>
+      <AdminPanel user={auth.currentUser} onBack={() => setShowAdmin(false)} />
+    </Suspense>
+  );
 
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '1.5rem 1rem 3rem' }}>
@@ -230,6 +251,16 @@ export default function Lobby() {
               fontWeight: '700', boxShadow: '0 4px 14px rgba(100,210,255,0.45)'
             }}>
               <Zap size={13} /> {isEn ? 'Upgrade' : 'Mejorar Plan'}
+            </button>
+          )}
+          {isAdmin && (
+            <button onClick={() => setShowAdmin(true)} title={isEn ? 'Admin panel' : 'Panel de admin'} style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              background: 'rgba(139,92,246,0.1)', color: 'rgba(255,255,255,0.7)',
+              border: '1px solid rgba(139,92,246,0.35)', padding: '0.35rem 0.8rem',
+              borderRadius: '2rem', cursor: 'pointer', textDecoration: 'none', fontSize: '0.82rem'
+            }}>
+              <Shield size={13} /> {isEn ? 'Admin' : 'Admin'}
             </button>
           )}
           <a href={isEn ? "/presentacion_en.html" : "/presentacion.html"} target="_blank" rel="noopener noreferrer"
