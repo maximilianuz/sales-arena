@@ -40,11 +40,12 @@ function providerChain() {
     process.env.GEMINI_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
     process.env.GEMINI_API_KEY, 'gemini-1.5-flash', 'gemini-1.5-flash');
 
-  add('groq', 'GROQ',
-    process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
-    process.env.GROQ_API_KEY || process.env.AI_API_KEY,
-    process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
-    process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile');
+  // TEST 1: Deshabilitado para testear failover a Cerebras
+  // add('groq', 'GROQ',
+  //   process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
+  //   process.env.GROQ_API_KEY || process.env.AI_API_KEY,
+  //   process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
+  //   process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile');
 
   add('openrouter', 'OPENROUTER',
     process.env.OPENROUTER_URL || 'https://openrouter.ai/api/v1/chat/completions',
