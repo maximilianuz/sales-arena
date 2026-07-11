@@ -16,8 +16,6 @@ export const handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
   if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
 
-  const apiKey = process.env.AI_API_KEY;
-  if (!apiKey) return { statusCode: 500, headers, body: JSON.stringify({ error: "AI_API_KEY no configurada." }) };
 
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
