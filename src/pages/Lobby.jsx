@@ -238,6 +238,14 @@ export default function Lobby() {
               {isPaid ? '⚡ Pro' : isEn ? 'Free plan' : 'Plan Gratis'}
             </span>
           )}
+          {auth.currentUser && (
+            <span style={{
+              fontSize: '0.55rem', opacity: 0.4, fontFamily: 'monospace',
+              color: 'var(--text-muted)', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis'
+            }} title={auth.currentUser.uid}>
+              UID: {auth.currentUser.uid.substring(0, 8)}...
+            </span>
+          )}
         </div>
 
         {/* Right: utility actions */}
