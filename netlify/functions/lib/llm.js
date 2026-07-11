@@ -32,20 +32,20 @@ function providerChain() {
     });
   };
 
-  add('cerebras', 'CEREBRAS',
-    process.env.CEREBRAS_URL || 'https://api.cerebras.ai/v1/chat/completions',
-    process.env.CEREBRAS_API_KEY, 'gpt-oss-120b', 'gpt-oss-120b');
+  // TEST 1: Cerebras deshabilitado para testear si Groq funciona
+  // add('cerebras', 'CEREBRAS',
+  //   process.env.CEREBRAS_URL || 'https://api.cerebras.ai/v1/chat/completions',
+  //   process.env.CEREBRAS_API_KEY, 'gpt-oss-120b', 'gpt-oss-120b');
 
   add('gemini', 'GEMINI',
     process.env.GEMINI_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
     process.env.GEMINI_API_KEY, 'gemini-1.5-flash', 'gemini-1.5-flash');
 
-  // TEST 1: Deshabilitado para testear failover a Cerebras
-  // add('groq', 'GROQ',
-  //   process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
-  //   process.env.GROQ_API_KEY || process.env.AI_API_KEY,
-  //   process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
-  //   process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile');
+  add('groq', 'GROQ',
+    process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
+    process.env.GROQ_API_KEY || process.env.AI_API_KEY,
+    process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
+    process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile');
 
   add('openrouter', 'OPENROUTER',
     process.env.OPENROUTER_URL || 'https://openrouter.ai/api/v1/chat/completions',
