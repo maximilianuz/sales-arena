@@ -3,6 +3,7 @@ import {
   signInWithPopup,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
@@ -21,6 +22,10 @@ export function registerWithEmail(email, password) {
 
 export function signInWithEmail(email, password) {
   return signInWithEmailAndPassword(auth, email, password);
+}
+
+export function resetPassword(email) {
+  return sendPasswordResetEmail(auth, email);
 }
 
 export function signOutUser() {
