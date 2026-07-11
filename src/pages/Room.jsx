@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRoomSync } from '../hooks/useRoomSync';
+import { useRoomOwnerPlan } from '../hooks/useRoomOwnerPlan';
 import { auth } from '../utils/db';
 import Header from '../components/Header';
 import PipelinePanel from '../components/PipelinePanel';
@@ -33,10 +34,16 @@ export default function Room() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
+  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, registerLead, registerObserver, updateListeningLog } = useRoomSync(roomId);
+  const { ownerIsPaid, ownerLoading } = useRoomOwnerPlan(roomData);
+
+  // Si el propietario es Pro, todos heredan acceso Pro en esta sala
+  const effectivelyPaid = isPaid || ownerIsPaid;
+  const effectivelyFree = isFree && !ownerIsPaid;
+
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showClocks, setShowClocks] = useState(false);
-  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, registerLead, registerObserver, updateListeningLog } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -228,8 +235,11 @@ export default function Room() {
         onTitleChange={isFacilitator ? (newTitle) => {
           setSessionTitle(newTitle);
           localStorage.setItem('session_title', newTitle);
-        } : undefined} 
-        onOpenSettings={isFacilitator ? () => setShowSettings(true) : undefined} 
+        } : undefined}
+        onOpenSettings={isFacilitator ? () => setShowSettings(true) : undefined}
+        ownerIsPaid={ownerIsPaid}
+        userIsPaid={isPaid}
+        ownerLoading={ownerLoading}
       />
       
       <main className="dashboard-wrapper">
@@ -239,7 +249,7 @@ export default function Room() {
             setActiveStageIndex={isFacilitator ? handleStageChange : undefined}
             pipelineQuestions={currentScenario?.pipelineQuestions}
             stages={stagesEff}
-            isFree={isFree}
+            isFree={effectivelyFree}
             onUpgradeStage={() => setUpgradeModal({ feature: 'Cualificación y Cierre', requiredPlan: 'closer' })}
           />
         )}
@@ -307,9 +317,9 @@ export default function Room() {
                 activeStageIndex={activeStageIndex || 0}
                 timerState={timerState}
                 updateTimer={isFacilitator ? updateTimer : undefined}
-                maxMinutes={isFree ? 30 : null}
+                maxMinutes={effectivelyFree ? 30 : null}
                 sessionStartedAt={roomData?.sessionStartedAt || null}
-                onTimeLimitReached={isFree ? () => setUpgradeModal({ feature: 'Sesiones ilimitadas', requiredPlan: 'closer' }) : null}
+                onTimeLimitReached={effectivelyFree ? () => setUpgradeModal({ feature: 'Sesiones ilimitadas', requiredPlan: 'closer' }) : null}
               />
             )}
             
@@ -382,7 +392,7 @@ export default function Room() {
                   updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
                   isFacilitator={isFacilitator}
                 />
-                {isFree && (
+                {effectivelyFree && (
                   <div
                     onClick={() => setUpgradeModal({ feature: 'Debrief completo', requiredPlan: 'closer' })}
                     style={{
@@ -431,7 +441,7 @@ export default function Room() {
                     updateQuestions={updateQuestions}
                     activeStage={stagesEff[activeStageIndex || 0]}
                   />
-                  {isFree && (
+                  {effectivelyFree && (
                     <div
                       onClick={() => setUpgradeModal({ feature: 'Panel de Votación', requiredPlan: 'closer' })}
                       style={{
@@ -469,7 +479,7 @@ export default function Room() {
         >
           <Globe size={15} /> {i18n.language?.startsWith('en') ? 'Time zones' : 'Husos horarios'}
         </button>
-        {isPaid && currentScenario && (
+        {effectivelyPaid && currentScenario && (
           <button
             className="btn btn-primary"
             onClick={() => setShowAnalysis(true)}
@@ -524,7 +534,7 @@ export default function Room() {
           stages={Array.isArray(stages) ? stages : []}
           onSave={handleSaveSettings}
           onClose={() => setShowSettings(false)}
-          isFree={isFree}
+          isFree={effectivelyFree}
           onUpgradeStages={() => setUpgradeModal({ feature: 'Personalización de etapas', requiredPlan: 'closer' })}
           roomConfig={roomData?.config}
           onSaveConfig={updateConfig}

@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Settings, Cpu, ChessKnight, Copy, CheckCircle2, User, BookOpen, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { signOutUser } from '../utils/auth';
+import RoomAccessBadge from './RoomAccessBadge';
 
-export default function Header({ title, roomId, role, onTitleChange, onOpenSettings }) {
+export default function Header({ title, roomId, role, onTitleChange, onOpenSettings, ownerIsPaid, userIsPaid, ownerLoading }) {
   const { t, i18n } = useTranslation();
   const [copied, setCopied] = useState(false);
 
@@ -43,6 +44,8 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
             <span>{t(`lobby.roles.${role}`, role)}</span>
           </div>
         )}
+
+        <RoomAccessBadge ownerIsPaid={ownerIsPaid} userIsPaid={userIsPaid} ownerLoading={ownerLoading} />
 
         {roomId && (
           <button 

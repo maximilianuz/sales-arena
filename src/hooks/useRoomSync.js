@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ref, onValue, set, update, serverTimestamp } from 'firebase/database';
-import { db } from '../utils/db';
+import { db, auth } from '../utils/db';
 
 export function useRoomSync(roomId) {
   const [roomData, setRoomData] = useState(null);
@@ -28,6 +28,7 @@ export function useRoomSync(roomId) {
           // una promesa rechazada suelta: lo registramos como error de sala.
           set(roomRef, {
             createdAt: serverTimestamp(),
+            ownerId: auth.currentUser?.uid || null,
             timerState: {
               isRunning: false,
               startTimestamp: 0,

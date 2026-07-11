@@ -207,6 +207,34 @@ X-Setup-Token: your_secret_token_here
 - Check that token was added to Netlify environment variables
 - Verify token in curl request matches exactly (no extra spaces)
 
+## Inherited Pro Access in Shared Rooms
+
+When a Pro user (Trainer) creates and shares a room with others:
+
+✅ **Anyone can join the shared room** (including Free users)
+✅ **All participants inherit Pro access** while in that room
+✅ **No restrictions apply** - Free users can access all Pro features
+✅ **Visual indicator** - Badge shows "Acceso Pro compartido" when applicable
+✅ **Scope limited** - Access is only active within that specific room
+
+### How it works:
+
+1. **Trainer creates room** → Room is marked with `ownerId` = Trainer's UID
+2. **Closers join room** → System checks Trainer's subscription status
+3. **If Trainer is Pro** → All participants get Pro access in that room
+4. **Features enabled** → Timer limits removed, all panels available
+5. **Room-specific** → Access doesn't extend outside that room
+
+### Database Structure:
+
+```
+rooms/
+  └── {roomId}/
+      ├── ownerId: "trainer_uid"
+      ├── createdAt: "2024-01-15T10:30:00Z"
+      ├── ...other room data
+```
+
 ## Future Enhancements
 
 - [ ] Admin user management panel
