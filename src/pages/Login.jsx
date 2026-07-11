@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChessKnight, Mail, Lock, ArrowRight, Smartphone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { signInWithGoogle, registerWithEmail, signInWithEmail } from '../utils/auth';
+import { signInWithGoogle, registerWithEmail, signInWithEmail, resetPassword } from '../utils/auth';
 
 export default function Login() {
   const { i18n } = useTranslation();
@@ -22,9 +22,30 @@ export default function Login() {
     finally { setLoading(false); }
   };
 
+  const [resetMessage, setResetMessage] = useState('');
+
+  const handleForgot = async (e) => {
+    e.preventDefault();
+    setError('');
+    setResetMessage('');
+    if (!email.trim()) {
+      setError(isEn ? 'Please enter your email address first.' : 'Por favor ingresá tu email primero.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await resetPassword(email.trim());
+      setResetMessage(isEn ? 'Password reset email sent. Check your inbox.' : 'Te enviamos un email para restablecer tu contraseña.');
+    } catch (e) {
+      setError(e.message || (isEn ? "Couldn't send reset email." : 'No se pudo enviar el email de recuperación.'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    setError(''); setLoading(true);
+    setError(''); setResetMessage(''); setLoading(true);
     try {
       if (mode === 'signup') await registerWithEmail(email, password);
       else await signInWithEmail(email, password);
@@ -103,6 +124,7 @@ export default function Login() {
             <input type="password" required minLength={6} value={password} onChange={e => setPassword(e.target.value)} placeholder={isEn ? 'Password (min. 6)' : 'Contraseña (mín. 6)'} style={{ paddingLeft: '2.5rem' }} />
           </div>
           {error && <div style={{ color: 'var(--danger)', fontSize: '0.82rem' }}>{error}</div>}
+          {resetMessage && <div style={{ color: 'var(--success)', fontSize: '0.82rem' }}>{resetMessage}</div>}
           <button type="submit" disabled={loading}
             style={{
               width: '100%', padding: '0.8rem', marginTop: '0.25rem', borderRadius: '0.875rem', cursor: 'pointer',
@@ -113,6 +135,13 @@ export default function Login() {
             {mode === 'signup' ? (isEn ? 'Create account' : 'Crear cuenta') : (isEn ? 'Sign in' : 'Entrar')}
             <ArrowRight size={17} />
           </button>
+          {mode === 'signin' && (
+            <div style={{ textAlign: 'right', marginTop: '0.2rem' }}>
+              <a href="#" onClick={handleForgot} style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', textDecoration: 'underline' }}>
+                {isEn ? 'Forgot password?' : '¿Olvidaste tu contraseña?'}
+              </a>
+            </div>
+          )}
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
