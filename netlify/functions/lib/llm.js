@@ -32,12 +32,28 @@ function providerChain() {
     });
   };
 
-  // TEST: Solo Groq por ahora para debuggear
+  add('cerebras', 'CEREBRAS',
+    process.env.CEREBRAS_URL || 'https://api.cerebras.ai/v1/chat/completions',
+    process.env.CEREBRAS_API_KEY, 'llama3.1-8b', 'llama-3.3-70b');
+
+  add('gemini', 'GEMINI',
+    process.env.GEMINI_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+    process.env.GEMINI_API_KEY, 'gemini-2.0-flash', 'gemini-2.0-flash');
+
   add('groq', 'GROQ',
     process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
     process.env.GROQ_API_KEY || process.env.AI_API_KEY,
     process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
     process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile');
+
+  add('openrouter', 'OPENROUTER',
+    process.env.OPENROUTER_URL || 'https://openrouter.ai/api/v1/chat/completions',
+    process.env.OPENROUTER_API_KEY,
+    'meta-llama/llama-3.3-70b-instruct:free', 'meta-llama/llama-3.3-70b-instruct:free');
+
+  add('github', 'GITHUB_MODELS',
+    process.env.GITHUB_MODELS_URL || 'https://models.inference.ai.azure.com/chat/completions',
+    process.env.GITHUB_MODELS_TOKEN, 'gpt-4o-mini', 'gpt-4o-mini');
 
   // Slots genéricos extra (cualquier otro proveedor estilo OpenAI).
   for (const n of ['LLM2', 'LLM3', 'LLM4']) {
