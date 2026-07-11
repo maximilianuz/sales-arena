@@ -38,7 +38,7 @@ function providerChain() {
 
   add('gemini', 'GEMINI',
     process.env.GEMINI_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-    process.env.GEMINI_API_KEY, 'gemini-2.0-flash', 'gemini-2.0-flash');
+    process.env.GEMINI_API_KEY, 'gemini-1.5-flash', 'gemini-1.5-flash');
 
   add('groq', 'GROQ',
     process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
