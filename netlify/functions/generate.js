@@ -29,10 +29,6 @@ export const handler = async (event) => {
     return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
-  const apiKey = process.env.AI_API_KEY;
-  if (!apiKey) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: "AI_API_KEY no configurada en el servidor." }) };
-  }
 
   let body;
   try {
