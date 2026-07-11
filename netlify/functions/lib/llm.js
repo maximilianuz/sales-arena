@@ -34,7 +34,7 @@ function providerChain() {
 
   add('cerebras', 'CEREBRAS',
     process.env.CEREBRAS_URL || 'https://api.cerebras.ai/v1/chat/completions',
-    process.env.CEREBRAS_API_KEY, 'llama3.1-8b', 'llama-3.3-70b');
+    process.env.CEREBRAS_API_KEY, 'gpt-oss-120b', 'gpt-oss-120b');
 
   add('gemini', 'GEMINI',
     process.env.GEMINI_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
