@@ -106,7 +106,9 @@ Return ONLY a valid JSON object with this EXACT structure:
   }
 
   return `
-Eres un guionista experto en psicología de ventas y comportamiento humano. Creá un Buyer Persona PROFUNDO y REALISTA para un roleplay de ventas High Ticket, en español.
+IDIOMA OBLIGATORIO: TODO — absolutamente TODO — debe estar en ESPAÑOL. Sin excepciones. Ni una palabra en inglés.
+
+Eres un guionista experto en psicología de ventas y comportamiento humano. Creá un Buyer Persona PROFUNDO y REALISTA para un roleplay de ventas High Ticket, completamente en ESPAÑOL.
 
 PARÁMETROS:
 - Dificultad: ${level} — ${depthInstruction}
@@ -129,6 +131,8 @@ Para pipelineQuestions: por cada etapa, 2 a 4 preguntas/consejos "salvavidas" qu
 
 ETAPAS DEL EMBUDO:
 ${stagesContext}
+
+⚠️ RECORDATORIO CRÍTICO: TODOS los campos (nombre, role, problema, objeciones, miedos, deseos, causas profundas, producto, absolutamente TODO) deben estar en ESPAÑOL. Prohibido inglés en cualquier campo. Si detectas que escribiste algo en inglés, reemplazalo inmediatamente por español. Revisa DOS VECES antes de devolver el JSON.
 
 Devolvé ÚNICAMENTE un objeto JSON válido con esta estructura EXACTA:
 {
