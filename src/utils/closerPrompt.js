@@ -27,7 +27,7 @@ export function closerOpeningLine(scenario = {}, language = 'es') {
 // sabría por el formulario de agenda), pero NO conoce la psicología interna ni
 // las objeciones del lead: las descubre preguntando, como en la vida real.
 export function buildCloserSystem(scenario = {}, language = 'es', stages = []) {
-  const isEn = typeof language === 'string' && language.startsWith('en');
+  const isEn = language && typeof language === 'string' && language.startsWith('en');
   const d = scenario.demographics || {};
   const closerName = getCloserName(language);
   const name = d.name || (isEn ? 'the prospect' : 'el prospecto');

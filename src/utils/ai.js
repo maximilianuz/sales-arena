@@ -130,7 +130,8 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
   }
 }
 
-export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language = 'es') {
+export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language) {
+  const lang = language && typeof language === 'string' ? (language.startsWith('en') ? 'en' : 'es') : 'es';
   const activeStages = stages && stages.length > 0 ? stages : [
     { id: 'apertura', label: 'Apertura', baseQuestions: 'Romper hielo', baseObjections: '' }
   ];
@@ -164,7 +165,7 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     targetObjection: selectedObjectionKey,
     specificObjectionFramework,
     activeStages,
-    language,
+    language: lang,
     personalityHint,
     realProduct
   });

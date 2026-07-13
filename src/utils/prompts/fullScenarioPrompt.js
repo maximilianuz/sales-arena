@@ -2,7 +2,92 @@
 // + pipeline) en UNA sola llamada. Enriquecido para máxima profundidad psicológica
 // y realismo conductual, manteniendo la salida acotada (free tier de Groq, 6000 TPM).
 export function getFullScenarioPrompt({ level, theme, leadTemperature, targetObjection, specificObjectionFramework, activeStages, language, personalityHint, realProduct }) {
-  const lang = language === 'es' ? 'Español' : 'Inglés';
+  const isEn = typeof language === 'string' && language.startsWith('en');
+
+  const stagesContext = activeStages.map(s =>
+    `- "${s.id}" (${s.label}): objective "${s.objective}". Base: ${s.baseQuestions || 'general'}`
+  ).join('\n');
+
+  const pipelineKeys = activeStages.map(s => `"${s.id}": ["question/tip 1", "question/tip 2"]`).join(',\n      ');
+
+  if (isEn) {
+    let tempInstruction = `Lead is "${leadTemperature || 'Random'}". Cold = skeptical/defensive, <15% buy. Hot = urgent/referred, >60% buy. Warm = curious with doubts. Adjust emotional state and situation accordingly.`;
+    if (!leadTemperature || leadTemperature === 'Aleatoria') {
+      tempInstruction = `Randomly determine if Cold, Warm, or Hot and adjust emotional state and purchase probability.`;
+    }
+
+    let depthInstruction = 'Low resistance: 1 easy secondary objection. Lead cooperates if treated well. Emotions surface-level, easy to read.';
+    if (level === 'Intermedio') {
+      depthInstruction = 'Medium resistance: 3-5 varied secondary objections (timing, technical doubt, consult partner). Lead has real doubts and emotional layers that need uncovering.';
+    } else if (level === 'Avanzado') {
+      depthInstruction = 'High resistance: 6-10 hostile secondary objections. Lead hides true motivation, tests salesperson, uses sarcasm or sharp cuts. Real pain buried under layers of defense and pride.';
+    }
+
+    return `
+You are an expert screenwriter in sales psychology and human behavior. Create a DEEP and REALISTIC Buyer Persona for a high-ticket sales roleplay, in English.
+
+PARAMETERS:
+- Difficulty: ${level} — ${depthInstruction}
+- Industry/Theme: ${theme}
+- Temperature: ${tempInstruction}
+- Expected main objection: "${targetObjection}"
+${specificObjectionFramework ? `- Objection framework to apply: ${specificObjectionFramework}` : ''}
+${personalityHint ? `- PERSONALITY of the lead (embody it strongly in psychology, behavioralCues and verbalStyle — how they talk, what opens them up, what shuts them down): ${personalityHint}` : ''}
+${realProduct ? `- FIXED PRODUCT the Closer sells (use EXACTLY this, DO NOT invent another): "${realProduct.name}" — ${realProduct.description}. USD ${realProduct.price}. Generate a lead who is a realistic prospect for THIS product/service, with a problem this product solves.` : ''}
+
+REALISM PRINCIPLES (critical):
+- Real people with contradictions. DO NOT assume everyone is a CEO; adapt to industry (employees, freelancers, students, small owners, etc.).
+- Visible objection is almost NEVER the real reason: it's smokescreen. Behind it ALWAYS are 1-3 DEEP ROOT CAUSES in layers (past wound, fear, identity belief) — the deepest barely admitted even to oneself.
+- Vary objection TYPES by person: structural (automatic procrastination), defensive (regain control), wound-based (been burned before), identity-based (don't know if I'm capable). Secondaries should NOT all be the same type or textbook generic: invent ones THIS lead would raise.
+- Give them a story: a trigger event that brought them to this call, a previous attempt that failed, concrete consequence if unchanged.
+- Specific conversational behavior: how they talk, what makes them open up, what shuts them down. This must be actionable for whoever plays them.
+- Avoid clichés and generic phrases. Sound like a real person, not a manual.
+
+For pipelineQuestions: per stage, 2-4 "lifesaver" questions/tips the CLOSER must use, tailored to THIS lead's pain and psychology. Exact questions, not generic.
+
+FUNNEL STAGES:
+${stagesContext}
+
+Return ONLY a valid JSON object with this EXACT structure:
+{
+  "demographics": { "name": "", "age": "", "role": "", "industry": "", "companySize": "" },
+  "psychology": {
+    "urgency": "High/Medium/Low",
+    "communicationStyle": "e.g. Direct and sharp / Analytical and cold / Warm but evasive",
+    "primaryFear": "The deep fear (not superficial)",
+    "primaryDesire": "The real desire behind the purchase",
+    "decisionStyle": "How they make decisions: impulsive, needs data, consults others, analysis paralysis, etc.",
+    "trustTrigger": "What specifically builds or breaks their trust in a salesperson"
+  },
+  "behavioralCues": {
+    "opensUpWhen": "What makes them lower their guard and speak truthfully",
+    "shutsDownWhen": "What puts them on defense or makes them close off",
+    "verbalStyle": "How they literally talk: typical phrases, verbal tics, pace, tone"
+  },
+  "currentSituation": {
+    "problem": "The real, deep problem",
+    "triggerEvent": "The concrete event that made them book this call right now",
+    "previousAttempts": "What they tried before and why it failed",
+    "impact": "Financial AND emotional concrete impact of not solving it"
+  },
+  "productToSell": "1-2 paragraphs: high-ticket product/service the Closer offers, with name, key features and USD PRICE of 1500 or more (never less than 1500)",
+  "productPrice": <integer in USD with NO symbols or text, equal to product price, 1500 or more>,
+  "visibleObjection": "The easy excuse they'll say first (smokescreen)",
+  "secondaryObjections": ["varied TYPES of objections (structural/defensive/wound/identity) specific to THIS lead"],
+  "hiddenObjection": "The true hidden reason (for the Trainer), connected to fear and wound",
+  "rootCauses": ["1-3 DEEP ROOT CAUSES in layers, shallowest to deepest. Each in 1 sentence with its type in brackets. E.g.: '[Wound] Paid USD 3,000 to an agency that disappeared and never told his wife', '[Identity] Deep down believes he's not the type who succeeds at this'"],
+  "roleplayGuide": {
+    "moneyBelief": "Limiting belief about money, 1 sentence",
+    "competingGoal": "Inner conflict (wants X but fears Y), 1 sentence",
+    "vendorFatigue": "Why they distrust salespeople, 1 sentence",
+    "actorAdvice": "Direction for the person PLAYING THIS LEAD (the buyer), NOT the seller. Second person ('you'): voice tone, posture, attitude, resistance level and what emotion to project. E.g.: 'Speak sharp and rushed, arms crossed, defensive but deep down desperate for a solution.' NEVER give sales advice."
+  },
+  "pipelineQuestions": {
+      ${pipelineKeys}
+  }
+}
+`;
+  }
 
   let tempInstruction;
   if (leadTemperature && leadTemperature !== 'Aleatoria') {
@@ -20,14 +105,8 @@ export function getFullScenarioPrompt({ level, theme, leadTemperature, targetObj
     depthInstruction = 'Resistencia alta: 6 a 10 objeciones secundarias hostiles. El lead esconde su verdadera motivación, prueba al vendedor, usa sarcasmo o cortes secos. Su dolor real está enterrado bajo capas de defensa y orgullo.';
   }
 
-  const stagesContext = activeStages.map(s =>
-    `- "${s.id}" (${s.label}): objetivo "${s.objective}". Base: ${s.baseQuestions || 'general'}`
-  ).join('\n');
-
-  const pipelineKeys = activeStages.map(s => `"${s.id}": ["pregunta/consejo 1", "pregunta/consejo 2"]`).join(',\n      ');
-
   return `
-Eres un guionista experto en psicología de ventas y comportamiento humano. Creá un Buyer Persona PROFUNDO y REALISTA para un roleplay de ventas High Ticket, en ${lang}.
+Eres un guionista experto en psicología de ventas y comportamiento humano. Creá un Buyer Persona PROFUNDO y REALISTA para un roleplay de ventas High Ticket, en español.
 
 PARÁMETROS:
 - Dificultad: ${level} — ${depthInstruction}
