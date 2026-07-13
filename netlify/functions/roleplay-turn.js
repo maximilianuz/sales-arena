@@ -3,8 +3,8 @@ import { llmChat } from './lib/llm.js';
 
 // Un turno del COMPRADOR IA. Recibe el system prompt del buyer + el historial y
 // devuelve la respuesta estructurada del lead. El modelo/proveedor (y sus
-// respaldos) viven en lib/llm.js — tier 'smart' = modelo potente (70b por
-// defecto) para actuar el personaje y razonar sobre la técnica del closer.
+// respaldos) viven en lib/llm.js — tier 'fast' = modelo rápido (8b por
+// defecto) para diálogo natural y respuestas inmediatas en roleplay.
 
 export const handler = async (event) => {
   const headers = {
@@ -45,10 +45,10 @@ export const handler = async (event) => {
     .map(m => ({ role: m.role, content: m.content }));
 
   try {
-    // Cadena de proveedores (tier 'smart' = modelo potente para el diálogo). Si el
+    // Cadena de proveedores (tier 'fast' = modelo rápido 8B para diálogo ágil). Si el
     // principal está agotado (429/límite), salta al de respaldo en vez de esperar.
     const { content } = await llmChat({
-      tier: 'smart',
+      tier: 'fast',
       messages: [{ role: "system", content: system }, ...trimmed],
       temperature: 0.85,
       max_tokens: 320,
