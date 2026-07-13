@@ -43,6 +43,17 @@
   color-scheme: dark;
 }
 
+/* Ocultar elementos de debug/UID que se muestren en la página */
+[style*="UID"], [style*="uid"], [class*="uid"], [class*="debug"], [data-testid*="uid"] {
+  display: none !important;
+}
+
+/* Ocultar badges o elementos dinámicos que muestren información de sesión */
+div:has(> :contains("UID:")),
+div:has(> :contains("V8AGEhfn")) {
+  display: none !important;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
