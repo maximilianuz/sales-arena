@@ -4,13 +4,11 @@
 // haya al menos un proveedor con cupo. Clave para que planificar un escenario
 // (buyer persona + escenario del closer) SIEMPRE devuelva respuesta.
 //
-// Vos solo cargás la KEY de cada proveedor en Netlify; el código ya sabe su URL
-// y sus modelos. Orden por defecto: Flowise (opcional) → Cerebras → Gemini → Groq →
-// OpenRouter → GitHub Models. (Groq sigue leyendo AI_API_KEY por retrocompat.)
+// Orden: Flowise (principal) → NVIDIA → Groq (fallback)
 //
 // Overrides opcionales por proveedor (si cambian nombres de modelo):
 //   <PROV>_MODEL_FAST, <PROV>_MODEL_SMART, <PROV>_MODEL, <PROV>_URL
-//   Ej: CEREBRAS_MODEL_SMART=llama-4-scout-17b-16e-instruct
+//   Ej: NVIDIA_MODEL_SMART=nvidia/llama-3.3-70b-instruct
 //
 // `tier`: 'fast' = generar escenario / puntuar (modelo chico) · 'smart' = diálogo.
 
@@ -34,41 +32,24 @@ function providerChain() {
     });
   };
 
-  // Flowise (opcional, self-hosted o cloud)
+  // 1. Flowise (proveedor principal)
   if (process.env.FLOWISE_URL && process.env.FLOWISE_API_KEY && process.env.FLOWISE_CHATFLOW_ID) {
     const fw = createFlowiseProvider(process.env.FLOWISE_URL, process.env.FLOWISE_API_KEY, process.env.FLOWISE_CHATFLOW_ID);
     if (fw) chain.push(fw);
   }
 
-  add('cerebras', 'CEREBRAS',
-    process.env.CEREBRAS_URL || 'https://api.cerebras.ai/v1/chat/completions',
-    process.env.CEREBRAS_API_KEY, 'gpt-oss-120b', 'gpt-oss-120b');
+  // 2. NVIDIA (fallback)
+  add('nvidia', 'NVIDIA',
+    process.env.NVIDIA_URL || 'https://integrate.api.nvidia.com/v1/chat/completions',
+    process.env.NVIDIA_API_KEY,
+    'nvidia/llama-3.1-8b-instruct', 'nvidia/llama-3.3-70b-instruct');
 
-  add('gemini', 'GEMINI',
-    process.env.GEMINI_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-    process.env.GEMINI_API_KEY, 'gemini-1.5-flash', 'gemini-1.5-flash');
-
+  // 3. Groq (último fallback)
   add('groq', 'GROQ',
     process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
     process.env.GROQ_API_KEY || process.env.AI_API_KEY,
     process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
     process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile');
-
-  add('openrouter', 'OPENROUTER',
-    process.env.OPENROUTER_URL || 'https://openrouter.ai/api/v1/chat/completions',
-    process.env.OPENROUTER_API_KEY,
-    'meta-llama/llama-3.3-70b-instruct:free', 'meta-llama/llama-3.3-70b-instruct:free');
-
-  add('github', 'GITHUB_MODELS',
-    process.env.GITHUB_MODELS_URL || 'https://models.inference.ai.azure.com/chat/completions',
-    process.env.GITHUB_MODELS_TOKEN, 'gpt-4o-mini', 'gpt-4o-mini');
-
-  // Slots genéricos extra (cualquier otro proveedor estilo OpenAI).
-  for (const n of ['LLM2', 'LLM3', 'LLM4']) {
-    add(n.toLowerCase(), n, process.env[`${n}_URL`], process.env[`${n}_KEY`],
-      process.env[`${n}_MODEL_FAST`] || process.env[`${n}_MODEL`],
-      process.env[`${n}_MODEL_SMART`] || process.env[`${n}_MODEL`]);
-  }
 
   return chain;
 }
