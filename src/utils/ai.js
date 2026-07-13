@@ -23,13 +23,26 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
       finalUrl = "/api/nvidia/v1/chat/completions";
     }
     headers["Authorization"] = `Bearer ${apiKey}`;
-    requestBody = {
-      model: apiModel || "meta/llama-3.1-8b-instruct",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: maxTokens,
-      response_format: { type: "json_object" }
-    };
+
+    // Detectar si es Flowise (contiene /prediction/)
+    const isFlowise = finalUrl.includes("/prediction/");
+
+    if (isFlowise) {
+      // Flowise usa formato diferente (question en lugar de messages)
+      requestBody = {
+        question: prompt,
+        chatId: auth.currentUser?.uid
+      };
+    } else {
+      // OpenAI-compatible
+      requestBody = {
+        model: apiModel || "meta/llama-3.1-8b-instruct",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+        response_format: { type: "json_object" }
+      };
+    }
   }
 
   try {
@@ -79,10 +92,18 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
 
     const data = await response.json();
 
-    // Blindaje: el proveedor puede devolver un shape inesperado (choices vacío,
-    // message nulo, content no-string). Sin estos guards, se cae con un
-    // "Cannot read properties of undefined" críptico en vez de un mensaje útil.
-    const content = data?.choices?.[0]?.message?.content;
+    // Detectar si la respuesta es de Flowise o formato OpenAI
+    const isFlowise = useOwnKey && finalUrl.includes("/prediction/");
+    let content;
+
+    if (isFlowise) {
+      // Flowise devuelve {text, chatId, ...}
+      content = data?.text || data?.message || '';
+    } else {
+      // OpenAI-compatible devuelve {choices: [{message: {content: ...}}]}
+      content = data?.choices?.[0]?.message?.content;
+    }
+
     if (typeof content !== 'string' || content.trim() === '') {
       throw new Error("La IA devolvió una respuesta vacía o con un formato inesperado. Probá de nuevo.");
     }

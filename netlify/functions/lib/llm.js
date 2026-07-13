@@ -5,14 +5,16 @@
 // (buyer persona + escenario del closer) SIEMPRE devuelva respuesta.
 //
 // Vos solo cargás la KEY de cada proveedor en Netlify; el código ya sabe su URL
-// y sus modelos. Orden por defecto: Cerebras → Gemini → Groq → OpenRouter →
-// Mistral → GitHub Models. (Groq sigue leyendo AI_API_KEY por retrocompat.)
+// y sus modelos. Orden por defecto: Flowise (opcional) → Cerebras → Gemini → Groq →
+// OpenRouter → GitHub Models. (Groq sigue leyendo AI_API_KEY por retrocompat.)
 //
 // Overrides opcionales por proveedor (si cambian nombres de modelo):
 //   <PROV>_MODEL_FAST, <PROV>_MODEL_SMART, <PROV>_MODEL, <PROV>_URL
 //   Ej: CEREBRAS_MODEL_SMART=llama-4-scout-17b-16e-instruct
 //
 // `tier`: 'fast' = generar escenario / puntuar (modelo chico) · 'smart' = diálogo.
+
+import { createFlowiseProvider, flowiseChat } from './flowise-adapter.js';
 
 function envModel(prefix, tier, def) {
   return process.env[`${prefix}_MODEL_${tier === 'fast' ? 'FAST' : 'SMART'}`]
@@ -31,6 +33,12 @@ function providerChain() {
       smart: envModel(prefix, 'smart', smartDef),
     });
   };
+
+  // Flowise (opcional, self-hosted o cloud)
+  if (process.env.FLOWISE_URL && process.env.FLOWISE_API_KEY && process.env.FLOWISE_CHATFLOW_ID) {
+    const fw = createFlowiseProvider(process.env.FLOWISE_URL, process.env.FLOWISE_API_KEY, process.env.FLOWISE_CHATFLOW_ID);
+    if (fw) chain.push(fw);
+  }
 
   add('cerebras', 'CEREBRAS',
     process.env.CEREBRAS_URL || 'https://api.cerebras.ai/v1/chat/completions',
@@ -94,6 +102,22 @@ export async function llmChat({ tier = 'smart', messages, temperature = 0.7, max
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), Math.min(timeoutMs, remaining));
     try {
+      let result;
+
+      // Flowise usa una API diferente (no OpenAI compatible)
+      if (p.name === 'flowise') {
+        result = await flowiseChat({
+          url: p.url,
+          key: p.key,
+          chatflowId: p.chatflowId,
+          messages,
+          max_tokens,
+          timeoutMs: Math.min(timeoutMs, remaining)
+        });
+        return result;
+      }
+
+      // Proveedores estándar (OpenAI-compatible)
       const payload = { model, messages, temperature, max_tokens };
       if (useJson) payload.response_format = { type: 'json_object' };
 
