@@ -47,13 +47,15 @@ export const handler = async (event) => {
   try {
     // Cadena de proveedores (tier 'fast' = modelo rápido 8B para diálogo ágil). Si el
     // principal está agotado (429/límite), salta al de respaldo en vez de esperar.
+    // Timeouts optimizados para Netlify (10s hard limit): consultas de diálogo son
+    // más rápidas que scenario generation, así que podemos ser más agresivos.
     const { content } = await llmChat({
       tier: 'fast',
       messages: [{ role: "system", content: system }, ...trimmed],
       temperature: 0.85,
       max_tokens: 320,
-      timeoutMs: 8000,
-      budgetMs: 9000,
+      timeoutMs: 6500,
+      budgetMs: 8000,
     });
 
     let turn;

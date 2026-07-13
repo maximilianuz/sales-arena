@@ -83,13 +83,15 @@ export const handler = async (event) => {
   // La generación de buyer persona requiere análisis psicológico complejo.
   // Si el principal está agotado (429/límite diario), salta solo al de respaldo.
   // Reintento adicional del lado del cliente (ai.js) con presupuesto de tiempo fresco.
+  // Timeouts optimizados para Netlify (10s hard limit): fallar rápido en cada proveedor
+  // permite que Flowise/NVIDIA/Groq se intenten sin exceder el límite.
   try {
     const { content } = await llmChat({
       tier: 'smart',
       messages: [{ role: 'user', content: prompt }],
       temperature: typeof temperature === 'number' ? temperature : 0.7,
       max_tokens: typeof max_tokens === 'number' ? max_tokens : 1500,
-      timeoutMs: 8000,
+      timeoutMs: 7000,
       budgetMs: 8500,
     });
     // Devolvemos el shape que espera el cliente (choices[0].message.content).
