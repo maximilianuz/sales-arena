@@ -39,7 +39,7 @@ function stateGuidance(state, isEn) {
 // Construye el system prompt del comprador para un turno dado. `focusStage` (opcional)
 // = { label, objective } cuando el closer eligió practicar UNA sola etapa.
 export function buildBuyerSystem(scenario = {}, state = null, language = 'es', focusStage = null) {
-  const isEn = typeof language === 'string' && language.startsWith('en');
+  const isEn = language && typeof language === 'string' && language.startsWith('en');
   const d = scenario.demographics || {};
   const sit = scenario.currentSituation || {};
   const persona = getPersonality(scenario.personality);
