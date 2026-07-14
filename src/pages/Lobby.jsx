@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
+import { GROUP_ONLY_MODE } from '../config/appMode';
 import { signOutUser } from '../utils/auth';
 import { joinCohort } from '../utils/cohort';
 import { auth, db } from '../utils/db';
@@ -108,9 +109,12 @@ export default function Lobby() {
   // 'individual' | 'team'. Se persiste para aterrizar siempre donde trabaja,
   // con un switcher para cambiar. Así no se ve TODO en una misma pantalla.
   const [workspace, setWorkspace] = useState(() => {
+    // Modo solo-grupal: siempre se aterriza en "Equipos"; no hay espacio individual.
+    if (GROUP_ONLY_MODE) return 'team';
     try { return localStorage.getItem('lobbyWorkspace') || ''; } catch { return ''; }
   });
   const chooseWorkspace = (w) => {
+    if (GROUP_ONLY_MODE) return; // en modo solo-grupal no se cambia de espacio
     setWorkspace(w);
     try { localStorage.setItem('lobbyWorkspace', w); } catch { /* sin storage */ }
   };
@@ -242,7 +246,7 @@ export default function Lobby() {
 
         {/* Right: utility actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          {isFree && openPlans && (
+          {!GROUP_ONLY_MODE && isFree && openPlans && (
             <button onClick={openPlans} style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
               background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
@@ -314,7 +318,9 @@ export default function Lobby() {
 
       {/* ── Elegí tu espacio: Individual o Equipos ──────────
           Primera vez: dos tarjetas grandes. Después: switcher de pestañas.
-          Solo se muestra el contenido del espacio elegido. */}
+          Solo se muestra el contenido del espacio elegido.
+          En modo solo-grupal NO se muestra el selector: se entra directo a Equipos. */}
+      {!GROUP_ONLY_MODE && (
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2.75rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
         {!workspace ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
@@ -360,8 +366,9 @@ export default function Lobby() {
           </div>
         )}
       </div>
+      )}
 
-      {workspace === 'individual' && (<>
+      {!GROUP_ONLY_MODE && workspace === 'individual' && (<>
       {/* ── Sección: Práctica individual ───────────────────── */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
         <SectionLabel badge={isEn ? '👤 1 player' : '👤 1 jugador'} badgeAccent="48,209,88">
