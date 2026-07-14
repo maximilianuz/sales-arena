@@ -2,7 +2,12 @@
 
 ## Resumen del Cambio
 
-Se ha reemplazado **Flowise** como proveedor principal de LLM por **NVIDIA**, manteniendo **Groq** como fallback. Esta configuración está optimizada exclusivamente para la funcionalidad de **equipos** (equipment management).
+Se ha reemplazado **Flowise** como proveedor principal de LLM por **NVIDIA** (con soporte para 2 APIs), manteniendo **Groq** como fallback final. Esta configuración está optimizada exclusivamente para la funcionalidad de **equipos** (equipment management).
+
+**Cadena de Proveedores**:
+1. **NVIDIA #1** (API principal)
+2. **NVIDIA #2** (API secundaria - si #1 falla)
+3. **Groq** (fallback final)
 
 **Estado de Operación**:
 - ✅ Equipos: Totalmente funcional (100%)
@@ -82,26 +87,59 @@ Para optimizar la experiencia en equipos:
 
 ## Configuración Requerida
 
-### 1. Obtener API Key de NVIDIA
-1. Ir a https://build.nvidia.com/
-2. Registrarse/iniciar sesión
-3. Obtener API Key
-4. Agregar a variables de entorno: `NVIDIA_API_KEY`
+### Opción 1: Una API de NVIDIA (Recomendado para empezar)
 
-### 2. Agregar Variables de Entorno
 ```bash
 # Mínimo requerido:
 NVIDIA_API_KEY=nvapi_xxxxxxxxxxxx
-
-# Opcional (sobreescribe defaults):
-NVIDIA_MODEL_FAST=meta/llama-3.1-8b-instruct
-NVIDIA_MODEL_SMART=meta/llama-3.1-70b-instruct
 
 # Groq como fallback:
 GROQ_API_KEY=gsk_xxxxxxxxxxxx
 ```
 
-### 3. Quitar Variables de Flowise (Opcional)
+### Opción 2: Dos APIs de NVIDIA (Redundancia completa)
+
+```bash
+# NVIDIA #1 (Principal)
+NVIDIA_API_KEY=nvapi_xxxxxxx1_here
+NVIDIA_MODEL_FAST=meta/llama-3.1-8b-instruct
+NVIDIA_MODEL_SMART=meta/llama-3.1-70b-instruct
+
+# NVIDIA #2 (Fallback - si #1 falla)
+NVIDIA_API_KEY_2=nvapi_xxxxxxx2_here
+NVIDIA_2_MODEL_FAST=meta/llama-3.2-3b-instruct     # Modelo diferente - más rápido
+NVIDIA_2_MODEL_SMART=meta/llama-3.3-70b-instruct  # Modelo diferente - versión mejorada
+
+# Groq (Fallback final - si ambas NVIDIA fallan)
+GROQ_API_KEY=gsk_xxxxxxxxxxxx
+```
+
+**Flujo de Fallback Automático**:
+```
+Solicitud → NVIDIA #1 (api_key_1) 
+         ↓ (si falla)
+         → NVIDIA #2 (api_key_2, modelo diferente)
+         ↓ (si falla)
+         → Groq (fallback final)
+```
+
+### Casos de Uso para Dual NVIDIA
+
+| Caso | NVIDIA #1 | NVIDIA #2 | Groq |
+|------|-----------|-----------|------|
+| **Máxima Redundancia** | Llama 70B | Llama 33B | Fallback |
+| **Balance Costo/Velocidad** | Llama 8B | Llama 70B | Fallback |
+| **Máxima Velocidad** | Llama 3B | Llama 8B | Fallback |
+| **Testing** | Llama 70B | Mistral 8x22B | Fallback |
+
+### Obtener API Keys de NVIDIA
+
+1. Ir a https://build.nvidia.com/
+2. Registrarse/iniciar sesión
+3. Generar API Key (puede generar múltiples)
+4. Copiar y agregar a variables de entorno
+
+### Quitar Variables de Flowise (Opcional)
 Puedes remover estas variables si ya no usas Flowise:
 ```bash
 # FLOWISE_URL
