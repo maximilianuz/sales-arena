@@ -4,15 +4,13 @@
 // haya al menos un proveedor con cupo. Clave para que planificar un escenario
 // (buyer persona + escenario del closer) SIEMPRE devuelva respuesta.
 //
-// Orden: Flowise (principal) → NVIDIA → Groq (fallback)
+// Orden: NVIDIA (principal) → Groq (fallback)
 //
 // Overrides opcionales por proveedor (si cambian nombres de modelo):
 //   <PROV>_MODEL_FAST, <PROV>_MODEL_SMART, <PROV>_MODEL, <PROV>_URL
-//   Ej: NVIDIA_MODEL_SMART=nvidia/llama-3.3-70b-instruct
+//   Ej: NVIDIA_MODEL_SMART=meta/llama-3.1-70b-instruct
 //
 // `tier`: 'fast' = generar escenario / puntuar (modelo chico) · 'smart' = diálogo.
-
-import { createFlowiseProvider, flowiseChat } from './flowise-adapter.js';
 
 function envModel(prefix, tier, def) {
   return process.env[`${prefix}_MODEL_${tier === 'fast' ? 'FAST' : 'SMART'}`]
@@ -32,19 +30,13 @@ function providerChain() {
     });
   };
 
-  // 1. Flowise (proveedor principal)
-  if (process.env.FLOWISE_URL && process.env.FLOWISE_API_KEY && process.env.FLOWISE_CHATFLOW_ID) {
-    const fw = createFlowiseProvider(process.env.FLOWISE_URL, process.env.FLOWISE_API_KEY, process.env.FLOWISE_CHATFLOW_ID);
-    if (fw) chain.push(fw);
-  }
-
-  // 2. NVIDIA (fallback)
+  // 1. NVIDIA (proveedor principal) - Optimizado para equipos
   add('nvidia', 'NVIDIA',
     process.env.NVIDIA_URL || 'https://integrate.api.nvidia.com/v1/chat/completions',
     process.env.NVIDIA_API_KEY,
-    'nvidia/llama-3.1-8b-instruct', 'nvidia/llama-3.3-70b-instruct');
+    'meta/llama-3.1-8b-instruct', 'meta/llama-3.1-70b-instruct');
 
-  // 3. Groq (último fallback)
+  // 2. Groq (fallback)
   add('groq', 'GROQ',
     process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
     process.env.GROQ_API_KEY || process.env.AI_API_KEY,
@@ -83,22 +75,7 @@ export async function llmChat({ tier = 'smart', messages, temperature = 0.7, max
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), Math.min(timeoutMs, remaining));
     try {
-      let result;
-
-      // Flowise usa una API diferente (no OpenAI compatible)
-      if (p.name === 'flowise') {
-        result = await flowiseChat({
-          url: p.url,
-          key: p.key,
-          chatflowId: p.chatflowId,
-          messages,
-          max_tokens,
-          timeoutMs: Math.min(timeoutMs, remaining)
-        });
-        return result;
-      }
-
-      // Proveedores estándar (OpenAI-compatible)
+      // Proveedores OpenAI-compatible (NVIDIA, Groq, etc)
       const payload = { model, messages, temperature, max_tokens };
       if (useJson) payload.response_format = { type: 'json_object' };
 
