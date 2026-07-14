@@ -1,5 +1,6 @@
 import { getUserData, getPath, setPath, patchPath } from './lib/firebaseAdmin.js';
 import { llmChat } from './lib/llm.js';
+import { GROUP_ONLY_MODE } from './lib/appMode.js';
 
 export const handler = async (event) => {
   const headers = {
@@ -20,15 +21,20 @@ export const handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
   }
 
-  // Verificar suscripción (solo closer/trainer pueden guardar historial)
-  let userData;
+  // Verificar suscripción (solo closer/trainer pueden guardar historial).
+  // En modo solo-grupal el análisis está habilitado para TODOS los usuarios
+  // autenticados (la app es gratuita): no se exige plan pago.
+  let userData = {};
   try {
     userData = await getUserData(uid);
-    if (userData.subscriptionStatus !== 'active') {
+    if (!GROUP_ONLY_MODE && userData.subscriptionStatus !== 'active') {
       return { statusCode: 403, headers, body: JSON.stringify({ error: "Se requiere plan pago para guardar historial." }) };
     }
   } catch (e) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: "Error verificando suscripción." }) };
+    if (!GROUP_ONLY_MODE) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Error verificando suscripción." }) };
+    }
+    // En modo grupal seguimos con datos vacíos: el análisis no depende del plan.
   }
 
   // La comisión y el progreso se acreditan al CLOSER (quien practicó), no a quien
