@@ -21,12 +21,15 @@ function envModel(prefix, tier, def) {
 }
 
 // Catálogo ordenado. Cada proveedor se activa SOLO si su key está presente.
+// `supportsJson`: si el proveedor acepta response_format:json_object. Los NIMs
+// de NVIDIA (Llama 3.1/3.2/3.3) suelen RECHAZAR ese parámetro con un 400, así
+// que NO se lo mandamos: el prompt ya pide JSON y el cliente extrae el objeto.
 function providerChain() {
   const chain = [];
-  const add = (name, prefix, url, key, fastDef, smartDef) => {
+  const add = (name, prefix, url, key, fastDef, smartDef, supportsJson = true) => {
     if (!url || !key) return;
     chain.push({
-      name, url, key,
+      name, url, key, supportsJson,
       fast: envModel(prefix, 'fast', fastDef),
       smart: envModel(prefix, 'smart', smartDef),
     });
@@ -36,28 +39,30 @@ function providerChain() {
   add('nvidia-1', 'NVIDIA',
     process.env.NVIDIA_URL || 'https://integrate.api.nvidia.com/v1/chat/completions',
     process.env.NVIDIA_API_KEY,
-    'meta/llama-3.1-8b-instruct', 'meta/llama-3.1-70b-instruct');
+    'meta/llama-3.1-8b-instruct', 'meta/llama-3.1-70b-instruct', false);
 
   // 2. NVIDIA #2 (segundo proveedor NVIDIA con modelo diferente)
   add('nvidia-2', 'NVIDIA_2',
     process.env.NVIDIA_URL_2 || 'https://integrate.api.nvidia.com/v1/chat/completions',
     process.env.NVIDIA_API_KEY_2,
-    'meta/llama-3.2-3b-instruct', 'meta/llama-3.3-70b-instruct');
+    'meta/llama-3.2-3b-instruct', 'meta/llama-3.3-70b-instruct', false);
 
-  // 3. Groq (fallback final)
+  // 3. Groq (fallback final) — sí soporta json_object.
   add('groq', 'GROQ',
     process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
     process.env.GROQ_API_KEY || process.env.AI_API_KEY,
     process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
-    process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile');
+    process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile', true);
 
   return chain;
 }
 
 // Errores por los que conviene saltar al siguiente proveedor (agotamiento, auth
-// del slot, o caída). Un 400 puro (bad request) NO hace failover.
+// del slot, caída, o rechazo del request por un proveedor puntual). Incluimos
+// 400/422 para que la peculiaridad de UN proveedor no tumbe toda la cadena: si
+// NVIDIA rechaza algo, se intenta el siguiente (Groq) en vez de fallar seco.
 function shouldFailover(status) {
-  return status === 429 || status === 402 || status === 401 || status === 403 || status === 408 || status >= 500;
+  return status === 400 || status === 422 || status === 429 || status === 402 || status === 401 || status === 403 || status === 408 || status >= 500;
 }
 
 // Chat-completion probando la cadena. Devuelve { content, provider, model } o
@@ -83,9 +88,10 @@ export async function llmChat({ tier = 'smart', messages, temperature = 0.7, max
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), Math.min(timeoutMs, remaining));
     try {
-      // Proveedores OpenAI-compatible (NVIDIA, Groq, etc)
+      // Proveedores OpenAI-compatible (NVIDIA, Groq, etc). Solo mandamos
+      // response_format a los que lo soportan (Groq); NVIDIA lo rechaza con 400.
       const payload = { model, messages, temperature, max_tokens };
-      if (useJson) payload.response_format = { type: 'json_object' };
+      if (useJson && p.supportsJson !== false) payload.response_format = { type: 'json_object' };
 
       const res = await fetch(p.url, {
         method: 'POST',
