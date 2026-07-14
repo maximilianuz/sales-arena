@@ -4,11 +4,13 @@
 // haya al menos un proveedor con cupo. Clave para que planificar un escenario
 // (buyer persona + escenario del closer) SIEMPRE devuelva respuesta.
 //
-// Orden: NVIDIA (principal) → Groq (fallback)
+// Orden: NVIDIA #1 → NVIDIA #2 → Groq (fallback)
 //
 // Overrides opcionales por proveedor (si cambian nombres de modelo):
 //   <PROV>_MODEL_FAST, <PROV>_MODEL_SMART, <PROV>_MODEL, <PROV>_URL
 //   Ej: NVIDIA_MODEL_SMART=meta/llama-3.1-70b-instruct
+//       NVIDIA_API_KEY_2=... (segunda API key)
+//       NVIDIA_MODEL_2_SMART=meta/llama-3.3-70b-instruct
 //
 // `tier`: 'fast' = generar escenario / puntuar (modelo chico) · 'smart' = diálogo.
 
@@ -30,13 +32,19 @@ function providerChain() {
     });
   };
 
-  // 1. NVIDIA (proveedor principal) - Optimizado para equipos
-  add('nvidia', 'NVIDIA',
+  // 1. NVIDIA #1 (proveedor principal) - Optimizado para equipos
+  add('nvidia-1', 'NVIDIA',
     process.env.NVIDIA_URL || 'https://integrate.api.nvidia.com/v1/chat/completions',
     process.env.NVIDIA_API_KEY,
     'meta/llama-3.1-8b-instruct', 'meta/llama-3.1-70b-instruct');
 
-  // 2. Groq (fallback)
+  // 2. NVIDIA #2 (segundo proveedor NVIDIA con modelo diferente)
+  add('nvidia-2', 'NVIDIA_2',
+    process.env.NVIDIA_URL_2 || 'https://integrate.api.nvidia.com/v1/chat/completions',
+    process.env.NVIDIA_API_KEY_2,
+    'meta/llama-3.2-3b-instruct', 'meta/llama-3.3-70b-instruct');
+
+  // 3. Groq (fallback final)
   add('groq', 'GROQ',
     process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
     process.env.GROQ_API_KEY || process.env.AI_API_KEY,

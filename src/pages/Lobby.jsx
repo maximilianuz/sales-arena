@@ -237,7 +237,7 @@ export default function Lobby() {
             }}>
               {isPaid ? '⚡ Pro' : isEn ? 'Free plan' : 'Plan Gratis'}
             </span>
-          }
+          )}
         </div>
 
         {/* Right: utility actions */}
