@@ -25,6 +25,7 @@ import CloserCommandPanel from '../components/CloserCommandPanel';
 import RoleOnboarding from '../components/RoleOnboarding';
 import WorldClockPanel from '../components/WorldClockPanel';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
+import { GROUP_ONLY_MODE } from '../config/appMode';
 import { Dices, X, Lock, Globe } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
 import '../App.css';
@@ -37,9 +38,11 @@ export default function Room() {
   const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, registerLead, registerObserver, updateListeningLog } = useRoomSync(roomId);
   const { ownerIsPaid, ownerLoading } = useRoomOwnerPlan(roomData);
 
-  // Si el propietario es Pro, todos heredan acceso Pro en esta sala
-  const effectivelyPaid = isPaid || ownerIsPaid;
-  const effectivelyFree = isFree && !ownerIsPaid;
+  // Si el propietario es Pro, todos heredan acceso Pro en esta sala.
+  // En modo solo-grupal la sala está 100% desbloqueada para todos (gratis):
+  // sesiones ilimitadas, Evento Sorpresa, Debrief, Votación, etapas y análisis.
+  const effectivelyPaid = GROUP_ONLY_MODE || isPaid || ownerIsPaid;
+  const effectivelyFree = GROUP_ONLY_MODE ? false : (isFree && !ownerIsPaid);
 
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -351,7 +354,7 @@ export default function Room() {
                 )}
 
                 {showSurpriseBtn && (
-                  isFree ? (
+                  effectivelyFree ? (
                     <button
                       className="btn btn-outline"
                       style={{ opacity: 0.5, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
