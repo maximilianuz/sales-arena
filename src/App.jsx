@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import SubscriptionGate from './components/SubscriptionGate';
 import { SubscriptionProvider, useSubscriptionContext } from './contexts/SubscriptionContext';
 import { subscribeToAuthState } from './utils/auth';
+import { GROUP_ONLY_MODE } from './config/appMode';
 import './App.css';
 
 // Code-splitting por ruta: Room arrastra ~21 componentes + utilidades de IA +
@@ -26,7 +27,11 @@ function RouteFallback() {
 
 function GatedRoutes({ user }) {
   const { isActive, isLoading, isFree, showPlans, closePlans } = useSubscriptionContext();
-  const hasAccess = (isActive || isFree) && !showPlans;
+  // En modo solo-grupal nadie ve la pantalla de pagos: el acceso depende solo de
+  // tener plan (free o activo) y `showPlans` se ignora por completo.
+  const hasAccess = GROUP_ONLY_MODE
+    ? (isActive || isFree)
+    : (isActive || isFree) && !showPlans;
 
   return (
     // onClose solo cuando el usuario abrió planes manualmente (showPlans): en el

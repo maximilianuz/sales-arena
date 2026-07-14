@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard, Lock, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { signOutUser, activateFreeplan } from '../utils/auth';
+import { GROUP_ONLY_MODE } from '../config/appMode';
 
 // Métodos de pago habilitados. Por ahora SOLO cripto (NOWPayments) está
 // configurado; tarjeta y MercadoPago quedan "Próximamente" hasta cargar sus
@@ -39,6 +40,15 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
   const [loadingPlan, setLoadingPlan] = useState(null);
   const [error, setError] = useState('');
 
+  // Modo solo-grupal: la pantalla de planes/pagos NUNCA se muestra. Al primer
+  // ingreso (usuario sin plan) se activa el plan gratis automáticamente y entra
+  // directo a la app. Así "registrarse gratis → sección grupal" es un solo paso.
+  useEffect(() => {
+    if (GROUP_ONLY_MODE && !isLoading && !isActive && user?.uid) {
+      activateFreeplan(user.uid).catch(() => {});
+    }
+  }, [isLoading, isActive, user?.uid]);
+
   if (isLoading) {
     return (
       <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -48,6 +58,16 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
   }
 
   if (isActive) return children;
+
+  // En modo solo-grupal, mientras se activa el plan gratis, mostramos el loader
+  // (nunca la pantalla de pagos).
+  if (GROUP_ONLY_MODE) {
+    return (
+      <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'var(--text-muted)' }}>{t('subscription.loading')}</p>
+      </div>
+    );
+  }
 
   const handleFree = async () => {
     setLoadingPlan('free');
