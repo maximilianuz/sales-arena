@@ -193,9 +193,17 @@ export async function generateSurpriseEvent(apiKey, apiUrl, apiModel, scenario, 
   if (!scenario) {
     throw new Error("No hay un escenario activo para generar el evento.");
   }
-  
+
+  // Idioma de salida: español por defecto; inglés solo si la página está en inglés.
+  const isEn = typeof language === 'string' && language.startsWith('en');
+  const langInstruction = isEn
+    ? 'OUTPUT LANGUAGE: write "eventText" entirely in ENGLISH.'
+    : 'IDIOMA DE SALIDA: escribí "eventText" íntegramente en ESPAÑOL (sin una palabra en inglés).';
+
   const prompt = `
 Actúa como un director de simulaciones de ventas. Tienes que crear UN EVENTO SORPRESA ALEATORIO (tipo "plot twist") para el siguiente Lead con el que un vendedor está hablando en este momento.
+
+${langInstruction}
 
 Contexto del Lead:
 - Nombre: ${scenario.demographics?.name || 'Cliente'}
@@ -210,6 +218,7 @@ Requisitos del evento sorpresa:
 4. Tienes un pool mental de más de 100 tipos de eventos diferentes (ej: llamadas entrantes, emergencias en su empresa, confesiones inesperadas, la aparición repentina de un socio/jefe en la sala, problemas técnicos, revelaciones de la competencia, interrupciones externas, etc.). Elige uno al azar.
 5. Redáctalo en 1 o 2 oraciones, de forma impactante.
 
+${langInstruction}
 Responde ÚNICAMENTE en formato JSON con la siguiente estructura:
 {
   "eventText": "Texto del evento sorpresa que debe leer el actor."
