@@ -3,6 +3,7 @@ import { UserCircle, HeartPulse, Target, ShieldAlert, RefreshCw, Shuffle, BookMa
 import { useTranslation } from 'react-i18next';
 import { generateAIScenario } from '../utils/ai';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
+import { GROUP_ONLY_MODE } from '../config/appMode';
 import ScenarioLibrary from './ScenarioLibrary';
 import { INDUSTRY_CATEGORIES, randomIndustryValue } from '../utils/industries';
 
@@ -321,7 +322,9 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
 export default function ScenarioPanel({ currentScenario, setCurrentScenario, apiKey, apiUrl, apiModel, stages, isReadOnly, isLeadRole, isCompactObserver, roomConfig }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
-  const { isPaid } = useSubscriptionContext() || {};
+  const { isPaid: isPaidRaw } = useSubscriptionContext() || {};
+  // En modo solo-grupal la biblioteca de escenarios está desbloqueada para todos.
+  const isPaid = GROUP_ONLY_MODE || isPaidRaw;
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStep, setGeneratingStep] = useState(0);
   const [genError, setGenError] = useState('');
