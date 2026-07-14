@@ -99,8 +99,11 @@ export const handler = async (event) => {
       messages: [{ role: 'user', content: prompt }],
       temperature: typeof temperature === 'number' ? temperature : 0.7,
       max_tokens: typeof max_tokens === 'number' ? max_tokens : 1500,
-      timeoutMs: 6000,
+      timeoutMs: 9000,
       budgetMs: 9300,
+      // Carrera: si NVIDIA no arranca en ~1.2s, se dispara Groq en paralelo y
+      // gana el primero. Evita que un NVIDIA lento/encolado agote el presupuesto.
+      hedgeMs: 1200,
     });
     // Devolvemos el shape que espera el cliente (choices[0].message.content).
     return { statusCode: 200, headers, body: JSON.stringify({ choices: [{ message: { content } }] }) };
