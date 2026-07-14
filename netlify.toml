@@ -85,22 +85,6 @@
   status = 200
   force = true
 
-# Descarga del APK Android. Redirect estable: el QR del Lobby apunta acá y el
-# destino real (GitHub Releases del repo móvil) se puede cambiar sin re-deployar
-# la web. Subí el APK a un release y nombralo "sales-arena.apk" → /releases/latest
-# siempre sirve el más nuevo. Alias /app y /descargar-app.
-[[redirects]]
-  from = "/descargar-app"
-  to = "https://github.com/maximilianuz/sales-arena-mobile/releases/latest/download/sales-arena.apk"
-  status = 302
-  force = true
-
-[[redirects]]
-  from = "/app"
-  to = "https://github.com/maximilianuz/sales-arena-mobile/releases/latest/download/sales-arena.apk"
-  status = 302
-  force = true
-
 [[redirects]]
   from = "/*"
   to = "/index.html"

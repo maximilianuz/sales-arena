@@ -77,21 +77,103 @@ function shouldFailover() {
   return true;
 }
 
+// Un intento contra UN proveedor, con su propio timeout. Devuelve
+// { content, provider, model } o lanza (con .status si fue error HTTP).
+async function callProvider(p, { tier, messages, temperature, max_tokens, useJson, attemptMs }) {
+  const model = tier === 'fast' ? p.fast : p.smart;
+  if (!model) throw new Error(`${p.name}: sin modelo para tier ${tier}`);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), attemptMs);
+  try {
+    // Proveedores OpenAI-compatible (NVIDIA, Groq, etc). Solo mandamos
+    // response_format a los que lo soportan (Groq); NVIDIA lo rechaza con 400.
+    const payload = { model, messages, temperature, max_tokens };
+    if (useJson && p.supportsJson !== false) payload.response_format = { type: 'json_object' };
+
+    const res = await fetch(p.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${p.key}` },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(`${p.name}: HTTP ${res.status}${data?.error?.message ? ` (${data.error.message})` : ''}`);
+      err.status = res.status;
+      throw err;
+    }
+
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content;
+    if (typeof content !== 'string' || !content.trim()) {
+      throw new Error(`${p.name}: respuesta vacía`);
+    }
+    return { content, provider: p.name, model };
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      const err = new Error(`${p.name}: timeout`);
+      err.status = 408;
+      throw err;
+    }
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
 // Chat-completion probando la cadena. Devuelve { content, provider, model } o
 // lanza Error (con .allFailed si se agotaron todos). Respeta un presupuesto de
 // tiempo total (Netlify mata la función a ~10s) para no colgarse.
-export async function llmChat({ tier = 'smart', messages, temperature = 0.7, max_tokens = 1024, jsonMode, timeoutMs = 8000, budgetMs = 9000 } = {}) {
+//
+// `hedgeMs`: modo CARRERA. Se dispara el proveedor principal y, si en hedgeMs
+// no respondió, se dispara TAMBIÉN el último (fallback) en paralelo — gana el
+// primero que responda bien. Clave para generaciones largas: los endpoints
+// gratuitos de NVIDIA pueden encolar/tardar, y sin carrera se comían el
+// presupuesto dejando al fallback sin ventana útil dentro de los ~10s de Netlify.
+export async function llmChat({ tier = 'smart', messages, temperature = 0.7, max_tokens = 1024, jsonMode, timeoutMs = 8000, budgetMs = 9000, hedgeMs = null } = {}) {
   const useJson = jsonMode === undefined ? !process.env.LLM_DISABLE_JSON_MODE : jsonMode;
   const chain = providerChain();
   if (chain.length === 0) throw new Error('No hay proveedores LLM configurados (falta al menos una API key).');
 
   const start = Date.now();
+  const opts = { tier, messages, temperature, max_tokens, useJson };
+
+  // ── Modo carrera (hedge): principal vs. fallback en paralelo ──
+  if (hedgeMs != null && chain.length > 1) {
+    const primary = chain[0];
+    const fallback = chain[chain.length - 1];
+    const errors = [];
+
+    const pPrimary = callProvider(primary, { ...opts, attemptMs: Math.min(timeoutMs, budgetMs - 300) })
+      .catch((e) => { errors.push(e.message); throw e; });
+
+    const pFallback = (async () => {
+      await sleep(hedgeMs);
+      const remaining = budgetMs - (Date.now() - start) - 200;
+      if (remaining < 1200) throw new Error(`${fallback.name}: sin presupuesto`);
+      return callProvider(fallback, { ...opts, attemptMs: Math.min(timeoutMs, remaining) });
+    })().catch((e) => { errors.push(e.message); throw e; });
+
+    try {
+      // Gana el primero que RESPONDA BIEN; los errores no cortan la carrera.
+      return await Promise.any([pPrimary, pFallback]);
+    } catch {
+      const err = new Error(`Todos los proveedores de IA fallaron (${errors.join(' · ') || 'desconocido'}).`);
+      err.allFailed = true;
+      throw err;
+    }
+  }
+
+  // ── Modo secuencial (cadena con reserva para el fallback) ──
   let lastErr = 'desconocido';
 
   for (let i = 0; i < chain.length; i++) {
     const p = chain[i];
-    const model = tier === 'fast' ? p.fast : p.smart;
-    if (!model) continue;
+    if (!(tier === 'fast' ? p.fast : p.smart)) continue;
 
     const remaining = budgetMs - (Date.now() - start);
     if (remaining < 1200) break;
@@ -106,48 +188,16 @@ export async function llmChat({ tier = 'smart', messages, temperature = 0.7, max
       if (attemptMs < 1200) continue;
     }
 
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), attemptMs);
     try {
-      // Proveedores OpenAI-compatible (NVIDIA, Groq, etc). Solo mandamos
-      // response_format a los que lo soportan (Groq); NVIDIA lo rechaza con 400.
-      const payload = { model, messages, temperature, max_tokens };
-      if (useJson && p.supportsJson !== false) payload.response_format = { type: 'json_object' };
-
-      const res = await fetch(p.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${p.key}` },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        lastErr = `${p.name}: HTTP ${res.status}`;
-        if (shouldFailover(res.status) && !isLast) continue;
-        const data = await res.json().catch(() => ({}));
-        const err = new Error(data?.error?.message || data?.message || `Error del proveedor (${res.status}).`);
-        err.status = res.status;
-        throw err;
-      }
-
-      const data = await res.json();
-      const content = data?.choices?.[0]?.message?.content;
-      if (typeof content !== 'string' || !content.trim()) {
-        lastErr = `${p.name}: respuesta vacía`;
-        if (!isLast) continue;
-        throw new Error('La IA devolvió una respuesta vacía.');
-      }
-      return { content, provider: p.name, model };
+      return await callProvider(p, { ...opts, attemptMs });
     } catch (e) {
-      lastErr = `${p.name}: ${e.name === 'AbortError' ? 'timeout' : e.message}`;
-      if (e.status && !shouldFailover(e.status)) throw e; // error definitivo del cliente
-      if (i === chain.length - 1) {
+      lastErr = e.message;
+      // CUALQUIER error de un proveedor intenta el siguiente (ver shouldFailover).
+      if (isLast || !shouldFailover(e.status)) {
         const err = new Error(`Todos los proveedores de IA fallaron (${lastErr}).`);
         err.allFailed = true;
         throw err;
       }
-    } finally {
-      clearTimeout(timer);
     }
   }
 
