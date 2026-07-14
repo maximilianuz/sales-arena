@@ -20,6 +20,18 @@ function envModel(prefix, tier, def) {
     || def;
 }
 
+// Normaliza la URL del proveedor al endpoint de chat-completions. Acepta que
+// la env var traiga el host pelado, la base /v1, o la URL completa — todas
+// terminan en .../v1/chat/completions. (Causa real de 404: NVIDIA_URL cargada
+// como https://integrate.api.nvidia.com/v1 sin el path del endpoint.)
+function chatUrl(url) {
+  if (!url) return url;
+  let u = String(url).trim().replace(/\/+$/, '');
+  if (/\/chat\/completions$/.test(u)) return u;
+  if (!/\/v1$/.test(u)) u += '/v1';
+  return u + '/chat/completions';
+}
+
 // Catálogo ordenado. Cada proveedor se activa SOLO si su key está presente.
 // `supportsJson`: si el proveedor acepta response_format:json_object. Los NIMs
 // de NVIDIA (Llama 3.1/3.2/3.3) suelen RECHAZAR ese parámetro con un 400, así
@@ -29,7 +41,7 @@ function providerChain() {
   const add = (name, prefix, url, key, fastDef, smartDef, supportsJson = true) => {
     if (!url || !key) return;
     chain.push({
-      name, url, key, supportsJson,
+      name, url: chatUrl(url), key, supportsJson,
       fast: envModel(prefix, 'fast', fastDef),
       smart: envModel(prefix, 'smart', smartDef),
     });
@@ -57,12 +69,12 @@ function providerChain() {
   return chain;
 }
 
-// Errores por los que conviene saltar al siguiente proveedor (agotamiento, auth
-// del slot, caída, o rechazo del request por un proveedor puntual). Incluimos
-// 400/422 para que la peculiaridad de UN proveedor no tumbe toda la cadena: si
-// NVIDIA rechaza algo, se intenta el siguiente (Groq) en vez de fallar seco.
-function shouldFailover(status) {
-  return status === 400 || status === 422 || status === 429 || status === 402 || status === 401 || status === 403 || status === 408 || status >= 500;
+// CUALQUIER error HTTP de un proveedor salta al siguiente de la cadena: la
+// peculiaridad de UN proveedor (400 por parámetro no soportado, 404 por URL o
+// modelo mal cargado, 401/403 por key vencida, 429 por cupo, 5xx por caída)
+// nunca debe tumbar toda la cadena. El último proveedor sí propaga su error.
+function shouldFailover() {
+  return true;
 }
 
 // Chat-completion probando la cadena. Devuelve { content, provider, model } o
@@ -82,11 +94,20 @@ export async function llmChat({ tier = 'smart', messages, temperature = 0.7, max
     if (!model) continue;
 
     const remaining = budgetMs - (Date.now() - start);
-    if (remaining < 1500) break;
+    if (remaining < 1200) break;
     const isLast = i === chain.length - 1;
 
+    // Reserva de presupuesto: un proveedor intermedio no puede comerse todo el
+    // tiempo — siempre le dejamos ~3s al último (fallback) para que llegue a
+    // intentar. Si a este intento no le queda ventana útil, saltamos al siguiente.
+    let attemptMs = Math.min(timeoutMs, remaining);
+    if (!isLast) {
+      attemptMs = Math.min(attemptMs, remaining - 3000);
+      if (attemptMs < 1200) continue;
+    }
+
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), Math.min(timeoutMs, remaining));
+    const timer = setTimeout(() => controller.abort(), attemptMs);
     try {
       // Proveedores OpenAI-compatible (NVIDIA, Groq, etc). Solo mandamos
       // response_format a los que lo soportan (Groq); NVIDIA lo rechaza con 400.
