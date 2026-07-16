@@ -146,6 +146,23 @@ export default function Lobby() {
     { id: 'Observador',  label: t('lobby.roles.Observador'),  desc: t('lobby.roles.ObservadorDesc') }
   ];
 
+  // Navegación con teclado dentro del grupo de roles (patrón radiogroup):
+  // ← ↑ anterior, → ↓ siguiente, Home/End extremos. Selecciona al mover.
+  const handleRoleKeyDown = (e, idx) => {
+    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (e.key in keys) {
+      e.preventDefault();
+      const next = (idx + keys[e.key] + roles.length) % roles.length;
+      setRole(roles[next].id);
+      document.getElementById(`role-opt-${roles[next].id}`)?.focus();
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      const target = e.key === 'Home' ? 0 : roles.length - 1;
+      setRole(roles[target].id);
+      document.getElementById(`role-opt-${roles[target].id}`)?.focus();
+    }
+  };
+
   const handleJoin = (e) => {
     e.preventDefault();
     if (!name || !role || !roomId) return;
@@ -276,7 +293,7 @@ export default function Lobby() {
             }}>
             <BookOpen size={13} /> {isEn ? 'Guide' : 'Guía'}
           </a>
-          <select onChange={e => i18n.changeLanguage(e.target.value)} value={(i18n.language || 'es').split('-')[0]}
+          <select aria-label={isEn ? 'Change language' : 'Cambiar idioma'} onChange={e => i18n.changeLanguage(e.target.value)} value={(i18n.language || 'es').split('-')[0]}
             style={{
               background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)',
               border: '1px solid var(--glass-border)', padding: '0.35rem 0.6rem',
@@ -518,12 +535,12 @@ export default function Lobby() {
                 className="form-input" placeholder={t('lobby.roomIdPlaceholder')}
                 style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.95rem', letterSpacing: '0.05em' }}
               />
-              <button type="button" onClick={generateRoomId} title={isEn ? 'Generate random ID' : 'Generar ID al azar'}
-                style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
+              <button type="button" onClick={generateRoomId} aria-label={isEn ? 'Generate random room ID' : 'Generar ID de sala al azar'} title={isEn ? 'Generate random ID' : 'Generar ID al azar'}
+                style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
                 <Shuffle size={18} />
               </button>
-              <button type="button" onClick={copyRoomId} disabled={!roomId} title={isEn ? 'Copy ID' : 'Copiar ID'}
-                style={{ padding: '0.6rem 0.8rem', background: copied ? 'rgba(48,209,88,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(48,209,88,0.5)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '0.75rem', cursor: 'pointer', color: copied ? 'var(--success)' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
+              <button type="button" onClick={copyRoomId} disabled={!roomId} aria-label={isEn ? 'Copy room ID' : 'Copiar ID de sala'} title={isEn ? 'Copy ID' : 'Copiar ID'}
+                style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.6rem 0.8rem', background: copied ? 'rgba(48,209,88,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(48,209,88,0.5)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '0.75rem', cursor: copied || roomId ? 'pointer' : 'not-allowed', color: copied ? 'var(--success)' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
                 {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
               </button>
             </div>
@@ -535,14 +552,25 @@ export default function Lobby() {
               <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>3</span>
               <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.chooseRole')}</label>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
-              {roles.map(r => {
+            <div role="radiogroup" aria-label={isEn ? 'Choose your role' : 'Elegí tu rol'} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+              {roles.map((r, idx) => {
                 const meta = ROLE_META[r.id] || { icon: <Target size={20} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' };
                 const isActive = role === r.id;
+                // Roving tabindex: solo el rol activo (o el primero si no hay
+                // ninguno) es tabbable; el resto se navega con flechas.
+                const isTabbable = role ? isActive : idx === 0;
                 return (
-                  <div
-                    key={r.id} onClick={() => setRole(r.id)}
+                  <button
+                    type="button"
+                    key={r.id}
+                    id={`role-opt-${r.id}`}
+                    role="radio"
+                    aria-checked={isActive}
+                    tabIndex={isTabbable ? 0 : -1}
+                    onClick={() => setRole(r.id)}
+                    onKeyDown={(e) => handleRoleKeyDown(e, idx)}
                     style={{
+                      textAlign: 'left', font: 'inherit', width: '100%',
                       padding: '1rem 1rem 0.85rem',
                       borderRadius: '1rem', cursor: 'pointer',
                       border: `1px solid ${isActive ? meta.color : 'rgba(255,255,255,0.07)'}`,
@@ -571,10 +599,10 @@ export default function Lobby() {
                     <div style={{ fontWeight: '700', fontSize: '0.95rem', color: isActive ? 'white' : 'rgba(255,255,255,0.7)', marginBottom: '0.2rem' }}>
                       {r.label}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', lineHeight: '1.3' }}>
+                    <div style={{ fontSize: '0.75rem', color: isActive ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.58)', lineHeight: '1.3' }}>
                       {r.desc}
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
