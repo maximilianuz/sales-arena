@@ -208,6 +208,19 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 2px rgba(94, 92, 230, 0.25);
 }
 
+/* Anillo de foco visible para navegación con teclado.
+   Solo aparece con :focus-visible (teclado), nunca al hacer click con mouse,
+   para no romper la estética. Cubre botones, links, radios y celdas clickables. */
+button:focus-visible,
+a:focus-visible,
+[role="radio"]:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand-cyan);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
 select option {
   background-color: var(--bg-dark);
   color: var(--text-main);
@@ -379,5 +392,19 @@ input::placeholder, textarea::placeholder {
   .lobby-nav svg {
     width: 10px !important;
     height: 10px !important;
+  }
+}
+
+/* Accesibilidad: respetar la preferencia del sistema de movimiento reducido.
+   Anula animaciones/transiciones/parallax para quienes marean o tienen
+   sensibilidad vestibular, sin quitar la funcionalidad. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

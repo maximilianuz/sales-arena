@@ -290,6 +290,17 @@ export default function LeadCheckoutPanel({ checkout, scenario, updateCheckoutPh
     setShowCheckout(false);
   };
 
+  // Navegación con teclado del dial de fricción (patrón radiogroup).
+  const handleDialKey = (e, idx) => {
+    if (phase !== 'idle') return;
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    const next = (idx + step + levels.length) % levels.length;
+    setFrictionLevel(levels[next].id);
+    document.getElementById(`friction-opt-${levels[next].id}`)?.focus();
+  };
+
   if (result) {
     const closed = result === 'closed';
     return (
@@ -320,27 +331,40 @@ export default function LeadCheckoutPanel({ checkout, scenario, updateCheckoutPh
         </p>
 
         {/* Dial de fricción */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
-          {levels.map(l => (
-            <div
-              key={l.id}
-              onClick={() => phase === 'idle' && setFrictionLevel(l.id)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.75rem',
-                padding: '0.75rem 1rem', borderRadius: '0.75rem', cursor: phase === 'idle' ? 'pointer' : 'default',
-                border: `1px solid ${frictionLevel === l.id ? l.color : 'var(--glass-border)'}`,
-                background: frictionLevel === l.id ? `color-mix(in srgb, ${l.color} 12%, transparent)` : 'rgba(0,0,0,0.2)',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <span style={{ fontSize: '1.4rem' }}>{l.emoji}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: '700', color: frictionLevel === l.id ? l.color : 'var(--text-main)', fontSize: '0.9rem' }}>{l.label}</div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{l.desc}</div>
-              </div>
-              {frictionLevel === l.id && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: l.color, boxShadow: `0 0 8px ${l.color}` }} />}
-            </div>
-          ))}
+        <div role="radiogroup" aria-label={isEn ? 'Friction level' : 'Nivel de fricción'} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
+          {levels.map((l, idx) => {
+            const selected = frictionLevel === l.id;
+            const disabled = phase !== 'idle';
+            return (
+              <button
+                type="button"
+                key={l.id}
+                id={`friction-opt-${l.id}`}
+                role="radio"
+                aria-checked={selected}
+                aria-label={`${l.label}: ${l.desc}`}
+                tabIndex={selected ? 0 : -1}
+                disabled={disabled}
+                onClick={() => phase === 'idle' && setFrictionLevel(l.id)}
+                onKeyDown={(e) => handleDialKey(e, idx)}
+                style={{
+                  textAlign: 'left', font: 'inherit', width: '100%',
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  padding: '0.75rem 1rem', borderRadius: '0.75rem', cursor: disabled ? 'default' : 'pointer',
+                  border: `1px solid ${selected ? l.color : 'var(--glass-border)'}`,
+                  background: selected ? `color-mix(in srgb, ${l.color} 12%, transparent)` : 'rgba(0,0,0,0.2)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <span style={{ fontSize: '1.4rem' }}>{l.emoji}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '700', color: selected ? l.color : 'var(--text-main)', fontSize: '0.9rem' }}>{l.label}</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{l.desc}</div>
+                </div>
+                {selected && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: l.color, boxShadow: `0 0 8px ${l.color}` }} />}
+              </button>
+            );
+          })}
         </div>
 
         {phase === 'idle' && checkout?.enabled && (

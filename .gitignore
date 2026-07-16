@@ -27,3 +27,4 @@ ruvector.db
 *.njsproj
 *.sln
 *.sw?
+__pycache__/

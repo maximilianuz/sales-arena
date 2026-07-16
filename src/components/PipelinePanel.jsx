@@ -38,33 +38,48 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
           const isActive = index === activeStageIndex;
           const isPast = index < activeStageIndex;
           const locked = isLocked(stage);
+          const interactive = !!setActiveStageIndex;
+          const chipStyle = {
+            padding: '0.4rem 1rem',
+            borderRadius: '2rem',
+            fontSize: '0.85rem',
+            fontWeight: isActive ? '700' : '600',
+            cursor: interactive ? 'pointer' : 'default',
+            background: locked ? 'rgba(0,0,0,0.3)' : isActive ? 'linear-gradient(135deg, var(--primary), #818cf8)' : (isPast ? 'rgba(48, 209, 88, 0.15)' : 'var(--bg-dark)'),
+            color: locked ? 'var(--text-muted)' : isActive ? 'white' : (isPast ? 'var(--success)' : 'var(--text-muted)'),
+            border: locked ? '1px dashed var(--glass-border)' : isActive ? '1px solid rgba(255,255,255,0.2)' : `1px solid ${isPast ? 'var(--success)' : 'var(--glass-border)'}`,
+            boxShadow: isActive ? '0 0 20px rgba(99, 102, 241, 0.4)' : 'none',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            whiteSpace: 'nowrap',
+            opacity: locked ? 0.6 : 1,
+            display: 'flex', alignItems: 'center', gap: '0.4rem',
+            font: 'inherit',
+          };
+          const chipInner = (<>
+            {locked && <Lock size={12} />}
+            {stage.label}
+            <span style={{ opacity: isActive ? 0.9 : 0.6, fontSize: '0.85em' }}>({stage.estimatedTime || 5}m)</span>
+          </>);
           return (
             <div key={stage.id} style={{ display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-              <div
-                onClick={() => {
-                  if (!setActiveStageIndex) return;
-                  if (locked) { onUpgradeStage?.(); return; }
-                  setActiveStageIndex(index);
-                }}
-                style={{
-                  padding: '0.4rem 1rem',
-                  borderRadius: '2rem',
-                  fontSize: '0.85rem',
-                  fontWeight: isActive ? '700' : '600',
-                  cursor: setActiveStageIndex ? 'pointer' : 'default',
-                  background: locked ? 'rgba(0,0,0,0.3)' : isActive ? 'linear-gradient(135deg, var(--primary), #818cf8)' : (isPast ? 'rgba(48, 209, 88, 0.15)' : 'var(--bg-dark)'),
-                  color: locked ? 'var(--text-muted)' : isActive ? 'white' : (isPast ? 'var(--success)' : 'var(--text-muted)'),
-                  border: locked ? '1px dashed var(--glass-border)' : isActive ? '1px solid rgba(255,255,255,0.2)' : `1px solid ${isPast ? 'var(--success)' : 'var(--glass-border)'}`,
-                  boxShadow: isActive ? '0 0 20px rgba(99, 102, 241, 0.4)' : 'none',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  whiteSpace: 'nowrap',
-                  opacity: locked ? 0.6 : 1,
-                  display: 'flex', alignItems: 'center', gap: '0.4rem'
-                }}>
-                {locked && <Lock size={12} />}
-                {stage.label}
-                <span style={{ opacity: isActive ? 0.9 : 0.6, fontSize: '0.85em' }}>({stage.estimatedTime || 5}m)</span>
-              </div>
+              {interactive ? (
+                <button
+                  type="button"
+                  aria-current={isActive ? 'step' : undefined}
+                  aria-label={locked ? `${stage.label} — ${t('pipeline.locked', 'bloqueado')}` : stage.label}
+                  onClick={() => {
+                    if (locked) { onUpgradeStage?.(); return; }
+                    setActiveStageIndex(index);
+                  }}
+                  style={chipStyle}
+                >
+                  {chipInner}
+                </button>
+              ) : (
+                <div aria-current={isActive ? 'step' : undefined} style={chipStyle}>
+                  {chipInner}
+                </div>
+              )}
             </div>
           );
         })}
