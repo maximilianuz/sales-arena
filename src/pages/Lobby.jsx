@@ -4,7 +4,7 @@ import { ref, onValue } from 'firebase/database';
 import {
   Shuffle, Copy, ChessKnight, BookOpen,
   Zap, History, Target, TrendingUp, Theater, Eye,
-  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase, Target as TargetIcon,
+  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, User, X, Trophy, Briefcase, Target as TargetIcon,
   FileText, Lock, Shield
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -365,18 +365,19 @@ export default function Lobby() {
         ) : (
           <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(0,0,0,0.25)', borderRadius: '0.9rem', padding: '0.3rem', border: '1px solid rgba(255,255,255,0.06)' }}>
             {[
-              { id: 'individual', l: isEn ? '👤 Individual Work' : '👤 Trabajo Individual' },
-              { id: 'team', l: isEn ? '👥 Team Work' : '👥 Trabajo en Equipos' },
+              { id: 'individual', icon: <User size={15} />, l: isEn ? 'Individual Work' : 'Trabajo Individual' },
+              { id: 'team', icon: <Users size={15} />, l: isEn ? 'Team Work' : 'Trabajo en Equipos' },
             ].map(tab => {
               const active = workspace === tab.id;
               return (
                 <button key={tab.id} onClick={() => chooseWorkspace(tab.id)} style={{
                   flex: 1, padding: '0.6rem 0.5rem', borderRadius: '0.65rem', cursor: 'pointer', font: 'inherit',
                   fontSize: '0.88rem', fontWeight: 700, border: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem',
                   background: active ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'transparent',
                   color: active ? 'white' : 'var(--text-muted)',
                 }}>
-                  {tab.l}
+                  {tab.icon} {tab.l}
                 </button>
               );
             })}
