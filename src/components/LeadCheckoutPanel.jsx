@@ -322,7 +322,7 @@ export default function LeadCheckoutPanel({ checkout, scenario, updateCheckoutPh
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
           <ShoppingCart size={18} color="var(--primary)" />
           <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--primary)' }}>
-            {isEn ? '🎭 Your Friction Level (private)' : '🎭 Tu Nivel de Fricción (privado)'}
+            {isEn ? 'Your Friction Level (private)' : 'Tu Nivel de Fricción (privado)'}
           </h3>
         </div>
 

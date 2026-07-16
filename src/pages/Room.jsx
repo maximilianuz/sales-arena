@@ -26,7 +26,7 @@ import RoleOnboarding from '../components/RoleOnboarding';
 import WorldClockPanel from '../components/WorldClockPanel';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
 import { GROUP_ONLY_MODE } from '../config/appMode';
-import { Dices, X, Lock, Globe } from 'lucide-react';
+import { Dices, X, Lock, Globe, ShoppingCart, CheckCircle2, BarChart2 } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
 import '../App.css';
 
@@ -344,12 +344,12 @@ export default function Room() {
                     onClick={enableCheckout}
                     style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                   >
-                    🛒 {i18n.language?.startsWith('en') ? 'Enable Closing Phase' : 'Habilitar Fase de Cierre'}
+                    <ShoppingCart size={16} /> {i18n.language?.startsWith('en') ? 'Enable Closing Phase' : 'Habilitar Fase de Cierre'}
                   </button>
                 )}
                 {isFacilitator && roomData?.checkout?.enabled && !roomData?.checkout?.result && (
-                  <div style={{ fontSize: '0.82rem', color: 'var(--success)', textAlign: 'center', padding: '0.4rem 0.8rem', background: 'rgba(48,209,88,0.1)', borderRadius: '1rem', border: '1px solid rgba(48,209,88,0.3)' }}>
-                    ✅ {i18n.language?.startsWith('en') ? 'Closing phase active' : 'Fase de Cierre activa'}
+                  <div style={{ fontSize: '0.82rem', color: 'var(--success)', textAlign: 'center', padding: '0.4rem 0.8rem', background: 'rgba(48,209,88,0.1)', borderRadius: '1rem', border: '1px solid rgba(48,209,88,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                    <CheckCircle2 size={14} /> {i18n.language?.startsWith('en') ? 'Closing phase active' : 'Fase de Cierre activa'}
                   </div>
                 )}
 
@@ -488,7 +488,7 @@ export default function Room() {
             onClick={() => setShowAnalysis(true)}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
           >
-            📊 {i18n.language?.startsWith('en') ? 'Analyze Session' : 'Analizar Sesión'}
+            <BarChart2 size={15} /> {i18n.language?.startsWith('en') ? 'Analyze Session' : 'Analizar Sesión'}
           </button>
         )}
       </footer>
