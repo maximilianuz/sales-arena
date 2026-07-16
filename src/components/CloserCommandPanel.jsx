@@ -134,7 +134,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
       )}
 
       {/* Quick lead intel — 4 fichas: objeción, miedo, cuándo se abre, qué le da confianza */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+      <div className="auto-2col">
         <div style={{ background: 'rgba(255,159,10,0.07)', border: '1px solid rgba(255,159,10,0.2)', borderRadius: '0.75rem', padding: '0.875rem' }}>
           <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.4rem' }}>
             {isEn ? 'Main objection' : 'Objeción principal'}
