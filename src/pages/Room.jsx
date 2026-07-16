@@ -285,13 +285,13 @@ export default function Room() {
               {isObserver && stagesEff[activeStageIndex || 0] && (
                 <div className="glass-panel" style={{ padding: '1.25rem' }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                    Camino del Closer (Etapa {activeStageIndex + 1})
+                    {isEn ? `Closer's path (Stage ${activeStageIndex + 1})` : `Camino del Closer (Etapa ${activeStageIndex + 1})`}
                   </div>
                   <div style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
                     {stagesEff[activeStageIndex || 0].label}
                   </div>
                   <div style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                    <strong>Objetivo:</strong> {stagesEff[activeStageIndex || 0].objective}
+                    <strong>{isEn ? 'Objective:' : 'Objetivo:'}</strong> {stagesEff[activeStageIndex || 0].objective}
                   </div>
                 </div>
               )}
