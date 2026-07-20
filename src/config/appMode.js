@@ -7,4 +7,4 @@
 //
 //   Para REACTIVAR todo (trabajo individual + planes de pago) poné esto en false.
 //   Ningún código de pagos ni de individual se borró: solo se saltea con este flag.
-export const GROUP_ONLY_MODE = true;
+export const GROUP_ONLY_MODE = false;
