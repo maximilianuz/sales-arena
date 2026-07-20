@@ -1,6 +1,6 @@
 import { getUserData, setFreePlanUsage, activateSubscription } from './lib/firebaseAdmin.js';
 import { llmChat } from './lib/llm.js';
-import { GROUP_ONLY_MODE } from './lib/appMode.js';
+import { GROUP_ONLY_MODE, FREE_ACCESS_MODE } from './lib/appMode.js';
 
 // Lista de emails con acceso admin/dev (bypass de límites). Se configura en
 // Netlify como variable de entorno ADMIN_EMAILS, separados por coma.
@@ -41,10 +41,11 @@ export const handler = async (event) => {
   const { prompt, temperature, max_tokens, uid, email, byok } = body;
 
   // Chequeo de suscripción — se saltea si el usuario usa su propia key (BYOK) o
-  // si la app corre en modo solo-grupal (todo gratis e ilimitado): ahí solo
-  // exigimos autenticación y NO aplicamos el límite de sesiones del plan free.
-  // Saltear el viaje a Firebase además libera presupuesto de tiempo para la IA.
-  if (!byok && GROUP_ONLY_MODE) {
+  // si la app corre en modo solo-grupal o acceso-gratis (todo gratis e
+  // ilimitado): ahí solo exigimos autenticación y NO aplicamos el límite de
+  // sesiones del plan free. Saltear el viaje a Firebase además libera
+  // presupuesto de tiempo para la IA.
+  if (!byok && (GROUP_ONLY_MODE || FREE_ACCESS_MODE)) {
     if (!uid) {
       return { statusCode: 401, headers, body: JSON.stringify({ error: "Se requiere autenticación." }) };
     }

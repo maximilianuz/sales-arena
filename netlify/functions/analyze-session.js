@@ -1,6 +1,6 @@
 import { getUserData, getPath, setPath, patchPath } from './lib/firebaseAdmin.js';
 import { llmChat } from './lib/llm.js';
-import { GROUP_ONLY_MODE } from './lib/appMode.js';
+import { GROUP_ONLY_MODE, FREE_ACCESS_MODE } from './lib/appMode.js';
 
 export const handler = async (event) => {
   const headers = {
@@ -22,19 +22,20 @@ export const handler = async (event) => {
   }
 
   // Verificar suscripción (solo closer/trainer pueden guardar historial).
-  // En modo solo-grupal el análisis está habilitado para TODOS los usuarios
-  // autenticados (la app es gratuita): no se exige plan pago.
+  // En modo solo-grupal o acceso-gratis el análisis está habilitado para TODOS
+  // los usuarios autenticados (la app es gratuita): no se exige plan pago.
+  const freeAccess = GROUP_ONLY_MODE || FREE_ACCESS_MODE;
   let userData = {};
   try {
     userData = await getUserData(uid);
-    if (!GROUP_ONLY_MODE && userData.subscriptionStatus !== 'active') {
+    if (!freeAccess && userData.subscriptionStatus !== 'active') {
       return { statusCode: 403, headers, body: JSON.stringify({ error: "Se requiere plan pago para guardar historial." }) };
     }
   } catch (e) {
-    if (!GROUP_ONLY_MODE) {
+    if (!freeAccess) {
       return { statusCode: 500, headers, body: JSON.stringify({ error: "Error verificando suscripción." }) };
     }
-    // En modo grupal seguimos con datos vacíos: el análisis no depende del plan.
+    // En modo gratis seguimos con datos vacíos: el análisis no depende del plan.
   }
 
   // La comisión y el progreso se acreditan al CLOSER (quien practicó), no a quien
