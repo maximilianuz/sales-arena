@@ -5,4 +5,4 @@
 //   • analyze-session.js NO exige plan pago para analizar/guardar historial
 //
 // Para volver al modelo de planes pagos, poner false acá Y en src/config/appMode.js.
-export const GROUP_ONLY_MODE = true;
+export const GROUP_ONLY_MODE = false;
