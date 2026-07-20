@@ -208,11 +208,13 @@ export function unlockAudio() {
   } catch { /* no bloquea */ }
 }
 
-async function speakFishAudio(text, { uid, personalityId, language = 'es', emotion = 'neutral', gender = 'male', onStart } = {}) {
+async function speakFishAudio(text, { uid, personalityId, language = 'es', emotion = 'neutral', gender = 'male', seed = '', onStart } = {}) {
   const res = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ uid, text, personalityId, language, emotion, gender })
+    // `seed` fija el timbre por lead: sin esto Fish regenera una voz distinta en
+    // cada turno. Es el nombre del personaje → misma fuente que género y avatar.
+    body: JSON.stringify({ uid, text, personalityId, language, emotion, gender, seed })
   });
   const data = await res.json();
 
@@ -268,7 +270,7 @@ export async function speak(text, { uid, personalityId, language = 'es', seed = 
   // ── Intento 1: Fish Audio (voz neural con emoción) ──────────────────────────
   if (uid) {
     try {
-      await speakFishAudio(text, { uid, personalityId, language, emotion, gender, onStart: fireStart });
+      await speakFishAudio(text, { uid, personalityId, language, emotion, gender, seed, onStart: fireStart });
       return; // ✓ Fish Audio funcionó
     } catch (e) {
       if (session !== speakSession) return; // llegó otro speak() mientras esperaba

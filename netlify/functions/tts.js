@@ -46,6 +46,17 @@ function voiceDescriptor(lang, gender) {
   return gender === 'female' ? '[natural female voice]' : '[natural male voice]';
 }
 
+// Seed estable → Fish genera SIEMPRE el mismo timbre para un mismo personaje.
+// Sin reference_id ni seed, S2.1 Pro re-muestrea una voz distinta en cada turno
+// (de ahí que la voz del lead "cambiara" entre respuestas). Derivamos el seed del
+// nombre del lead: parte de su identidad, igual que el género y el avatar.
+function hashSeed(s) {
+  let h = 0;
+  const str = String(s || '');
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+  return Math.abs(h) || 12345; // entero no negativo (int32) — nunca 0
+}
+
 export const handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -63,7 +74,7 @@ export const handler = async (event) => {
   try { body = JSON.parse(event.body || '{}'); }
   catch { return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
 
-  const { uid, text, personalityId, language = 'es', emotion = 'neutral', gender = 'male' } = body;
+  const { uid, text, personalityId, language = 'es', emotion = 'neutral', gender = 'male', seed = '' } = body;
 
   if (!uid) return { statusCode: 401, headers, body: JSON.stringify({ error: 'Se requiere autenticación.' }) };
   if (!text || typeof text !== 'string' || text.trim().length === 0)
@@ -87,14 +98,17 @@ export const handler = async (event) => {
   const prefix = [voiceId ? '' : voiceDescriptor(langPrefix, g), emotionTag].filter(Boolean).join(' ');
   const taggedText = prefix ? `${prefix} ${text.trim()}` : text.trim();
 
-  // Payload para Fish Audio S2.1 Pro
+  // Payload para Fish Audio S2.1 Pro. `seed` fija el timbre por personaje: el
+  // mismo lead (mismo nombre) suena igual en todos sus turnos; leads distintos
+  // suenan distinto. Coherente con el género/avatar, que también salen del nombre.
   const fishPayload = {
     text: taggedText,
     chunk_length: 200,
     format: 'mp3',
     mp3_bitrate: 128,
     normalize: true,
-    latency: 'normal'
+    latency: 'normal',
+    seed: hashSeed(seed || `${personalityId || ''}-${g}-${langPrefix}`)
   };
 
   // Si hay un voice model configurado, lo usamos como referencia
@@ -109,19 +123,24 @@ export const handler = async (event) => {
     // El header `model` es REQUERIDO por /v1/tts (422 sin él — causa raíz del
     // silencio en producción). s2.1-pro-free es gratis; si el plan no lo admite,
     // reintentamos una vez con s2-pro.
-    const doFetch = (model) => fetch(FISH_TTS_URL, {
+    const doFetch = (model, payload) => fetch(FISH_TTS_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'model': model
       },
-      body: JSON.stringify(fishPayload),
+      body: JSON.stringify(payload),
       signal: controller.signal
     });
-    let res = await doFetch(process.env.FISH_MODEL || 's2.1-pro-free');
+    let res = await doFetch(process.env.FISH_MODEL || 's2.1-pro-free', fishPayload);
     if (!res.ok && [400, 402, 404, 422].includes(res.status)) {
-      res = await doFetch('s2-pro');
+      // Reintento con otro modelo y, por las dudas, SIN `seed`: si algún plan de
+      // Fish rechazara el campo con un 422, igual devolvemos audio (voz estable
+      // por reference_id cuando exista; el resto cae al fallback del navegador).
+      const noSeed = { ...fishPayload };
+      delete noSeed.seed;
+      res = await doFetch('s2-pro', noSeed);
     }
 
     clearTimeout(timeout);
