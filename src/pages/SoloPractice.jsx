@@ -571,7 +571,7 @@ export default function SoloPractice({ onBack }) {
                   <button type="button" key={m.id} onClick={() => setMode(m.id)}
                     style={{ flex: 1, padding: '0.6rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(139,92,246,0.65)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(139,92,246,0.16)' : 'rgba(255,255,255,0.02)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', fontSize: '0.82rem', fontWeight: '700' }}>{m.icon} {m.l}</div>
-                    <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.15rem' }}>{m.d}</div>
+                    <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.15rem' }}>{m.d}</div>
                   </button>
                 );
               })}
@@ -590,7 +590,7 @@ export default function SoloPractice({ onBack }) {
               </div>
 
               {/* Industria / rubro */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Industry' : 'Rubro / Industria'}
               </label>
               <select value={genConfig.theme} onChange={e => setGenConfig(c => ({ ...c, theme: e.target.value }))}
@@ -608,7 +608,7 @@ export default function SoloPractice({ onBack }) {
               </select>
 
               {/* Dificultad */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Difficulty' : 'Dificultad'}
               </label>
               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
@@ -618,7 +618,7 @@ export default function SoloPractice({ onBack }) {
                     <button type="button" key={l.v} onClick={() => setGenConfig(c => ({ ...c, level: l.v }))}
                       style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(100,210,255,0.6)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(100,210,255,0.15)' : 'rgba(255,255,255,0.02)' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{l.l}</div>
-                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{l.d}</div>
+                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{l.d}</div>
                       <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: l.m > 1 ? 'var(--accent)' : l.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{l.m}</div>
                     </button>
                   );
@@ -626,7 +626,7 @@ export default function SoloPractice({ onBack }) {
               </div>
 
               {/* Temperatura */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Lead Temperature' : 'Temperatura'}
               </label>
               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
@@ -636,7 +636,7 @@ export default function SoloPractice({ onBack }) {
                     <button type="button" key={t.v} onClick={() => setGenConfig(c => ({ ...c, leadTemperature: t.v }))}
                       style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(255,159,10,0.5)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(255,159,10,0.1)' : 'rgba(255,255,255,0.02)' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{t.l}</div>
-                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{t.d}</div>
+                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{t.d}</div>
                       <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: t.m > 1 ? 'var(--accent)' : t.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{t.m}</div>
                     </button>
                   );
@@ -644,7 +644,7 @@ export default function SoloPractice({ onBack }) {
               </div>
 
               {/* Objeción principal a enfrentar */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Main objection' : 'Objeción principal'}
               </label>
               <select value={genConfig.targetObjection} onChange={e => setGenConfig(c => ({ ...c, targetObjection: e.target.value }))}

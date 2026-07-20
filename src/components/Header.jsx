@@ -95,7 +95,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
         <button
           onClick={signOutUser}
           title={i18n.language?.startsWith('en') ? 'Sign out' : 'Cerrar sesión'}
-          style={{ background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.25)', color: 'rgba(255,255,255,0.5)', borderRadius: '0.5rem', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.25)', color: 'rgba(255,255,255,0.74)', borderRadius: '0.5rem', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <LogOut size={16} />
         </button>
