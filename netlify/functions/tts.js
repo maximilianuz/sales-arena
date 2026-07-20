@@ -20,24 +20,59 @@ const EMOTION_TAGS = {
 };
 
 // IDs de voice models públicos de Fish Audio para cada perfil DISC.
-// Los IDs se pueden actualizar/reemplazar desde fish.audio/voice-library
-// o ejecutando: FISH_AUDIO_API_KEY=... node scripts/find-fish-voices.js
+// Cómo cargarlos (dos vías, se pueden combinar):
 //
-// null = Fish elige la voz default del idioma (igual funciona bien con los
-// emotion tags; solo pierde la consistencia de timbre entre turnos).
+//   A) Variables de entorno en Netlify (RECOMENDADO — sin tocar código ni
+//      redeploy). Formato: FISH_VOICE_<IDIOMA>_<GENERO>[_<PERSONALIDAD>]
+//        FISH_VOICE_ES_MALE           → voz por defecto de todos los hombres ES
+//        FISH_VOICE_ES_FEMALE         → voz por defecto de todas las mujeres ES
+//        FISH_VOICE_ES_MALE_DIRECTIVO → voz específica del directivo hombre ES
+//        FISH_VOICE_EN_FEMALE_EMPATICO … etc.
+//      Con SOLO un default por género (male/female) por idioma ya alcanza para
+//      que la voz sea consistente Y del género correcto. Las de personalidad
+//      son un refinamiento opcional.
+//
+//   B) La tabla de acá abajo (requiere commit + deploy). `_default` es la voz
+//      del género cuando no hay una específica de personalidad.
+//
+// Para descubrir IDs: FISH_AUDIO_API_KEY=... node scripts/find-fish-voices.js
+//
+// null = Fish usa el descriptor + seed (voz estable por lead, pero timbre no
+// garantizado por género). Con un voice model asignado, el timbre y el género
+// quedan FIJOS y garantizados.
 const VOICE_MODELS = {
   es: {
     male: {
-      directivo:  'a3e44b1f7a274991977b4e7eb3ca46bc', // firme, acento latam
+      _default:   'a3e44b1f7a274991977b4e7eb3ca46bc', // firme, acento latam
+      directivo:  'a3e44b1f7a274991977b4e7eb3ca46bc',
       entusiasta: null, empatico: null, analitico: null
     },
-    female: { directivo: null, entusiasta: null, empatico: null, analitico: null }
+    female: { _default: null, directivo: null, entusiasta: null, empatico: null, analitico: null }
   },
   en: {
-    male:   { directivo: null, entusiasta: null, empatico: null, analitico: null },
-    female: { directivo: null, entusiasta: null, empatico: null, analitico: null }
+    male:   { _default: null, directivo: null, entusiasta: null, empatico: null, analitico: null },
+    female: { _default: null, directivo: null, entusiasta: null, empatico: null, analitico: null }
   }
 };
+
+// Resuelve el voice_id para un lead: primero variables de entorno (específica de
+// personalidad → default de género), luego la tabla en código (idem). Devuelve
+// null si no hay ninguna configurada (ahí manda el descriptor + seed).
+function resolveVoiceId(langPrefix, gender, personalityId) {
+  const L = langPrefix.toUpperCase();
+  const G = gender.toUpperCase();
+  const P = (personalityId || '').toUpperCase();
+  const env = (name) => {
+    const v = process.env[name];
+    return v && v.trim() ? v.trim() : null;
+  };
+  const table = VOICE_MODELS[langPrefix]?.[gender] || {};
+  return (P && env(`FISH_VOICE_${L}_${G}_${P}`))
+    || env(`FISH_VOICE_${L}_${G}`)
+    || (personalityId && table[personalityId])
+    || table._default
+    || null;
+}
 
 // Sin voice model asignado, un descriptor libre orienta el timbre de S2.1 Pro
 // (género + acento). Se combina con el tag de emoción del turno.
@@ -89,9 +124,11 @@ export const handler = async (event) => {
   const langPrefix = (language || 'es').startsWith('en') ? 'en' : 'es';
   const emotionTag = EMOTION_TAGS[emotion] || '';
 
-  // Obtener voice_id del modelo de personaje (por idioma + género) si existe
+  // Obtener voice_id del modelo de personaje (env vars → tabla; por idioma +
+  // género + personalidad, con fallback al default del género). Con un voice
+  // model asignado, el timbre y el género quedan FIJOS entre turnos.
   const g = gender === 'female' ? 'female' : 'male';
-  const voiceId = VOICE_MODELS[langPrefix]?.[g]?.[personalityId] || null;
+  const voiceId = resolveVoiceId(langPrefix, g, personalityId);
 
   // Tags al inicio del texto (S2.1 Pro los interpreta): género/acento + emoción.
   // El descriptor de voz solo hace falta cuando NO hay voice model fijo.
