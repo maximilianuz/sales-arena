@@ -11,7 +11,7 @@ function CoachRow({ Icon, color, label, text }) {
       <Icon size={15} color={color} style={{ marginTop: '2px', flexShrink: 0 }} />
       <div>
         <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color, display: 'block', marginBottom: '2px' }}>{label}</span>
-        <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>{text}</span>
+        <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)', lineHeight: '1.5' }}>{text}</span>
       </div>
     </div>
   );
@@ -66,7 +66,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
         {activeStage.indicator && (
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', marginTop: '0.75rem', padding: '0.5rem 0.75rem', background: 'rgba(48,209,88,0.08)', borderRadius: '0.5rem', border: '1px solid rgba(48,209,88,0.2)' }}>
             <span style={{ color: 'var(--success)', fontSize: '0.8rem', marginTop: '1px' }}>✓</span>
-            <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)', lineHeight: '1.4' }}>
+            <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.86)', lineHeight: '1.4' }}>
               <strong style={{ color: 'var(--success)' }}>{isEn ? 'Win signal:' : 'Señal de éxito:'}</strong> {activeStage.indicator}
             </span>
           </div>
@@ -82,12 +82,12 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
               {isEn ? 'Lead profile' : 'Perfil del lead'}: {persona.name}
             </span>
           </div>
-          <p style={{ margin: '0 0 0.85rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>{persona.essence}</p>
+          <p style={{ margin: '0 0 0.85rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.86)', lineHeight: 1.5 }}>{persona.essence}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem', lineHeight: 1.5 }}>
-            <div><strong style={{ color: 'var(--success)' }}>{isEn ? 'Connect: ' : 'Conectá: '}</strong><span style={{ color: 'rgba(255,255,255,0.72)' }}>{persona.connect}</span></div>
-            <div><strong style={{ color: '#a5b4fc' }}>{isEn ? 'Close: ' : 'Cerrá: '}</strong><span style={{ color: 'rgba(255,255,255,0.72)' }}>{persona.close}</span></div>
-            <div><strong style={{ color: 'var(--danger)' }}>{isEn ? 'Avoid: ' : 'Evitá: '}</strong><span style={{ color: 'rgba(255,255,255,0.72)' }}>{persona.avoid}</span></div>
-            <div><strong style={{ color: 'var(--accent)' }}>{isEn ? 'Tone: ' : 'Tono: '}</strong><span style={{ color: 'rgba(255,255,255,0.72)' }}>{persona.tone}</span></div>
+            <div><strong style={{ color: 'var(--success)' }}>{isEn ? 'Connect: ' : 'Conectá: '}</strong><span style={{ color: 'rgba(255,255,255,0.9)' }}>{persona.connect}</span></div>
+            <div><strong style={{ color: '#a5b4fc' }}>{isEn ? 'Close: ' : 'Cerrá: '}</strong><span style={{ color: 'rgba(255,255,255,0.9)' }}>{persona.close}</span></div>
+            <div><strong style={{ color: 'var(--danger)' }}>{isEn ? 'Avoid: ' : 'Evitá: '}</strong><span style={{ color: 'rgba(255,255,255,0.9)' }}>{persona.avoid}</span></div>
+            <div><strong style={{ color: 'var(--accent)' }}>{isEn ? 'Tone: ' : 'Tono: '}</strong><span style={{ color: 'rgba(255,255,255,0.9)' }}>{persona.tone}</span></div>
           </div>
         </div>
       )}
@@ -114,18 +114,18 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
           {questions && questions.length > 0 && (
             <ul style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               {questions.map((q, i) => (
-                <li key={i} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.75)', lineHeight: '1.5' }}>{q}</li>
+                <li key={i} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.92)', lineHeight: '1.5' }}>{q}</li>
               ))}
             </ul>
           )}
           {coaching?.socratic?.length > 0 && (
             <>
-              <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', margin: '0.9rem 0 0.5rem' }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', margin: '0.9rem 0 0.5rem' }}>
                 {isEn ? 'Consultative — always work' : 'Consultivas — siempre funcionan'}
               </div>
               <ul style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {coaching.socratic.map((q, i) => (
-                  <li key={i} style={{ fontSize: '0.87rem', color: 'rgba(255,255,255,0.55)', lineHeight: '1.5' }}>{q}</li>
+                  <li key={i} style={{ fontSize: '0.87rem', color: 'rgba(255,255,255,0.82)', lineHeight: '1.5' }}>{q}</li>
                 ))}
               </ul>
             </>
@@ -139,7 +139,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
           <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.4rem' }}>
             {isEn ? 'Main objection' : 'Objeción principal'}
           </div>
-          <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', lineHeight: '1.4' }}>
+          <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', fontStyle: 'italic', lineHeight: '1.4' }}>
             "{currentScenario.visibleObjection}"
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
           <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--danger)', marginBottom: '0.4rem' }}>
             {isEn ? 'Core fear' : 'Miedo central'}
           </div>
-          <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>
+          <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', lineHeight: '1.4' }}>
             {currentScenario.psychology?.primaryFear}
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
             <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.4rem' }}>
               {isEn ? 'Opens up when' : 'Se abre cuando'}
             </div>
-            <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>
+            <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', lineHeight: '1.4' }}>
               {currentScenario.behavioralCues.opensUpWhen}
             </p>
           </div>
@@ -166,7 +166,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
             <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a5b4fc', marginBottom: '0.4rem' }}>
               {isEn ? 'Builds trust' : 'Genera confianza'}
             </div>
-            <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>
+            <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', lineHeight: '1.4' }}>
               {currentScenario.psychology.trustTrigger}
             </p>
           </div>
@@ -178,7 +178,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '0.75rem', overflow: 'hidden' }}>
           <button
             onClick={() => setShowProduct(!showProduct)}
-            style={{ width: '100%', padding: '0.875rem 1rem', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'rgba(255,255,255,0.5)' }}
+            style={{ width: '100%', padding: '0.875rem 1rem', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'rgba(255,255,255,0.74)' }}
           >
             <Package size={14} />
             <span style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
@@ -187,7 +187,7 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
             <span style={{ marginLeft: 'auto' }}>{showProduct ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</span>
           </button>
           {showProduct && (
-            <div style={{ padding: '0 1rem 1rem', fontSize: '0.9rem', color: 'rgba(255,255,255,0.65)', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+            <div style={{ padding: '0 1rem 1rem', fontSize: '0.9rem', color: 'rgba(255,255,255,0.88)', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
               {productPresentation}
             </div>
           )}

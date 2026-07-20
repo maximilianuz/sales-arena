@@ -105,7 +105,9 @@ export default function SoloPractice({ onBack }) {
   const [transcribing, setTranscribing] = useState(false);
   const [showCoach, setShowCoach] = useState(false);
   // Producto a vender: visible al arrancar (clima) y colapsable para no tapar el chat.
-  const [showProduct, setShowProduct] = useState(true);
+  // Colapsado por defecto: el foco de la pantalla es la CHARLA, no el producto
+  // (se despliega con un tap cuando el closer lo necesita consultar).
+  const [showProduct, setShowProduct] = useState(false);
   // Modo de práctica: 'closer' (vendés vos, el clásico) | 'lead' (te llama un
   // closer experto y vos sos el cliente) | 'observer' (mirás un partido IA vs IA
   // como un partido de tenis). Los modos lead/observer enseñan la metodología
@@ -569,7 +571,7 @@ export default function SoloPractice({ onBack }) {
                   <button type="button" key={m.id} onClick={() => setMode(m.id)}
                     style={{ flex: 1, padding: '0.6rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(139,92,246,0.65)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(139,92,246,0.16)' : 'rgba(255,255,255,0.02)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', fontSize: '0.82rem', fontWeight: '700' }}>{m.icon} {m.l}</div>
-                    <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.15rem' }}>{m.d}</div>
+                    <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.15rem' }}>{m.d}</div>
                   </button>
                 );
               })}
@@ -588,7 +590,7 @@ export default function SoloPractice({ onBack }) {
               </div>
 
               {/* Industria / rubro */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Industry' : 'Rubro / Industria'}
               </label>
               <select value={genConfig.theme} onChange={e => setGenConfig(c => ({ ...c, theme: e.target.value }))}
@@ -606,7 +608,7 @@ export default function SoloPractice({ onBack }) {
               </select>
 
               {/* Dificultad */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Difficulty' : 'Dificultad'}
               </label>
               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
@@ -616,7 +618,7 @@ export default function SoloPractice({ onBack }) {
                     <button type="button" key={l.v} onClick={() => setGenConfig(c => ({ ...c, level: l.v }))}
                       style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(100,210,255,0.6)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(100,210,255,0.15)' : 'rgba(255,255,255,0.02)' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{l.l}</div>
-                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{l.d}</div>
+                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{l.d}</div>
                       <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: l.m > 1 ? 'var(--accent)' : l.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{l.m}</div>
                     </button>
                   );
@@ -624,7 +626,7 @@ export default function SoloPractice({ onBack }) {
               </div>
 
               {/* Temperatura */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Lead Temperature' : 'Temperatura'}
               </label>
               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
@@ -634,7 +636,7 @@ export default function SoloPractice({ onBack }) {
                     <button type="button" key={t.v} onClick={() => setGenConfig(c => ({ ...c, leadTemperature: t.v }))}
                       style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(255,159,10,0.5)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(255,159,10,0.1)' : 'rgba(255,255,255,0.02)' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{t.l}</div>
-                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{t.d}</div>
+                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{t.d}</div>
                       <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: t.m > 1 ? 'var(--accent)' : t.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{t.m}</div>
                     </button>
                   );
@@ -642,7 +644,7 @@ export default function SoloPractice({ onBack }) {
               </div>
 
               {/* Objeción principal a enfrentar */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Main objection' : 'Objeción principal'}
               </label>
               <select value={genConfig.targetObjection} onChange={e => setGenConfig(c => ({ ...c, targetObjection: e.target.value }))}
@@ -891,7 +893,7 @@ export default function SoloPractice({ onBack }) {
                 name={closerName}
                 seed={`closer-${closerName}`}
                 isEn={isEn}
-                size={120}
+                size={104}
                 subtitle={isEn ? 'Expert closer' : 'Closer experto'}
               />
             ) : (
@@ -902,7 +904,7 @@ export default function SoloPractice({ onBack }) {
                 name={leadName}
                 seed={leadName}
                 isEn={isEn}
-                size={120}
+                size={104}
               />
             )}
           </div>
@@ -918,14 +920,11 @@ export default function SoloPractice({ onBack }) {
             prompter (rota cada 2 turnos — ayuda al principiante sin dictarle). */}
         {mode === 'closer' && (
           <div className="glass-panel" style={{ padding: '0.55rem 0.9rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-            <span style={{ fontWeight: '800', fontSize: '1.05rem', fontVariantNumeric: 'tabular-nums', color: elapsed >= MAX_SECONDS - 300 ? 'var(--danger)' : 'white', flexShrink: 0 }}>
-              {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
-            </span>
-            <span style={{ fontSize: '0.68rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(100,210,255,0.1)', border: '1px solid rgba(100,210,255,0.25)', padding: '0.15rem 0.5rem', borderRadius: '2rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(100,210,255,0.1)', border: '1px solid rgba(100,210,255,0.25)', padding: '0.2rem 0.6rem', borderRadius: '2rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
               {promptStage?.label}
             </span>
             {prompterOn && promptTip && (
-              <span style={{ flex: 1, fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.3 }}>
+              <span style={{ flex: 1, fontSize: '0.82rem', color: 'var(--text-main)', fontStyle: 'italic', lineHeight: 1.35 }}>
                 💡 “{promptTip}”
               </span>
             )}
@@ -957,7 +956,7 @@ export default function SoloPractice({ onBack }) {
         )}
 
         {/* Mensajes */}
-        <div ref={scrollRef} className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '1rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+        <div ref={scrollRef} className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '1.1rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
           {messages.map((m, i) => {
             // Derecha = quien "vende" o el humano: user (closer/lead humano) y el
             // closer del partido IA vs IA. Izquierda = el comprador.
@@ -983,10 +982,12 @@ export default function SoloPractice({ onBack }) {
                   </div>
                 )}
                 <div style={{
-                  padding: '0.6rem 0.85rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: 1.4,
-                  background: right ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.06)',
-                  color: 'white', borderBottomRightRadius: right ? '0.2rem' : '12px',
-                  borderBottomLeftRadius: right ? '12px' : '0.2rem',
+                  padding: '0.7rem 0.95rem', borderRadius: '14px', fontSize: '0.98rem', lineHeight: 1.5,
+                  background: right ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.12)',
+                  border: right ? 'none' : '1px solid rgba(255,255,255,0.16)',
+                  color: 'white', borderBottomRightRadius: right ? '0.25rem' : '14px',
+                  borderBottomLeftRadius: right ? '14px' : '0.25rem',
+                  boxShadow: right ? '0 2px 10px rgba(99,102,241,0.28)' : '0 1px 6px rgba(0,0,0,0.25)',
                 }}>
                   {m.content}
                 </div>

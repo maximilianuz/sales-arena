@@ -30,7 +30,7 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Industry */}
       <div>
-        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.5rem' }}>
+        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
           {isEn ? 'Industry' : 'Rubro / Industria'}
         </label>
         <select value={config.theme} onChange={e => setConfig({ ...config, theme: e.target.value })}
@@ -50,7 +50,7 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
 
       {/* Level pills */}
       <div>
-        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.5rem' }}>
+        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
           {isEn ? 'Difficulty' : 'Dificultad'}
         </label>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -58,7 +58,7 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
             <div key={l.v} onClick={() => setConfig({ ...config, level: l.v })}
               style={{ flex: 1, padding: '0.6rem 0.4rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', border: `1px solid ${config.level === l.v ? 'rgba(100,210,255,0.6)' : 'rgba(255,255,255,0.07)'}`, background: config.level === l.v ? 'rgba(100,210,255,0.15)' : 'rgba(255,255,255,0.02)', transition: 'all 0.2s' }}>
               <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>{l.l}</div>
-              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{l.d}</div>
+              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{l.d}</div>
             </div>
           ))}
         </div>
@@ -66,7 +66,7 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
 
       {/* Temperature pills */}
       <div>
-        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.5rem' }}>
+        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
           {isEn ? 'Lead Temperature' : 'Temperatura'}
         </label>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -74,7 +74,7 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
             <div key={t.v} onClick={() => setConfig({ ...config, leadTemperature: t.v })}
               style={{ flex: 1, padding: '0.6rem 0.4rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', border: `1px solid ${config.leadTemperature === t.v ? 'rgba(255,159,10,0.5)' : 'rgba(255,255,255,0.07)'}`, background: config.leadTemperature === t.v ? 'rgba(255,159,10,0.1)' : 'rgba(255,255,255,0.02)', transition: 'all 0.2s' }}>
               <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>{t.l}</div>
-              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{t.d}</div>
+              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{t.d}</div>
             </div>
           ))}
         </div>
@@ -82,7 +82,7 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
 
       {/* Error banner */}
       {genError && !isGenerating && (
-        <div style={{ background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.3)', borderRadius: '0.75rem', padding: '0.75rem 0.875rem', fontSize: '0.82rem', color: 'rgba(255,255,255,0.75)', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+        <div style={{ background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.3)', borderRadius: '0.75rem', padding: '0.75rem 0.875rem', fontSize: '0.82rem', color: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
           <span style={{ color: 'var(--danger)', flexShrink: 0 }}>⚠️</span>
           <span>{genError}</span>
         </div>
@@ -130,14 +130,14 @@ export function LeadActorView({ scenario }) {
       <div style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.12),rgba(255,55,95,0.08))', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '1rem', padding: '1.125rem' }}>
         <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.4rem' }}>🎭 {isEn ? 'You are playing' : 'Vos sos'}</div>
         <div style={{ fontSize: '1.35rem', fontWeight: '600', color: 'white', marginBottom: '0.15rem' }}>{scenario.demographics?.name}</div>
-        <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>{scenario.demographics?.role} · {scenario.demographics?.industry}{scenario.demographics?.age && ` · ${scenario.demographics.age} años`}</div>
+        <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.74)' }}>{scenario.demographics?.role} · {scenario.demographics?.industry}{scenario.demographics?.age && ` · ${scenario.demographics.age} años`}</div>
       </div>
 
       {/* Acting instruction */}
       {scenario.roleplayGuide?.actorAdvice && (
         <div style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.22)', borderLeft: '3px solid #8b5cf6', borderRadius: '0.75rem', padding: '0.875rem 1rem' }}>
           <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.35rem' }}>{isEn ? 'Acting note' : 'Actuación'}</div>
-          <p style={{ margin: 0, fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.78)', lineHeight: '1.5' }}>"{scenario.roleplayGuide.actorAdvice}"</p>
+          <p style={{ margin: 0, fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.92)', lineHeight: '1.5' }}>"{scenario.roleplayGuide.actorAdvice}"</p>
         </div>
       )}
 
@@ -146,21 +146,21 @@ export function LeadActorView({ scenario }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {scenario.behavioralCues.verbalStyle && (
             <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '0.75rem', padding: '0.7rem 0.875rem' }}>
-              <div style={{ fontSize: '0.66rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.25rem' }}>{isEn ? 'How you talk' : 'Cómo hablás'}</div>
-              <p style={{ margin: 0, fontSize: '0.83rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>{scenario.behavioralCues.verbalStyle}</p>
+              <div style={{ fontSize: '0.66rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.25rem' }}>{isEn ? 'How you talk' : 'Cómo hablás'}</div>
+              <p style={{ margin: 0, fontSize: '0.83rem', color: 'rgba(255,255,255,0.9)', lineHeight: '1.4' }}>{scenario.behavioralCues.verbalStyle}</p>
             </div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             {scenario.behavioralCues.opensUpWhen && (
               <div style={{ background: 'rgba(48,209,88,0.06)', border: '1px solid rgba(48,209,88,0.18)', borderRadius: '0.75rem', padding: '0.7rem' }}>
                 <div style={{ fontSize: '0.64rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.25rem' }}>{isEn ? 'You open up when' : 'Te abrís si'}</div>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.62)', lineHeight: '1.35' }}>{scenario.behavioralCues.opensUpWhen}</p>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.86)', lineHeight: '1.35' }}>{scenario.behavioralCues.opensUpWhen}</p>
               </div>
             )}
             {scenario.behavioralCues.shutsDownWhen && (
               <div style={{ background: 'rgba(255,69,58,0.06)', border: '1px solid rgba(255,69,58,0.18)', borderRadius: '0.75rem', padding: '0.7rem' }}>
                 <div style={{ fontSize: '0.64rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--danger)', marginBottom: '0.25rem' }}>{isEn ? 'You shut down when' : 'Te cerrás si'}</div>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.62)', lineHeight: '1.35' }}>{scenario.behavioralCues.shutsDownWhen}</p>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.86)', lineHeight: '1.35' }}>{scenario.behavioralCues.shutsDownWhen}</p>
               </div>
             )}
           </div>
@@ -179,11 +179,11 @@ export function LeadActorView({ scenario }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
         <div style={{ background: 'rgba(48,209,88,0.07)', border: '1px solid rgba(48,209,88,0.18)', borderRadius: '0.75rem', padding: '0.8rem' }}>
           <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.35rem' }}>{isEn ? 'Your pain' : 'Tu dolor'}</div>
-          <p style={{ margin: 0, fontSize: '0.82rem', color: 'rgba(255,255,255,0.65)', lineHeight: '1.4' }}>{scenario.currentSituation?.problem}</p>
+          <p style={{ margin: 0, fontSize: '0.82rem', color: 'rgba(255,255,255,0.88)', lineHeight: '1.4' }}>{scenario.currentSituation?.problem}</p>
         </div>
         <div style={{ background: 'rgba(255,159,10,0.07)', border: '1px solid rgba(255,159,10,0.18)', borderRadius: '0.75rem', padding: '0.8rem' }}>
           <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.35rem' }}>{isEn ? 'Core fear' : 'Tu miedo'}</div>
-          <p style={{ margin: 0, fontSize: '0.82rem', color: 'rgba(255,255,255,0.65)', lineHeight: '1.4' }}>{scenario.psychology?.primaryFear}</p>
+          <p style={{ margin: 0, fontSize: '0.82rem', color: 'rgba(255,255,255,0.88)', lineHeight: '1.4' }}>{scenario.psychology?.primaryFear}</p>
         </div>
       </div>
 
@@ -198,7 +198,7 @@ export function LeadActorView({ scenario }) {
           {showSecondary && (
             <div style={{ padding: '0 0.875rem 0.875rem' }}>
               {scenario.secondaryObjections.map((obj, i) => (
-                <div key={i} style={{ padding: '0.45rem 0', borderTop: '1px solid rgba(255,55,95,0.08)', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>
+                <div key={i} style={{ padding: '0.45rem 0', borderTop: '1px solid rgba(255,55,95,0.08)', fontSize: '0.85rem', color: 'rgba(255,255,255,0.86)', fontStyle: 'italic' }}>
                   {i + 1}. "{obj}"
                 </div>
               ))}
@@ -247,7 +247,7 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
   const F = ({ label, value, accent = '255,255,255' }) => (
     <div style={{ marginBottom: '0.6rem', background: `rgba(${accent},0.03)`, borderLeft: `2px solid rgba(${accent},0.18)`, padding: '0.65rem 0.8rem', borderRadius: '0.5rem' }}>
       <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.09em', textTransform: 'uppercase', color: `rgba(${accent},0.45)`, marginBottom: '0.25rem' }}>{label}</div>
-      <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.78)', lineHeight: '1.5' }}>{value}</div>
+      <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.92)', lineHeight: '1.5' }}>{value}</div>
     </div>
   );
 
@@ -280,7 +280,7 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
           <p style={{ margin: 0, fontStyle: 'italic', fontWeight: '600', fontSize: '0.95rem' }}>"{scenario.visibleObjection}"</p>
         </div>
         {scenario.secondaryObjections?.map((obj, i) => (
-          <div key={i} style={{ background: 'rgba(255,55,95,0.04)', border: '1px solid rgba(255,55,95,0.1)', borderRadius: '0.5rem', padding: '0.6rem 0.75rem', marginBottom: '0.35rem', fontStyle: 'italic', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>"{obj}"</div>
+          <div key={i} style={{ background: 'rgba(255,55,95,0.04)', border: '1px solid rgba(255,55,95,0.1)', borderRadius: '0.5rem', padding: '0.6rem 0.75rem', marginBottom: '0.35rem', fontStyle: 'italic', fontSize: '0.85rem', color: 'rgba(255,255,255,0.86)' }}>"{obj}"</div>
         ))}
         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '0.4rem' }}>
           ℹ️ {isEn ? 'Hidden objection in Private Info' : 'Objeción oculta en Info Privada'}
@@ -310,7 +310,7 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
       </div>
       <div style={{ flex: 1 }}>{renderTab()}</div>
       {!isReadOnly && (
-        <button onClick={() => onRegenerate(null)} disabled={isGenerating} style={{ marginTop: '0.875rem', width: '100%', padding: '0.55rem', borderRadius: '0.625rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+        <button onClick={() => onRegenerate(null)} disabled={isGenerating} style={{ marginTop: '0.875rem', width: '100%', padding: '0.55rem', borderRadius: '0.625rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: '0.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
           <RefreshCw size={12} /> {isEn ? 'Regenerate' : 'Regenerar escenario'}
         </button>
       )}
@@ -389,7 +389,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <UserCircle size={14} color="rgba(100,210,255,0.7)" />
-          <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+          <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)' }}>
             {currentScenario ? 'Buyer Persona' : (isEn ? 'Configure Scenario' : 'Configurar Escenario')}
           </span>
         </div>

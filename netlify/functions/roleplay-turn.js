@@ -1,6 +1,55 @@
 import { getUserData } from './lib/firebaseAdmin.js';
 import { llmChat } from './lib/llm.js';
 
+// Extrae el turno del comprador de la respuesta cruda del modelo. El modelo
+// rápido (8B) y algunos proveedores (NVIDIA rechaza json_object) a veces
+// devuelven JSON con prosa alrededor, comas colgantes, comillas tipográficas o
+// TRUNCADO (se corta por max_tokens). En vez de tumbar la charla con un 502,
+// intentamos varias estrategias y, como último recurso, usamos el texto plano
+// como respuesta: la conversación NUNCA se corta por un JSON imperfecto.
+function extractBuyerTurn(raw) {
+  const tryParse = (s) => { try { return JSON.parse(s); } catch { return null; } };
+
+  let text = String(raw || '').trim()
+    // saca cercos de código markdown ```json ... ```
+    .replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+
+  // 1) Objeto balanceado desde el primer '{' (respetando strings y escapes).
+  const start = text.indexOf('{');
+  if (start !== -1) {
+    let depth = 0, inStr = false, esc = false, end = -1;
+    for (let i = start; i < text.length; i++) {
+      const c = text[i];
+      if (inStr) {
+        if (esc) esc = false;
+        else if (c === '\\') esc = true;
+        else if (c === '"') inStr = false;
+      } else if (c === '"') inStr = true;
+      else if (c === '{') depth++;
+      else if (c === '}') { depth--; if (depth === 0) { end = i; break; } }
+    }
+    let candidate = end !== -1 ? text.slice(start, end + 1) : text.slice(start);
+    // Si quedó truncado (sin cierre): cerramos string abierto y las llaves.
+    if (end === -1) {
+      if (inStr) candidate += '"';
+      candidate += '}'.repeat(Math.max(1, depth));
+    }
+    const repaired = candidate
+      .replace(/[“”]/g, '"').replace(/[‘’]/g, "'")
+      .replace(/,\s*([}\]])/g, '$1'); // comas colgantes
+    const obj = tryParse(candidate) || tryParse(repaired);
+    if (obj && typeof obj === 'object') return obj;
+  }
+
+  // 2) Último recurso: rescatar solo el campo "reply" si está.
+  const m = text.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (m) return { reply: m[1].replace(/\\"/g, '"').replace(/\\n/g, ' ').trim() };
+
+  // 3) Nada parseable: usar el texto plano (sin llaves ni claves) como reply.
+  const plain = text.replace(/[{}[\]]/g, '').replace(/"\w+"\s*:/g, '').replace(/\s+/g, ' ').trim();
+  return { reply: plain || '...' };
+}
+
 // Un turno del COMPRADOR IA. Recibe el system prompt del buyer + el historial y
 // devuelve la respuesta estructurada del lead. El modelo/proveedor (y sus
 // respaldos) viven en lib/llm.js — tier 'fast' = modelo rápido (8b por
@@ -53,17 +102,13 @@ export const handler = async (event) => {
       tier: 'fast',
       messages: [{ role: "system", content: system }, ...trimmed],
       temperature: 0.85,
-      max_tokens: 320,
+      max_tokens: 420, // margen para que el JSON no se trunque (reply + thought + state)
       timeoutMs: 6500,
       budgetMs: 8000,
     });
 
-    let turn;
-    try {
-      turn = JSON.parse(content.match(/\{[\s\S]*\}/)[0]);
-    } catch {
-      return { statusCode: 502, headers, body: JSON.stringify({ error: "JSON malformado de la IA." }) };
-    }
+    // Parseo tolerante a fallas: nunca cortamos la charla por un JSON imperfecto.
+    const turn = extractBuyerTurn(content);
 
     // Blindaje del shape antes de devolverlo al cliente.
     const clamp = (n, def) => {

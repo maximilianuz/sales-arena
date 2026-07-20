@@ -150,7 +150,7 @@ export default function Login() {
               <ExternalLink size={18} color="var(--accent)" style={{ flexShrink: 0, marginTop: '1px' }} />
               <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.45 }}>
                 <strong style={{ color: 'var(--accent)' }}>{isEn ? 'Open in your browser' : 'Abrí en tu navegador'}</strong>
-                <div style={{ marginTop: '0.2rem', color: 'rgba(255,255,255,0.7)' }}>
+                <div style={{ marginTop: '0.2rem', color: 'rgba(255,255,255,0.9)' }}>
                   {isEn
                     ? "You're inside an app's browser, where Google sign-in is blocked. Open this page in Chrome or Safari — or just use email below."
                     : 'Estás en el navegador de una app, donde Google bloquea el acceso. Abrí esta página en Chrome o Safari — o usá tu email acá abajo.'}
@@ -184,17 +184,17 @@ export default function Login() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.25rem 0' }}>
           <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
-          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem' }}>{isEn ? 'or with email' : 'o con tu email'}</span>
+          <span style={{ color: 'rgba(255,255,255,0.58)', fontSize: '0.78rem' }}>{isEn ? 'or with email' : 'o con tu email'}</span>
           <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
         </div>
 
         <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <div style={{ position: 'relative' }}>
-            <Mail size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+            <Mail size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.58)' }} />
             <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" style={{ paddingLeft: '2.5rem' }} />
           </div>
           <div style={{ position: 'relative' }}>
-            <Lock size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+            <Lock size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.58)' }} />
             <input type="password" required minLength={6} value={password} onChange={e => setPassword(e.target.value)} placeholder={isEn ? 'Password (min. 6)' : 'Contraseña (mín. 6)'} style={{ paddingLeft: '2.5rem' }} />
           </div>
           {error && <div style={{ color: 'var(--danger)', fontSize: '0.82rem' }}>{error}</div>}
@@ -211,7 +211,7 @@ export default function Login() {
           </button>
           {mode === 'signin' && (
             <div style={{ textAlign: 'right', marginTop: '0.2rem' }}>
-              <a href="#" onClick={handleForgot} style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', textDecoration: 'underline' }}>
+              <a href="#" onClick={handleForgot} style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.74)', textDecoration: 'underline' }}>
                 {isEn ? 'Forgot password?' : '¿Olvidaste tu contraseña?'}
               </a>
             </div>

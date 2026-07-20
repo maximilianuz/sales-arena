@@ -150,7 +150,7 @@ export default function RoleOnboarding({ role }) {
           {g.steps[isEn ? 'en' : 'es'].map((step, i) => (
             <div key={i} style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
               <span style={{ width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, background: `${g.color}22`, border: `1px solid ${g.color}55`, color: g.color, fontSize: '0.72rem', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1px' }}>{i + 1}</span>
-              <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.78)', lineHeight: '1.45' }}>{step}</span>
+              <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.92)', lineHeight: '1.45' }}>{step}</span>
             </div>
           ))}
         </div>

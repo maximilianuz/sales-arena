@@ -277,7 +277,7 @@ export default function Lobby() {
           {isAdmin && (
             <button onClick={() => setShowAdmin(true)} title={isEn ? 'Admin panel' : 'Panel de admin'} style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(139,92,246,0.1)', color: 'rgba(255,255,255,0.7)',
+              background: 'rgba(139,92,246,0.1)', color: 'rgba(255,255,255,0.9)',
               border: '1px solid rgba(139,92,246,0.35)', padding: '0.35rem 0.8rem',
               borderRadius: '2rem', cursor: 'pointer', textDecoration: 'none', fontSize: '0.82rem'
             }}>
@@ -287,7 +287,7 @@ export default function Lobby() {
           <a href={isEn ? "/presentacion_en.html" : "/presentacion.html"} target="_blank" rel="noopener noreferrer"
             style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(48,209,88,0.1)', color: 'rgba(255,255,255,0.7)',
+              background: 'rgba(48,209,88,0.1)', color: 'rgba(255,255,255,0.9)',
               border: '1px solid rgba(48,209,88,0.35)', padding: '0.35rem 0.8rem',
               borderRadius: '2rem', cursor: 'pointer', textDecoration: 'none', fontSize: '0.82rem'
             }}>
@@ -305,7 +305,7 @@ export default function Lobby() {
           <button onClick={signOutUser} title={isEn ? 'Sign out' : 'Cerrar sesión'}
             style={{
               background: 'rgba(255,69,58,0.07)', border: '1px solid rgba(255,69,58,0.2)',
-              color: 'rgba(255,255,255,0.35)', borderRadius: '2rem', padding: '0.35rem 0.6rem',
+              color: 'rgba(255,255,255,0.6)', borderRadius: '2rem', padding: '0.35rem 0.6rem',
               cursor: 'pointer', display: 'flex', alignItems: 'center', fontSize: '0.75rem', gap: '0.3rem'
             }}>
             <LogOut size={13} /> {isEn ? 'Exit' : 'Salir'}
@@ -515,7 +515,7 @@ export default function Lobby() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
               <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>1</span>
-              <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.yourName')}</label>
+              <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.yourName')}</label>
             </div>
             <input
               type="text" required value={name} onChange={e => setName(e.target.value)}
@@ -528,7 +528,7 @@ export default function Lobby() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
               <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>2</span>
-              <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.roomId')}</label>
+              <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.roomId')}</label>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <input
@@ -537,7 +537,7 @@ export default function Lobby() {
                 style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.95rem', letterSpacing: '0.05em' }}
               />
               <button type="button" onClick={generateRoomId} aria-label={isEn ? 'Generate random room ID' : 'Generar ID de sala al azar'} title={isEn ? 'Generate random ID' : 'Generar ID al azar'}
-                style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
+                style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', cursor: 'pointer', color: 'rgba(255,255,255,0.74)', transition: 'all 0.2s' }}>
                 <Shuffle size={18} />
               </button>
               <button type="button" onClick={copyRoomId} disabled={!roomId} aria-label={isEn ? 'Copy room ID' : 'Copiar ID de sala'} title={isEn ? 'Copy ID' : 'Copiar ID'}
@@ -551,7 +551,7 @@ export default function Lobby() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
               <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>3</span>
-              <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.chooseRole')}</label>
+              <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.chooseRole')}</label>
             </div>
             <div role="radiogroup" aria-label={isEn ? 'Choose your role' : 'Elegí tu rol'} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
               {roles.map((r, idx) => {

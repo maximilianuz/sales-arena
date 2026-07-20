@@ -19,7 +19,7 @@
   --bg-card: rgba(24, 24, 27, 0.75);
 
   --text-main: #f5f5f7; /* Gris claro Apple */
-  --text-muted: #98989d; /* systemGray Apple dark */
+  --text-muted: #b4b4bd; /* gris secundario — subido para mejor legibilidad sobre fondo oscuro */
 
   /* Superficies: sombras definidas en lugar de glassmorphism pesado */
   --glass-border: rgba(255, 255, 255, 0.06);
