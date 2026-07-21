@@ -114,6 +114,20 @@ export async function getUserEmail(uid) {
   return data.users?.[0]?.email || null;
 }
 
+// Busca un usuario de Firebase Auth por email (Identity Toolkit). Devuelve el
+// registro (incluye localId = uid) o info del fallo. Útil para el flujo inverso:
+// del email de la whitelist al uid del usuario.
+export async function lookupUserByEmail(email) {
+  const token = await getAccessToken();
+  const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:lookup', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: [email] })
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, user: data.users?.[0] || null, error: data.error?.message || null };
+}
+
 // ¿Este usuario puede usar la práctica solo (que consume tokens de la API)?
 // Se decide SOLO por uid (no por email del cliente → no se puede spoofear):
 //   • es admin (admin/admins/{uid}), o
