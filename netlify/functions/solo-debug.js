@@ -1,4 +1,4 @@
-import { lookupUserByEmail, getPath, getUserData } from './lib/firebaseAdmin.js';
+import { lookupUserByEmail, getPath, getUserData, isSoloAuthorized } from './lib/firebaseAdmin.js';
 
 // ⚠️ ENDPOINT TEMPORAL DE DIAGNÓSTICO — BORRAR después de depurar el acceso solo.
 // Se abre en el navegador (GET): /api/solo-debug?email=alguien@correo.com
@@ -53,6 +53,14 @@ export const handler = async (event) => {
       };
     } catch (e) {
       out.userRecord = { error: e.message };
+    }
+
+    // Resultado REAL de la misma función que usa /api/solo-access — así vemos
+    // si el gate del lado servidor autoriza a este uid o no.
+    try {
+      out.isSoloAuthorized = await isSoloAuthorized(out.uid);
+    } catch (e) {
+      out.isSoloAuthorized = { error: e.message };
     }
   }
 
