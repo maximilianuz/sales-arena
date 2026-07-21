@@ -128,6 +128,18 @@ export async function lookupUserByEmail(email) {
   return { ok: res.ok, status: res.status, user: data.users?.[0] || null, error: data.error?.message || null };
 }
 
+// ¿Este uid está en admin/admins/? Se usa tanto para el gate de práctica solo
+// como para autorizar endpoints exclusivos de admin (gestionar accesos, etc.).
+export async function isAdmin(uid) {
+  if (!uid) return false;
+  try {
+    const admin = await dbGet(`/admin/admins/${uid}`);
+    return !!admin;
+  } catch {
+    return false;
+  }
+}
+
 // ¿Este usuario puede usar la práctica solo (que consume tokens de la API)?
 // Se decide SOLO por uid (no por email del cliente → no se puede spoofear):
 //   • es admin (admin/admins/{uid}), o
@@ -138,10 +150,7 @@ export async function lookupUserByEmail(email) {
 // así que agregar un email a esa lista habilita también la práctica solo.
 export async function isSoloAuthorized(uid) {
   if (!uid) return false;
-  try {
-    const admin = await dbGet(`/admin/admins/${uid}`);
-    if (admin) return true;
-  } catch { /* seguimos con el resto de las señales */ }
+  if (await isAdmin(uid)) return true;
   try {
     const u = await getUserData(uid);
     if (u?.soloApproved === true) return true;

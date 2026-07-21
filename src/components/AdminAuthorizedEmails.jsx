@@ -1,8 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { ref, onValue, push, remove } from 'firebase/database';
 import { db } from '../utils/db';
-import { Trash2, Plus, Mail, Copy, Check } from 'lucide-react';
+import { Trash2, Plus, Mail, Copy, Check, ShieldOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+// Estado real de acceso de un email: 'active' (ya inició sesión y tiene
+// acceso), 'revoked' (se le quitó explícitamente), o pendiente (agregado a
+// la whitelist pero todavía no inició sesión, así que no se le otorgó nada).
+function StatusBadge({ status, isEn }) {
+  if (!status || !status.uid) {
+    return (
+      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
+        {isEn ? 'Pending login' : 'Pendiente de ingreso'}
+      </span>
+    );
+  }
+  if (status.subscriptionStatus === 'active') {
+    return (
+      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.35)', color: 'var(--success)' }}>
+        {isEn ? 'Active' : 'Activo'}
+      </span>
+    );
+  }
+  if (status.subscriptionStatus === 'revoked') {
+    return (
+      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--danger)' }}>
+        {isEn ? 'Revoked' : 'Revocado'}
+      </span>
+    );
+  }
+  return (
+    <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
+      {isEn ? 'No access yet' : 'Sin acceso aún'}
+    </span>
+  );
+}
 
 export default function AdminAuthorizedEmails({ adminUid }) {
   const { t, i18n } = useTranslation();
@@ -11,6 +43,12 @@ export default function AdminAuthorizedEmails({ adminUid }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+  // Estado REAL de acceso por email (no alcanza con estar en la lista: el
+  // acceso recién se otorga cuando esa persona inicia sesión). Se resuelve
+  // en el servidor porque requiere buscar el uid del email vía Identity
+  // Toolkit y leer users/{uid} — datos que el cliente no puede ver directo.
+  const [accessStatus, setAccessStatus] = useState({});
+  const [revokingId, setRevokingId] = useState(null);
 
   const isEn = i18n.language?.startsWith('en');
 
@@ -28,6 +66,29 @@ export default function AdminAuthorizedEmails({ adminUid }) {
     });
     return () => unsub();
   }, []);
+
+  // Refresca el estado de acceso cada vez que cambia la lista de emails.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      if (emails.length === 0) { if (alive) setAccessStatus({}); return; }
+      try {
+        const res = await fetch('/api/admin-manage-access', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callerUid: adminUid, action: 'status', emails: emails.map(e => e.email) })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (alive && Array.isArray(data.results)) {
+          const map = {};
+          data.results.forEach(r => { map[r.email] = r; });
+          setAccessStatus(map);
+        }
+      } catch { /* si falla, simplemente no mostramos el estado */ }
+    })();
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [emails.map(e => e.email).join(','), adminUid]);
 
   const handleAddEmail = async (e) => {
     e.preventDefault();
@@ -55,16 +116,32 @@ export default function AdminAuthorizedEmails({ adminUid }) {
     }
   };
 
-  const handleRemoveEmail = async (emailId) => {
-    if (!window.confirm(isEn ? 'Remove this email?' : '¿Remover este correo?')) return;
+  const handleRemoveEmail = async (emailId, email) => {
+    if (!window.confirm(isEn
+      ? 'Remove this email and revoke any access already granted?'
+      : '¿Remover este correo y revocar el acceso ya otorgado?')) return;
 
+    setRevokingId(emailId);
     try {
+      // 1) Revocar en el servidor el acceso YA otorgado (si esa persona ya
+      // inició sesión y tiene subscriptionStatus:active). Sacarla solo de la
+      // whitelist no le quita el acceso que ya tiene.
+      await fetch('/api/admin-manage-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callerUid: adminUid, action: 'revoke', email })
+      }).catch(() => {});
+
+      // 2) Sacarla de la whitelist para que no se le vuelva a otorgar a futuro.
       const emailRef = ref(db, `admin/authorizedEmails/${emailId}`);
       await remove(emailRef);
-      setMessage(isEn ? 'Email removed' : 'Email removido');
-      setTimeout(() => setMessage(''), 2000);
+
+      setMessage(isEn ? 'Email removed and access revoked' : 'Correo removido y acceso revocado');
+      setTimeout(() => setMessage(''), 2500);
     } catch (error) {
       setMessage(isEn ? `Error: ${error.message}` : `Error: ${error.message}`);
+    } finally {
+      setRevokingId(null);
     }
   };
 
@@ -163,9 +240,15 @@ export default function AdminAuthorizedEmails({ adminUid }) {
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: '500', marginBottom: '0.2rem' }}>{item.email}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                    <span style={{ fontWeight: '500' }}>{item.email}</span>
+                    <StatusBadge status={accessStatus[item.email]} isEn={isEn} />
+                  </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {new Date(item.addedAt).toLocaleString()}
+                    {isEn ? 'Added: ' : 'Agregado: '}{new Date(item.addedAt).toLocaleString()}
+                    {accessStatus[item.email]?.authorizedAt && (
+                      <> · {isEn ? 'access since: ' : 'acceso desde: '}{new Date(accessStatus[item.email].authorizedAt).toLocaleString()}</>
+                    )}
                   </div>
                 </div>
                 <button
@@ -185,19 +268,21 @@ export default function AdminAuthorizedEmails({ adminUid }) {
                   {copiedId === item.email ? <Check size={16} /> : <Copy size={16} />}
                 </button>
                 <button
-                  onClick={() => handleRemoveEmail(item.id)}
+                  onClick={() => handleRemoveEmail(item.id, item.email)}
+                  disabled={revokingId === item.id}
                   style={{
                     background: 'none',
                     border: 'none',
                     color: 'var(--danger)',
-                    cursor: 'pointer',
+                    cursor: revokingId === item.id ? 'wait' : 'pointer',
+                    opacity: revokingId === item.id ? 0.5 : 1,
                     padding: '0.4rem',
                     display: 'flex',
                     alignItems: 'center'
                   }}
-                  title={isEn ? 'Remove' : 'Remover'}
+                  title={isEn ? 'Revoke access and remove' : 'Revocar acceso y quitar'}
                 >
-                  <Trash2 size={16} />
+                  {revokingId === item.id ? <ShieldOff size={16} /> : <Trash2 size={16} />}
                 </button>
               </li>
             ))}
