@@ -1,6 +1,6 @@
 import { isAdmin, lookupUserByEmail, getUserData, patchPath, getPath } from './lib/firebaseAdmin.js';
 
-// Gestión de accesos otorgados por email, para el panel de admin. Dos acciones:
+// Gestión de accesos otorgados por email, para el panel de admin.
 //   - 'status': dado un array de emails (la whitelist), devuelve para cada uno
 //     si ya efectivamente tiene acceso otorgado (subscriptionStatus del uid
 //     real, resuelto vía Identity Toolkit) — no alcanza con estar en la lista,
@@ -10,6 +10,12 @@ import { isAdmin, lookupUserByEmail, getUserData, patchPath, getPath } from './l
 //     subscriptionStatus a 'revoked' en users/{uid}. Sin esto, sacar el email
 //     de la lista solo evita otorgar acceso a futuro, pero no le quita el
 //     acceso a quien ya inició sesión antes.
+//   - 'grant': otorga acceso directo (subscriptionStatus:'active'), sin
+//     depender de que esa persona vuelva a iniciar sesión. Necesario porque
+//     el chequeo automático del cliente (useSubscription.js) solo se dispara
+//     cuando subscriptionStatus === 'none' — una vez 'revoked', nunca vuelve
+//     a evaluarse solo con volver a loguearse, así que el admin necesita
+//     poder reactivar el acceso a mano desde el panel.
 // Protegido por isAdmin(callerUid): solo admins pueden ver/gestionar esto.
 export const handler = async (event) => {
   const headers = {
@@ -82,6 +88,30 @@ export const handler = async (event) => {
         subscriptionExpiry: null,
         soloApproved: false,
         revokedAt: new Date().toISOString()
+      });
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, uid }) };
+    }
+
+    if (action === 'grant') {
+      const email = String(body.email || '').toLowerCase().trim();
+      if (!email) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Falta email' }) };
+
+      const lookup = await lookupUserByEmail(email);
+      const uid = lookup.user?.localId;
+      if (!uid) {
+        // Nunca inició sesión → no hay users/{uid} donde escribir. Basta con
+        // que esté en la whitelist: al iniciar sesión por primera vez,
+        // verify-authorized-email le va a otorgar el acceso.
+        return { statusCode: 200, headers, body: JSON.stringify({ success: true, note: 'no_account' }) };
+      }
+
+      await patchPath(`/users/${uid}`, {
+        subscriptionStatus: 'active',
+        subscriptionPlan: 'trainer',
+        subscriptionExpiry: null,
+        soloApproved: false,
+        authorizedAt: new Date().toISOString(),
+        authorizedMethod: 'admin-panel'
       });
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, uid }) };
     }
