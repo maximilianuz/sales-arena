@@ -85,6 +85,16 @@
   status = 200
   force = true
 
+# Catch-all de la API: cualquier /api/<fn> que no tenga un redirect propio arriba
+# se enruta a su Netlify Function homónima. Cubre solo-access, verify-authorized-email
+# y cualquier función nueva sin tener que agregar una regla por cada una. DEBE ir
+# después del proxy de nvidia (que apunta afuera) y antes del fallback SPA de abajo.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
