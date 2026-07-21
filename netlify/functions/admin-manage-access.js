@@ -1,4 +1,4 @@
-import { isAdmin, lookupUserByEmail, getUserData, patchPath } from './lib/firebaseAdmin.js';
+import { isAdmin, lookupUserByEmail, getUserData, patchPath, getPath } from './lib/firebaseAdmin.js';
 
 // Gestión de accesos otorgados por email, para el panel de admin. Dos acciones:
 //   - 'status': dado un array de emails (la whitelist), devuelve para cada uno
@@ -31,6 +31,15 @@ export const handler = async (event) => {
   }
 
   try {
+    // Lectura directa y cruda del nodo admin/authorizedEmails (para depurar
+    // discrepancias entre lo que muestra el cliente vía onValue y lo que hay
+    // realmente guardado — por ejemplo si las reglas de Firebase bloquean la
+    // lectura del cliente pero no la del service account).
+    if (action === 'list') {
+      const raw = await getPath('/admin/authorizedEmails');
+      return { statusCode: 200, headers, body: JSON.stringify({ raw }) };
+    }
+
     if (action === 'status') {
       const emails = Array.isArray(body.emails) ? body.emails : [];
       const results = await Promise.all(emails.map(async (email) => {
