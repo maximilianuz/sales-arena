@@ -1,4 +1,4 @@
-import { getUserData } from './lib/firebaseAdmin.js';
+import { isSoloAuthorized } from './lib/firebaseAdmin.js';
 import { llmChat } from './lib/llm.js';
 
 // Extrae el turno del comprador de la respuesta cruda del modelo. El modelo
@@ -75,13 +75,12 @@ export const handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "system y messages son requeridos." }) };
   }
 
-  // Verificación liviana: el usuario debe existir. No exigimos plan pago acá
-  // (el modo solo es el gancho de conversión), pero sí que esté autenticado y
-  // registrado para evitar abuso anónimo del proxy.
-  try {
-    await getUserData(uid);
-  } catch {
-    return { statusCode: 403, headers, body: JSON.stringify({ error: "Usuario no encontrado." }) };
+  // Autorización de práctica solo: este endpoint es EXCLUSIVO del modo solo (las
+  // salas grupales no lo usan), y consume tokens de la API en cada turno. Solo
+  // pueden usarlo los usuarios validados por el admin (por uid → no spoofeable).
+  // Los demás deben pedir validación por email antes de practicar.
+  if (!(await isSoloAuthorized(uid))) {
+    return { statusCode: 403, headers, body: JSON.stringify({ error: "solo_not_authorized" }) };
   }
 
   // Recortamos el historial: los últimos ~16 turnos alcanzan para coherencia y

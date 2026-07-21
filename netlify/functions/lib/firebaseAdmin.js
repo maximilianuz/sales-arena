@@ -98,6 +98,28 @@ export async function getUserData(uid) {
   return data || {};
 }
 
+// ¿Este usuario puede usar la práctica solo (que consume tokens de la API)?
+// Se decide SOLO por uid (no por email del cliente → no se puede spoofear):
+//   • es admin (admin/admins/{uid}), o
+//   • tiene el flag users/{uid}/soloApproved === true, o
+//   • tiene suscripción activa (users/{uid}/subscriptionStatus === 'active').
+// Los correos que el admin agrega a admin/authorizedEmails se convierten en
+// 'active' por el flujo verificado de verify-authorized-email al iniciar sesión,
+// así que agregar un email a esa lista habilita también la práctica solo.
+export async function isSoloAuthorized(uid) {
+  if (!uid) return false;
+  try {
+    const admin = await dbGet(`/admin/admins/${uid}`);
+    if (admin) return true;
+  } catch { /* seguimos con el resto de las señales */ }
+  try {
+    const u = await getUserData(uid);
+    if (u?.soloApproved === true) return true;
+    if (u?.subscriptionStatus === 'active') return true;
+  } catch { /* sin datos → no autorizado */ }
+  return false;
+}
+
 export async function getSubscriptionStatus(uid) {
   return dbGet(`/users/${uid}/subscriptionStatus`);
 }
