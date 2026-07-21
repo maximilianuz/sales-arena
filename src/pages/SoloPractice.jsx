@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen, Shuffle, Package, ChevronDown, ChevronUp, Lock, Lightbulb, Pause, Play, Theater, TrendingUp, Mail } from 'lucide-react';
 import { auth } from '../utils/db';
+import { subscribeToAuthState } from '../utils/auth';
 import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, closerTurn, initialBuyerState } from '../utils/roleplayClient';
 import { openingLine } from '../utils/buyerPrompt';
@@ -165,24 +166,30 @@ export default function SoloPractice({ onBack }) {
   useEffect(() => () => stopSpeaking(), []); // cortar la voz al desmontar
 
   // Verifica en el servidor si el usuario está validado para practicar solo.
-  // Corre una vez al montar; ante cualquier error, negamos (protege los tokens).
+  // auth.currentUser es null de forma SÍNCRONA hasta que Firebase termina de
+  // restaurar la sesión (proceso asíncrono) — leerlo directo en el mount podía
+  // mandar uid=undefined y quedar en 'denied' para siempre aunque el usuario
+  // estuviera autorizado. Por eso esperamos a subscribeToAuthState (mismo
+  // patrón que App.jsx) antes de consultar /api/solo-access.
   useEffect(() => {
     let alive = true;
-    (async () => {
-      try {
-        // Sin uid, el server responde 401 → denied (sin ramas síncronas de setState).
-        const res = await fetch('/api/solo-access', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: auth.currentUser?.uid })
-        });
-        const data = await res.json().catch(() => ({}));
-        if (alive) setSoloAccess(res.ok && data.allowed ? 'allowed' : 'denied');
-      } catch {
-        if (alive) setSoloAccess('denied');
-      }
-    })();
-    return () => { alive = false; };
+    const unsubscribe = subscribeToAuthState((user) => {
+      (async () => {
+        try {
+          // Sin uid (user null → sin sesión), el server responde 401 → denied.
+          const res = await fetch('/api/solo-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uid: user?.uid })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (alive) setSoloAccess(res.ok && data.allowed ? 'allowed' : 'denied');
+        } catch {
+          if (alive) setSoloAccess('denied');
+        }
+      })();
+    });
+    return () => { alive = false; unsubscribe(); };
   }, []);
 
   useEffect(() => {
