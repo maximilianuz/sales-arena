@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen, Shuffle, Package, ChevronDown, ChevronUp, Lock, Lightbulb, Pause, Play, Theater, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen, Shuffle, Package, ChevronDown, ChevronUp, Lock, Lightbulb, Pause, Play, Theater, TrendingUp, Mail } from 'lucide-react';
 import { auth } from '../utils/db';
 import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, closerTurn, initialBuyerState } from '../utils/roleplayClient';
@@ -14,6 +14,10 @@ import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
 import MethodScores from '../components/MethodScores';
 import { LeadActorView } from '../components/ScenarioPanel';
+
+// Correo del admin al que se pide validación para practicar solo (protege los
+// tokens de la API). Configurable por env; default al contacto ya usado en la app.
+const SOLO_ACCESS_EMAIL = import.meta.env.VITE_ACCESS_REQUEST_EMAIL || 'contacto.maximilianoc@gmail.com';
 
 // Expresión emocional del lead por turno (la emite la IA en `emotion`).
 // El emoji + etiqueta le dan al closer feedback inmediato de cómo cayó su técnica.
@@ -104,6 +108,9 @@ export default function SoloPractice({ onBack }) {
   const [leadEmotion, setLeadEmotion] = useState('neutral'); // emoción del último turno → cara del avatar
   const [transcribing, setTranscribing] = useState(false);
   const [showCoach, setShowCoach] = useState(false);
+  // Candado de la práctica solo: solo usuarios validados por el admin pueden
+  // practicar (protege los tokens de la API). 'checking' | 'allowed' | 'denied'.
+  const [soloAccess, setSoloAccess] = useState('checking');
   // Producto a vender: visible al arrancar (clima) y colapsable para no tapar el chat.
   // Colapsado por defecto: el foco de la pantalla es la CHARLA, no el producto
   // (se despliega con un tap cuando el closer lo necesita consultar).
@@ -156,6 +163,27 @@ export default function SoloPractice({ onBack }) {
 
   useEffect(() => { warmUpVoices(); }, []);
   useEffect(() => () => stopSpeaking(), []); // cortar la voz al desmontar
+
+  // Verifica en el servidor si el usuario está validado para practicar solo.
+  // Corre una vez al montar; ante cualquier error, negamos (protege los tokens).
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        // Sin uid, el server responde 401 → denied (sin ramas síncronas de setState).
+        const res = await fetch('/api/solo-access', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid: auth.currentUser?.uid })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (alive) setSoloAccess(res.ok && data.allowed ? 'allowed' : 'denied');
+      } catch {
+        if (alive) setSoloAccess('denied');
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -499,6 +527,57 @@ export default function SoloPractice({ onBack }) {
   const thinkingName = mode === 'lead' ? closerName
     : mode === 'observer' ? (messages[messages.length - 1]?.role === 'closer' ? leadName : closerName)
     : leadName;
+
+  // ── Candado de acceso a la práctica solo ───────────────────────────────────
+  // Verifica contra el servidor si el usuario está validado. Mientras chequea,
+  // muestra un loader; si no está validado, una pantalla para PEDIR validación
+  // por email (no se genera ningún escenario ni se gasta un token hasta acá).
+  if (soloAccess === 'checking') {
+    return (
+      <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
+        <p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Checking access…' : 'Verificando acceso…'}</p>
+      </div>
+    );
+  }
+  if (soloAccess === 'denied') {
+    const email = auth.currentUser?.email || '';
+    const subject = isEn ? 'Solo practice access request — Sales Arena' : 'Pedido de acceso a la práctica solo — Sales Arena';
+    const bodyLines = isEn
+      ? `Hi, I'd like access to solo practice.\n\nMy account email: ${email}\n\nThanks!`
+      : `Hola, quisiera acceso a la práctica solo.\n\nMail de mi cuenta: ${email}\n\n¡Gracias!`;
+    const mailto = `mailto:${SOLO_ACCESS_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines)}`;
+    return (
+      <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
+        <div style={{ maxWidth: '480px', width: '100%' }}>
+          <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
+          </button>
+          <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+              <Lock size={28} color="var(--primary)" />
+            </div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: '700', margin: '0 0 0.75rem' }}>
+              {isEn ? 'Solo practice needs validation' : 'La práctica solo requiere validación'}
+            </h1>
+            <p style={{ color: 'var(--text-main)', fontSize: '0.95rem', lineHeight: 1.55, margin: '0 0 1.5rem' }}>
+              {isEn
+                ? 'To keep AI usage under control, solo practice is enabled per user. Request access by email and you\'ll be validated shortly.'
+                : 'Para cuidar el uso de la IA, la práctica solo se habilita por usuario. Pedí acceso por email y te validamos a la brevedad.'}
+            </p>
+            <a href={mailto}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%', padding: '0.85rem 1rem', borderRadius: '0.75rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', textDecoration: 'none', fontWeight: '700', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(100,210,255,0.35)' }}>
+              <Mail size={17} /> {isEn ? 'Request access by email' : 'Pedir acceso por email'}
+            </a>
+            {email && (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: '1rem 0 0' }}>
+                {isEn ? 'Your account:' : 'Tu cuenta:'} {email}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── Intro ────────────────────────────────────────────────────────────────
   if (phase === 'intro' || phase === 'loading') {
