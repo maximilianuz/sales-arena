@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ref, onValue, push, remove } from 'firebase/database';
 import { db } from '../utils/db';
-import { Trash2, Plus, Mail, Copy, Check, ShieldOff } from 'lucide-react';
+import { Trash2, Plus, Mail, Copy, Check, ShieldOff, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // Estado real de acceso de un email: 'active' (ya inició sesión y tiene
@@ -49,6 +49,7 @@ export default function AdminAuthorizedEmails({ adminUid }) {
   // Toolkit y leer users/{uid} — datos que el cliente no puede ver directo.
   const [accessStatus, setAccessStatus] = useState({});
   const [revokingId, setRevokingId] = useState(null);
+  const [grantingId, setGrantingId] = useState(null);
 
   const isEn = i18n.language?.startsWith('en');
 
@@ -67,25 +68,31 @@ export default function AdminAuthorizedEmails({ adminUid }) {
     return () => unsub();
   }, []);
 
+  // Consulta al servidor el estado REAL de acceso de una lista de emails.
+  // Reusada por el efecto de abajo (cuando cambia la whitelist) y por las
+  // acciones de otorgar/revocar (para reflejar el cambio sin esperar a que
+  // se dispare otro efecto).
+  const refreshStatus = async (emailList) => {
+    if (emailList.length === 0) { setAccessStatus({}); return; }
+    try {
+      const res = await fetch('/api/admin-manage-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callerUid: adminUid, action: 'status', emails: emailList })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (Array.isArray(data.results)) {
+        const map = {};
+        data.results.forEach(r => { map[r.email] = r; });
+        setAccessStatus(map);
+      }
+    } catch { /* si falla, simplemente no mostramos el estado */ }
+  };
+
   // Refresca el estado de acceso cada vez que cambia la lista de emails.
   useEffect(() => {
     let alive = true;
-    (async () => {
-      if (emails.length === 0) { if (alive) setAccessStatus({}); return; }
-      try {
-        const res = await fetch('/api/admin-manage-access', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ callerUid: adminUid, action: 'status', emails: emails.map(e => e.email) })
-        });
-        const data = await res.json().catch(() => ({}));
-        if (alive && Array.isArray(data.results)) {
-          const map = {};
-          data.results.forEach(r => { map[r.email] = r; });
-          setAccessStatus(map);
-        }
-      } catch { /* si falla, simplemente no mostramos el estado */ }
-    })();
+    (async () => { if (alive) await refreshStatus(emails.map(e => e.email)); })();
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [emails.map(e => e.email).join(','), adminUid]);
@@ -136,12 +143,43 @@ export default function AdminAuthorizedEmails({ adminUid }) {
       const emailRef = ref(db, `admin/authorizedEmails/${emailId}`);
       await remove(emailRef);
 
+      await refreshStatus(emails.map(e => e.email));
       setMessage(isEn ? 'Email removed and access revoked' : 'Correo removido y acceso revocado');
       setTimeout(() => setMessage(''), 2500);
     } catch (error) {
       setMessage(isEn ? `Error: ${error.message}` : `Error: ${error.message}`);
     } finally {
       setRevokingId(null);
+    }
+  };
+
+  // Otorga (o reactiva) acceso directo, sin depender de que la persona vuelva
+  // a iniciar sesión. Necesario para reactivar a alguien que fue revocado:
+  // el chequeo automático del cliente solo corre cuando subscriptionStatus
+  // es 'none', así que una vez 'revoked' queda pegado ahí para siempre salvo
+  // que el admin lo reactive a mano desde acá.
+  const handleGrantAccess = async (emailId, email) => {
+    setGrantingId(emailId);
+    try {
+      const res = await fetch('/api/admin-manage-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callerUid: adminUid, action: 'grant', email })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) throw new Error(data.error || 'No se pudo otorgar el acceso');
+
+      await refreshStatus(emails.map(e => e.email));
+      setMessage(
+        data.note === 'no_account'
+          ? (isEn ? 'No account yet — access will activate on first login' : 'Sin cuenta aún — el acceso se activará al iniciar sesión')
+          : (isEn ? 'Access granted' : 'Acceso otorgado')
+      );
+      setTimeout(() => setMessage(''), 2500);
+    } catch (error) {
+      setMessage(isEn ? `Error: ${error.message}` : `Error: ${error.message}`);
+    } finally {
+      setGrantingId(null);
     }
   };
 
@@ -267,6 +305,26 @@ export default function AdminAuthorizedEmails({ adminUid }) {
                 >
                   {copiedId === item.email ? <Check size={16} /> : <Copy size={16} />}
                 </button>
+                {accessStatus[item.email]?.subscriptionStatus !== 'active' && (
+                  <button
+                    onClick={() => handleGrantAccess(item.id, item.email)}
+                    disabled={grantingId === item.id}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--success)',
+                      cursor: grantingId === item.id ? 'wait' : 'pointer',
+                      opacity: grantingId === item.id ? 0.5 : 1,
+                      padding: '0.4rem',
+                      marginRight: '0.4rem',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                    title={isEn ? 'Grant access now' : 'Dar acceso ahora'}
+                  >
+                    <ShieldCheck size={16} />
+                  </button>
+                )}
                 <button
                   onClick={() => handleRemoveEmail(item.id, item.email)}
                   disabled={revokingId === item.id}
