@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { X, Globe } from 'lucide-react';
 import { db, auth } from '../utils/db';
 import { flagEmoji, countryName } from '../utils/countries';
+import { useCerrarConEscape } from '../hooks/useCerrarConEscape';
 
 // Mini-reloj mundial NATIVO: cada participante escribe su huso horario (el real
 // del dispositivo, vía Intl) + su bandera a rooms/{id}/clocks/{uid}, y todos ven
@@ -34,6 +35,7 @@ function hourDiff(tz, myTz, base) {
 }
 
 export default function WorldClockPanel({ roomId, userName, onClose }) {
+  useCerrarConEscape(onClose);
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const [clocks, setClocks] = useState({});
@@ -75,7 +77,7 @@ export default function WorldClockPanel({ roomId, userName, onClose }) {
     .sort((a, b) => (a.uid === myUid ? -1 : b.uid === myUid ? 1 : 0));
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 1150, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={onClose}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 'var(--z-modal)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={onClose}>
       <div className="glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '420px', width: '100%', maxHeight: '80vh', overflowY: 'auto', padding: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
           <Globe size={18} color="var(--primary)" />
@@ -97,16 +99,16 @@ export default function WorldClockPanel({ roomId, userName, onClose }) {
               <span style={{ fontSize: '1.3rem', width: '26px', textAlign: 'center' }}>{r.country ? flagEmoji(r.country) : '🌐'}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: '700', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {r.name}{isMe && <span style={{ color: 'var(--primary)', fontSize: '0.72rem', fontWeight: '600' }}> {isEn ? '(you)' : '(vos)'}</span>}
+                  {r.name}{isMe && <span style={{ color: 'var(--primary-text)', fontSize: '0.72rem', fontWeight: '600' }}> {isEn ? '(you)' : '(vos)'}</span>}
                 </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                   {r.country ? countryName(r.country, i18n.language) + ' · ' : ''}{r.tz}
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontWeight: '600', fontVariantNumeric: 'tabular-nums' }}>{localTime(r.tz, now)}</div>
                 {!isMe && diff !== 0 && (
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                     {diff > 0 ? '+' : ''}{diff}h {isEn ? 'vs you' : 'vs vos'}
                   </div>
                 )}

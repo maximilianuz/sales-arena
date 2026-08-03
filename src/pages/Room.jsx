@@ -287,7 +287,7 @@ export default function Room() {
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>
                     {isEn ? `Closer's path (Stage ${activeStageIndex + 1})` : `Camino del Closer (Etapa ${activeStageIndex + 1})`}
                   </div>
-                  <div style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                  <div style={{ color: 'var(--primary-text)', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
                     {stagesEff[activeStageIndex || 0].label}
                   </div>
                   <div style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>
@@ -474,7 +474,7 @@ export default function Room() {
       </main>
 
       <footer style={{ textAlign: 'center', padding: '2rem 1rem', marginTop: 'auto', fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-        <span>{t('room.madeWith')} <span className="heart-beat">❤️</span> {t('room.by')} <a href="https://maximilianoc.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>Maximiliano C.</a></span>
+        <span>{t('room.madeWith')} <span className="heart-beat">❤️</span> {t('room.by')} <a href="https://maximilianoc.netlify.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-text)', textDecoration: 'none', fontWeight: 'bold' }}>Maximiliano C.</a></span>
         <button
           className="btn btn-outline"
           onClick={() => setShowClocks(true)}

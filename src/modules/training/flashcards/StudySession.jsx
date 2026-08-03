@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Loader, Check, X, AlertTriangle, Mic } from 'lucide-react';
+import { ArrowLeft, Loader, Check, X, AlertTriangle, Mic, CircleCheck } from 'lucide-react';
 import { auth } from '../../../utils/db';
 import { subscribeList, subscribeNode, setItem, logActivity } from '../db';
 import { review, dueCards } from '../srs/fsrs';
 import { DECKS } from '../seedImport';
 import { cartasBloqueadas } from '../plan/consolidacion';
-import { panel, surface, CSS_INTERACCION, TOQUE_MIN } from '../ui';
+import { panel, surface, ACENTO, CSS_INTERACCION, TOQUE_MIN } from '../ui';
 
 // Sesión de repaso con FSRS. Cartas clásicas: frente → respondés EN VOZ ALTA →
 // dorso + por qué + autocalificación. Cartas Feynman: escribís tu explicación,
@@ -211,7 +211,7 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
     return (
       <Shell onBack={onBack} title={deckName}>
         <div style={{ ...panel, textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>✅</div>
+          <CircleCheck size={30} color={ACENTO.progreso} strokeWidth={1.9} style={{ marginBottom: '0.5rem' }} />
           <p style={{ fontWeight: 700, margin: '0 0 0.3rem' }}>Sesión terminada: {done} cartas</p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1rem' }}>
             Quedó registrado en tu log de práctica.
@@ -226,7 +226,7 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
     <Shell onBack={onBack} title={deckName} progress={`${done} hechas · ${Math.max(0, queue.length - idx)} en cola`}>
       {/* FRENTE */}
       <div style={{ ...surface.raised, padding: '1.2rem 1.3rem', marginBottom: '0.8rem' }}>
-        <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
           {DECKS.find(d => d.id === carta.mazo)?.nombre || carta.mazo}{isFeynman ? ' · Modo Feynman' : ''}
         </div>
         <div style={{ fontSize: '1rem', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>{carta.frente}</div>
@@ -294,7 +294,7 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
 
           {evalResult && (
             <div style={{ ...panel, marginBottom: '0.8rem' }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>Evaluación</div>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>Evaluación</div>
               {(evalResult.cubiertos || []).map((p, i) => (
                 <p key={`c${i}`} style={{ margin: '0.25rem 0', fontSize: '0.85rem' }}><Check size={13} color="#30d158" style={{ verticalAlign: '-2px' }} /> {p}</p>
               ))}
@@ -312,7 +312,7 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
             {isFeynman ? (
               principio && (
                 <>
-                  <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Referencia: {principio.nombre}</div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Referencia: {principio.nombre}</div>
                   <p style={{ margin: 0, fontSize: '0.88rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{principio.explicacionReferencia}</p>
                 </>
               )
@@ -363,7 +363,7 @@ function Shell({ onBack, title, progress, children }) {
     <style>{CSS_INTERACCION}</style>
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '1rem' }}>
-        <button className="btn btn-outline" onClick={onBack} style={{ padding: '0.4rem 0.7rem' }}><ArrowLeft size={15} /></button>
+        <button aria-label="Volver" className="btn btn-outline" onClick={onBack} style={{ padding: '0.4rem 0.7rem' }}><ArrowLeft size={15} /></button>
         <div style={{ fontWeight: 700 }}>{title}</div>
         {progress && <div style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{progress}</div>}
       </div>

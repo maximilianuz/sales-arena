@@ -20,8 +20,8 @@ const panel = {
 };
 
 const EMOTION_LABEL = {
-  neutral: '😐 neutral', interesado: '🙂 interesado', esceptico: '🤨 escéptico',
-  molesto: '😠 molesto', entusiasmado: '😃 entusiasmado', dudoso: '😕 dudoso', apurado: '⏱️ apurado',
+  neutral: 'neutral', interesado: 'interesado', esceptico: 'escéptico',
+  molesto: 'molesto', entusiasmado: 'entusiasmado', dudoso: 'dudoso', apurado: '⏱️ apurado',
 };
 
 // `perfilInicial` lo manda el plan: salta el selector y arranca la llamada con
@@ -299,7 +299,7 @@ function LiveCall({ perfil, oferta, fases, principios, onBack, onExit, onDone })
             background: m.role === 'closer' ? 'rgba(48,209,88,0.10)' : 'rgba(255,255,255,0.04)',
             borderColor: m.role === 'closer' ? 'rgba(48,209,88,0.25)' : 'rgba(255,255,255,0.08)',
           }}>
-            <div style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
               {m.role === 'closer' ? 'Vos' : perfil.nombre}{m.emotion ? ` · ${EMOTION_LABEL[m.emotion] || m.emotion}` : ''}
             </div>
             <div style={{ fontSize: '0.9rem', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{m.content}</div>
@@ -339,7 +339,7 @@ function LiveCall({ perfil, oferta, fases, principios, onBack, onExit, onDone })
       {corte?.finDeLlamada && (
         <div style={{ ...panel, marginBottom: '0.9rem', borderColor: corte.finDeLlamada === 'closed' ? 'rgba(48,209,88,0.45)' : 'rgba(255,69,58,0.45)' }}>
           <p style={{ margin: '0 0 0.7rem', fontWeight: 700 }}>
-            {corte.finDeLlamada === 'closed' ? '✅ El prospecto decidió avanzar.' : '❌ El prospecto se cayó.'}
+            {corte.finDeLlamada === 'closed' ? 'El prospecto decidió avanzar.' : 'El prospecto se cayó.'}
           </p>
           <button className="btn btn-primary" onClick={terminar} disabled={cerrando} style={{ fontSize: '0.82rem' }}>
             {cerrando ? 'Auditando…' : 'Ver auditoría'}
@@ -377,7 +377,7 @@ function LiveCall({ perfil, oferta, fases, principios, onBack, onExit, onDone })
 function Barra({ label, valor, color }) {
   return (
     <div style={{ flex: '1 1 100px', minWidth: '90px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
         <span>{label}</span><span style={{ fontVariantNumeric: 'tabular-nums' }}>{valor}</span>
       </div>
       <div style={{ height: '5px', borderRadius: '3px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
@@ -391,7 +391,7 @@ function Shell({ onBack, title, children }) {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '1rem' }}>
-        <button className="btn btn-outline" onClick={onBack} style={{ padding: '0.4rem 0.7rem', flexShrink: 0 }}><ArrowLeft size={15} /></button>
+        <button aria-label="Volver" className="btn btn-outline" onClick={onBack} style={{ padding: '0.4rem 0.7rem', flexShrink: 0 }}><ArrowLeft size={15} /></button>
         <div style={{ fontWeight: 700, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
       </div>
       {children}

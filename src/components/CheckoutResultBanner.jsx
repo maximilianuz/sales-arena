@@ -12,7 +12,7 @@ export default function CheckoutResultBanner({ checkout }) {
   return (
     <div style={{
       position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)',
-      zIndex: 500, padding: '1rem 2rem', borderRadius: '2rem',
+      zIndex: 'var(--z-toast)', padding: '1rem 2rem', borderRadius: '2rem',
       background: closed ? 'rgba(48,209,88,0.15)' : 'rgba(255,69,58,0.15)',
       border: `1px solid ${closed ? 'var(--success)' : 'var(--danger)'}`,
       backdropFilter: 'blur(12px)',

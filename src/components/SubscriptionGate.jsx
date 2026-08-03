@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard, Lock, Mail } from 'lucide-react';
+import { ChessKnight, Zap, Users, Check, Bitcoin, CreditCard, Lock, Mail, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { signOutUser, activateFreeplan } from '../utils/auth';
 import { GROUP_ONLY_MODE } from '../config/appMode';
@@ -25,7 +25,7 @@ const PLAN_META = [
   {
     id: 'trainer',
     icon: <Users size={28} />,
-    color: 'var(--primary)',
+    color: 'var(--primary-text)',
     monthlyId: 'trainer_monthly',
     yearlyId: 'trainer_yearly',
     monthlyPrice: 97,
@@ -119,7 +119,7 @@ export default function SubscriptionGate({ user, children, isActive, isLoading, 
             onClick={onClose}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
           >
-            ← {t('subscription.back')}
+            <ArrowLeft size={15} style={{ verticalAlign: '-2px' }} /> {t('subscription.back')}
           </button>
         </div>
       )}

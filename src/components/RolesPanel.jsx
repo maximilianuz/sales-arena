@@ -59,7 +59,7 @@ export default function RolesPanel({ participants, setParticipants }) {
           onChange={(e) => setNewName(e.target.value)}
           style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}
         />
-        <button type="submit" className="btn btn-primary" style={{ padding: '0.4rem 0.75rem' }}>
+        <button aria-label="UserPlus" type="submit" className="btn btn-primary" style={{ padding: '0.4rem 0.75rem' }}>
           <UserPlus size={16} />
         </button>
       </form>

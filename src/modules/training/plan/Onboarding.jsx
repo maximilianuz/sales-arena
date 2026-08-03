@@ -74,7 +74,7 @@ export default function Onboarding({ onListo, onCancel }) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '1rem' }}>
-        <button className="btn btn-outline" onClick={atras} disabled={guardando} style={{ padding: '0.4rem 0.7rem', flexShrink: 0 }}>
+        <button aria-label="Volver" className="btn btn-outline" onClick={atras} disabled={guardando} style={{ padding: '0.4rem 0.7rem', flexShrink: 0 }}>
           <ArrowLeft size={15} />
         </button>
         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.08em' }}>

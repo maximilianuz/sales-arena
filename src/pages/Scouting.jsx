@@ -24,7 +24,7 @@ function ProspectCard({ p, isEn, lng }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
             <span style={{ fontWeight: '600' }}>{p.name || 'Closer'}</span>
             <span style={{
-              fontSize: '0.68rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em',
+              fontSize: '0.72rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em',
               color: tier.color, background: `${tier.color}1f`, border: `1px solid ${tier.color}55`,
               padding: '0.1rem 0.5rem', borderRadius: '2rem'
             }}>

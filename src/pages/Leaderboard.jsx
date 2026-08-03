@@ -46,7 +46,7 @@ function LeaderRow({ rank, entry, isMe, isEn, lng }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {entry.country && <span style={{ marginRight: '0.35rem' }}>{flagEmoji(entry.country)}</span>}
-          {entry.name || 'Closer'} {isMe && <span style={{ fontSize: '0.72rem', color: 'var(--primary)', fontWeight: '600' }}>{isEn ? '(you)' : '(vos)'}</span>}
+          {entry.name || 'Closer'} {isMe && <span style={{ fontSize: '0.72rem', color: 'var(--primary-text)', fontWeight: '600' }}>{isEn ? '(you)' : '(vos)'}</span>}
         </div>
         <div style={{ fontSize: '0.72rem', fontWeight: '700', color: tier.color, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           {tierLabel(tier, lng)}
@@ -115,7 +115,7 @@ export default function Leaderboard({ onBack }) {
             <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
           </button>
           <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '600', flex: 1 }}>
-            {isEn ? '🏆 Leaderboard' : '🏆 Tabla de posiciones'}
+            {isEn ? 'Leaderboard' : 'Tabla de posiciones'}
           </h1>
         </div>
 

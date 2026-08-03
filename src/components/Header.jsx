@@ -21,7 +21,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
   };
 
   return (
-    <header className="header-container" style={{ position: 'sticky', top: '1rem', zIndex: 50 }}>
+    <header className="header-container" style={{ position: 'sticky', top: '1rem', zIndex: 'var(--z-sticky)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#0a84ff 0%,#5e5ce6 55%,#4d4ad9 100%)', padding: '0.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 15px rgba(94, 92, 230, 0.3)' }}>
           <ChessKnight size={24} color="white" strokeWidth={1.5} />
@@ -92,7 +92,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
             <Cpu size={18} /> {t('header.aiSettings')}
           </button>
         )}
-        <button
+        <button aria-label={i18n.language?.startsWith('en') ? 'Sign out' : 'Cerrar sesión'}
           onClick={signOutUser}
           title={i18n.language?.startsWith('en') ? 'Sign out' : 'Cerrar sesión'}
           style={{ background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.25)', color: 'rgba(255,255,255,0.74)', borderRadius: '0.5rem', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}

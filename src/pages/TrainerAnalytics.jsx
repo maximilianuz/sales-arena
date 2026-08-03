@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Copy, CheckCircle2, Users, TrendingUp, Award, Target, ChevronDown, ChevronUp, FileText, FileSpreadsheet, Wallet } from 'lucide-react';
 import { exportCohortCSV, exportCohortPDF } from '../utils/export';
 import { tierFromEarnings, tierLabel, formatMoney, commissionForSession } from '../utils/gamification';
+import { propsDeFila } from '../utils/a11y';
 
 const SCORE_KEYS = ['rapport', 'objectionHandling', 'closing', 'activeListening'];
 
@@ -91,7 +92,11 @@ function StudentRow({ student, uid, isEn }) {
 
   return (
     <div className="glass-panel" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: sessions.length ? 'pointer' : 'default' }} onClick={() => sessions.length && setExpanded(!expanded)}>
+      <div
+        {...(sessions.length
+          ? propsDeFila(() => setExpanded(!expanded), { expandido: expanded })
+          : {})}
+        style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: sessions.length ? 'pointer' : 'default' }}>
         <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: `color-mix(in srgb, ${scoreColor(avg)} 15%, transparent)`, border: `2px solid ${scoreColor(avg)}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <span style={{ fontWeight: '600', color: scoreColor(avg) }}>{avg || '—'}</span>
         </div>
@@ -198,7 +203,7 @@ export default function TrainerAnalytics({ onBack }) {
             <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
           </button>
           <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '600', flex: 1 }}>
-            {isEn ? '📊 Trainer Analytics' : '📊 Analytics del Trainer'}
+            {isEn ? 'Trainer Analytics' : 'Analytics del Trainer'}
           </h1>
           {students.length > 0 && (
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -246,7 +251,7 @@ export default function TrainerAnalytics({ onBack }) {
               { icon: <TrendingUp size={16} />, label: isEn ? 'Weakest area' : 'Área débil', value: weakestArea ? areaLabels[weakestArea] : '—', small: true }
             ].map((stat, i) => (
               <div key={i} className="glass-panel" style={{ textAlign: 'center', padding: '1rem 0.5rem' }}>
-                <div style={{ color: 'var(--primary)', display: 'flex', justifyContent: 'center', marginBottom: '0.35rem' }}>{stat.icon}</div>
+                <div style={{ color: 'var(--primary-text)', display: 'flex', justifyContent: 'center', marginBottom: '0.35rem' }}>{stat.icon}</div>
                 <div style={{ fontSize: stat.small ? '0.85rem' : '1.6rem', fontWeight: '600', lineHeight: 1.1 }}>{stat.value}</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{stat.label}</div>
               </div>

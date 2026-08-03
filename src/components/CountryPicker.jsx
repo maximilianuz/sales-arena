@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { X, Search } from 'lucide-react';
 import { db, auth } from '../utils/db';
 import { COUNTRIES, flagEmoji } from '../utils/countries';
+import { useCerrarConEscape } from '../hooks/useCerrarConEscape';
 
 // Selector de país del closer (bandera identificatoria). Escribe el código ISO-2
 // en users/{uid}/country (regla: cada uno escribe solo el suyo). La bandera se
 // propaga al leaderboard cuando el servidor analiza la próxima sesión.
 export default function CountryPicker({ current, onClose, onSaved }) {
+  useCerrarConEscape(onClose);
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const [q, setQ] = useState('');
@@ -36,7 +38,7 @@ export default function CountryPicker({ current, onClose, onSaved }) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={onClose}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 'var(--z-modal-alto)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={onClose}>
       <div className="glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', width: '100%', maxHeight: '80vh', display: 'flex', flexDirection: 'column', padding: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem' }}>
           <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600', flex: 1 }}>{isEn ? 'Your country' : 'Tu país'}</h2>
