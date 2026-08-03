@@ -25,6 +25,9 @@ import ProgressPath from '../components/ProgressPath';
 const SoloPractice = lazy(() => import('./SoloPractice'));
 // Generador de Propuestas VIP: módulo aparte que se abre desde el Lobby.
 const ProposalGenerator = lazy(() => import('../modules/proposals/ProposalGenerator'));
+// Entrenamiento de closing high ticket (flashcards FSRS, base de conocimiento,
+// registro de práctica). Diferido: arrastra los seeds JSON del contenido.
+const TrainingHome = lazy(() => import('../modules/training/TrainingHome'));
 // Panel de Administración: solo para admins
 const AdminPanel = lazy(() => import('./AdminPanel'));
 
@@ -94,6 +97,7 @@ export default function Lobby() {
   const [showScouting, setShowScouting] = useState(false);
   const [showScoutingModal, setShowScoutingModal] = useState(false);
   const [showSolo, setShowSolo] = useState(false);
+  const [showTraining, setShowTraining] = useState(false);
   const [showProposals, setShowProposals] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showJoinCohort, setShowJoinCohort] = useState(false);
@@ -221,9 +225,17 @@ export default function Lobby() {
   if (showAnalytics) return <TrainerAnalytics onBack={() => setShowAnalytics(false)} />;
   if (showLeaderboard) return <Leaderboard onBack={() => setShowLeaderboard(false)} />;
   if (showScouting) return <Scouting onBack={() => setShowScouting(false)} />;
+  if (showTraining) return (
+    <Suspense fallback={<div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}><p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Loading…' : 'Cargando…'}</p></div>}>
+      <TrainingHome
+        onBack={() => setShowTraining(false)}
+        onPracticaVoz={() => { setShowTraining(false); setShowSolo(true); }}
+      />
+    </Suspense>
+  );
   if (showSolo) return (
     <Suspense fallback={<div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}><p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Loading…' : 'Cargando…'}</p></div>}>
-      <SoloPractice onBack={() => setShowSolo(false)} />
+      <SoloPractice onBack={() => setShowSolo(false)} onOpenTraining={() => { setShowSolo(false); setShowTraining(true); }} />
     </Suspense>
   );
   if (showProposals) return (
@@ -398,6 +410,12 @@ export default function Lobby() {
             label={isEn ? 'Practice solo' : 'Practicar solo'}
             accent="48,209,88"
             onClick={() => setShowSolo(true)}
+          />
+          <FeatureButton
+            icon={<BookOpen size={16} />}
+            label={isEn ? 'Closer Training' : 'Entrenamiento Closer'}
+            accent="6,182,212"
+            onClick={() => setShowTraining(true)}
           />
           {isPaid && (
             <FeatureButton

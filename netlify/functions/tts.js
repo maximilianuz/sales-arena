@@ -1,4 +1,4 @@
-import { getUserData } from './lib/firebaseAdmin.js';
+import { getUserData, isSoloAuthorized } from './lib/firebaseAdmin.js';
 
 // Text-to-Speech via Fish Audio S2.1 Pro — proxy serverless.
 // Recibe texto + parámetros de voz y devuelve audio MP3 en base64.
@@ -120,6 +120,21 @@ export const handler = async (event) => {
   // Validar usuario activo
   try { await getUserData(uid); }
   catch { return { statusCode: 403, headers, body: JSON.stringify({ error: 'Usuario no encontrado.' }) }; }
+
+  // Candado de práctica individual. El roleplay individual consume mucho más
+  // que la práctica en equipo, así que se habilita por aprobación: admin, o
+  // email agregado a admin/authorizedEmails (que el flujo verificado convierte
+  // en subscriptionStatus 'active'). La práctica en grupo no usa este endpoint
+  // y queda abierta.
+  try {
+    if (!(await isSoloAuthorized(uid))) {
+      return { statusCode: 403, headers, body: JSON.stringify({ error: "Tu cuenta no tiene acceso a la práctica individual." }) };
+    }
+  } catch {
+    // Ante un fallo de verificación se niega: proteger los tokens es lo que
+    // este chequeo viene a hacer.
+    return { statusCode: 403, headers, body: JSON.stringify({ error: "No se pudo verificar el acceso." }) };
+  }
 
   const langPrefix = (language || 'es').startsWith('en') ? 'en' : 'es';
   const emotionTag = EMOTION_TAGS[emotion] || '';

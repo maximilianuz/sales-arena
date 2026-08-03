@@ -1,0 +1,321 @@
+{
+  "version": 2,
+  "descripcion": "Principios de venta high ticket. Entidad central: objeciones, flashcards, guion y feedback del simulador referencian estos IDs. Seed para la base de conocimiento del usuario.",
+  "principios": [
+    {
+      "id": "p-dolor-antes-precio",
+      "nombre": "El precio solo existe en relación a un dolor cuantificado",
+      "resumen": "Nunca digas el precio antes de que el prospecto haya puesto número a lo que le cuesta su problema.",
+      "explicacionReferencia": "Un precio no es caro ni barato en sí mismo: el cerebro lo compara contra algo. Si todavía no cuantificaste el dolor, la única referencia disponible es el bolsillo ('¿tengo esa plata?') o la competencia ('vi uno más barato'). Si primero el prospecto puso número a su problema —cuánta plata, tiempo o salud pierde por mes—, el precio se compara contra ESE número, y un programa de 2.400 contra un problema de 12.000 al año es una obviedad, no un gasto. Por eso decir el precio antes de tiempo no es un error de orden: cambia el objeto contra el que se compara y pierde siempre.",
+      "puntosClave": [
+        "El precio se evalúa por comparación, nunca en absoluto",
+        "Si no hay dolor cuantificado, la comparación es contra el bolsillo o la competencia",
+        "Cuantificar dolor = ponerle número en plata, tiempo o energía",
+        "El orden importa más que el argumento: dolor primero, precio después"
+      ],
+      "comoAplicarlo": "En Descubrimiento preguntá '¿qué te está costando esto por mes?' y no avances a Pitch sin un número concreto. Al decir el precio, anclalo: 'me dijiste que esto te cuesta X por mes; el programa sale Y'.",
+      "errorTipico": "Ceder cuando el prospecto pide el precio al minuto 3. Se puede posponer con permiso: 'te lo digo en 10 minutos cuando entienda tu caso, porque un precio sin contexto no te sirve para decidir. ¿Te parece?'"
+    },
+    {
+      "id": "p-costo-inaccion",
+      "nombre": "La venta se decide contra el costo de no actuar",
+      "resumen": "Tu verdadero competidor no es otra oferta: es el statu quo. Vendés contra 'seguir igual'.",
+      "explicacionReferencia": "El prospecto no compara tu programa contra otro programa; compara actuar contra no actuar. Y 'no hacer nada' se siente gratis, aunque nunca lo es: el problema sigue cobrando su cuota todos los meses en plata, salud o tiempo. El trabajo del closer es hacer visible esa cuenta invisible: cuánto acumuló ya el problema, y cuánto va a acumular en 6 o 12 meses más de espera. Cuando esperar tiene precio explícito, 'lo dejo para más adelante' deja de ser la opción segura y pasa a ser la opción cara.",
+      "puntosClave": [
+        "El statu quo es el competidor real",
+        "No actuar se percibe gratis pero tiene costo acumulativo",
+        "Hacer explícita la cuenta: costo por mes × meses de espera",
+        "Esperar tiene que quedar como decisión con precio, no como neutro"
+      ],
+      "comoAplicarlo": "Ante 'no es buen momento' o 'el año que viene': '¿qué va a ser distinto entonces? y mientras tanto, ¿cuánto te cuesta cada mes que pasa igual que este?'",
+      "errorTipico": "Usarlo como amenaza ('¡vas a perder todo!'). Es una cuenta que el prospecto hace con vos, no un pronóstico catastrófico tuyo."
+    },
+    {
+      "id": "p-quien-pregunta-lidera",
+      "nombre": "Quien hace las preguntas conduce la conversación",
+      "resumen": "Las preguntas dirigen la atención. El que pregunta elige de qué se habla; el que responde lo sigue.",
+      "explicacionReferencia": "Responder es un acto automático: ante una pregunta, el cerebro busca la respuesta antes de decidir si quería responderla. Por eso el que pregunta controla el foco sin necesidad de imponer nada. Cuando el closer habla mucho y el prospecto pregunta, los roles se invierten: el closer queda defendiendo su producto ante un examinador. Además, la gente no se convence con tus afirmaciones sino con sus propias respuestas: lo que el prospecto dice en voz alta ('esto me está costando el matrimonio') tiene un peso que ninguna frase tuya puede igualar, porque discutirlo sería discutirse a sí mismo.",
+      "puntosClave": [
+        "Responder es automático: preguntar dirige el foco",
+        "El que pregunta lidera sin presionar",
+        "La gente cree lo que se escucha decir, no lo que le dicen",
+        "Si el prospecto te examina a vos, el marco se invirtió"
+      ],
+      "comoAplicarlo": "Regla práctica: si llevás dos intervenciones seguidas sin pregunta, la próxima frase termina en signo de pregunta. Cuando el prospecto pregunta algo, respondé corto y devolvé una pregunta.",
+      "errorTipico": "Convertirlo en interrogatorio policial: preguntas encadenadas sin acuse de recibo. Entre pregunta y pregunta va escucha reflejada ('claro, dos años así...')."
+    },
+    {
+      "id": "p-objecion-es-informacion",
+      "nombre": "Una objeción es información, no un ataque",
+      "resumen": "Detrás de cada objeción hay un miedo o una duda sin resolver. Tu trabajo es diagnosticarla, no ganarla.",
+      "explicacionReferencia": "Si el prospecto llegó hasta el final de la llamada y objeta, es porque una parte de él quiere comprar y otra tiene miedo. La objeción es la forma verbal de ese miedo: 'está caro' puede significar 'no confío en que funcione para mí', 'lo hablo con mi pareja' puede significar 'me da miedo decidir solo otra vez'. Si tratás la objeción como ataque y la rebatís, ganás el debate y perdés al cliente, porque el miedo real quedó intacto y ahora además se siente presionado. Si la tratás como síntoma, preguntás hasta encontrar la causa, y respondés a ESO.",
+      "puntosClave": [
+        "Objeción = miedo o duda verbalizada, no rechazo",
+        "El que objeta sigue en la conversación; el que no quiere, corta",
+        "Rebatir gana debates y pierde clientes",
+        "Primero diagnosticar qué hay detrás, después responder"
+      ],
+      "comoAplicarlo": "Ante cualquier objeción, antes de responder: '¿te puedo preguntar algo? cuando decís [objeción], ¿qué es lo que más te preocupa concretamente?'",
+      "errorTipico": "Tener la respuesta lista y dispararla apenas aparece la objeción. Respuesta rápida = respuesta ensayada = vendedor, y encima suele responder a la objeción equivocada."
+    },
+    {
+      "id": "p-acuerdo-antes-rebatir",
+      "nombre": "Validar antes de responder",
+      "resumen": "Nadie escucha mientras se siente atacado. Acordá con la emoción antes de trabajar el contenido.",
+      "explicacionReferencia": "Cuando una persona siente que su posición está bajo ataque, su atención se va a defenderla, no a escucharte: podés tener el mejor argumento del mundo y rebota. Validar primero ('tiene sentido que lo veas así', 'yo en tu lugar preguntaría lo mismo') no es darle la razón en el contenido: es reconocer que su reacción es legítima. Eso desactiva la defensa, porque no hay nada que defender de alguien que está de tu lado. Recién entonces el canal está abierto para reencuadrar. El orden es fisiológico, no cortesía: emoción primero, contenido después.",
+      "puntosClave": [
+        "En modo defensa no hay escucha, solo contraataque",
+        "Validar la emoción no es conceder el argumento",
+        "La validación desactiva la defensa porque elimina el ataque",
+        "Orden fijo: validar → explorar → recién ahí reencuadrar"
+      ],
+      "comoAplicarlo": "Prohibido arrancar con 'pero'. Ante escepticismo u hostilidad: 'hacés bien en desconfiar, hay mucho humo en este rubro. Justamente por eso dejame mostrarte cómo trabajo yo.'",
+      "errorTipico": "La validación falsa de manual ('entiendo perfectamente lo que decís, PERO...'). El 'pero' inmediato borra la validación: lo que se dice antes del pero no cuenta."
+    },
+    {
+      "id": "p-silencio-trabaja",
+      "nombre": "El silencio trabaja para vos",
+      "resumen": "Después de una pregunta fuerte o de decir el precio: callate. El primero que habla, cede.",
+      "explicacionReferencia": "El silencio incomoda, y el principiante lo llena hablando: reformula la pregunta, justifica el precio, ofrece descuento sin que se lo pidan. Cada palabra de más le quita al prospecto el espacio para procesar y decidir. Una pregunta fuerte necesita segundos de elaboración: si la pisás, la respuesta que obtengas es superficial. Y después del precio, el silencio obliga al prospecto a posicionarse: lo que diga primero revela su verdadera reacción. Si hablás vos primero, le comunicás que ni vos bancás tu precio. Sostener el silencio comunica seguridad sin decir una palabra.",
+      "puntosClave": [
+        "El impulso de llenar el silencio es ansiedad propia, no necesidad del otro",
+        "Pregunta fuerte + silencio = respuesta profunda; pregunta pisada = respuesta superficial",
+        "Tras el precio, el que habla primero cede terreno",
+        "El silencio sostenido comunica seguridad en lo que vendés"
+      ],
+      "comoAplicarlo": "Regla mecánica: tras decir el precio o hacer una pregunta emocional, contá 5 segundos mentalmente antes de considerar hablar. Ese conteo te ancla mientras entrenás la tolerancia.",
+      "errorTipico": "Decir el precio y encadenar sin pausa: '...sale 2.400 pero tenemos cuotas y además ahora hay un descuento y...'. Eso es leer tu propio nerviosismo en voz alta."
+    },
+    {
+      "id": "p-palabras-del-prospecto",
+      "nombre": "Vendé con las palabras exactas del prospecto",
+      "resumen": "Reusar sus palabras textuales demuestra escucha real y hace tus frases indiscutibles: nadie discute contra sí mismo.",
+      "explicacionReferencia": "Cuando parafraseás con tus términos ('o sea que tenés burnout'), el prospecto puede corregirte o sentirse etiquetado, y tus palabras le suenan a diagnóstico ajeno. Cuando usás sus palabras exactas ('me dijiste que llegás a las 7 arrastrándote y sin nada para tu familia'), pasan dos cosas: primero, siente que lo escuchaste de verdad —rarísimo en un vendedor— y la confianza sube; segundo, tu argumento queda construido con material que él mismo declaró, así que rebatirlo sería desdecirse. En el pitch, describir el resultado con su vocabulario convierte tu oferta en la respuesta literal a lo que pidió.",
+      "puntosClave": [
+        "Palabras propias del closer = etiqueta discutible; palabras del prospecto = verdad ya admitida",
+        "Citar textual demuestra escucha y dispara confianza",
+        "El pitch armado con su vocabulario se siente hecho a medida",
+        "Requiere anotar frases textuales durante Descubrimiento"
+      ],
+      "comoAplicarlo": "Durante la llamada anotá 3-5 frases textuales del prospecto (dolor, deseo, miedo). Usalas en la Transición (resumen), en el Pitch (beneficios) y en el Cierre.",
+      "errorTipico": "Traducir a jerga de venta: el prospecto dice 'estoy fundido' y el closer devuelve 'tu nivel de energía es subóptimo'. Cada traducción rompe el espejo."
+    },
+    {
+      "id": "p-marco-previo",
+      "nombre": "Los acuerdos del inicio se cobran al final",
+      "resumen": "Todo lo que acuerdes en los primeros minutos (agenda, decisión, honestidad) es un contrato que podés invocar después sin presionar.",
+      "explicacionReferencia": "Pedir algo en caliente genera resistencia; pedirlo por adelantado, cuando no cuesta nada, genera un compromiso. Al inicio de la llamada nadie tiene problema en aceptar 'al final me decís con total honestidad si esto es para vos, aunque sea un no'. Pero ese acuerdo cambia el final: cuando aparece 'lo tengo que pensar', no tenés que presionar; solo recordás el trato ('quedamos en que me ibas a decir con honestidad qué te frena, ¿qué es?'). El prospecto cumple porque las personas necesitan ser consistentes con lo que aceptaron. El marco no se impone al final: se siembra al principio.",
+      "puntosClave": [
+        "Los compromisos se piden cuando son baratos (al inicio), se cobran cuando valen (al final)",
+        "Invocar un acuerdo previo no es presión: es consistencia",
+        "El marco define roles: vos dirigís el proceso, él decide el resultado",
+        "Sin marco inicial, el final de la llamada queda a merced del prospecto"
+      ],
+      "comoAplicarlo": "En la fase Marco cerrá 3 acuerdos: agenda ('primero preguntas, después te cuento, al final decidís'), honestidad ('decime lo que pienses de verdad') y decisión ('¿estás en condiciones de decidir hoy si tiene sentido?').",
+      "errorTipico": "Saltearse el Marco por ansiedad de 'ir al grano'. Los 3 minutos que ahorrás al inicio los pagás con 20 minutos de objeciones evasivas al final."
+    },
+    {
+      "id": "p-vender-es-diagnosticar",
+      "nombre": "El closer es un médico, no un vendedor ambulante",
+      "resumen": "Receta sin diagnóstico es mala praxis. La autoridad nace de examinar antes de proponer.",
+      "explicacionReferencia": "Un médico que te receta a los 30 segundos de entrar al consultorio no te genera confianza, aunque la receta sea correcta: no examinó tu caso. La autoridad del médico no viene de conocer remedios sino del proceso visible de diagnóstico. En ventas es igual: el pitch lanzado temprano suena a producto enlatado que le vendés a cualquiera; el mismo pitch después de 20 minutos de preguntas suena a prescripción para TU caso. Además el diagnóstico te da el material real: sin él, tu pitch habla de características genéricas en vez del dolor concreto de esa persona. Y te habilita a NO vender: si no hay fit, decirlo te da más autoridad que cualquier cierre.",
+      "puntosClave": [
+        "La autoridad viene del proceso de diagnóstico, no del conocimiento del producto",
+        "Mismo pitch, distinto momento: enlatado vs. prescripción",
+        "El diagnóstico alimenta el pitch con material específico",
+        "Poder decir 'esto no es para vos' es la máxima señal de autoridad"
+      ],
+      "comoAplicarlo": "No pases a Pitch hasta tener: el problema con sus palabras, el costo cuantificado, qué intentó antes y por qué falló, y qué quiere lograr. Si falta uno, seguí preguntando.",
+      "errorTipico": "El 'pitch ansioso': el prospecto menciona un dolor y el closer salta a contar cómo su programa lo resuelve. Cada salto de esos rompe el rol de médico y activa el de vendedor."
+    },
+    {
+      "id": "p-emocion-decide-logica-justifica",
+      "nombre": "La emoción decide, la lógica justifica",
+      "resumen": "Las decisiones de compra se toman emocionalmente y se defienden racionalmente. Vendé a la emoción, equipá a la lógica.",
+      "explicacionReferencia": "Nadie compra un programa de 2.400 dólares por una planilla de costos: compra porque se imaginó distinto —con energía, sin dolor, orgulloso— y esa imagen le generó algo. La lógica entra después, cuando tiene que justificar la decisión ante sí mismo, su pareja o su contador. Por eso el trabajo tiene dos partes en orden fijo: primero construir la experiencia emocional (hacerle sentir la brecha entre donde está y donde quiere estar, con sus palabras, con escenas concretas de su vida), y después darle los ladrillos racionales (mecanismo, plan, garantía, casos) para que pueda sostener la decisión cuando la emoción baje. Datos sin emoción no mueven; emoción sin datos no se sostiene y termina en arrepentimiento.",
+      "puntosClave": [
+        "La decisión es emocional; la justificación es racional; el orden no se invierte",
+        "Escenas concretas de SU vida generan emoción; features no",
+        "La lógica sirve para defender la decisión después, ante sí mismo y terceros",
+        "Emoción sin lógica = compra que se cae; lógica sin emoción = 'lo voy a pensar'"
+      ],
+      "comoAplicarlo": "En Descubrimiento buscá escenas, no datos ('¿cómo fue la última vez que...?'). En el Pitch pintá el futuro con sus escenas. Cerrada la emoción, entregá el respaldo racional para que defienda la compra.",
+      "errorTipico": "Vender con PowerPoint mental: listar módulos, semanas y bonuses. El prospecto asiente, entiende todo, y dice 'lo voy a pensar' — porque entender no es querer."
+    },
+    {
+      "id": "p-desapego",
+      "nombre": "El desapego vende; la necesidad espanta",
+      "resumen": "Si necesitás la venta, se nota, y el que se nota necesitado pierde estatus y credibilidad. El desapego habilita calificar de verdad.",
+      "explicacionReferencia": "La necesidad se filtra por el tono: hablar de más, aceptar cualquier condición, perseguir, bajar el precio sin que lo pidan. El prospecto lo lee instantáneamente, y razona simple: si este necesita tanto venderme, su oferta no debe valer tanto. El desapego —estar dispuesto a que la respuesta sea no— invierte la señal: alguien que puede perder la venta sin drama transmite que su oferta se sostiene sola. Además el desapego es condición para calificar honestamente: solo quien no necesita cerrar a cualquiera puede decir 'esto no es para vos', y esa frase, dicha con calma, construye más confianza que cualquier argumento. El desapego no es indiferencia por la persona: es indiferencia por el resultado de ESTA llamada.",
+      "puntosClave": [
+        "La necesidad se comunica sola: tono, persecución, concesiones espontáneas",
+        "Lectura del prospecto: necesidad del vendedor = debilidad de la oferta",
+        "Desapego = disposición real a aceptar el no, no frialdad",
+        "Solo el desapegado puede calificar y descartar, y eso da autoridad"
+      ],
+      "comoAplicarlo": "Antes de cada llamada, recordatorio: 'mi trabajo es diagnosticar si hay fit, no convencer'. Si no hay fit, decilo vos primero. Nunca ofrezcas descuento no pedido.",
+      "errorTipico": "Confundir desapego con desinterés: contestar frío, no indagar, no hacer seguimiento. El desapego es por el resultado, no por la persona: máximo interés en su caso, cero ansiedad por su respuesta."
+    },
+    {
+      "id": "p-claridad-sobre-presion",
+      "nombre": "Claridad, no presión",
+      "resumen": "La presión cierra ventas que después se caen. La claridad cierra decisiones que se sostienen.",
+      "explicacionReferencia": "Presionar funciona a corto plazo: mucha gente cede para salir de la incomodidad. Pero una venta cerrada por presión es una decisión que el prospecto no siente propia, y lo que no es propio se revierte: arrepentimiento, reembolso, cliente que no ejecuta el programa y lo cuenta mal. El cierre sólido es el opuesto: eliminar toda la niebla (qué incluye, qué no, qué se espera de él, qué pasa si no funciona, cuánto cuesta esperar) y devolverle la decisión limpia: 'con todo esto sobre la mesa, ¿qué querés hacer?'. La urgencia legítima (cupos reales, fechas reales) es información y suma claridad; la urgencia inventada es presión disfrazada y cuando se descubre —siempre se descubre— destruye la confianza en todo lo anterior.",
+      "puntosClave": [
+        "La presión produce compliance, no decisión; y el compliance se revierte",
+        "Decisión propia = cliente que ejecuta y se queda",
+        "Cerrar = quitar niebla, no empujar: información completa + pregunta limpia",
+        "Urgencia real es claridad; urgencia inventada es presión con disfraz"
+      ],
+      "comoAplicarlo": "En el cierre, verificá que el prospecto pueda responder: qué compra, por qué él, por qué ahora, y qué pasa si espera. Después una sola pregunta: '¿querés que lo arranquemos?' — y silencio.",
+      "errorTipico": "Falsa escasez ('me quedan 2 cupos' todos los días). El prospecto de high ticket es adulto: la detecta, y con ella cae la credibilidad de todo lo que dijiste antes."
+    },
+    {
+      "id": "p-futuro-vs-presente",
+      "nombre": "La venta vive en la brecha",
+      "resumen": "Sin distancia visible entre la situación actual y la deseada no hay venta. Tu trabajo es abrir y medir esa brecha.",
+      "explicacionReferencia": "Una persona compra cuando percibe distancia entre donde está (estado A) y donde quiere estar (estado B), y cree que tu oferta es el puente. Si no tiene claro A, minimiza su problema ('estoy cansado, como todos'); si no tiene claro B, no hay nada que desear; si A y B están cerca, el puente no vale lo que pedís. Por eso el Descubrimiento trabaja las dos puntas: profundizar A (qué le cuesta, desde cuándo, a qué renunció) y darle forma concreta a B (¿cómo sería un martes tuyo si esto estuviera resuelto?). La tensión entre A vivo y B concreto es la energía de la venta: el pitch no crea el deseo, solo presenta el puente sobre una brecha que ya duele.",
+      "puntosClave": [
+        "Compra = percepción de brecha entre estado actual y deseado + puente creíble",
+        "Sin A profundo, el problema se minimiza; sin B concreto, no hay deseo",
+        "El pitch es el puente: no genera la energía, la canaliza",
+        "Brecha chica = precio caro; brecha grande = precio obvio"
+      ],
+      "comoAplicarlo": "Dedicá el Descubrimiento a las dos puntas: 'contame un día tuyo hoy' (A) y 'si en 6 meses esto está resuelto, ¿qué hacés distinto un martes cualquiera?' (B). El pitch conecta A→B con la oferta en el medio.",
+      "errorTipico": "Pitchear el puente sin haber abierto la brecha: el prospecto escucha una solución excelente para un problema que no siente urgente. Resultado: 'está buenísimo, lo voy a pensar'."
+    },
+    {
+      "id": "p-compromisos-graduales",
+      "nombre": "Los micro-síes preparan el sí grande",
+      "resumen": "Nadie salta de cero a 'sí, te transfiero 2.400'. La decisión grande se construye con acuerdos chicos en cadena.",
+      "explicacionReferencia": "Las personas necesitan sentirse consistentes con lo que ya dijeron e hicieron: cada acuerdo chico que el prospecto da ('¿te cierra esa agenda?' — sí; '¿esto que me contás es prioridad este año?' — sí; '¿cómo lo ves hasta acá?' — bien) crea un historial de posiciones tomadas, y decir que no al final implicaría contradecir su propia cadena de síes. No es un truco: cada micro-sí es también un chequeo real de temperatura que te dice si podés avanzar o hay que volver atrás. Un 'no' temprano en un micro-sí es un regalo: te muestra el problema cuando todavía es barato resolverlo. El cierre final debería ser el eslabón obvio de una cadena, nunca un salto al vacío.",
+      "puntosClave": [
+        "Consistencia: la gente honra la posición que ya tomó en voz alta",
+        "Cada micro-sí es compromiso Y termómetro a la vez",
+        "Un no temprano es información barata; un no final es información carísima",
+        "Si el cierre se siente como salto al vacío, faltaron eslabones"
+      ],
+      "comoAplicarlo": "Sembrá chequeos en toda la llamada: '¿te hace sentido?', '¿cómo lo ves hasta acá?', '¿esto es lo que estabas buscando?'. Nunca pases de fase sin un acuerdo explícito de la anterior.",
+      "errorTipico": "Monólogo de pitch de 10 minutos sin un solo chequeo, y pregunta de cierre al final. El closer descubre recién ahí que perdió al prospecto en el minuto 2 del pitch."
+    },
+    {
+      "id": "p-objecion-oculta",
+      "nombre": "La primera objeción rara vez es la real",
+      "resumen": "Antes de responder una objeción, aislala: si respondés la objeción pantalla, aparece otra, y otra, y la real nunca sale.",
+      "explicacionReferencia": "Decir el miedo real cuesta: da vergüenza admitir 'no confío en mí para sostener esto' o 'me quemé una vez y me sentí estúpido'. Es mucho más fácil decir 'está caro' o 'lo tengo que pensar' — objeciones socialmente aceptables que funcionan de pantalla. Si respondés la pantalla, aunque la respondas perfecto, el miedo real sigue intacto y el prospecto saca otra pantalla: es el juego de la ametralladora de objeciones, y no se gana respondiendo más rápido. Se gana aislando ANTES de responder: 'si el precio no fuera tema, ¿lo harías?' Si dice sí, el precio era real. Si duda, acabás de descubrir que había otra cosa — y ahora podés preguntar por ella con empatía.",
+      "puntosClave": [
+        "El miedo real da vergüenza; la objeción pantalla es socialmente cómoda",
+        "Responder pantallas perfectamente = seguir perdiendo",
+        "Aislar antes de responder: 'si X no fuera tema, ¿avanzarías?'",
+        "La objeción real solo sale en un clima sin juicio"
+      ],
+      "comoAplicarlo": "Ante toda objeción, paso 1 es aislar, no responder: 'entiendo. Dejame preguntarte: si resolvemos [objeción], ¿hay algo más que te frene o avanzamos?' Recién con la real confirmada, respondés.",
+      "errorTipico": "El ping-pong: objeción → respuesta → nueva objeción → respuesta. Tres rondas de eso y la llamada está muerta. Si aparece la segunda objeción distinta, dejá de responder y empezá a aislar."
+    },
+    {
+      "id": "p-razon-vs-objecion",
+      "nombre": "Razón no es lo mismo que objeción",
+      "resumen": "Una razón es un límite logístico real. Una objeción es un límite emocional o mental.",
+      "explicacionReferencia": "Esta distinción decide qué hacés a continuación, y confundirla hace perder la llamada por cualquiera de los dos lados. Si alguien tiene una hora real por día para dedicarle al programa, eso es una razón: se negocia, se adapta, o se descualifica con honestidad. Si alguien cree que no va a poder sostenerlo, eso es una objeción: no se negocia, se trabaja. Tratar una razón como objeción te convierte en el vendedor que presiona sobre un imposible, y se nota. Tratar una objeción como razón te hace aceptar como límite algo que era miedo, y dejás ir a alguien que solo necesitaba que le sostuvieran la mirada. La pregunta que las separa es simple: ¿esto es algo que no podés, o algo que creés que no podés?",
+      "puntosClave": [
+        "Razón: limitante logístico, real y verificable",
+        "Objeción: limitante emocional o mental, o sea una creencia",
+        "Con una razón se negocia o se descualifica; con una objeción se trabaja",
+        "La pregunta que las separa: ¿no podés, o creés que no podés?",
+        "Presionar sobre una razón real destruye la relación y tu reputación"
+      ],
+      "comoAplicarlo": "Cuando aparezca un freno, clasificá antes de responder. Si es logístico, buscá si hay adaptación posible; si no la hay, descualificá con respeto y dejá la puerta abierta. Si es emocional, entrás a trabajarlo.",
+      "errorTipico": "Aplicar técnica de objeciones sobre una razón real. Se siente manipulador, y con razón."
+    },
+    {
+      "id": "p-el-cliente-da-la-solucion",
+      "nombre": "El cliente da la solución",
+      "resumen": "Preguntás qué necesitaría para avanzar, y te callás. La respuesta no la ponés vos.",
+      "explicacionReferencia": "El error más caro que se ve en los roleplays es hacer la pregunta correcta y contestarla uno mismo. Alguien pregunta «¿qué necesitarías para sentirte tranquilo?» y sin esperar agrega «porque te puedo mandar testimonios». El prospecto en realidad tenía miedo de cargar su tarjeta por internet: eso no lo iba a decir nunca, había que sacárselo. La regla detrás es que vos no sos tu cliente. Lo que a vos te daría confianza no es lo que a él se la da, y darlo por supuesto te hace perder gente por el camino sin enterarte por qué. Además, cuando la solución sale de su boca no solo es la correcta: queda comprometido con ella, porque discutirla sería discutirse a sí mismo.",
+      "puntosClave": [
+        "Hacé la pregunta y sostené el silencio, aunque se haga largo",
+        "Vos no sos tu cliente: lo que a vos te tranquilizaría no es lo que a él",
+        "La solución que sale de su boca viene con compromiso incluido",
+        "Dar por supuesta la objeción real te hace perder gente sin saber por qué",
+        "En el paso final no le cerrás: lo hacés cerrar solo"
+      ],
+      "comoAplicarlo": "«¿Qué tendría que pasar para que esto sí o sí funcione para vos?» o «¿cuál creés que es la acción que tenés que tomar?». Y después, silencio.",
+      "errorTipico": "Hacer la pregunta y contestarla en la misma respiración. Un buen vendedor del siglo XX tenía la solución para todo; hoy eso pierde ventas."
+    },
+    {
+      "id": "p-quiere-no-necesita",
+      "nombre": "Se compra lo que se quiere, no lo que se necesita",
+      "resumen": "La necesidad es lógica y vende poco. El deseo es emocional y es lo que mueve.",
+      "explicacionReferencia": "Nadie necesita un reloj de lujo ni un teléfono de última generación: cualquier alternativa cumple la función. La pregunta no es si lo necesita, es si lo quiere, y después por qué lo quiere. Si vendés bajo la óptica de lo que la persona objetivamente necesita vas a vender algo, porque hay gente racional, pero con ratios bajos: estás compitiendo en el único terreno donde tu oferta se puede comparar por precio. En el terreno del deseo no hay comparación posible, porque lo que se compra es una versión futura de uno mismo. Nunca compramos lo que creemos que estamos comprando: compramos cómo nos hace sentir. Por eso el descubrimiento no termina en el problema, tiene que llegar a qué emoción quiere satisfacer.",
+      "puntosClave": [
+        "La necesidad es lógica; el querer es emocional",
+        "Preguntate qué emoción quiere satisfacer con esta compra",
+        "En el terreno de la necesidad, tu oferta se compara por precio",
+        "No se venden características ni beneficios: se venden emociones",
+        "«Me lo tengo que pensar» a veces significa que todavía no lo visualizó"
+      ],
+      "comoAplicarlo": "Después de mapear el problema, llevalo al deseo: «¿qué mejoraría si todo sale como querés?» y «¿qué se siente cuando lo conseguís?». Ahí aparece lo que de verdad compra.",
+      "errorTipico": "Argumentar todo lo que objetivamente necesita. Cuanto más racional es tu argumento, más fácil es compararte con otro."
+    },
+    {
+      "id": "p-espejo-del-closer",
+      "nombre": "Las objeciones que recibís son las tuyas",
+      "resumen": "Si tus prospectos dudan, revisá cuánto dudás vos al comprar.",
+      "explicacionReferencia": "Si escuchás una y otra vez las mismas objeciones, casi siempre son las que vos tenés al momento de comprar. Quien ve el dinero como gasto y no como inversión no puede manejar con naturalidad la objeción del dinero, porque en el fondo le está dando la razón. Quien toma decisiones lentas transmite, sin decirlo, que esta decisión también puede esperar. Esto se filtra por microexpresiones y por frases aparentemente inofensivas: «entiendo, esto hay que meditarlo bien», «hay que ir con pies de plomo». Le estás diciendo que no decida hoy. Hay además tres creencias que impiden vender caro y las tres son del closer: que no lo vale, que nadie pagaría eso, o que un precio alto perjudica al cliente. Ninguna es del prospecto.",
+      "puntosClave": [
+        "Las objeciones que más recibís son las que vos tenés al comprar",
+        "Tres creencias bloquean el precio alto: no lo vale, nadie lo pagaría, es malo para el cliente",
+        "¿Quién sos vos para juzgar lo que para él es valor?",
+        "Cuidado con las frases que autorizan a postergar",
+        "La venta que no se cierra suele ser responsabilidad del closer"
+      ],
+      "comoAplicarlo": "Practicá invertir en vos en lo chico para que la palabra inversión te salga natural en lo grande. Y grabate: las muletillas que te delatan solo se ven en la grabación.",
+      "errorTipico": "Buscar la falla en el prospecto. Cuando se analizan las llamadas perdidas, casi siempre estaba de este lado."
+    },
+    {
+      "id": "p-adaptarse-al-perfil",
+      "nombre": "Hablar en el idioma del otro",
+      "resumen": "Tratás a la persona como ella quiere ser tratada, no como vos querrías.",
+      "explicacionReferencia": "Hay cuatro perfiles dominantes y cada uno compra por un motor distinto: diversión, ayudar a otros, datos y orden, o ganar. La misma frase dicha a dos perfiles distintos produce resultados opuestos: desafiar a alguien competitivo lo enciende, y al que se mueve por cuidar a los suyos lo hunde. Por eso el perfil no es un adorno: es la capa que define el ángulo con el que ejecutás todo lo demás. Todos tenemos los cuatro y operamos bajo dos, uno primario y uno secundario, así que no se busca la etiqueta pura sino cuál domina en esta conversación. Y un buen closer sabe actuar los cuatro, no solo el suyo: si sos del perfil que se conecta emocionalmente y te toca alguien igual, los dos se quedan dando vueltas al problema, se caen muy bien, y no hay venta.",
+      "puntosClave": [
+        "Cuatro motores: diversión, ayudar, datos, ganar",
+        "Todos tenemos los cuatro; operamos bajo dos, primario y secundario",
+        "La misma frase cierra o mata según el perfil",
+        "Un buen closer actúa los cuatro, no solo el propio",
+        "El perfil se detecta en la apertura y define todo lo que sigue"
+      ],
+      "comoAplicarlo": "Detectá el perfil en los primeros minutos: cómo se viste, cómo habla, qué prioriza, qué le molesta. Ajustá tono, velocidad y tipo de argumento antes de entrar al descubrimiento.",
+      "errorTipico": "Usar un solo estilo con todos, el propio. Funciona con la cuarta parte de la gente y no entendés por qué con el resto no."
+    },
+    {
+      "id": "p-recapitular-para-liderar",
+      "nombre": "Recapitular es liderar",
+      "resumen": "Devolverle su historia ordenada te da la autoridad para guiarlo.",
+      "explicacionReferencia": "Hasta la recapitulación el prospecto te contó su mundo desde el caos: emoción, desorden, cosas sueltas. Recapitular no es avanzar, es devolverle su verdad con claridad y estructura. Cuando lo hacés bien no necesitás convencerlo de nada, porque siente que lo entendiste mejor que él mismo. Funciona por cinco motivos a la vez: rompe la negación suave y lo obliga a mirar su realidad ordenada, lo cual genera una disonancia explícita entre lo que dice que quiere y lo que viene haciendo; integra lo emocional con lo racional; te devuelve el marco, porque a partir de ahí dirigís vos; construye vínculo y autoridad en el mismo movimiento; y contrasta su presente con su futuro, con lo cual el cambio deja de ser una opción emocional y pasa a ser una conclusión lógica.",
+      "puntosClave": [
+        "Cinco partes: contexto, detonante, cuellos de botella, qué le falta, situación soñada",
+        "Se pide permiso antes: eso cambia el marco",
+        "No aporta información nueva: reorganiza la que ya está",
+        "Le hacés sentir escuchado y demostrás que entendés: vínculo y autoridad juntos",
+        "Cuando alguien escucha su verdad mejor dicha que la suya, no discute: asiente"
+      ],
+      "comoAplicarlo": "Pausá, pedí permiso —«¿te parece si pongo esto en limpio para confirmar desde dónde partimos?»— y recorré las cinco partes con sus palabras. Cerrá con «¿estoy en lo correcto?».",
+      "errorTipico": "Saltearla por apuro para llegar al pitch. Es el momento que más autoridad te da en toda la llamada."
+    },
+    {
+      "id": "p-congruencia",
+      "nombre": "La congruencia decide quién merece seguimiento",
+      "resumen": "Quien fue coherente toda la llamada está procesando. Quien fue esquivo va a repetir el patrón afuera.",
+      "explicacionReferencia": "Al final de la llamada tenés que decidir si le das tiempo o lo enfrentás, y esa decisión no se toma desde tu comodidad sino desde el criterio. La pregunta es si el lead fue congruente: si reconoció su dolor, si admitió que necesita resolverlo, si mostró deseo genuino, y si lo único que trajo fue un límite puntual de último momento. Si todo eso se cumple, pedir tiempo no es huir, es procesar, y el seguimiento va a funcionar porque quedó fuego emocional. Si en cambio fue ambiguo, cambiante o evasivo durante toda la llamada, ese mismo patrón es el que va a repetir afuera y el seguimiento no va a existir. A esos hay que resolverlos en la llamada, no porque no valgan, sino porque no pueden permitirse seguir posponiéndose. Y hay dos formas de equivocarse acá: si operás desde el miedo a incomodar soltás a todos, y si operás desde el miedo a perder presionás a todos.",
+      "puntosClave": [
+        "Cuatro chequeos: reconoció el dolor, admitió que necesita resolverlo, mostró deseo, y su freno es puntual",
+        "El comportamiento futuro espeja al pasado: si evadió acá, evade afuera",
+        "Congruente que pide tiempo: seguimiento con fecha y hora concretas",
+        "Incongruente: se resuelve en llamada o se descualifica",
+        "Miedo a incomodar suelta a todos; miedo a perder presiona a todos"
+      ],
+      "comoAplicarlo": "Antes de aceptar un «lo pienso», repasá los cuatro chequeos. Si dan bien, agendá el próximo paso con día y hora en la misma llamada. Si dan mal, volvé a la raíz o descualificá con respeto.",
+      "errorTipico": "Aceptar el «te aviso» de alguien que estuvo esquivo toda la llamada. Ese seguimiento no va a pasar y en el fondo ya lo sabés."
+    }
+  ]
+}

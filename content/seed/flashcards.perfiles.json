@@ -1,0 +1,271 @@
+{
+  "version": 2,
+  "mazo": "deteccion-perfiles",
+  "descripcion": "Entrenamiento de lectura de prospectos. Frente: la señal tal como aparece en la llamada (frases, conducta). Dorso: qué perfil es, cómo ajustás tu estilo, y POR QUÉ ese ajuste funciona. Los perfiles se corresponden con los del simulador (perfiles-prospecto.json).",
+  "cartas": [
+    {
+      "id": "perf-001",
+      "tipo": "clasica",
+      "frente": "Te interrumpe al minuto 2: «Dale, al grano: ¿qué hacés, cuánto sale y por qué te elegiría a vos?» Habla rápido, decide rápido, no le interesa el small talk.",
+      "dorso": "PERFIL: Dominante. Ajuste: frases cortas, cero vueltas, respuestas directas, y devolvele el control aparente con opciones («¿preferís que te haga 5 preguntas primero o te doy el panorama y después profundizamos?»). El Descubrimiento igual se hace — pero pedile permiso con un motivo de eficiencia, no de proceso.",
+      "porQue": "El dominante respeta a quien sostiene el marco sin achicarse y desprecia la sumisión tanto como el verso. Espejo de estilo: directo con el directo. Si le esquivás el precio, huele debilidad; si le obedecés en todo, dejás de ser un par y pasás a ser un empleado.",
+      "principioId": "p-marco-previo",
+      "dificultad": 2,
+      "tags": [
+        "dominante"
+      ]
+    },
+    {
+      "id": "perf-002",
+      "tipo": "clasica",
+      "frente": "Pregunta por el método, los estudios que lo respaldan, qué pasa en la semana 4, cómo se mide el progreso. Tomó notas. Ya comparó 3 alternativas en una planilla.",
+      "dorso": "PERFIL: Analítico. Ajuste: bajá la velocidad, dale estructura (números, proceso paso a paso, cómo se mide), evitá superlativos y hype («increíble», «brutal» le activan alarmas). No lo presiones a decidir en caliente: dale un próximo paso concreto con la información que pidió y fecha de decisión.",
+      "porQue": "El analítico decide con la emoción como todos, pero su emoción es la SEGURIDAD de haber analizado bien. El hype se la quita; el detalle se la da. Presionarlo a decidir sin proceso lo pierde para siempre — estructurarle la decisión lo cierra solo.",
+      "principioId": "p-emocion-decide-logica-justifica",
+      "dificultad": 2,
+      "tags": [
+        "analitico"
+      ]
+    },
+    {
+      "id": "perf-003",
+      "tipo": "clasica",
+      "frente": "Amabilísimo. Te da la razón en todo: «sí, claro, tal cual, me encanta». Pero cuando acercás el cierre: «lo dejamos para la semana que viene y lo vemos bien, ¿dale?»",
+      "dorso": "PERFIL: Complaciente. Su 'sí' es cortesía, no acuerdo: dice sí para no incomodar y después desaparece. Ajuste: hacé seguro el disenso — invitá al 'no' explícitamente y preguntá por lo negativo: «¿qué parte NO te convence?», «si tuvieras que ponerle un pero, ¿cuál sería?». Verificá cada micro-sí dos veces.",
+      "porQue": "Al complaciente el conflicto le cuesta más que la mentira blanca. Si el 'no' es incómodo, te va a decir 'sí' hasta la puerta y comprarte nunca. Solo habilitando el disenso sin costo social conseguís datos reales — sus objeciones verdaderas — con los que sí se puede trabajar.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 2,
+      "tags": [
+        "complaciente"
+      ]
+    },
+    {
+      "id": "perf-004",
+      "tipo": "clasica",
+      "frente": "Entusiasmado al 100: «¡Esto es EXACTAMENTE lo que necesito! ¿Cuándo arrancamos? Contá conmigo». Te contó su vida entera, se rió de todo, ya se imagina en el resultado.",
+      "dorso": "PERFIL: Expresivo. El riesgo no es cerrarlo — es que el sí de hoy se evapore mañana. Ajuste: disfrutá el clima pero anclá compromisos concretos EN la llamada (pago o seña hoy, primera sesión agendada, algo firmado). Y calificalo igual: que el entusiasmo no te saltee el Descubrimiento.",
+      "porQue": "La decisión del expresivo es pura emoción con poca estructura de justificación: si cuelga sin compromiso material, la emoción decae en horas y la lógica que nunca construyó no la sostiene. El compromiso concreto en caliente convierte el pico emocional en decisión anclada.",
+      "principioId": "p-emocion-decide-logica-justifica",
+      "dificultad": 2,
+      "tags": [
+        "expresivo"
+      ]
+    },
+    {
+      "id": "perf-005",
+      "tipo": "clasica",
+      "frente": "Tono defensivo desde el hola: «Mirá, te aviso que ya hice dos programas de estos y tiré la plata. Convénceme si podés.»",
+      "dorso": "PERFIL: Escéptico quemado. Ajuste: NO aceptes el desafío de convencerlo (es una trampa de marco). Validá su experiencia como aprendizaje, explorá los fracasos como médico («¿qué probaste? ¿qué falló exactamente?») y diferenciá tu mecanismo punto por punto contra lo que falló. Prueba social específica, no genérica.",
+      "porQue": "Su agresión protege una herida: se sintió estafado y estúpido, y no quiere sentirse así de nuevo. 'Convénceme' invita a un rol de vendedor que confirmaría su guion. El rol de médico que diagnostica sus fracasos anteriores es el único que su guion no tiene previsto — y validar primero abre el canal.",
+      "principioId": "p-acuerdo-antes-rebatir",
+      "dificultad": 3,
+      "tags": [
+        "esceptico"
+      ]
+    },
+    {
+      "id": "perf-006",
+      "tipo": "clasica",
+      "frente": "Todo le parece bien pero todo lo negocia: «¿Y si te pago la mitad ahora y la mitad si funciona? ¿Sin los llamados semanales cuánto queda? Dale, haceme precio.»",
+      "dorso": "PERFIL: Regateador. Ajuste: precio firme con total serenidad, siempre. Si hay que flexibilizar algo, que sea alcance o forma de pago, nunca el precio del mismo paquete. Frase ancla: «el precio es el mismo para todos — lo que podemos ver es qué versión del programa te queda mejor». Prepará el desapego: este perfil testea si tu precio era verdad.",
+      "porQue": "Para el regateador, negociar es un deporte de estatus: si el precio baja, confirmás que era mentira, pierde respeto por la oferta Y por vos, y va por más. Sostener el precio con calma pasa su test — y paradójicamente es lo que le permite comprar tranquilo: sabe que nadie pagó menos.",
+      "principioId": "p-desapego",
+      "dificultad": 2,
+      "tags": [
+        "regateador"
+      ]
+    },
+    {
+      "id": "perf-007",
+      "tipo": "clasica",
+      "frente": "Respuestas de 4 palabras. Silencios largos. «Sí... puede ser... no sé». Tono plano — no parece ni interesado ni molesto. No te da NADA para leer.",
+      "dorso": "PERFIL: Reservado. Ajuste: preguntas abiertas que no se contesten con monosílabos («contame cómo es un día tuyo» y no «¿te sentís cansado?»), tolerá SUS silencios sin llenarlos (está pensando, no rechazando), bajá tu energía al nivel de la suya, y validá lo poco que da para que suelte más («eso que decís de X es importante, contame más»).",
+      "porQue": "El reservado procesa hacia adentro: el silencio es su forma de pensar, no una señal de rechazo. Si lo llenás por ansiedad, le quitás el espacio donde estaba elaborando su respuesta — y le confirmás que con vos no se puede pensar tranquilo. Pregunta fuerte + silencio respetado es tu única llave.",
+      "principioId": "p-silencio-trabaja",
+      "dificultad": 3,
+      "tags": [
+        "reservado"
+      ]
+    },
+    {
+      "id": "perf-008",
+      "tipo": "clasica",
+      "frente": "«Necesito empezar YA. ¿Te puedo pagar ahora mismo? Es urgente, no doy más.» Ni preguntó qué incluye.",
+      "dorso": "PERFIL: Impulsivo urgente. Contraintuitivo: FRENÁ. «Pará, antes de cobrarte necesito saber si de verdad puedo ayudarte — contame qué está pasando». Hacé el Descubrimiento completo igual: la urgencia es dolor real (dato valioso) pero la compra sin diagnóstico es un reembolso en 2 semanas. Si hay fit, cerrá rápido, sí — pero con el caso entendido y expectativas claras.",
+      "porQue": "La compra impulsiva se revierte con la misma velocidad con que se hizo: sin diagnóstico ni expectativas claras, al primer obstáculo pide el reembolso y encima habla mal. Frenarlo también te da autoridad instantánea: sos el primero que no le quiso agarrar la tarjeta al vuelo. Claridad antes que velocidad.",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 2,
+      "tags": [
+        "impulsivo"
+      ]
+    },
+    {
+      "id": "perf-009",
+      "tipo": "clasica",
+      "frente": "Primeros minutos: brazos cruzados verbales — respuestas secas, un «a ver qué me vas a vender» flotando. Pero a los 10 minutos de buenas preguntas, se suelta y habla con ganas.",
+      "dorso": "Eso NO era un perfil: era resistencia de rol — la guardia automática ante 'un vendedor', que se derrite con rapport y preguntas genuinas. Distinguíla de la resistencia real (la que PERSISTE después de validación y buen descubrimiento: esa es escepticismo de fondo o falta de fit). Regla: no diagnostiques perfil en los primeros 5 minutos; la apertura los distorsiona.",
+      "porQue": "Confundir la guardia inicial con el perfil te hace jugar toda la llamada contra un personaje que ya no existe (tratás de escéptico a un complaciente asustado). El diagnóstico de perfil, como todo diagnóstico, necesita datos de la persona real — y la persona real aparece recién cuando el rapport disolvió el rol.",
+      "principioId": "p-vender-es-diagnosticar",
+      "dificultad": 3,
+      "tags": [
+        "meta",
+        "resistencia"
+      ]
+    },
+    {
+      "id": "perf-010",
+      "tipo": "clasica",
+      "frente": "Te frena con: «¿Y vos qué ganás con esto? ¿Cuánto te llevás por venderme?» — desconfianza frontal sobre TU incentivo.",
+      "dorso": "Transparencia total, sin incomodarte: «Yo cobro por esto, obvio — es mi trabajo, y me va bien cuando a mis clientes les va bien. Por eso mismo no cierro a cualquiera: un cliente que fracasa me cuesta más de lo que me paga». Después seguí normal. La incomodidad que NO mostraste es la respuesta que buscaba.",
+      "porQue": "La pregunta es un test: quiere ver si te incomoda admitir tu incentivo (si te incomoda, algo escondés). La transparencia serena alinea incentivos a la vista — 'gano cuando ganás' — y desarma la sospecha de fondo. Defensividad o chistes nerviosos la confirman.",
+      "principioId": "p-acuerdo-antes-rebatir",
+      "dificultad": 3,
+      "tags": [
+        "desconfiado",
+        "test"
+      ]
+    },
+    {
+      "id": "perf-011",
+      "tipo": "clasica",
+      "frente": "Muy simpático, pregunta de todo con curiosidad... pero no encontrás dolor concreto, no hay urgencia, no hay presupuesto claro. «No, problema problema no tengo, quería saber de qué se trataba.»",
+      "dorso": "PERFIL: Turista — no es un prospecto, es un curioso. Ajuste: verificá con 2-3 preguntas de calificación honestas, y si se confirma, cerrá la llamada con elegancia y SIN pitch: «Por lo que me contás, esto no es algo que necesites hoy — y no te voy a hacer perder tiempo ni plata. Si el día de mañana [señal de dolor], acordate de esta charla». Tu tiempo es el inventario.",
+      "porQue": "Pitchearle a un turista es gastar 40 minutos y autoestima en alguien que nunca iba a comprar — el peor trade del closer, cuyo único inventario es el tiempo. Y soltarlo con elegancia tiene retorno: el desapego genuino es lo que más recuerda la gente, y los turistas de hoy refieren mañana.",
+      "principioId": "p-desapego",
+      "dificultad": 2,
+      "tags": [
+        "turista",
+        "calificacion"
+      ]
+    },
+    {
+      "id": "perf-012",
+      "tipo": "clasica",
+      "frente": "Intelectualiza todo: debate cada término, te corrige definiciones, quiere discutir si 'el estrés crónico existe como categoría' — pero de SU situación concreta no cuenta nada.",
+      "dorso": "PERFIL: Intelectualizador (variante defensiva del analítico). El debate abstracto es su escudo contra hablar de sí mismo. Ajuste: no entres a NINGÚN debate teórico — cada uno es un desvío. Redirigí siempre a su experiencia: «Puede ser, hay literatura para todos los gustos. Pero contame de VOS: ¿cómo dormiste esta semana?». Concreto, personal, escena.",
+      "porQue": "En el terreno abstracto él gana siempre (o empatan, que para vos es perder: no hay venta sin caso personal). Su intelecto es la defensa de una vulnerabilidad que no quiere tocar. Las preguntas por escenas concretas son las únicas que el escudo no bloquea — a un dato de su propia semana no se le puede discutir la epistemología.",
+      "principioId": "p-quien-pregunta-lidera",
+      "dificultad": 3,
+      "tags": [
+        "intelectualizador"
+      ]
+    },
+    {
+      "id": "perf-013",
+      "tipo": "clasica",
+      "frente": "META: ¿Por qué adaptar tu estilo a cada perfil en vez de tener 'tu estilo' único y auténtico?",
+      "dorso": "Porque la resistencia baja cuando el prospecto siente que habla con alguien 'como él': el espejo de estilo es rapport a nivel estructural. Adaptarse NO es actuar ni mentir — el contenido (diagnóstico honesto, precio firme, claridad) es idéntico con todos; lo que cambia es el envase: velocidad, cantidad de detalle, temperatura emocional, quién siente que controla. Un solo estilo = chocar por pura forma con la mitad de tus llamadas.",
+      "porQue": "La confianza pre-racional se construye sobre similitud percibida. El mensaje correcto en el formato incorrecto no llega: al dominante lo aburre tu proceso, al analítico lo asusta tu velocidad, al reservado lo apabulla tu energía. Adaptar el envase es respeto por cómo el otro procesa — no falta de autenticidad.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 2,
+      "tags": [
+        "meta",
+        "adaptacion"
+      ]
+    },
+    {
+      "id": "perf-101",
+      "tipo": "clasica",
+      "frente": "Los cuatro perfiles y el motor de cada uno, en una línea.",
+      "dorso": "ZAFIRO: diversión. PERLA: ayudar a otros. ESMERALDA: datos y orden. RUBÍ: ganar. Todos tenemos los cuatro y operamos bajo dos, uno primario y uno secundario: no busques la etiqueta pura, buscá cuál domina en esta conversación.",
+      "porQue": "Tratás a la persona como ELLA quiere ser tratada, no como vos querrías. Un solo estilo funciona con la cuarta parte de la gente, y con el resto no entendés por qué no.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 1,
+      "tags": [
+        "gemas",
+        "fundamento"
+      ]
+    },
+    {
+      "id": "perf-102",
+      "tipo": "clasica",
+      "frente": "Hay una frase que enciende a un perfil y destruye a otros dos. ¿Cuál es y con quién se usa?",
+      "dorso": "«No sé si serás capaz de esto.» Al RUBÍ lo enciende: es la frase del «a que no» de los dieciséis años. Al PERLA lo hunde, y al ESMERALDA también, porque necesita certeza y datos, no desafío.",
+      "porQue": "Es la prueba más clara de por qué el perfil va como capa separada de la técnica. La misma línea, dicha con la misma intención, cierra o mata según con quién.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 3,
+      "tags": [
+        "gemas",
+        "tactica"
+      ]
+    },
+    {
+      "id": "perf-103",
+      "tipo": "clasica",
+      "frente": "¿Cómo se ve la psicología inversa bien calibrada, y con qué perfil evitarla?",
+      "dorso": "«Vos me decís que querés [objetivo], pero también me dijiste que estás harto de [su palabra exacta]. Quizás esto no es algo que quieras hacer ahora; quizás te lo tenés que plantear dentro de seis meses.» Funciona muy bien con RUBÍ. Con PERLA, evitarla.",
+      "porQue": "Usar su vocabulario exacto hace que la descualificación suene a comprensión y no a manipulación. Y si contesta que sí, te acabás de ahorrar una venta que no correspondía: ser buen closer no significa que la venta siempre suceda.",
+      "principioId": "p-desapego",
+      "dificultad": 3,
+      "tags": [
+        "gemas",
+        "psicologia-inversa"
+      ]
+    },
+    {
+      "id": "perf-104",
+      "tipo": "clasica",
+      "frente": "Sos un closer del perfil PERLA y te toca un prospecto PERLA. ¿Qué riesgo hay y qué tenés que hacer?",
+      "dorso": "Que los dos detecten el problema, le den vueltas, se caigan muy bien… y no haya venta. Hay que cambiar de registro deliberadamente: convertirte en rubí para ese tramo.",
+      "porQue": "Por eso el ejercicio central es actuar los cuatro perfiles, no solo el propio. Si sos rubí practicá esmeralda; si sos perla practicá rubí. El que solo sabe actuar el suyo tiene un techo.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 3,
+      "tags": [
+        "gemas",
+        "autoconocimiento"
+      ]
+    },
+    {
+      "id": "perf-105",
+      "tipo": "clasica",
+      "frente": "Al entrar a indagar en el dolor, hay un ajuste de voz que va sin importar tu perfil ni el suyo. ¿Cuál?",
+      "dorso": "Bajar una octava. Aunque sea un zafiro y la charla venga alta, en ese momento te ponés a nivel perla: la persona está abriendo algo íntimo y la energía de antes no acompaña.",
+      "porQue": "El tono comunica antes que las palabras. Preguntar por el dolor con la misma energía con la que hacías rapport se siente invasivo y cierra el acceso al dato real.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 2,
+      "tags": [
+        "gemas",
+        "tono"
+      ]
+    },
+    {
+      "id": "perf-106",
+      "tipo": "clasica",
+      "frente": "Misma objeción de precio, cuatro perfiles. ¿Qué ángulo usás con cada uno?",
+      "dorso": "ESMERALDA: los números —«son veinticuatro mil al año, eso justifica tres mil». PERLA: la familia —«¿esto marcaría la diferencia para los tuyos?». RUBÍ: el resultado y la velocidad, rápido. ZAFIRO: la visión, con historias y sin tecnicismos.",
+      "porQue": "La estructura de la respuesta es la misma —aislar, ir a la raíz, cerrar— pero el argumento que la sostiene cambia por completo. Por eso el perfil se entrena aparte y después se combina.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 3,
+      "tags": [
+        "gemas",
+        "precio"
+      ]
+    },
+    {
+      "id": "perf-107",
+      "tipo": "clasica",
+      "frente": "¿Qué le pasa a un ESMERALDA si le hablás de diversión, y qué a un ZAFIRO si le hacés muchas preguntas?",
+      "dorso": "Al esmeralda lo perdés: necesita datos, proceso y validación de que funciona. Al zafiro lo intimidás: hay que mantenerlo simple, contarle historias y pintarle el cuadro, no darle todos los detalles.",
+      "porQue": "Cada perfil tiene un error que lo pierde, y casi siempre es el estilo natural de otro perfil. Conocer el error fatal de cada uno vale más que conocer sus virtudes.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 2,
+      "tags": [
+        "gemas",
+        "errores"
+      ]
+    },
+    {
+      "id": "perf-108",
+      "tipo": "clasica",
+      "frente": "¿Qué necesita escuchar un PERLA antes de decidir, que ningún otro perfil necesita?",
+      "dorso": "Que lo apoyás decida lo que decida. Se le dice de antemano, antes de cerrar. Y el argumento va por cómo esto ayuda a él o a su familia, nunca por ganar o destacar.",
+      "porQue": "El perla teme que su decisión perjudique a otros. Sacarle ese miedo de encima antes de pedirle la decisión es lo que la hace posible; presionarlo produce exactamente lo contrario.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 2,
+      "tags": [
+        "gemas",
+        "perla"
+      ]
+    }
+  ]
+}
