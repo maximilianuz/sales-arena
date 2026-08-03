@@ -4,7 +4,7 @@ import { auth } from '../../../utils/db';
 import { subscribeList, subscribeNode, setItem, logActivity } from '../db';
 import { review, dueCards } from '../srs/fsrs';
 import { DECKS } from '../seedImport';
-import { cartasBloqueadas } from '../plan/consolidacion';
+import { cartasBloqueadas, unidadesEnPausa } from '../plan/consolidacion';
 import { panel, surface, ACENTO, CSS_INTERACCION, TOQUE_MIN } from '../ui';
 
 // Sesión de repaso con FSRS. Cartas clásicas: frente → respondés EN VOZ ALTA →
@@ -61,6 +61,7 @@ export default function StudySession({ deckId, onBack, limite = null, onDone = n
       pool={pool}
       srsMap={srsMap}
       bloqueadas={cartasBloqueadas(progresoUnidad)}
+      enPausa={unidadesEnPausa(progresoUnidad)}
       principiosMap={principiosMap}
       onBack={onBack}
       limite={limite}
@@ -69,7 +70,7 @@ export default function StudySession({ deckId, onBack, limite = null, onDone = n
   );
 }
 
-function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBack, limite, onDone }) {
+function SessionRunner({ deckName, pool, srsMap, bloqueadas, enPausa, principiosMap, onBack, limite, onDone }) {
   // Cola congelada al montar: los props posteriores no la reconstruyen.
   const [queue, setQueue] = useState(() => {
     const q = dueCards(pool, srsMap, undefined, { bloqueadas });
@@ -92,6 +93,16 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
   useEffect(() => { startRef.current = Date.now(); }, []);
   // Sin cartas vencidas no hay nada que hacer, así que el bloque del plan se
   // cumple igual: dejarlo trabado obligaría a saltearlo a mano cada vez.
+  // Una cola vacía tiene DOS causas y no son lo mismo:
+  //
+  //   · no hay nada vencido — FSRS ya programó todo para más adelante. Eso SÍ
+  //     es "estar al día", y el bloque se cumple.
+  //   · está todo en pausa por consolidación — no hiciste nada y no podías. El
+  //     bloque se cierra igual para no trabar el día, pero decir "hecho" sería
+  //     falso, así que la pantalla lo dice como es.
+  const bloqueadasDelMazo = pool.filter(c => bloqueadas?.has(c.id)).length;
+  const todoEnPausa = queue.length === 0 && bloqueadasDelMazo > 0;
+
   useEffect(() => { if (queue.length === 0) onDone?.(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // Si sale de la sesión con la X/volver a mitad de camino, igual se loguea lo hecho.
   useEffect(() => () => {
@@ -198,10 +209,32 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
   };
 
   if (queue.length === 0) {
+    const proxima = enPausa?.[0];
     return (
       <Shell onBack={onBack} title={deckName}>
-        <div style={panel}>
-          <p style={{ margin: 0 }}>🎉 No hay cartas vencidas en este mazo. Volvé mañana — el algoritmo decide cuándo te toca cada una.</p>
+        <div style={{ ...panel, borderColor: todoEnPausa ? 'rgba(255,159,10,0.35)' : 'rgba(255,255,255,0.08)' }}>
+          {todoEnPausa ? (
+            <>
+              <p style={{ margin: '0 0 0.5rem', fontWeight: 700 }}>
+                Este mazo está en pausa, no al día
+              </p>
+              <p style={{ margin: 0, fontSize: '0.87rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                Sus {bloqueadasDelMazo} cartas esperan a que el material asiente: se habilitan
+                al día siguiente de pasarlo por el bloque de material nuevo, no antes.
+                {proxima?.liberaEn && (
+                  <> La primera se libera {new Date(proxima.liberaEn).toLocaleDateString('es-AR', { weekday: 'long' })}.</>
+                )}
+              </p>
+              <p style={{ margin: '0.7rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                No es un error: no se repasa lo que se acaba de ver.
+              </p>
+            </>
+          ) : (
+            <p style={{ margin: 0 }}>
+              No hay cartas vencidas en este mazo. Volvé mañana — el algoritmo decide cuándo te
+              toca cada una.
+            </p>
+          )}
         </div>
       </Shell>
     );
