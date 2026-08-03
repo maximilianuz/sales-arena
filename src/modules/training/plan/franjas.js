@@ -91,6 +91,13 @@ export const franjaPorId = (id) => FRANJAS.find(f => f.id === id) || null;
 // descomposición con palabras propias es una COMPUERTA, no un paso más. Sin
 // pasarla no se habilita Feynman, porque simplificar algo que todavía no
 // reconstruiste es repetir el resumen de otro con menos palabras.
+//
+// `porUnidad` marca los dos pasos que se recorren una vez POR CADA unidad del
+// lote. No es un detalle de presentación: es lo que ya asume consolidacion.js,
+// donde `descomposicion` y `feynmanOk` viven en el progreso de cada unidad,
+// mientras que `cerrarAdquisicion` es del lote entero. Los otros tres son del
+// lote: se declara una carga, se abre el material una vez, y la codificación es
+// "una sola pasada de recuperación" sobre todo lo que entró.
 
 export const PASOS_ADQUISICION = [
   {
@@ -111,12 +118,14 @@ export const PASOS_ADQUISICION = [
     minutos: 22,
     detalle: 'Material cerrado, a mano. Reconstruir con tu propio lenguaje técnico. Todavía no es simplificar: es re-derivar.',
     compuerta: true,
+    porUnidad: true,
   },
   {
     id: 'feynman',
     titulo: 'Feynman',
     minutos: 15,
     detalle: 'Recién ahora: explicarlo a alguien de doce años. Solo sobre el porqué, nunca sobre líneas literales.',
+    porUnidad: true,
   },
   {
     id: 'codificacion',
@@ -125,6 +134,90 @@ export const PASOS_ADQUISICION = [
     detalle: 'Una sola pasada de recuperación. Es parte del encoding, no una repetición: el reloj de consolidación arranca después.',
   },
 ];
+
+
+// ── La adquisición se extiende a varios días ────────────────
+//
+// El recorrido de una sola unidad ya pide 68 minutos, y la franja de adquisición
+// reparte entre 30 (con 75 min diarios) y 84 (con 4 horas). O sea: NUNCA entra
+// entero en un día, ni siquiera en el mejor caso, y con dos o tres unidades la
+// distancia crece. Comprimir los pasos para que entren sería convertirlos en un
+// trámite — es exactamente lo que la carga definida viene a impedir.
+//
+// Entonces el lote NO se recorta: se extiende. Cuando se acaban los minutos de
+// la franja se corta EN EL BORDE DE UN PASO y se retoma mañana en la franja de
+// adquisición, que es la única que toca material fresco. Es la misma regla que
+// ya rige el plan entero: secuencial, no calendario.
+//
+// Dos consecuencias que sostienen las decisiones ya tomadas:
+//
+// · El reloj de consolidación arranca al cerrar el ÚLTIMO paso del lote
+//   (`cerrarAdquisicion`), no al terminar la franja del día. Un lote a medias
+//   sigue "introducida", no pasa a "consolidando", y por lo tanto sus cartas
+//   siguen bloqueadas — que es lo correcto: todavía no lo reconstruiste.
+//
+// · Una franja de adquisición sin el lote terminado igual SE DA POR CERRADA
+//   cuando se le acaban los minutos. Si no, `siguienteFranja` la devolvería para
+//   siempre y consolidación, aplicación y cierre no se abrirían nunca — o sea se
+//   rompería el roleplay diario, que es justo lo que no puede pasar.
+
+// La secuencia real del lote, aplanada: los pasos del lote una vez y los de
+// unidad repetidos por cada una. `unidadIdx` es null en los del lote.
+//
+// `unidades` puede ser un número (todas normales) o la lista de unidades con su
+// bandera `literal`. Las literales —las seis transiciones y la respuesta al
+// precio prematuro— SALTEAN la descomposición: su valor está en el fraseo
+// exacto y reconstruirlo con palabras propias destruye lo que hay que tener
+// automático. No es un caso especial de la UI: `estadoUnidad` en
+// consolidacion.js ya no les pide `descomposicion.ok`, y si la secuencia se la
+// pidiera igual, el lote no podría cerrar nunca.
+export function pasosDelLote(unidades = 1) {
+  const lista = typeof unidades === 'number'
+    ? Array.from({ length: Math.max(1, unidades) }, () => ({ literal: false }))
+    : (unidades.length ? unidades : [{ literal: false }]);
+
+  const out = [];
+  for (const p of PASOS_ADQUISICION) {
+    if (!p.porUnidad) { out.push({ ...p, unidadIdx: null, clave: p.id }); continue; }
+    lista.forEach((u, i) => {
+      if (p.id === 'descomposicion' && u?.literal) return;
+      out.push({ ...p, unidadIdx: i, unidadId: u?.id || null, clave: `${p.id}:${i}` });
+    });
+  }
+  return out;
+}
+
+export function minutosDelLote(unidades = 1) {
+  return pasosDelLote(unidades).reduce((a, p) => a + p.minutos, 0);
+}
+
+// Cuántos pasos entran en los minutos que quedan. Corta en el borde: un paso
+// empezado se termina, porque cortar una descomposición a la mitad la pierde.
+// Siempre entra al menos uno — si no, un día corto no avanzaría nunca.
+export function pasosQueEntran(pasos = [], desde = 0, minutosDisponibles = 0) {
+  let usados = 0, hasta = desde;
+  while (hasta < pasos.length) {
+    const m = pasos[hasta].minutos;
+    if (hasta > desde && usados + m > minutosDisponibles) break;
+    usados += m;
+    hasta++;
+  }
+  return { desde, hasta, pasos: pasos.slice(desde, hasta), minutos: usados };
+}
+
+// En qué paso quedó el lote. `hechos` es el mapa de claves cumplidas que guarda
+// el nodo `adquisicionEnCurso`.
+export function avanceDelLote(pasos = [], hechos = {}) {
+  const i = pasos.findIndex(p => !hechos[p.clave]);
+  const idx = i === -1 ? pasos.length : i;
+  return {
+    indice: idx,
+    paso: pasos[idx] || null,
+    terminado: idx >= pasos.length,
+    hechos: idx,
+    total: pasos.length,
+  };
+}
 
 // ── Reparto del día ─────────────────────────────────────────
 
@@ -236,20 +329,53 @@ export function repartirDia(minutosTotales, {
 // Una franja se cierra cuando cumplió su carga. No cuando se acabó el tiempo:
 // el tiempo es una estimación para poder planificar el día, la carga es el
 // criterio real.
-export function franjaCompleta(sesion, cumplido = 0) {
+//
+// La adquisición es la excepción, y no por comodidad: su carga es un lote que
+// no entra en un día ni con 4 horas (ver `minutosDelLote`). Ahí el criterio es
+// "el lote terminó, o se te acabaron los minutos de HOY". Sin esa segunda
+// condición la franja quedaría abierta para siempre y taparía a las otras tres.
+//
+// `curso` es el nodo `adquisicionEnCurso` y solo se pasa para adquisición. El
+// que garantiza que `minutosHoy` sea de hoy —y no el acumulado de ayer— es el
+// store, que lo resetea al cambiar el día.
+export function franjaCompleta(sesion, cumplido = 0, curso = null) {
+  if (sesion?.franja === 'adquisicion' && curso) return adquisicionCerradaHoy(sesion, curso);
   return cumplido >= (sesion?.carga?.objetivo || 0);
+}
+
+// El criterio de "terminé por hoy" es EL MISMO que usa `pasosQueEntran` para
+// cortar: no "gasté todos los minutos" sino "el próximo paso ya no entra". La
+// diferencia no es sutil — los pasos son gruesos (22 min la descomposición) y
+// una franja de 30 se queda en 21 usados. Pidiendo 30 la franja no cerraba
+// nunca, y al no cerrar tapaba a consolidación, aplicación y cierre.
+//
+// `totalPasos` y `minutosProximoPaso` los calcula y guarda el store: la
+// secuencia depende de qué unidades son `literal`, y eso es del currículum.
+// Esta capa reparte tiempo; no tiene por qué saber qué material entró.
+export function adquisicionCerradaHoy(sesion, curso, minutosProximoPaso = null) {
+  if (!curso?.unidades?.length) return false;
+  const cumplidos = Object.keys(curso.hechos || {}).length;
+  if (curso.totalPasos && cumplidos >= curso.totalPasos) return true;
+
+  const usados = curso.minutosHoy || 0;
+  // Siempre entra al menos un paso por día. Si no, con una franja de 30 minutos
+  // la descomposición de 22 nunca arrancaría y el lote no avanzaría jamás.
+  if (usados === 0) return false;
+
+  const proximo = minutosProximoPaso ?? curso.minutosProximoPaso ?? 0;
+  return usados + proximo > (sesion?.minutos || 0);
 }
 
 // Qué ofrecer cuando una franja se corta y sobra tiempo. Nunca "una vuelta más"
 // del mismo material: eso es lo que la regla prohíbe. Se ofrece la franja
 // siguiente, que corre sobre material distinto.
-export function siguienteFranja(sesiones = [], cumplidos = {}) {
-  return sesiones.find(s => !franjaCompleta(s, cumplidos[s.id] || 0)) || null;
+export function siguienteFranja(sesiones = [], cumplidos = {}, curso = null) {
+  return sesiones.find(s => !franjaCompleta(s, cumplidos[s.id] || 0, curso)) || null;
 }
 
-export function progresoDelDia(sesiones = [], cumplidos = {}) {
+export function progresoDelDia(sesiones = [], cumplidos = {}, curso = null) {
   const total = sesiones.length;
-  const hechas = sesiones.filter(s => franjaCompleta(s, cumplidos[s.id] || 0)).length;
+  const hechas = sesiones.filter(s => franjaCompleta(s, cumplidos[s.id] || 0, curso)).length;
   const minutos = sesiones.reduce((a, s) => a + s.minutos, 0);
   return { total, hechas, minutos, pct: total ? Math.round((hechas / total) * 100) : 0 };
 }

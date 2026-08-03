@@ -27,6 +27,8 @@ import { dueCards } from '../srs/fsrs';
 import { agruparErrores, UMBRAL_PATRON } from '../audit/patterns';
 import { evaluarCierre, exigenciaDeNivel, rangoDeNivel, ejeMasDebil } from './dificultad';
 import { generarMesociclo, prorrogarMesociclo, sesionesObjetivoDe } from './mesociclo';
+import { siguientesUnidades, unidadPorId } from './curriculum';
+import { estadosDeTodas } from './consolidacion';
 
 export const PLAN_VERSION = 2;
 
@@ -256,6 +258,7 @@ export function hidratarBloques(dia, ctx) {
   const {
     cards = [], srsMap = {}, errores = [], principios = [], perfiles = [],
     identidad = null, checkHoy = null, fecha = null,
+    progresoUnidad = {}, cursoAdquisicion = null,
   } = ctx;
 
   const patrones = agruparErrores(errores);
@@ -317,6 +320,30 @@ export function hidratarBloques(dia, ctx) {
         nombre: principios.find(p => p.id === g.principioId)?.nombre || g.principioId,
       }));
       return { ...b, patrones: conNombre, vacio: false };
+    }
+
+    if (b.tipo === 'adquisicion') {
+      // Un lote abierto MANDA sobre el currículum. Si acá se propusiera material
+      // nuevo mientras hay uno a medio recorrer, el anterior no cerraría nunca y
+      // su reloj de consolidación no arrancaría — o sea, las cartas de esas
+      // unidades quedarían bloqueadas para siempre.
+      if (cursoAdquisicion?.unidades?.length) {
+        const abiertas = cursoAdquisicion.unidades.map(id => unidadPorId(id)).filter(Boolean);
+        return {
+          ...b, unidades: cursoAdquisicion.unidades,
+          titulo: abiertas.length === 1 ? abiertas[0].titulo : `${abiertas.length} unidades en curso`,
+          retomando: true, vacio: false,
+        };
+      }
+      const estados = estadosDeTodas(progresoUnidad);
+      const proximas = siguientesUnidades(estados, b.maxUnidades || 1);
+      return {
+        ...b, unidades: proximas.map(u => u.id),
+        titulo: proximas.length === 1 ? proximas[0].titulo : b.titulo,
+        // Sin unidades introducibles no es un bloque roto: es que los
+        // prerrequisitos están consolidando y se liberan solos.
+        vacio: proximas.length === 0,
+      };
     }
 
     if (b.tipo === 'cierre') {

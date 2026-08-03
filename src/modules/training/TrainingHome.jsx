@@ -14,6 +14,7 @@ import { subscribeIdentidad, checkDelDia, tieneIdentidad } from './identidad/sto
 import IdentidadOnboarding from './identidad/IdentidadOnboarding';
 import PanelVisionario from './identidad/PanelVisionario';
 import AcquisicionSession from './adquisicion/AcquisicionSession';
+import { NODO as NODO_ADQUISICION } from './adquisicion/store';
 
 // Hub del módulo de entrenamiento de closing high ticket. Accesible desde
 // Trabajo Individual y desde Practicar Solo. Todo el contenido vive en
@@ -61,6 +62,9 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
   const [ocultarAvisoIdentidad, setOcultarAvisoIdentidad] = useState(false);
   // Bloque del plan que se está ejecutando en pantalla completa.
   const [bloqueActivo, setBloqueActivo] = useState(null);
+  // Estado del currículum y el lote de adquisición abierto (si hay).
+  const [progresoUnidad, setProgresoUnidad] = useState({});
+  const [cursoAdquisicion, setCursoAdquisicion] = useState(null);
 
   useEffect(() => { isSeeded().then(setSeeded).catch(() => setSeeded(false)); }, []);
   useEffect(() => subscribeList('cards', setCards), []);
@@ -73,6 +77,8 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
   useEffect(() => subscribeNode('plan', (v) => setPlan(v || null)), []);
   useEffect(() => subscribeNode('planEstado', (v) => setPlanEstado(v || null)), []);
   useEffect(() => subscribeIdentidad(setIdentidad), []);
+  useEffect(() => subscribeNode('progresoUnidad', (v) => setProgresoUnidad(v || {})), []);
+  useEffect(() => subscribeNode(NODO_ADQUISICION, (v) => setCursoAdquisicion(v || null)), []);
 
   const streak = useMemo(() => computeStreak(logMap), [logMap]);
   const hoy = logMap?.[todayKey()];
@@ -91,8 +97,13 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
       // `logMap` lo usa el recordatorio de continuidad para saber hace cuántos
       // días que no entrenás — es el mismo log del que sale la racha.
       logMap,
+      // Para la franja de adquisición: qué unidades ya pasaron y cuál es el lote
+      // abierto. Un lote a medio recorrer manda sobre el currículum — si no, al
+      // día siguiente el bloque propondría material nuevo y el anterior quedaría
+      // colgado sin cerrar nunca.
+      progresoUnidad, cursoAdquisicion,
     }),
-    [cards, srsMap, errores, principios, perfilesProspecto, sesiones, identidad, fechaHoy, logMap]
+    [cards, srsMap, errores, principios, perfilesProspecto, sesiones, identidad, fechaHoy, logMap, progresoUnidad, cursoAdquisicion]
   );
 
   const handleImport = async () => {

@@ -30,7 +30,7 @@ const panel = {
 
 const ICONO_TIPO = {
   flashcards: '🗂', roleplay: '🎧', lectura: '📖', revision: '📈', cierre: '✍️', kb: '📦',
-  'identidad-manana': '🎯', 'roleplay-voz': '🎤',
+  'identidad-manana': '🎯', 'roleplay-voz': '🎤', adquisicion: '🌱',
 };
 
 export default function PlanHoy({ plan, estado, ctx, onLanzar, onLanzarVoz, onIrA }) {
