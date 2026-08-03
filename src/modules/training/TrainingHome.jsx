@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Flame, BookOpen, Layers, ClipboardList, Loader, Download, GraduationCap, MessageSquare, TrendingUp, Target, RotateCcw, Compass, X } from 'lucide-react';
 import { subscribeList, subscribeNode, setNode, getNode, computeStreak, todayKey } from './db';
+import { auth } from '../../utils/db';
+import { subscribeToAuthState } from '../../utils/auth';
 import { deckStats } from './srs/fsrs';
 import { cartasBloqueadas } from './plan/consolidacion';
 import { importSeed, isSeeded, DECKS } from './seedImport';
@@ -35,6 +37,44 @@ const NAV = [
   { id: 'registro', label: 'Registro', icon: <ClipboardList size={15} /> },
 ];
 
+const EMAIL_ACCESO = import.meta.env.VITE_ACCESS_REQUEST_EMAIL || 'contacto.maximilianoc@gmail.com';
+
+// Mientras el servidor responde. Es un estado corto pero tiene que existir: sin
+// él, el módulo parpadearía "sin acceso" en cada carga para quien SÍ lo tiene.
+function AccesoVerificando({ onBack }) {
+  return (
+    <Page onBack={onBack} header={<h2 style={{ margin: 0, fontSize: '1.15rem' }}>Entrenamiento Closer</h2>}>
+      <p style={{ color: 'var(--text-muted)' }}><Loader size={14} className="spin" /> Verificando acceso…</p>
+    </Page>
+  );
+}
+
+// Sin acceso. Mismo criterio que la práctica solo: se explica por qué y se deja
+// pedirlo por mail, en vez de esconder el botón — esconderlo haría que pareciera
+// que la app está rota.
+function AccesoDenegado({ onBack }) {
+  const email = auth.currentUser?.email || '';
+  const asunto = 'Pedido de acceso al Entrenamiento Closer — Sales Arena';
+  const cuerpo = `Hola, quisiera acceso al Entrenamiento Closer.\n\nMail de mi cuenta: ${email}\n\n¡Gracias!`;
+  const mailto = `mailto:${EMAIL_ACCESO}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+
+  return (
+    <Page onBack={onBack} header={<h2 style={{ margin: 0, fontSize: '1.15rem' }}>Entrenamiento Closer</h2>}>
+      <div style={{ ...panel, textAlign: 'center' }}>
+        <div style={{ fontSize: '2rem', marginBottom: '0.6rem' }}>🔒</div>
+        <p style={{ fontWeight: 700, margin: '0 0 0.4rem' }}>Acceso restringido</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1rem', lineHeight: 1.55 }}>
+          El Entrenamiento Closer se habilita por usuario. Pedí acceso por email y te validamos.
+          {email && <><br />Tu cuenta: <strong>{email}</strong></>}
+        </p>
+        <a className="btn btn-primary" href={mailto} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', textDecoration: 'none' }}>
+          <MessageSquare size={15} /> Pedir acceso por email
+        </a>
+      </div>
+    </Page>
+  );
+}
+
 // `onPracticaVoz` lleva a Práctica individual (la llamada con micrófono, que ya
 // existía fuera del módulo). El plan la usa para los bloques de voz: el que
 // navega es el lobby, acá solo se deja la marca de qué bloque la pidió.
@@ -66,6 +106,42 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
   // Estado del currículum y el lote de adquisición abierto (si hay).
   const [progresoUnidad, setProgresoUnidad] = useState({});
   const [cursoAdquisicion, setCursoAdquisicion] = useState(null);
+
+  // ── Candado de acceso ───────────────────────────────────────
+  //
+  // El Entrenamiento Closer va por la MISMA whitelist que la práctica solo
+  // (`/api/solo-access` → isSoloAuthorized): admin, `soloApproved` o suscripción
+  // activa. Una sola aprobación habilita las dos cosas, así no hay que validar a
+  // la misma persona dos veces.
+  //
+  // Esto es la UX del candado, no el candado: el bloqueo real de tokens está en
+  // los tres endpoints `training-*`, que verifican lo mismo del lado del
+  // servidor. Acá solo se decide si mostrar el módulo o la pantalla de pedido.
+  //
+  // Se espera a `subscribeToAuthState` en vez de leer `auth.currentUser` en el
+  // mount: Firebase restaura la sesión de forma asíncrona y leerlo directo
+  // mandaría uid=undefined, dejando en 'denied' a alguien que sí tiene acceso.
+  const [acceso, setAcceso] = useState('checking');
+
+  useEffect(() => {
+    let vivo = true;
+    const unsubscribe = subscribeToAuthState((user) => {
+      (async () => {
+        try {
+          const res = await fetch('/api/solo-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uid: user?.uid }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (vivo) setAcceso(res.ok && data.allowed ? 'allowed' : 'denied');
+        } catch {
+          if (vivo) setAcceso('denied');
+        }
+      })();
+    });
+    return () => { vivo = false; unsubscribe(); };
+  }, []);
 
   useEffect(() => { isSeeded().then(setSeeded).catch(() => setSeeded(false)); }, []);
   useEffect(() => subscribeList('cards', setCards), []);
@@ -110,6 +186,10 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
     }),
     [cards, srsMap, errores, principios, perfilesProspecto, sesiones, identidad, fechaHoy, logMap, progresoUnidad, cursoAdquisicion]
   );
+
+  // Nada del módulo se monta sin acceso: ni el seed, ni el plan, ni una llamada.
+  if (acceso === 'checking') return <AccesoVerificando onBack={onBack} />;
+  if (acceso === 'denied') return <AccesoDenegado onBack={onBack} />;
 
   const handleImport = async () => {
     setImporting(true);

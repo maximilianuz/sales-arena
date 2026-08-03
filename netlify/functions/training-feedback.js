@@ -1,4 +1,4 @@
-import { getUserData } from './lib/firebaseAdmin.js';
+import { getUserData, isSoloAuthorized } from './lib/firebaseAdmin.js';
 
 // Auditoría de una sesión de roleplay del módulo Training.
 //
@@ -53,6 +53,21 @@ export const handler = async (event) => {
     await getUserData(uid);
   } catch {
     return { statusCode: 403, headers, body: JSON.stringify({ error: "Usuario no encontrado." }) };
+  }
+
+  // El candado real de tokens. `getUserData` solo confirmaba que el usuario
+  // EXISTE, así que cualquier cuenta logueada podía consumir la API de NVIDIA
+  // por acá. El Entrenamiento Closer va por la misma whitelist que la práctica
+  // solo: una sola aprobación del admin habilita las dos, y así no hay que
+  // validar a la misma persona dos veces.
+  try {
+    if (!(await isSoloAuthorized(uid))) {
+      return { statusCode: 403, headers, body: JSON.stringify({ error: "Tu cuenta todavía no tiene acceso al Entrenamiento Closer." }) };
+    }
+  } catch {
+    // Ante un fallo de verificación, se niega: proteger los tokens es lo que
+    // este chequeo viene a hacer.
+    return { statusCode: 403, headers, body: JSON.stringify({ error: "No se pudo verificar el acceso." }) };
   }
 
   const system = `Sos un auditor de llamadas de venta high ticket que entrena a un closer principiante. Tu trabajo NO es motivar: es señalar con precisión qué falló y por qué, anclando cada error a un principio del método.
