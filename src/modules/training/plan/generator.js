@@ -29,6 +29,7 @@ import { evaluarCierre, exigenciaDeNivel, rangoDeNivel, ejeMasDebil } from './di
 import { generarMesociclo, prorrogarMesociclo, sesionesObjetivoDe } from './mesociclo';
 import { siguientesUnidades, unidadPorId } from './curriculum';
 import { estadosDeTodas } from './consolidacion';
+import { preguntaDeHoy } from '../identidad/dossier';
 
 export const PLAN_VERSION = 2;
 
@@ -258,7 +259,7 @@ export function hidratarBloques(dia, ctx) {
   const {
     cards = [], srsMap = {}, errores = [], principios = [], perfiles = [],
     identidad = null, checkHoy = null, fecha = null,
-    progresoUnidad = {}, cursoAdquisicion = null,
+    progresoUnidad = {}, cursoAdquisicion = null, logMap = null,
   } = ctx;
 
   const patrones = agruparErrores(errores);
@@ -355,6 +356,28 @@ export function hidratarBloques(dia, ctx) {
 
     return { ...b, vacio: false };
   });
+
+  // La pregunta del dossier va al final del día, no al principio: se contesta
+  // mejor DESPUÉS de haber entrenado —"¿qué sostenés aunque te cueste la venta?"
+  // significa otra cosa recién salido de una llamada simulada que en frío— y
+  // ponerla arriba la convertiría en un peaje antes de empezar.
+  //
+  // Efímera como el check de la mañana, y por el mismo motivo: su cumplimiento
+  // vive en identidad/dossier y no en `planEstado.hechos`, que es permanente por
+  // id de bloque. Si viviera ahí, cambiar de mesociclo la volvería a pedir.
+  const delDossier = fecha ? preguntaDeHoy({ identidad, logMap, fecha }) : null;
+  if (delDossier) {
+    bloques.push({
+      id: `dossier-${delDossier.key}`,
+      tipo: 'dossier',
+      minutos: 3,
+      titulo: 'Una pregunta más de tu dossier',
+      efimero: true,
+      hechoExterno: false,
+      pregunta: delDossier,
+      vacio: false,
+    });
+  }
 
   // El check de la mañana va primero y es efímero: no vive en `planEstado.hechos`
   // (que es permanente por id de bloque) sino en identidad/check/{fecha}, porque

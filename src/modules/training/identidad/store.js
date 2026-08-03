@@ -10,7 +10,7 @@
 // identidad/check/{fecha}, que además tiene que resetearse todos los días —
 // distinto de planEstado.hechos, que es permanente por id de bloque.
 
-import { getNode, setNode, setItem, removeItem, subscribeNode, todayKey } from '../db';
+import { getNode, setNode, setItem, removeItem, subscribeNode, bulkWrite, todayKey } from '../db';
 import { armarDeclaracion } from './questions';
 
 export const IDENTIDAD_VERSION = 1;
@@ -32,6 +32,7 @@ export function normalizar(nodo) {
       .sort((a, b) => (a.orden || 0) - (b.orden || 0)),
     check: nodo.check || {},
     recordatorios: nodo.recordatorios || {},
+    dossier: nodo.dossier || {},
   };
 }
 
@@ -112,6 +113,23 @@ export async function reescribirParte(parteKey, texto, declaracionActual) {
     partes,
     texto: armarDeclaracion(partes),
     actualizadoAt: Date.now(),
+  });
+}
+
+// Una respuesta del dossier. Escribe la parte en la declaración —que es donde
+// vive todo lo escrito, así el recordatorio semanal la puede rotar como a
+// cualquier otra— y además deja el registro de CUÁNDO se contestó.
+//
+// El registro guarda `dia` (días entrenados) y no solo la fecha porque el
+// espaciado entre preguntas se cuenta en días de práctica, no de calendario:
+// quien entrena tres veces por semana no debería recibirlas más rápido por el
+// simple paso del tiempo. La fecha se guarda aparte, para la regla de "no más
+// de una por día".
+export async function responderDossier({ key, texto, dia, fecha, declaracionActual }) {
+  const partes = { ...(declaracionActual?.partes || {}), [key]: texto };
+  await bulkWrite({
+    'identidad/declaracion': { partes, texto: armarDeclaracion(partes), actualizadoAt: Date.now() },
+    [`identidad/dossier/${key}`]: { dia, fecha, ts: Date.now() },
   });
 }
 

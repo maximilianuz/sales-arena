@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Pencil, Check, X, Flame, Target } from 'lucide-react';
 import { guardarDeclaracion, registrarAvance, rachaCheck } from './store';
-import { metaValida, faltaEnMeta, partesFaltantes } from './questions';
+import { metaValida, faltaEnMeta, PASOS_ARRANQUE } from './questions';
+import { progresoDossier } from './dossier';
 
 // El panel visionario: la declaración y las metas cuantificadas, en una sola
 // pantalla. Se llega desde el check de la mañana o desde la pestaña Identidad.
@@ -46,10 +47,14 @@ export default function PanelVisionario({ identidad, onEmpezar }) {
 
   const racha = rachaCheck(identidad);
   const metas = identidad.metas || [];
-  // Las dos preguntas de motor se agregaron después del resto: quien escribió su
-  // declaración antes no las tiene, y sin ellas el recordatorio de continuidad
-  // se queda sin la mitad de su munición.
-  const faltantes = partesFaltantes(identidad.declaracion);
+  // El aviso es SOLO por las dos de motor. Antes usaba `partesFaltantes`, que
+  // mira las seis, y desde que las otras cuatro llegan de a una por día eso
+  // habría puesto una alarma naranja el primer día por algo que es el diseño
+  // funcionando. Las de motor sí son un hueco real: sin ellas el recordatorio de
+  // continuidad se queda sin la mitad de su munición.
+  const partesEscritas = identidad.declaracion?.partes || {};
+  const faltantes = PASOS_ARRANQUE.filter(p => !(partesEscritas[p.key] || '').trim());
+  const dossier = progresoDossier(identidad);
 
   const guardarTexto = async () => {
     await guardarDeclaracion({ partes: identidad.declaracion.partes || {}, texto: borrador });
@@ -76,13 +81,29 @@ export default function PanelVisionario({ identidad, onEmpezar }) {
             Te {faltantes.length === 1 ? 'falta una pregunta' : `faltan ${faltantes.length} preguntas`}
           </div>
           <p style={{ margin: '0 0 0.6rem', fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            {faltantes.some(f => f.motor)
-              ? 'Sin “a qué no volvés” y “por qué estás dispuesto”, el recordatorio semanal se queda sin lo que más empuja cuando aflojás.'
-              : 'Completá lo que falta para que el recordatorio pueda rotar entre más partes.'}
+            Sin “a qué no volvés” y “por qué estás dispuesto”, el recordatorio semanal se queda
+            sin lo que más empuja cuando aflojás.
           </p>
           <button className="btn btn-outline" onClick={onEmpezar} style={{ fontSize: '0.8rem', padding: '0.35rem 0.8rem' }}>
             Completarlas
           </button>
+        </div>
+      )}
+
+      {/* El dossier no es un pendiente: es algo que se va llenando solo. Se
+          muestra como avance y sin botón — no hay nada que apurar acá. */}
+      {!faltantes.length && !dossier.completo && (
+        <div style={{ ...panel, padding: '0.8rem 1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+            <span style={{ fontWeight: 700, fontSize: '0.86rem' }}>Tu dossier</span>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              {dossier.hechas} de {dossier.total}
+            </span>
+          </div>
+          <p style={{ margin: '0.35rem 0 0', fontSize: '0.79rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+            Las preguntas que faltan van llegando de a una, cada dos días de entrenamiento. Se
+            contestan mejor así: después de haber entrenado, no antes.
+          </p>
         </div>
       )}
 

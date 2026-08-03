@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Loader, Check } from 'lucide-react';
-import { PASOS_DECLARACION, CATEGORIAS_META, armarDeclaracion, metaValida, faltaEnMeta } from './questions';
+import { PASOS_ARRANQUE, CATEGORIAS_META, armarDeclaracion, metaValida, faltaEnMeta } from './questions';
 import { guardarDeclaracion, guardarMeta, completarOnboarding } from './store';
 import { slugId } from '../schemas';
 
@@ -26,7 +26,10 @@ const inputBase = {
   background: 'rgba(0,0,0,0.3)', color: 'white', font: 'inherit', fontSize: '0.88rem',
 };
 
-const TOTAL_PASOS = PASOS_DECLARACION.length + 1;
+// Solo el arranque: las dos preguntas de motor y el panel. Las otras cuatro
+// llegan de a una por día desde el plan (ver identidad/dossier.js) — pedirlas
+// acá era lo que hacía que el wizard tuviera siete pantallas.
+const TOTAL_PASOS = PASOS_ARRANQUE.length + 1;
 
 export default function IdentidadOnboarding({ identidad, onListo, onCancel }) {
   // Reabrir el wizard no puede pisar lo ya escrito: se precarga lo que haya y se
@@ -34,8 +37,8 @@ export default function IdentidadOnboarding({ identidad, onListo, onCancel }) {
   // las dos preguntas de motor que se agregaron después.
   const [partes, setPartes] = useState(() => ({ ...(identidad?.declaracion?.partes || {}) }));
   const [paso, setPaso] = useState(() => {
-    const i = PASOS_DECLARACION.findIndex(p => !(identidad?.declaracion?.partes?.[p.key] || '').trim());
-    return i === -1 ? PASOS_DECLARACION.length : i;
+    const i = PASOS_ARRANQUE.findIndex(p => !(identidad?.declaracion?.partes?.[p.key] || '').trim());
+    return i === -1 ? PASOS_ARRANQUE.length : i;
   });
   const [metas, setMetas] = useState(() => CATEGORIAS_META.map(c => {
     const previa = (identidad?.metas || []).find(m => m.categoria === c.id);
@@ -46,8 +49,8 @@ export default function IdentidadOnboarding({ identidad, onListo, onCancel }) {
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
 
-  const esPanel = paso === PASOS_DECLARACION.length;
-  const pregunta = PASOS_DECLARACION[paso];
+  const esPanel = paso === PASOS_ARRANQUE.length;
+  const pregunta = PASOS_ARRANQUE[paso];
   const valor = pregunta ? (partes[pregunta.key] || '') : '';
   const suficiente = !pregunta || valor.trim().length >= pregunta.minimo;
 

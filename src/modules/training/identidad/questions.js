@@ -5,8 +5,20 @@
 // entre opciones — se escribe. No hay IA: el contenido es del usuario, y un
 // texto generado por un modelo no sirve para leerlo cada mañana como propio.
 //
-// Son cinco pantallas: cuatro de declaración y una de panel. Más que eso y se
-// abandona antes de llegar al producto.
+// El arranque son TRES pantallas: dos de declaración y una de panel. Las otras
+// cuatro preguntas no se piden acá — llegan de a una por día (ver dossier.js).
+//
+// El motivo es el que este mismo comentario decía desde el principio: más de
+// cinco pantallas y se abandona antes de llegar al producto. Cuando las
+// preguntas de motor se agregaron después, el wizard pasó a pedir siete de una
+// sentada, que es justo lo que la regla prohibía. Repartirlas además las mejora:
+// "¿quién sos en tu mejor versión vendiendo?" se contesta distinto el día uno
+// que después de haber hecho tres llamadas simuladas.
+//
+// El corte no es por dificultad sino por FUNCIÓN. Las dos de arranque son las
+// únicas que el sistema necesita para operar: continuidad.js usa `noVuelvoA`
+// para el recordatorio de regreso y `porQueCambio` para el de subida de nivel.
+// Sin esas dos hay funciones muertas; sin las otras cuatro, no.
 
 // El orden importa. Las dos primeras son las que más pegan y las más fáciles de
 // contestar —nadie duda de a qué no quiere volver—, así que abren. Las otras
@@ -24,6 +36,7 @@ export const PASOS_DECLARACION = [
     placeholder: 'A cerrar el mes contando lo que falta. A pedir prórroga sabiendo que la llamada la tuve y la solté…',
     minimo: 40,
     motor: 'desde',
+    arranque: true,
   },
   {
     key: 'porQueCambio',
@@ -32,6 +45,7 @@ export const PASOS_DECLARACION = [
     placeholder: 'Porque quiero elegir con quién trabajo en vez de aceptar lo que venga…',
     minimo: 40,
     motor: 'hacia',
+    arranque: true,
   },
   {
     key: 'quienSoy',
@@ -62,6 +76,20 @@ export const PASOS_DECLARACION = [
     minimo: 30,
   },
 ];
+
+// Las que se piden en el arranque y las que se reparten día a día. Se derivan
+// del mismo array para que agregar una pregunta nueva no obligue a acordarse de
+// tocar dos listas.
+export const PASOS_ARRANQUE = PASOS_DECLARACION.filter(p => p.arranque);
+export const PASOS_DOSSIER = PASOS_DECLARACION.filter(p => !p.arranque);
+
+// El arranque está completo cuando están las dos de motor. NO exige las cuatro
+// del dossier: son las que van llegando después, y bloquear el plan hasta
+// tenerlas sería volver al wizard de siete pantallas por otra puerta.
+export function arranqueCompleto(declaracion) {
+  const partes = declaracion?.partes || {};
+  return PASOS_ARRANQUE.every(p => (partes[p.key] || '').trim());
+}
 
 // El panel visionario. Tres metas, una por categoría: una de plata, una de
 // actividad y una de habilidad. La de actividad es la que más importa al

@@ -33,8 +33,18 @@
 //   exactamente lo que no queremos.
 //
 // · `minMinutos` — cuánto necesita la franja para tener sentido una vez que
-//   aparece. Adquisición con 40 minutos lleva UNA unidad en vez de tres; el
-//   recorrido de cinco pasos se sostiene igual, solo que más corto.
+//   aparece. Para adquisición eso es CARGA + EXPOSICIÓN (3 + 18 = 21): el día
+//   en que se abre un lote tiene que poder declarar la carga y abrir el
+//   material. Menos que eso es gastar una jornada en una declaración de tres
+//   minutos.
+//
+//   Antes decía 40, con el argumento de que "con 40 minutos lleva UNA unidad en
+//   vez de tres y el recorrido se sostiene igual, solo que más corto". Ese
+//   argumento murió cuando el lote pasó a extenderse a varios días: la franja ya
+//   no tiene que hospedar el recorrido entero, así que no hay nada que un piso
+//   de 40 defienda. Lo único que hacía era INFLAR la adquisición entre 75 y 100
+//   minutos diarios —de 26 a 30 y de 35 a 40— robándole esos minutos a
+//   consolidación y aplicación, justo en las jornadas donde más apretadas están.
 //
 // Con 20 minutos diarios sobrevive solo Consolidación, que es exactamente el
 // comportamiento viejo: nadie que hoy entrena 20 minutos se despierta mañana
@@ -47,7 +57,7 @@ export const FRANJAS = [
     etiqueta: 'Adquisición',
     resumen: 'Material nuevo. Es la única franja que lo toca.',
     peso: 0.35,
-    minMinutos: 40,
+    minMinutos: 21, // carga (3) + exposición (18): abrir un lote, no menos
     minDia: 75,
     material: 'fresco',
   },

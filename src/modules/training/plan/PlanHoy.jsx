@@ -8,7 +8,7 @@ import { necesitaCheckin, semanaISO } from './checkin';
 import CheckinSemanal from './CheckinSemanal';
 import { recordatorioDeHoy, recordatorioDeNivel } from '../identidad/continuidad';
 import Recordatorio, { RecordatorioDeNivel } from '../identidad/Recordatorio';
-import { marcarCheckManana, marcarCheckNoche } from '../identidad/store';
+import { marcarCheckManana, marcarCheckNoche, responderDossier } from '../identidad/store';
 
 // Vista "Hoy": el día del plan como una lista lineal. La regla de diseño es que
 // nunca haya más de una decisión en pantalla — hay un solo botón que importa
@@ -30,7 +30,7 @@ const panel = {
 
 const ICONO_TIPO = {
   flashcards: '🗂', roleplay: '🎧', lectura: '📖', revision: '📈', cierre: '✍️', kb: '📦',
-  'identidad-manana': '🎯', 'roleplay-voz': '🎤', adquisicion: '🌱',
+  'identidad-manana': '🎯', 'roleplay-voz': '🎤', adquisicion: '🌱', dossier: '🧭',
 };
 
 export default function PlanHoy({ plan, estado, ctx, onLanzar, onLanzarVoz, onIrA }) {
@@ -388,7 +388,7 @@ function FinDeBloque({ resultado, motivoDeFondo, onSeguir, onIrA }) {
 // ── Una fila del día ────────────────────────────────────────
 
 function BloqueFila({ bloque, hecho, esSiguiente, expandido, fecha, identidad, onToggle, onLanzar, onCompletar, onCompletarEfimero, onIrA }) {
-  const inline = ['lectura', 'revision', 'cierre', 'identidad-manana'].includes(bloque.tipo);
+  const inline = ['lectura', 'revision', 'cierre', 'identidad-manana', 'dossier'].includes(bloque.tipo);
   const activo = esSiguiente && !hecho;
 
   return (
@@ -449,8 +449,65 @@ function BloqueFila({ bloque, hecho, esSiguiente, expandido, fecha, identidad, o
           {bloque.tipo === 'revision' && <ContenidoRevision bloque={bloque} onCompletar={onCompletar} onIrA={onIrA} />}
           {bloque.tipo === 'cierre' && <ContenidoCierre bloque={bloque} fecha={fecha} identidad={identidad} onCompletar={onCompletar} />}
           {bloque.tipo === 'identidad-manana' && <ContenidoIdentidadManana bloque={bloque} fecha={fecha} onListo={onCompletarEfimero} onIrA={onIrA} />}
+          {bloque.tipo === 'dossier' && <ContenidoDossier bloque={bloque} fecha={fecha} identidad={identidad} onListo={onCompletarEfimero} />}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Una pregunta del dossier ────────────────────────────────
+//
+// Las cuatro preguntas que salieron del wizard de identidad. Cae una cada dos
+// días entrenados, al final del día, para que se conteste sobre experiencia
+// reciente y no en frío. Quién decide cuál y cuándo es identidad/dossier.js.
+
+function ContenidoDossier({ bloque, fecha, identidad, onListo }) {
+  const { pregunta } = bloque;
+  const [texto, setTexto] = useState('');
+  const [guardando, setGuardando] = useState(false);
+  const suficiente = texto.trim().length >= pregunta.minimo;
+
+  const guardar = async () => {
+    setGuardando(true);
+    try {
+      await responderDossier({
+        key: pregunta.key, texto: texto.trim(), dia: pregunta.dia, fecha,
+        declaracionActual: identidad?.declaracion,
+      });
+      onListo?.();
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  return (
+    <div style={{ paddingTop: '0.85rem' }}>
+      <div style={{ fontWeight: 700, fontSize: '0.94rem', marginBottom: '0.4rem' }}>{pregunta.titulo}</div>
+      <p style={{ margin: '0 0 0.7rem', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>
+        {pregunta.ayuda}
+      </p>
+      <textarea
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+        placeholder={pregunta.placeholder}
+        rows={4}
+        style={{
+          width: '100%', padding: '0.7rem', borderRadius: '0.6rem', resize: 'vertical',
+          background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.12)',
+          color: 'inherit', font: 'inherit', fontSize: '0.87rem', lineHeight: 1.55,
+        }}
+      />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginTop: '0.7rem', flexWrap: 'wrap' }}>
+        <button className="btn btn-primary" disabled={!suficiente || guardando} onClick={guardar}>
+          {guardando ? 'Guardando…' : 'Sumar al dossier'}
+        </button>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          {suficiente
+            ? `Quedan ${pregunta.restantes - 1} preguntas, y llegan de a una.`
+            : `Escribí un poco más (${texto.trim().length}/${pregunta.minimo}).`}
+        </span>
+      </div>
     </div>
   );
 }
