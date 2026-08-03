@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Flame, BookOpen, Layers, ClipboardList, Loader, Download, GraduationCap, MessageSquare, TrendingUp, Target, RotateCcw, Compass, X, Lock, Package } from 'lucide-react';
+import { ArrowLeft, Flame, BookOpen, Layers, ClipboardList, Loader, Download, GraduationCap, MessageSquare, TrendingUp, Target, RotateCcw, Compass, X, Lock, Package, AlertTriangle } from 'lucide-react';
 import { subscribeList, subscribeNode, setNode, getNode, computeStreak, todayKey } from './db';
 import { auth } from '../../utils/db';
 import { subscribeToAuthState } from '../../utils/auth';
@@ -71,6 +71,34 @@ function AccesoDenegado({ onBack }) {
   );
 }
 
+// El servidor no pudo consultar la whitelist. En producción es un incidente; en
+// local es casi siempre que faltan las credenciales de Firebase, y sin este
+// caso la pantalla decía "acceso restringido" — mandando a pedir permiso por
+// mail a quien es el dueño de la app.
+function AccesoSinVerificar({ onBack }) {
+  return (
+    <Page onBack={onBack} header={<h2 style={{ margin: 0, fontSize: '1.15rem' }}>Entrenamiento Closer</h2>}>
+      <div style={{ ...panel, borderColor: 'rgba(255,159,10,0.35)' }}>
+        <AlertTriangle size={26} color={ACENTO.atencion} strokeWidth={2} style={{ marginBottom: '0.5rem' }} />
+        <p style={{ fontWeight: 700, margin: '0 0 0.4rem' }}>No se pudo verificar el acceso</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.8rem', lineHeight: 1.55 }}>
+          El servidor no pudo consultar la lista de habilitados. Si estás corriendo la app en tu
+          máquina, casi seguro faltan las credenciales de Firebase en <code>.env.local</code>:
+          <br />
+          <code style={{ fontSize: '0.8rem' }}>FIREBASE_SERVICE_ACCOUNT</code> (el JSON entero) o
+          bien <code style={{ fontSize: '0.8rem' }}>FIREBASE_CLIENT_EMAIL</code> +{' '}
+          <code style={{ fontSize: '0.8rem' }}>FIREBASE_PRIVATE_KEY</code> +{' '}
+          <code style={{ fontSize: '0.8rem' }}>FIREBASE_PROJECT_ID</code>, más{' '}
+          <code style={{ fontSize: '0.8rem' }}>FIREBASE_DATABASE_URL</code>.
+        </p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>
+          El detalle exacto sale por consola en la ventana del servidor.
+        </p>
+      </div>
+    </Page>
+  );
+}
+
 // `onPracticaVoz` lleva a Práctica individual (la llamada con micrófono, que ya
 // existía fuera del módulo). El plan la usa para los bloques de voz: el que
 // navega es el lobby, acá solo se deja la marca de qué bloque la pidió.
@@ -130,9 +158,15 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
             body: JSON.stringify({ uid: user?.uid }),
           });
           const data = await res.json().catch(() => ({}));
-          if (vivo) setAcceso(res.ok && data.allowed ? 'allowed' : 'denied');
+          if (!vivo) return;
+          if (res.ok && data.allowed) setAcceso('allowed');
+          // El servidor no pudo verificar (falta configuración, típicamente en
+          // local). No es lo mismo que no tener acceso, y decirlo evita que
+          // alguien pida permiso por mail cuando le falta una env var.
+          else if (data.motivo === 'sin-verificar') setAcceso('sin-verificar');
+          else setAcceso('denied');
         } catch {
-          if (vivo) setAcceso('denied');
+          if (vivo) setAcceso('sin-verificar');
         }
       })();
     });
@@ -186,6 +220,7 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
   // Nada del módulo se monta sin acceso: ni el seed, ni el plan, ni una llamada.
   if (acceso === 'checking') return <AccesoVerificando onBack={onBack} />;
   if (acceso === 'denied') return <AccesoDenegado onBack={onBack} />;
+  if (acceso === 'sin-verificar') return <AccesoSinVerificar onBack={onBack} />;
 
   const handleImport = async () => {
     setImporting(true);

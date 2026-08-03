@@ -16,15 +16,38 @@ function base64url(input) {
     .replace(/=+$/, '');
 }
 
+// Las credenciales se aceptan en las DOS formas que circulan por el proyecto:
+// el JSON entero en FIREBASE_SERVICE_ACCOUNT, o las tres variables sueltas que
+// .env.example viene documentando desde siempre —y que hasta ahora el código no
+// leía, así que quien seguía el ejemplo al pie de la letra terminaba con las
+// functions caídas y sin ninguna pista de por qué.
+//
+// En la forma suelta la clave privada suele venir con los saltos de línea
+// escapados (\n literal), porque muchos paneles no aceptan multilínea. Si no se
+// desescapan, la firma RSA falla con un error que no menciona nada de esto.
+function credencialesDeEntorno() {
+  const crudo = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (crudo) {
+    try { return JSON.parse(crudo); }
+    catch { throw new Error('FIREBASE_SERVICE_ACCOUNT no es JSON válido.'); }
+  }
+  const privateKey = (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+  return {
+    client_email: process.env.FIREBASE_CLIENT_EMAIL || '',
+    private_key: privateKey,
+    project_id: process.env.FIREBASE_PROJECT_ID || '',
+  };
+}
+
 async function getAccessToken() {
   const now = Math.floor(Date.now() / 1000);
   if (cachedToken && cachedTokenExpiry > now + 60) {
     return cachedToken;
   }
 
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
+  const serviceAccount = credencialesDeEntorno();
   if (!serviceAccount.client_email || !serviceAccount.private_key) {
-    throw new Error('FIREBASE_SERVICE_ACCOUNT inválido o no configurado.');
+    throw new Error('Credenciales de Firebase no configuradas: falta FIREBASE_SERVICE_ACCOUNT (JSON) o el trío FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY + FIREBASE_PROJECT_ID.');
   }
 
   const header = { alg: 'RS256', typ: 'JWT' };
