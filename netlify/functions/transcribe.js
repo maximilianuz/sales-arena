@@ -1,4 +1,4 @@
-import { getUserData } from './lib/firebaseAdmin.js';
+import { getUserData, isSoloAuthorized } from './lib/firebaseAdmin.js';
 
 // Transcripción de voz para el modo práctica solo: el navegador graba el turno
 // del closer con el micrófono y manda el audio (base64) acá; lo pasamos a Groq
@@ -30,6 +30,21 @@ export const handler = async (event) => {
 
   try { await getUserData(uid); }
   catch { return { statusCode: 403, headers, body: JSON.stringify({ error: "Usuario no encontrado." }) }; }
+
+  // Candado de práctica individual. El roleplay individual consume mucho más
+  // que la práctica en equipo, así que se habilita por aprobación: admin, o
+  // email agregado a admin/authorizedEmails (que el flujo verificado convierte
+  // en subscriptionStatus 'active'). La práctica en grupo no usa este endpoint
+  // y queda abierta.
+  try {
+    if (!(await isSoloAuthorized(uid))) {
+      return { statusCode: 403, headers, body: JSON.stringify({ error: "Tu cuenta no tiene acceso a la práctica individual." }) };
+    }
+  } catch {
+    // Ante un fallo de verificación se niega: proteger los tokens es lo que
+    // este chequeo viene a hacer.
+    return { statusCode: 403, headers, body: JSON.stringify({ error: "No se pudo verificar el acceso." }) };
+  }
 
   // El cliente puede mandar un data URL ("data:audio/webm;base64,....") o base64 pelado.
   const base64 = audio.includes(',') ? audio.split(',')[1] : audio;

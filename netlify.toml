@@ -98,6 +98,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/training-respuesta"
+  to = "/.netlify/functions/training-respuesta"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/nvidia/*"
   to = "https://integrate.api.nvidia.com/:splat"
   status = 200

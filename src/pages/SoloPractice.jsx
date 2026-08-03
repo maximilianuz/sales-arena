@@ -354,7 +354,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
         theme: genConfig.theme,
         leadTemperature: genConfig.leadTemperature,
         targetObjection: genConfig.targetObjection,
-      }, stagesList, i18n.language);
+      }, stagesList, i18n.language, { soloMode: true });
       if (!sc || typeof sc !== 'object') throw new Error(isEn ? 'Could not generate the buyer.' : 'No se pudo generar el comprador.');
       setScenario(sc);
 

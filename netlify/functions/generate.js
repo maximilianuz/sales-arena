@@ -1,4 +1,4 @@
-import { getUserData, setFreePlanUsage, activateSubscription } from './lib/firebaseAdmin.js';
+import { getUserData, setFreePlanUsage, activateSubscription, isSoloAuthorized } from './lib/firebaseAdmin.js';
 import { llmChat } from './lib/llm.js';
 import { GROUP_ONLY_MODE, FREE_ACCESS_MODE } from './lib/appMode.js';
 
@@ -38,7 +38,27 @@ export const handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Body inválido, se esperaba JSON." }) };
   }
 
-  const { prompt, temperature, max_tokens, uid, email, byok } = body;
+  const { prompt, temperature, max_tokens, uid, email, byok, soloMode } = body;
+
+  // Candado de práctica individual. Este endpoint lo comparten la práctica en
+  // equipo y la individual, así que el criterio no puede ser la ruta sino qué
+  // se está pidiendo: `soloMode` lo declara el cliente al generar el comprador
+  // de una sesión individual. La generación de escenarios de equipo no pasa
+  // por acá y queda abierta.
+  //
+  // Va ANTES del chequeo de plan y de los modos gratis: en modo solo-grupal o
+  // acceso-gratis el resto se saltea, y sin esto la práctica individual quedaría
+  // abierta justamente en las configuraciones donde todo lo demás es libre.
+  if (soloMode && !byok) {
+    if (!uid) return { statusCode: 401, headers, body: JSON.stringify({ error: "Se requiere autenticación." }) };
+    try {
+      if (!(await isSoloAuthorized(uid))) {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "Tu cuenta no tiene acceso a la práctica individual." }) };
+      }
+    } catch {
+      return { statusCode: 403, headers, body: JSON.stringify({ error: "No se pudo verificar el acceso." }) };
+    }
+  }
 
   // Chequeo de suscripción — se saltea si el usuario usa su propia key (BYOK) o
   // si la app corre en modo solo-grupal o acceso-gratis (todo gratis e

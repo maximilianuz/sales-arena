@@ -85,6 +85,8 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
   const [finished, setFinished] = useState(false);
   // Feynman
   const [explicacion, setExplicacion] = useState('');
+  const [respuesta, setRespuesta] = useState('');
+  const [escribiendo, setEscribiendo] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
   const [evalResult, setEvalResult] = useState(null);
   const [evalError, setEvalError] = useState('');
@@ -122,6 +124,8 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
     setDone(d => d + 1);
     setRevealed(false);
     setExplicacion('');
+    setRespuesta('');
+    setEscribiendo(false);
     setEvalResult(null);
     setEvalError('');
     if (nextIdx >= newQueue.length) {
@@ -129,6 +133,40 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
     } else {
       setQueue(newQueue);
       setIdx(nextIdx);
+    }
+  };
+
+  // Evalúa la respuesta escrita de una carta clásica. Se escribe ANTES de ver el
+  // dorso a propósito: con la referencia a la vista, "sí, más o menos eso dije"
+  // es reconocimiento, no recuperación, y la autocalificación se vuelve
+  // generosa. Escribir primero deja rastro que el modelo puede corregir.
+  const evaluarRespuesta = async () => {
+    if (!respuesta.trim()) return;
+    setEvaluating(true);
+    setEvalError('');
+    try {
+      const resp = await fetch('/api/training-respuesta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: auth.currentUser?.uid,
+          respuesta,
+          carta: { frente: carta.frente, dorso: carta.dorso, porQue: carta.porQue || null },
+          principio: principio ? { nombre: principio.nombre, resumen: principio.resumen } : null,
+        }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data?.error || 'Error del evaluador');
+      setEvalResult(data);
+      setRevealed(true);
+    } catch (e) {
+      // Sin evaluador (offline / sin key / sin acceso): se degrada al flujo
+      // viejo en vez de trabar la sesión. Perder la corrección es peor que
+      // estudiar sin ella, pero no poder estudiar es peor que las dos.
+      setEvalError(`${e.message}. Compará vos contra el dorso y calificate.`);
+      setRevealed(true);
+    } finally {
+      setEvaluating(false);
     }
   };
 
@@ -220,9 +258,34 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
         </div>
       )}
 
+      {/* CLÁSICA: escribir la respuesta para que la corrijan. Es opcional —
+          decirla en voz alta sigue siendo válido y más rápido— pero es la única
+          vía por la que la devolución habla de lo que VOS dijiste. */}
+      {!revealed && !isFeynman && escribiendo && (
+        <div style={{ ...panel, marginBottom: '0.8rem' }}>
+          <textarea
+            value={respuesta}
+            onChange={(e) => setRespuesta(e.target.value)}
+            rows={5}
+            placeholder="Escribí tu respuesta como se la dirías al prospecto, sin mirar el dorso…"
+            style={{ width: '100%', boxSizing: 'border-box', padding: '0.7rem', borderRadius: '0.6rem', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.3)', color: 'white', font: 'inherit', fontSize: '0.9rem', resize: 'vertical' }}
+          />
+          <button className="btn btn-primary" disabled={evaluating || !respuesta.trim()} onClick={evaluarRespuesta} style={{ marginTop: '0.7rem', width: '100%' }}>
+            {evaluating ? <><Loader size={14} className="spin" /> Corrigiendo…</> : 'Corregir mi respuesta'}
+          </button>
+        </div>
+      )}
+
       {/* DORSO */}
       {!revealed && !isFeynman && (
-        <button className="btn btn-primary" onClick={() => setRevealed(true)} style={{ width: '100%' }}>Mostrar dorso</button>
+        <div style={{ display: 'grid', gridTemplateColumns: escribiendo ? '1fr' : '1fr 1fr', gap: '0.5rem' }}>
+          {!escribiendo && (
+            <button className="btn btn-outline" onClick={() => setEscribiendo(true)} style={{ width: '100%' }}>
+              Escribir y que me corrijan
+            </button>
+          )}
+          <button className="btn btn-primary" onClick={() => setRevealed(true)} style={{ width: '100%' }}>Mostrar dorso</button>
+        </div>
       )}
 
       {revealed && (
