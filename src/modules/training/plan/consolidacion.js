@@ -142,6 +142,33 @@ export function unidadesEnPausa(progresoMap = {}, ahora = Date.now()) {
 //
 // Devuelven el progreso nuevo; persistirlo es responsabilidad de store.js.
 
+// Las unidades base, otorgadas al importar el seed.
+//
+// Con la compuerta encendida, quien empieza de cero no tiene NADA para repasar
+// hasta cerrar su primer lote: dos o tres días mirando seis mazos en pausa. Eso
+// no es rigor, es una pantalla vacía — y la primera impresión del módulo.
+//
+// Las 11 unidades de la semana 1 (mentalidad y fases base) vienen ya
+// disponibles: son las que no tienen prerrequisitos fuera de su propio grupo,
+// así que otorgarlas no saltea ningún orden. El resto del currículum se gana
+// pasando por adquisición, como corresponde.
+//
+// Se marca `origen: 'seed'` para que quede claro que ese progreso no lo hizo la
+// persona: no es lo mismo a la hora de leer el historial.
+export function otorgarUnidadBase(id, ahora = Date.now()) {
+  return {
+    id,
+    introducidaAt: ahora,
+    descomposicion: { ok: true, solapamiento: 0, largo: 0, ts: ahora, origen: 'seed' },
+    feynmanOk: true,
+    feynmanAt: ahora,
+    // Hacia atrás: el reloj de consolidación ya venció, así que quedan
+    // DISPONIBLE en vez de esperar a mañana. Es el punto de otorgarlas.
+    consolidandoAt: ahora - (HORAS_CONSOLIDACION + 1) * HORA_MS - 24 * HORA_MS,
+    origen: 'seed',
+  };
+}
+
 export function marcarIntroducida(prog, ahora = Date.now()) {
   if (prog?.introducidaAt) return prog;
   return { ...(prog || {}), introducidaAt: ahora };

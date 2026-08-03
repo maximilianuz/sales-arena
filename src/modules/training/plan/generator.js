@@ -369,6 +369,40 @@ export function hidratarBloques(dia, ctx) {
     return { ...b, vacio: false };
   });
 
+  // ── Planes viejos: inyectar el bloque de material nuevo ──
+  //
+  // La estructura del plan se congela al generarlo, así que los planes creados
+  // ANTES de que existiera el currículum no tienen bloque de adquisición. Con
+  // la compuerta de consolidación encendida eso es un punto muerto: ninguna
+  // unidad se introduce nunca, y por lo tanto las 159 cartas quedan en pausa
+  // para siempre. La persona ve seis mazos "al día" con todo bloqueado y no hay
+  // nada que pueda hacer al respecto.
+  //
+  // Se inyecta al hidratar en vez de regenerar el plan: regenerar le haría
+  // perder en qué día del bloque iba, y esto no cambia el plan guardado — solo
+  // agrega el bloque que le falta al día que se está mirando.
+  //
+  // El id se deriva del prefijo de los bloques del día (`m1d3…`), así que
+  // `hechos` lo trata como a cualquier otro y no se re-pide mañana.
+  const tieneAdquisicion = bloques.some(b => b.tipo === 'adquisicion');
+  if (!tieneAdquisicion && fecha) {
+    const estados = estadosDeTodas(progresoUnidad);
+    const proximas = siguientesUnidades(estados, 1);
+    const prefijo = (dia.bloques[0]?.id || '').match(/^m\d+d\d+/)?.[0];
+    if (proximas.length && prefijo) {
+      bloques.unshift({
+        id: `${prefijo}badq`,
+        tipo: 'adquisicion',
+        minutos: 20,
+        maxUnidades: 1,
+        unidades: proximas.map(u => u.id),
+        titulo: proximas[0].titulo,
+        inyectado: true,
+        vacio: false,
+      });
+    }
+  }
+
   // La pregunta del dossier va al final del día, no al principio: se contesta
   // mejor DESPUÉS de haber entrenado —"¿qué sostenés aunque te cueste la venta?"
   // significa otra cosa recién salido de una llamada simulada que en frío— y
