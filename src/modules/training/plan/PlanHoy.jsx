@@ -111,7 +111,7 @@ export default function PlanHoy({ plan, estado, ctx, onLanzar, onLanzarVoz, onIr
   };
 
   const lanzar = (b) => {
-    if (b.tipo === 'flashcards' || b.tipo === 'roleplay') onLanzar(b);
+    if (b.tipo === 'flashcards' || b.tipo === 'roleplay' || b.tipo === 'adquisicion') onLanzar(b);
     // La llamada por voz corre en otra pantalla: se deja la marca y al terminarla
     // el bloque queda cumplido solo (ver plan/store.marcarPendienteVoz).
     else if (b.tipo === 'roleplay-voz') onLanzarVoz(b);

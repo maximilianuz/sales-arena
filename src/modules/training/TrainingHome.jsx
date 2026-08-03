@@ -13,6 +13,7 @@ import { marcarBloqueHecho, borrarPlan, marcarPendienteVoz } from './plan/store'
 import { subscribeIdentidad, checkDelDia, tieneIdentidad } from './identidad/store';
 import IdentidadOnboarding from './identidad/IdentidadOnboarding';
 import PanelVisionario from './identidad/PanelVisionario';
+import AcquisicionSession from './adquisicion/AcquisicionSession';
 
 // Hub del módulo de entrenamiento de closing high ticket. Accesible desde
 // Trabajo Individual y desde Practicar Solo. Todo el contenido vive en
@@ -114,7 +115,9 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
       <FullScreen>
         {bloqueActivo.tipo === 'roleplay'
           ? <RoleplaySession perfilInicial={bloqueActivo.perfil} onBack={cerrar} onDone={hecho} />
-          : <StudySession deckId={bloqueActivo.mazo || null} limite={bloqueActivo.limite} onBack={cerrar} onDone={hecho} />}
+          : bloqueActivo.tipo === 'adquisicion'
+            ? <AcquisicionSession bloque={bloqueActivo} onBack={cerrar} onDone={hecho} />
+            : <StudySession deckId={bloqueActivo.mazo || null} limite={bloqueActivo.limite} onBack={cerrar} onDone={hecho} />}
       </FullScreen>
     );
   }
