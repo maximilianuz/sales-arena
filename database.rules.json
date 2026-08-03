@@ -27,6 +27,25 @@
         },
         "library": {
           ".write": "$uid === auth.uid"
+        },
+        "training": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid",
+          "sesiones": {
+            "$sessionId": {
+              ".validate": "newData.hasChildren(['tipo', 'ts'])"
+            }
+          },
+          "log": {
+            "$day": {
+              ".validate": "newData.hasChild('minutos')"
+            }
+          },
+          "errores": {
+            "$erroreId": {
+              ".validate": "newData.hasChildren(['principioId', 'ts'])"
+            }
+          }
         }
       }
     },

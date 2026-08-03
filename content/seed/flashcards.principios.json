@@ -1,0 +1,249 @@
+{
+  "version": 2,
+  "mazo": "principios",
+  "descripcion": "Cartas modo Feynman: se responden EXPLICANDO con tus palabras, nunca con opción múltiple. La explicación de referencia y los puntosClave contra los que se compara tu respuesta viven en principios.json (fuente única de verdad, join por principioId). El sistema marca qué puntosClave faltaron en tu explicación.",
+  "cartas": [
+    {
+      "id": "prin-001",
+      "tipo": "feynman",
+      "frente": "Explicale a alguien que nunca vendió: ¿por qué NUNCA se dice el precio antes de cuantificar el dolor? ¿Qué pasa en la cabeza del prospecto si lo hacés al revés?",
+      "principioId": "p-dolor-antes-precio",
+      "dificultad": 1,
+      "tags": [
+        "precio",
+        "orden-de-llamada"
+      ]
+    },
+    {
+      "id": "prin-002",
+      "tipo": "feynman",
+      "frente": "Tu verdadero competidor no es otra oferta. ¿Quién es, por qué parece gratis, y qué hacés para que deje de parecerlo?",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 1,
+      "tags": [
+        "inaccion",
+        "urgencia"
+      ]
+    },
+    {
+      "id": "prin-003",
+      "tipo": "feynman",
+      "frente": "¿Por qué el que hace las preguntas conduce la llamada, incluso sin presionar? ¿Y por qué lo que el prospecto dice en voz alta vale más que cualquier argumento tuyo?",
+      "principioId": "p-quien-pregunta-lidera",
+      "dificultad": 1,
+      "tags": [
+        "preguntas",
+        "control-de-marco"
+      ]
+    },
+    {
+      "id": "prin-004",
+      "tipo": "feynman",
+      "frente": "Un colega te dice: 'las objeciones se rebaten rápido y con seguridad'. Explicale por qué está equivocado: ¿qué ES una objeción en realidad y qué se hace con ella?",
+      "principioId": "p-objecion-es-informacion",
+      "dificultad": 2,
+      "tags": [
+        "objeciones"
+      ]
+    },
+    {
+      "id": "prin-005",
+      "tipo": "feynman",
+      "frente": "¿Por qué validar la emoción ANTES de responder no es debilidad sino condición para que te escuchen? ¿Y por qué el 'pero' inmediato arruina la validación?",
+      "principioId": "p-acuerdo-antes-rebatir",
+      "dificultad": 2,
+      "tags": [
+        "objeciones",
+        "validacion"
+      ]
+    },
+    {
+      "id": "prin-006",
+      "tipo": "feynman",
+      "frente": "Dijiste el precio y hay silencio. Explicá por qué NO tenés que hablar: ¿qué comunica el silencio sostenido y qué comunica llenarlo?",
+      "principioId": "p-silencio-trabaja",
+      "dificultad": 2,
+      "tags": [
+        "silencio",
+        "precio",
+        "cierre"
+      ]
+    },
+    {
+      "id": "prin-007",
+      "tipo": "feynman",
+      "frente": "¿Por qué repetir las palabras EXACTAS del prospecto vende más que parafrasearlo con términos tuyos? Dos razones distintas.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 2,
+      "tags": [
+        "escucha",
+        "espejo"
+      ]
+    },
+    {
+      "id": "prin-008",
+      "tipo": "feynman",
+      "frente": "¿Por qué los acuerdos de los primeros 3 minutos (agenda, honestidad, decisión) valen oro en el minuto 40? ¿Qué mecanismo psicológico los hace cobrables?",
+      "principioId": "p-marco-previo",
+      "dificultad": 2,
+      "tags": [
+        "marco",
+        "agenda"
+      ]
+    },
+    {
+      "id": "prin-009",
+      "tipo": "feynman",
+      "frente": "'El closer es un médico.' Desarrollá la analogía: ¿de dónde sale la autoridad del médico, qué es la mala praxis en ventas, y por qué poder decir 'esto no es para vos' te hace más creíble?",
+      "principioId": "p-vender-es-diagnosticar",
+      "dificultad": 1,
+      "tags": [
+        "diagnostico",
+        "autoridad"
+      ]
+    },
+    {
+      "id": "prin-010",
+      "tipo": "feynman",
+      "frente": "'La emoción decide, la lógica justifica.' ¿Qué rol cumple cada una, en qué orden trabajan, y qué pasa si vendés solo con datos o solo con emoción?",
+      "principioId": "p-emocion-decide-logica-justifica",
+      "dificultad": 2,
+      "tags": [
+        "emocion",
+        "pitch"
+      ]
+    },
+    {
+      "id": "prin-011",
+      "tipo": "feynman",
+      "frente": "¿Por qué la necesidad de cerrar espanta al prospecto aunque no la digas? ¿Y por qué el desapego NO es desinterés? Explicá la diferencia con un ejemplo.",
+      "principioId": "p-desapego",
+      "dificultad": 2,
+      "tags": [
+        "postura",
+        "estatus"
+      ]
+    },
+    {
+      "id": "prin-012",
+      "tipo": "feynman",
+      "frente": "Diferenciá presión de claridad en el cierre: ¿por qué la venta presionada se cae después, y qué significa concretamente 'cerrar quitando niebla'?",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 2,
+      "tags": [
+        "cierre",
+        "etica"
+      ]
+    },
+    {
+      "id": "prin-013",
+      "tipo": "feynman",
+      "frente": "'La venta vive en la brecha.' ¿Qué son A y B, por qué sin brecha visible todo precio parece caro, y qué rol cumple el pitch respecto de esa brecha?",
+      "principioId": "p-futuro-vs-presente",
+      "dificultad": 2,
+      "tags": [
+        "descubrimiento",
+        "brecha"
+      ]
+    },
+    {
+      "id": "prin-014",
+      "tipo": "feynman",
+      "frente": "¿Por qué nadie salta de cero al 'sí' grande? Explicá cómo funcionan los micro-síes (los dos roles que cumplen) y qué te dice un 'no' temprano.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 2,
+      "tags": [
+        "cierre",
+        "consistencia"
+      ]
+    },
+    {
+      "id": "prin-015",
+      "tipo": "feynman",
+      "frente": "¿Por qué responder objeciones 'demasiado bien y demasiado rápido' te hace perder la venta igual? Explicá qué es la objeción pantalla, por qué existe, y qué es aislar.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 3,
+      "tags": [
+        "objeciones",
+        "aislar"
+      ]
+    },
+    {
+      "id": "pri-016",
+      "tipo": "feynman",
+      "frente": "Explicá la diferencia entre una RAZÓN y una OBJECIÓN, y por qué confundirlas hace perder la llamada por los dos lados.",
+      "principioId": "p-razon-vs-objecion",
+      "dificultad": 2,
+      "tags": [
+        "objeciones",
+        "diagnostico"
+      ]
+    },
+    {
+      "id": "pri-017",
+      "tipo": "feynman",
+      "frente": "Explicá por qué la solución tiene que salir de la boca del cliente, y qué pasa cuando hacés la pregunta correcta pero la contestás vos.",
+      "principioId": "p-el-cliente-da-la-solucion",
+      "dificultad": 3,
+      "tags": [
+        "objeciones",
+        "preguntas"
+      ]
+    },
+    {
+      "id": "pri-018",
+      "tipo": "feynman",
+      "frente": "Explicá por qué la gente compra lo que quiere y no lo que necesita, y qué le pasa a tus ratios si vendés desde la necesidad.",
+      "principioId": "p-quiere-no-necesita",
+      "dificultad": 2,
+      "tags": [
+        "psicologia",
+        "deseo"
+      ]
+    },
+    {
+      "id": "pri-019",
+      "tipo": "feynman",
+      "frente": "Explicá por qué las objeciones que más recibís son las que vos tenés al comprar, y cuáles son las tres creencias que impiden vender caro.",
+      "principioId": "p-espejo-del-closer",
+      "dificultad": 3,
+      "tags": [
+        "mentalidad",
+        "precio"
+      ]
+    },
+    {
+      "id": "pri-020",
+      "tipo": "feynman",
+      "frente": "Explicá por qué hay que hablar en el idioma del otro, y qué pasa cuando el closer y el prospecto comparten el mismo perfil emocional.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 2,
+      "tags": [
+        "perfiles",
+        "rapport"
+      ]
+    },
+    {
+      "id": "pri-021",
+      "tipo": "feynman",
+      "frente": "Explicá por qué la recapitulación es el momento que más autoridad te da, aunque no aporte ninguna información nueva.",
+      "principioId": "p-recapitular-para-liderar",
+      "dificultad": 3,
+      "tags": [
+        "transicion",
+        "autoridad"
+      ]
+    },
+    {
+      "id": "pri-022",
+      "tipo": "feynman",
+      "frente": "Explicá cómo decidís si a alguien le das seguimiento o lo resolvés en la llamada, y por qué esa decisión no se toma desde tu comodidad.",
+      "principioId": "p-congruencia",
+      "dificultad": 3,
+      "tags": [
+        "cierre",
+        "criterio"
+      ]
+    }
+  ]
+}

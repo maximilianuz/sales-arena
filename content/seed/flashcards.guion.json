@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "mazo": "guion",
+  "descripcion": "El esqueleto de tu guion y, sobre todo, las transiciones. Es el mazo fundacional: saber las fases sueltas no sirve si no sabés cómo se engancha una con la siguiente, que es exactamente lo que se rompe en el minuto 22 de una llamada real. Las transiciones van literales; los objetivos, con tus palabras.",
+  "cartas": [
+    {
+      "id": "gui-001",
+      "tipo": "clasica",
+      "frente": "Las 7 fases de la llamada, en orden, con su duración aproximada.",
+      "dorso": "1. Química (3-5') · 2. Marco (2-3') · 3. Descubrimiento (15-20') · 4. Transición (3-5') · 5. Pitch (5-8') · 6. Compromiso (3-5') · 7. Cierre (5-10'). Total: unos 45 minutos.",
+      "porQue": "Saber las fases sueltas no es lo mismo que saber la secuencia. Recordar una serie en orden es una habilidad distinta de recordar sus piezas, y es la que se rompe primero bajo presión: podés dominar cada fase y quedarte en blanco sobre qué venía ahora.",
+      "principioId": "p-marco-previo",
+      "dificultad": 1,
+      "tags": ["esqueleto", "secuencia"]
+    },
+    {
+      "id": "gui-002",
+      "tipo": "clasica",
+      "frente": "Dos fases se llevan la mitad de la llamada. ¿Cuáles, y por qué importa saberlo?",
+      "dorso": "Descubrimiento (15-20') y Cierre (5-10'). Descubrimiento solo se lleva casi la mitad del tiempo total. Si a los 10 minutos ya estás presentando, te salteaste algo.",
+      "porQue": "El reparto del tiempo es un diagnóstico en vivo. Si el pitch se estira y el descubrimiento se acorta, estás vendiendo antes de entender, y eso se paga en objeciones al final.",
+      "principioId": "p-vender-es-diagnosticar",
+      "dificultad": 2,
+      "tags": ["esqueleto", "tiempos"]
+    },
+    {
+      "id": "gui-003",
+      "tipo": "clasica",
+      "frente": "QUÍMICA → MARCO. Ya tenés el disparador: te contó qué lo hizo agendar. ¿Cómo enganchás la fase siguiente?",
+      "dorso": "Escuchás, validás, y encadenás sin pausa: «Buenísimo que lo cuentes. Mirá, te propongo algo para aprovechar la llamada…» Y entrás directo a plantear el orden.",
+      "porQue": "La transición se hace sobre la energía de lo que acaba de contar, no después de un silencio. Si dejás que se enfríe, el Marco suena a cambio de tema y a formulario.",
+      "principioId": "p-marco-previo",
+      "dificultad": 2,
+      "tags": ["transicion", "quimica", "marco"]
+    },
+    {
+      "id": "gui-004",
+      "tipo": "clasica",
+      "frente": "MARCO → DESCUBRIMIENTO. Ya cerraste los acuerdos y te dijo que sí. ¿Cómo abrís el descubrimiento?",
+      "dorso": "Volviendo a lo que él mismo trajo: «Genial. Entonces contame: esto que me decías de [el disparador que dio en Química]…»",
+      "porQue": "Arrancar el descubrimiento con SU tema y no con tu primera pregunta de la lista mantiene la conversación en su mundo. Además demuestra que estuviste escuchando, que es lo que autoriza las preguntas incómodas que vienen.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 2,
+      "tags": ["transicion", "marco", "descubrimiento"]
+    },
+    {
+      "id": "gui-005",
+      "tipo": "clasica",
+      "frente": "DESCUBRIMIENTO → TRANSICIÓN. ¿Cuál es el checklist de cuatro puntos que tiene que estar completo antes de cruzar?",
+      "dorso": "① El problema con SUS palabras ② el costo cuantificado, con números que dijo él ③ los intentos fallidos y su porqué ④ el punto B con su importancia emocional. ¿Están los cuatro? Cruzás. ¿Falta uno? Seguís en descubrimiento.",
+      "porQue": "Es el control de calidad de toda la llamada. Cada punto que falte reaparece después convertido en objeción: sin costo cuantificado, el precio parece caro; sin intentos fallidos, no podés explicar por qué esta vez es distinto.",
+      "principioId": "p-vender-es-diagnosticar",
+      "dificultad": 3,
+      "tags": ["transicion", "descubrimiento", "checklist"]
+    },
+    {
+      "id": "gui-006",
+      "tipo": "clasica",
+      "frente": "TRANSICIÓN → PITCH. Ya recapitulaste y te dijo «sí, es así». ¿Cómo entrás a presentar?",
+      "dorso": "Con el puente A→B: «Bien. Vos hoy estás en [A] y querés llegar a [B]. Dejame mostrarte cómo te llevo de A a B.» Y antes, el permiso: «¿Querés que te cuente cuál sería la mejor estrategia para [lo que dijo]?»",
+      "porQue": "El pitch entra invitado, no impuesto. Pedir permiso convierte la presentación en algo que él pidió, y el puente A→B le da la estructura con la que va a escuchar todo lo que sigue.",
+      "principioId": "p-recapitular-para-liderar",
+      "dificultad": 2,
+      "tags": ["transicion", "pitch"]
+    },
+    {
+      "id": "gui-007",
+      "tipo": "clasica",
+      "frente": "PITCH → COMPROMISO. Terminaste de explicar la entrega. ¿Cuál es la primera frase de Compromiso?",
+      "dorso": "«Solo por curiosidad, ¿qué te parece este servicio? ¿Es lo que estás buscando?» Y se busca doble confirmación: «¿Y te sentís capaz de conseguir tus objetivos con esto?»",
+      "porQue": "Antes de hablar de plata hay que saber si lo quiere. Si pasás al precio sin confirmar deseo, cualquier número va a chocar. El «solo por curiosidad» baja la carga de la pregunta y hace que la respuesta sea honesta.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 2,
+      "tags": ["transicion", "compromiso"]
+    },
+    {
+      "id": "gui-008",
+      "tipo": "clasica",
+      "frente": "COMPROMISO → CIERRE. Dijiste el precio. ¿Qué hacés exactamente después?",
+      "dorso": "Te callás y sostenés el silencio. Su primera frase define la entrada al Cierre: si es un sí directo, vas a logística de pago; si es una objeción, clasificás y trabajás; si el silencio se hace muy largo, «¿qué estás pensando?», una sola vez y con calma.",
+      "porQue": "Lo que agregues después del precio baja el valor. Justificarlo equivale a admitir que a vos también te parece mucho, y le entregás el argumento servido.",
+      "principioId": "p-silencio-trabaja",
+      "dificultad": 3,
+      "tags": ["transicion", "cierre", "precio"]
+    },
+    {
+      "id": "gui-009",
+      "tipo": "clasica",
+      "frente": "Fase 1, QUÍMICA. ¿Cuál es el objetivo real, más allá de romper el hielo?",
+      "dorso": "Salir de la categoría 'vendedor' y entrar en la de 'persona con la que se habla bien'. Además: detectar su perfil dominante y conseguir el disparador, o sea qué pasó que lo hizo agendar JUSTO AHORA.",
+      "porQue": "Los primeros dos minutos definen en qué categoría te pone, y esa categoría filtra todo lo que digas después. El 'justo ahora' revela el evento que rompió la inercia, que es la energía real de la venta.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 1,
+      "tags": ["quimica", "objetivo"]
+    },
+    {
+      "id": "gui-010",
+      "tipo": "clasica",
+      "frente": "En QUÍMICA hay una pregunta que previene una de las objeciones más comunes de toda la llamada. ¿Cuál es y qué previene?",
+      "dorso": "«¿Necesitás que haya alguien más?» Previene «lo tengo que consultar con mi socio / mi pareja», porque si dice que no, ya no puede usarlo como salida al final.",
+      "porQue": "Es más barato prevenir una objeción que resolverla. Preguntado en Química suena a cortesía; preguntado en el cierre suena a interrogatorio. Y el framework para resolverla después solo funciona si preguntaste antes y te dijo que no.",
+      "principioId": "p-marco-previo",
+      "dificultad": 2,
+      "tags": ["quimica", "prevencion", "socio"]
+    },
+    {
+      "id": "gui-011",
+      "tipo": "clasica",
+      "frente": "Fase 2, MARCO. ¿Cuáles son los tres acuerdos que hay que cerrar?",
+      "dorso": "① La agenda: el orden de la llamada y que el precio se ve al final. ② El permiso del 'no', de los dos lados. ③ Quién toma la decisión. Todo lo que acordás acá lo cobrás en el Cierre.",
+      "porQue": "El Marco es un contrato, no una cortesía. El acuerdo de agenda te autoriza a preguntar en profundidad sin que sea raro y a devolverlo al orden cuando se adelante al precio.",
+      "principioId": "p-marco-previo",
+      "dificultad": 1,
+      "tags": ["marco", "acuerdos"]
+    },
+    {
+      "id": "gui-012",
+      "tipo": "clasica",
+      "frente": "En el MARCO hay un movimiento que invierte la presión desde el minuto tres. ¿Cuál es?",
+      "dorso": "La descualificación preventiva: «También quiero ver si sos el tipo de cliente con el que trabajamos, porque hay muchos con los que decidimos no trabajar. Si veo que es tu caso, te lo voy a decir y listo.»",
+      "porQue": "Cambia quién está evaluando a quién. A partir de ahí él tiene que demostrar que califica, y eso desactiva la postura defensiva de 'me van a vender algo'. Solo funciona si de verdad estás dispuesto a descualificar.",
+      "principioId": "p-desapego",
+      "dificultad": 3,
+      "tags": ["marco", "descualificacion"]
+    },
+    {
+      "id": "gui-013",
+      "tipo": "clasica",
+      "frente": "Fase 4, TRANSICIÓN. Antes de recapitular hay un movimiento que cambia el marco de toda la fase. ¿Cuál?",
+      "dorso": "Pausar y pedir permiso: «Entiendo… a ver si te parece bien que ponga todo esto en limpio, así confirmamos si entendí bien desde dónde partimos, ¿sí?»",
+      "porQue": "El permiso convierte el resumen en algo compartido en vez de un veredicto tuyo. Y a partir de ese momento dirigís vos: devolvés la información con autoridad emocional y estructura.",
+      "principioId": "p-recapitular-para-liderar",
+      "dificultad": 2,
+      "tags": ["transicion", "permiso"]
+    },
+    {
+      "id": "gui-014",
+      "tipo": "clasica",
+      "frente": "Las cinco partes de la recapitulación, en orden.",
+      "dorso": "① Contexto: dónde está, hace cuánto, qué logró. ② Detonante: por qué agendó. ③ Cuellos de botella: las tres cosas que lo traban. ④ Qué le falta y qué pasa si no lo resuelve. ⑤ Situación soñada. Y cierra con «¿estoy en lo correcto?».",
+      "porQue": "No aporta información nueva: reorganiza la que ya está. Rompe la negación suave, integra lo emocional con lo racional, y construye vínculo y autoridad en el mismo movimiento. Cuando alguien escucha su verdad mejor dicha que la suya, no discute: asiente.",
+      "principioId": "p-recapitular-para-liderar",
+      "dificultad": 3,
+      "tags": ["transicion", "recapitulacion"]
+    },
+    {
+      "id": "gui-015",
+      "tipo": "clasica",
+      "frente": "Fase 5, PITCH. Las tres condiciones eliminatorias antes de presentar.",
+      "dorso": "① ¿Sabés si está emocionalmente comprometido con su problema? ② ¿Recapitulaste y te dio el 'sí, es así'? ③ ¿Él mismo dijo que necesita ayuda? Si falta cualquiera de las tres, no presentes.",
+      "porQue": "Presentar antes de tiempo es darle la medicina a alguien que todavía no aceptó que está enfermo. Mientras está en alerta emocional, el cerebro no evalúa propuestas; recién cuando se siente comprendido puede escucharte.",
+      "principioId": "p-dolor-antes-precio",
+      "dificultad": 3,
+      "tags": ["pitch", "condiciones"]
+    },
+    {
+      "id": "gui-016",
+      "tipo": "clasica",
+      "frente": "¿Cuál es el test de si tu pitch estuvo bien hecho?",
+      "dorso": "Que el prospecto pueda repetirlo. Si no puede repetir tu plan con sus palabras, no lo entendió; y si no lo entendió, no compra. Con un lead de bajo nivel de conciencia conviene pedírselo directamente: «contame cómo lo entendiste».",
+      "porQue": "Un prospecto confundido no compra, se va a pensarlo. La claridad no es un adorno del pitch: es la condición para que la decisión sea posible.",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 2,
+      "tags": ["pitch", "claridad"]
+    },
+    {
+      "id": "gui-017",
+      "tipo": "clasica",
+      "frente": "Fase 6, COMPROMISO. El tono de su respuesta es incierto. ¿Qué hacés?",
+      "dorso": "Vas a la escala: «Lo más importante para mí es que estemos alineados. Del 1 al 10, donde 1 es terminar la conversación y 10 es hacerlo ahora, ¿dónde estás?» Si responde menos de 10: «¿qué necesitarías para estar en un 10?»",
+      "porQue": "La escala convierte una sensación difusa en un dato con el que se puede trabajar, y la pregunta siguiente hace que sea él quien nombre lo que falta. Podés endurecerla descualificando: «no puedo trabajar con alguien que esté en un 9».",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 2,
+      "tags": ["compromiso", "escala"]
+    },
+    {
+      "id": "gui-018",
+      "tipo": "clasica",
+      "frente": "Las tres preguntas que van justo antes de decir el precio.",
+      "dorso": "«¿Te hace sentido?» · «¿Qué es lo que más te gustó?» · «¿Tenés alguna preocupación en la que te veas siguiendo el paso a paso y NO consiguiendo los resultados que buscás?»",
+      "porQue": "Las dos primeras acumulan síes y le hacen verbalizar el valor con su boca. La tercera saca a la superficie el miedo que si no, aparece disfrazado de objeción de precio treinta segundos después.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 3,
+      "tags": ["compromiso", "prevencion", "precio"]
+    },
+    {
+      "id": "gui-019",
+      "tipo": "clasica",
+      "frente": "Fase 7, CIERRE. Ya resolviste la objeción y dijo que le cierra. ¿Cuál es la pregunta de confirmación antes de pasar al pago?",
+      "dorso": "«¿Habría alguna razón por la que finalmente no lo harías?» Es la que le llaman la firma ante escribano: si hay algo más, sale acá y no después de mandar el link.",
+      "porQue": "Poner la objeción restante en su boca es más barato que descubrirla cuando ya no estás en la llamada. Y si dice que no hay ninguna, acaba de comprometerse en voz alta.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 3,
+      "tags": ["cierre", "confirmacion"]
+    },
+    {
+      "id": "gui-020",
+      "tipo": "clasica",
+      "frente": "No cerró hoy, pero fue congruente toda la llamada. ¿Qué NO podés dejar que pase?",
+      "dorso": "Que se vaya sin fecha y hora concretas. Se agenda en la misma llamada, dentro de 24 a 48 horas, con doble alternativa: «¿te queda más cómodo a las 14 o a las 16?». Lo agendás vos, le pedís el mail y esperás a que confirme mientras siguen hablando.",
+      "porQue": "«Avisame cuando lo pienses» es un no en cuotas. Y hay que terminar siempre en buenos términos: es alguien que se va con una impresión sobre si querías ayudarlo o sacarle la plata.",
+      "principioId": "p-congruencia",
+      "dificultad": 2,
+      "tags": ["cierre", "seguimiento"]
+    },
+    {
+      "id": "gui-021",
+      "tipo": "clasica",
+      "frente": "¿Qué partes del guion van LITERALES y cuáles solo como estructura?",
+      "dorso": "Literales: las transiciones, los tres acuerdos del Marco, la línea de aislar objeciones, la pregunta de cierre y la respuesta al precio prematuro. Estructura adaptable: las preguntas de Descubrimiento y el desarrollo del Pitch.",
+      "porQue": "Lo corto y de alto riesgo tiene que salir automático, porque si dudás ahí se te nota en la voz. Lo largo memorizado palabra por palabra te vuelve sordo: estás esperando tu turno para soltar la próxima línea en vez de escuchar.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 2,
+      "tags": ["esqueleto", "memorizacion"]
+    },
+    {
+      "id": "gui-022",
+      "tipo": "clasica",
+      "frente": "Regla transversal a todas las fases sobre cómo tomar notas. ¿Cuál es y por qué?",
+      "dorso": "Papel, no teclado. Y se anotan frases textuales entre comillas, no un resumen tuyo.",
+      "porQue": "El tecleo se escucha y le da al prospecto la sensación incómoda de estar siendo registrado. Y las frases textuales son el material del pitch: sus palabras, devueltas, valen más que cualquier frase tuya bien armada.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 1,
+      "tags": ["transversal", "notas"]
+    }
+  ]
+}

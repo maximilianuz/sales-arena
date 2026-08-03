@@ -27,3 +27,10 @@ ruvector.db
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code and Environment settings
+settings.json
+.env
+
+# Local Netlify folder
+.netlify

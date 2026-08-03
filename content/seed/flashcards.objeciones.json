@@ -1,0 +1,656 @@
+{
+  "version": 2,
+  "mazo": "objeciones",
+  "descripcion": "Frente: la objeción tal como suena en una llamada real. Dorso: cómo se maneja + POR QUÉ funciona (siempre con el principio que la sostiene, join por principioId). El dorso no es un guion para recitar: es la estructura del movimiento. Decilo con tus palabras en voz alta.",
+  "cartas": [
+    {
+      "id": "obj-001",
+      "tipo": "clasica",
+      "frente": "«Uf... está muy caro.»",
+      "dorso": "No defiendas el precio ni lo justifiques. Primero devolvé la comparación: «¿Caro comparado con qué?» o «¿Contra qué lo estás midiendo?». La mayoría lo mide contra su bolsillo o contra un curso de 50 dólares, no contra su problema. Reanclá: «Me dijiste que esto te está costando [X] por mes. Contra eso, ¿cómo lo ves?»",
+      "porQue": "El precio solo existe por comparación. Si no elegís vos el objeto de comparación (el costo del problema), el prospecto elige uno donde siempre perdés.",
+      "principioId": "p-dolor-antes-precio",
+      "dificultad": 1,
+      "tags": [
+        "precio"
+      ]
+    },
+    {
+      "id": "obj-002",
+      "tipo": "clasica",
+      "frente": "«Ahora no tengo esa plata.»",
+      "dorso": "Antes de responder, aislá para saber si es real o pantalla: «Te entiendo. Dejame preguntarte: si la plata no fuera un tema, ¿arrancarías hoy?». Si duda o dice 'mmm no sé', la plata NO era la objeción real — explorá qué hay detrás. Si dice 'sí, sin dudas', recién ahí trabajá opciones reales (cuotas, fecha de inicio diferida).",
+      "porQue": "'No tengo plata' es la pantalla socialmente más cómoda que existe. Responderla con financiación sin aislar primero es resolver un problema que quizás no existe, dejando intacto el real.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 1,
+      "tags": [
+        "precio",
+        "aislar"
+      ]
+    },
+    {
+      "id": "obj-003",
+      "tipo": "clasica",
+      "frente": "«Lo tengo que pensar.»",
+      "dorso": "Nunca aceptes la vaguedad ni presiones contra ella. Bajala a lo concreto con calma: «Perfecto, es una decisión importante. Para poder ayudarte: ¿qué es puntualmente lo que necesitás pensar? ¿Es el precio, es si va a funcionar para vos, es otra cosa?». Si acordaste honestidad en el Marco, invocalo: «Quedamos en que me ibas a decir lo que pensás de verdad — ¿qué te está frenando?»",
+      "porQue": "'Pensarlo' casi nunca es un proceso de análisis: es un miedo sin nombre. Mientras no tenga nombre, no se puede resolver. Tu trabajo es ayudarlo a nombrarlo, no darle tiempo para que se enfríe.",
+      "principioId": "p-objecion-es-informacion",
+      "dificultad": 1,
+      "tags": [
+        "evasion",
+        "cierre"
+      ]
+    },
+    {
+      "id": "obj-004",
+      "tipo": "clasica",
+      "frente": "«Lo tengo que hablar con mi pareja.»",
+      "dorso": "Validá (es legítimo) y después explorá en dos direcciones: «Me parece bien. ¿Qué creés que te va a decir?» — su predicción revela SU postura. Si dice 'me va a apoyar', devolvé: «Entonces la decisión es tuya, ¿qué te frena a vos?». Si es decisión genuinamente compartida, no cierres hoy: agendá una llamada corta CON la pareja, con fecha y hora.",
+      "porQue": "En la mayoría de los casos la pareja es una pantalla para no decidir. La predicción ('¿qué te va a decir?') destapa la postura propia sin confrontar. Y si es real, un 'andá a hablarlo' sin fecha es una venta muerta: el compromiso concreto la mantiene viva.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 2,
+      "tags": [
+        "terceros",
+        "aislar"
+      ]
+    },
+    {
+      "id": "obj-005",
+      "tipo": "clasica",
+      "frente": "«Mandame la info por mail y lo veo.»",
+      "dorso": "En una llamada que él agendó, esto es una retirada cortés: ya tiene toda la info, la tuviste 40 minutos. Respondé sin pelear el mail: «Te lo mando, ningún problema. Ahora, decime una cosa: vos ya escuchaste todo lo importante. De lo que hablamos, ¿qué es lo que todavía no te cierra?» y silencio.",
+      "porQue": "El mail no existe: nadie decide una compra de 2.400 leyendo un PDF que no leyó nadie. Aceptarlo sin más es aceptar el no sin enterarte del motivo. La objeción es información: hay algo que no cerró, y esta es tu única chance de saber qué.",
+      "principioId": "p-objecion-es-informacion",
+      "dificultad": 2,
+      "tags": [
+        "evasion"
+      ]
+    },
+    {
+      "id": "obj-006",
+      "tipo": "clasica",
+      "frente": "«Ya probé algo parecido y no me funcionó.»",
+      "dorso": "Esta objeción es tu aliada si la trabajás como médico: «Contame, ¿qué probaste y qué pasó?». Escuchá de verdad. Casi siempre falló por falta de acompañamiento, de personalización o de constancia — cosas que tu mecanismo resuelve distinto. Después diferenciá con SUS datos: «Claro: eso era un curso grabado sin nadie que te siga. Justamente lo que me contás es la razón de que esto tenga [mecanismo distinto]».",
+      "porQue": "Recetar sin diagnosticar el fracaso anterior es repetir el error del vendedor anterior. Explorar el intento fallido te da el material exacto para diferenciarte, y demuestra que te importa su caso, no tu cuota.",
+      "principioId": "p-vender-es-diagnosticar",
+      "dificultad": 2,
+      "tags": [
+        "confianza",
+        "historial"
+      ]
+    },
+    {
+      "id": "obj-007",
+      "tipo": "clasica",
+      "frente": "«¿Me podés hacer un descuento?»",
+      "dorso": "Sostené el precio con total calma y sin ofenderte: «No, el programa sale [X] para todos — no sería serio con el resto si negociara. Lo que sí puedo ver con vos es la forma de pago». Si insiste, volvé al valor: «La pregunta importante no es si sale 10% menos: es si esto te resuelve [su problema con sus palabras]. ¿Eso lo ves?»",
+      "porQue": "Un descuento inmediato comunica que el precio era inflado y que todo lo demás también puede ser flexible. Sostenerlo con serenidad comunica que la oferta se sostiene sola. El desapego vende: el que necesita cerrar, negocia; el que sabe lo que vale, no.",
+      "principioId": "p-desapego",
+      "dificultad": 1,
+      "tags": [
+        "precio",
+        "negociacion"
+      ]
+    },
+    {
+      "id": "obj-008",
+      "tipo": "clasica",
+      "frente": "«No es un buen momento para mí.»",
+      "dorso": "Explorá el momento imaginario donde sí sería: «¿Cuándo sería un buen momento? ¿Y qué va a ser distinto entonces?». Casi siempre descubre en voz alta que nada va a cambiar solo. Después la cuenta: «Mientras tanto, ¿cuánto te cuesta cada mes que pasa como este? Me dijiste [X por mes]. Esperar 6 meses son [6X]».",
+      "porQue": "El 'buen momento' es el statu quo disfrazado de plan. No actuar parece gratis; tu trabajo es hacer visible la cuota mensual que el problema le cobra mientras espera. Esperar tiene que quedar como una decisión con precio, no como lo neutro.",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 1,
+      "tags": [
+        "timing",
+        "inaccion"
+      ]
+    },
+    {
+      "id": "obj-009",
+      "tipo": "clasica",
+      "frente": "«¿Y qué garantía tengo de que esto funciona?»",
+      "dorso": "Validá el miedo real (miedo a fracasar de nuevo, no a perder plata) y respondé en tres partes: qué depende del mecanismo (mostralo), qué evidencia hay (casos de gente como él), y qué depende de él (honestidad: «si no hacés tu parte, no funciona — y prefiero decírtelo ahora»). Si tu oferta tiene garantía condicional, explicá exactamente cómo opera.",
+      "porQue": "Pedir garantías es pedir permiso para confiar. La honestidad sobre la responsabilidad compartida ('esto depende de los dos') construye más confianza que prometer de más, y filtra a quien buscaba magia. Claridad, no seducción.",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 2,
+      "tags": [
+        "confianza",
+        "garantia"
+      ]
+    },
+    {
+      "id": "obj-010",
+      "tipo": "clasica",
+      "frente": "«Esto lo puedo hacer solo, está todo en YouTube.»",
+      "dorso": "Acordá primero — es verdad: «Totalmente, la información está gratis en internet. Dejame preguntarte: ¿hace cuánto que lo venís intentando por tu cuenta?». La respuesta suele ser años. «¿Y qué te hace pensar que los próximos 2 años van a ser distintos de los últimos 2?». Después el reencuadre: no pagás información, pagás estructura, acompañamiento y velocidad.",
+      "porQue": "Discutir que 'no se puede solo' es mentir y perder. Acordar y preguntar por el historial hace que él mismo se demuestre que 'solo' ya lo intentó y qué le costó ese camino: el costo de seguir igual, dicho por su propia boca.",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 2,
+      "tags": [
+        "valor",
+        "diy"
+      ]
+    },
+    {
+      "id": "obj-011",
+      "tipo": "clasica",
+      "frente": "«Vi otro programa que sale la mitad. ¿Por qué el tuyo es tan caro?»",
+      "dorso": "Jamás hables mal de la competencia. Con calma: «Puede ser, hay opciones de todos los precios. La diferencia no está en el tema sino en el cómo: [tu mecanismo diferencial — acompañamiento 1a1, personalización, medición]. La pregunta es qué necesitás vos: ¿más información, o que esta vez funcione?». Volvé a su historial: ¿lo barato anterior le funcionó?",
+      "porQue": "Atacar la alternativa te baja de estatus y activa defensa (la eligió él como opción). Diferenciar el mecanismo con desapego deja que la comparación la haga él — y quien ya fracasó con lo barato tiene la evidencia en su propia historia.",
+      "principioId": "p-desapego",
+      "dificultad": 2,
+      "tags": [
+        "precio",
+        "competencia"
+      ]
+    },
+    {
+      "id": "obj-012",
+      "tipo": "clasica",
+      "frente": "«Dame unos días y te confirmo.»",
+      "dorso": "Concretá o es un no suave: «Dale. ¿Qué va a pasar en esos días que te ayude a decidir?». Si no hay respuesta concreta (hablar con alguien, cobrar un pago), no hay proceso real: volvé a aislar qué falta hoy. Si hay algo real, cerrá el próximo paso con fecha y hora exactas: «Perfecto: jueves 18hs, 15 minutos, y me decís. ¿Lo agendamos ahora?»",
+      "porQue": "'Unos días' sin contenido es niebla, y la niebla mata ventas: la emoción de hoy no existe la semana que viene. Claridad significa que todo aplazamiento tiene un motivo nombrado y una fecha — o se trabaja como la objeción encubierta que es.",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 2,
+      "tags": [
+        "evasion",
+        "seguimiento"
+      ]
+    },
+    {
+      "id": "obj-013",
+      "tipo": "clasica",
+      "frente": "«Me da miedo meterme en algo tan largo, son 3 meses.»",
+      "dorso": "No minimices el compromiso; achicá el primer paso: «Tiene sentido, 12 semanas suena un montón. Pero no decidís hoy las 12 semanas: decidís empezar la primera, donde hacemos [primer entregable concreto]. ¿Eso solo, te parece manejable?». Y traé el futuro: «Además: los 3 meses van a pasar igual. La pregunta es si el 24 de octubre estás igual que hoy o del otro lado».",
+      "porQue": "La brecha entre hoy y el resultado se percibe como un salto al vacío. Los compromisos grandes se aceptan en eslabones chicos: un primer paso concreto y manejable convierte el abismo en escalera. Y el tiempo corre igual con o sin decisión.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 2,
+      "tags": [
+        "compromiso",
+        "miedo"
+      ]
+    },
+    {
+      "id": "obj-014",
+      "tipo": "clasica",
+      "frente": "«¿Y si a mí no me funciona? Mi caso es especial.»",
+      "dorso": "No lo contradigas ('¡todos dicen eso!'). Preguntá en serio: «Puede ser. ¿Qué tiene tu caso que te hace pensar que es distinto?». Escuchá: o aparece un dato real (ajustás o derivás — sos médico, no vendedor) o aparece el miedo genérico a fracasar de nuevo. Para el segundo: caso específico de alguien parecido a él, con nombre y detalle.",
+      "porQue": "'Mi caso es especial' es la forma digna de decir 'tengo miedo de volver a fallar'. Tomarlo en serio como pregunta de diagnóstico te diferencia de todos los que le vendieron sin escucharlo — y te dice si de verdad hay fit o no.",
+      "principioId": "p-objecion-es-informacion",
+      "dificultad": 2,
+      "tags": [
+        "miedo",
+        "confianza"
+      ]
+    },
+    {
+      "id": "obj-015",
+      "tipo": "clasica",
+      "frente": "«No confío en las cosas que se venden por internet.»",
+      "dorso": "Dale la razón con ganas: «Hacés MUY bien. Hay muchísimo humo dando vueltas, y si me dijeras que confiás en todo lo que ves online me preocuparía. Justamente por eso esta llamada es como es: yo te hago preguntas, vos me contás tu caso, y si no veo que pueda ayudarte te lo digo y listo. ¿Te parece que sigamos y lo evaluás vos?»",
+      "porQue": "El escepticismo no se combate: se recluta. Validarlo como virtud te saca de la categoría 'vendedor de humo' (los del humo lo discuten) y convierte su defensa en criterio de evaluación — que tu proceso honesto va a pasar.",
+      "principioId": "p-acuerdo-antes-rebatir",
+      "dificultad": 2,
+      "tags": [
+        "confianza",
+        "escepticismo"
+      ]
+    },
+    {
+      "id": "obj-016",
+      "tipo": "clasica",
+      "frente": "«Estoy hasta las manos, no tengo tiempo para un programa.»",
+      "dorso": "El problema ES el tiempo — usalo: «Te entiendo, y fijate esto: me contaste que [su problema] te tiene [durmiendo mal / sin energía / apagando incendios]. ¿Cuántas horas por semana te roba eso hoy?». Cuantificá. «El programa te pide [X horas]. No es tiempo extra: es recuperar una parte de lo que el problema ya te está sacando».",
+      "porQue": "'No tengo tiempo' asume que seguir igual cuesta cero horas. Falso: el problema ya le cobra tiempo todas las semanas. Hacer esa cuenta visible convierte el programa de 'carga nueva' en 'inversión para recuperar lo que ya pierde'.",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 2,
+      "tags": [
+        "tiempo"
+      ]
+    },
+    {
+      "id": "obj-017",
+      "tipo": "clasica",
+      "frente": "Dijiste el precio y el prospecto se queda en silencio total. ¿Qué hacés?",
+      "dorso": "NADA. No hablás. No agregás cuotas, no justificás, no preguntás '¿hola, estás ahí?'. Contá 5 segundos mentalmente, después 5 más si hace falta. Está procesando y comparando — dejalo. El primero que habla define quién cede: si hablás vos, cediste. Cuando él hable, su primera frase te dice exactamente dónde está parado.",
+      "porQue": "El silencio post-precio se siente eterno para vos y normal para él. Llenarlo es leerle tu nerviosismo en voz alta: le comunica que ni vos bancás tu precio. Sostenerlo comunica seguridad total sin decir una palabra.",
+      "principioId": "p-silencio-trabaja",
+      "dificultad": 1,
+      "tags": [
+        "silencio",
+        "precio"
+      ]
+    },
+    {
+      "id": "obj-018",
+      "tipo": "clasica",
+      "frente": "«Me interesa en serio, pero prefiero arrancar el mes que viene.»",
+      "dorso": "Primero verificá si hay un motivo real (cobra a fin de mes, viaje) — si lo hay, cerrá HOY con inicio diferido: «Perfecto, reservamos tu lugar ahora y arrancás el 1°». Si no hay motivo concreto: «¿Qué tiene el mes que viene que no tenga este? ... ¿Y cuántas veces ya te dijiste 'el mes que viene' con esto?»",
+      "porQue": "'El mes que viene' compra la comodidad de no decidir sin el costo de decir no. Separar la DECISIÓN (hoy) del INICIO (cuando le sirva) desarma la excusa logística y deja a la vista si era logística o era miedo.",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 2,
+      "tags": [
+        "timing",
+        "procrastinacion"
+      ]
+    },
+    {
+      "id": "obj-019",
+      "tipo": "clasica",
+      "frente": "«¿Y si pago y después no puedo sostener el ritmo? Me pasó con el gimnasio.»",
+      "dorso": "Este es un miedo a fallarse, no una objeción al programa — tratalo con respeto: «Buenísimo que lo digas, porque es LA diferencia con el gimnasio: acá no dependés de tu fuerza de voluntad sola. Tenés [llamadas semanales / seguimiento / estructura]: cuando aflojás, el sistema te sostiene. El gimnasio no te llama cuando faltás. Yo sí».",
+      "porQue": "El prospecto que confiesa su patrón de abandono te está mostrando la objeción real sin pantallas: regalo enorme. La respuesta no es motivarlo ('¡vas a poder!') sino mostrarle que el mecanismo está diseñado exactamente para ese patrón.",
+      "principioId": "p-objecion-es-informacion",
+      "dificultad": 2,
+      "tags": [
+        "miedo",
+        "constancia"
+      ]
+    },
+    {
+      "id": "obj-020",
+      "tipo": "clasica",
+      "frente": "«La verdad, ahora estoy priorizando otras cosas.»",
+      "dorso": "Contrastá con lo que ÉL dijo en Descubrimiento, textual y sin agresión: «Te escucho, y ayudame a entender algo: hace 20 minutos me dijiste que [su frase exacta: 'no doy más', 'esto me está costando el matrimonio']. ¿Eso dónde queda en la lista de prioridades?» y silencio. O reordena sus prioridades en voz alta, o admite qué le frena de verdad.",
+      "porQue": "Sus propias palabras son la única autoridad que no puede discutir: rebatirlas sería desdecirse. Vos no afirmás nada — solo ponés sus dos declaraciones una al lado de la otra y dejás que el silencio le pida resolver la contradicción.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 3,
+      "tags": [
+        "prioridades",
+        "espejo"
+      ]
+    },
+    {
+      "id": "obj-021",
+      "tipo": "clasica",
+      "frente": "«Mirá, para mí esto es todo verso. Los coaches venden humo.»",
+      "dorso": "Cero defensa, cero ofensa. Acordá con calma total: «En gran parte tenés razón: hay mucho humo en este rubro y entiendo perfecto que llegues con esa guardia. Yo no te voy a pedir que me creas: te voy a hacer preguntas sobre tu caso, y si puedo ayudarte te muestro exactamente cómo, con casos y números. Y si no puedo, te lo digo. ¿Probamos?»",
+      "porQue": "La agresión busca una reacción: si te defendés, confirmás que hay algo que defender; si atacás, perdés el estatus. Acordar con serenidad desactiva el ataque (no hay contra qué pelear) y el desapego del 'y si no puedo, te lo digo' te separa de los que venden humo.",
+      "principioId": "p-acuerdo-antes-rebatir",
+      "dificultad": 3,
+      "tags": [
+        "hostilidad",
+        "escepticismo"
+      ]
+    },
+    {
+      "id": "obj-022",
+      "tipo": "clasica",
+      "frente": "Minuto 2 de la llamada: «Decime cuánto sale y qué incluye, no tengo todo el día.»",
+      "dorso": "No lo ignores ni cedas entero. Pedí permiso con un motivo que lo beneficia: «Te lo digo sin vueltas, es [rango]. Ahora, un número solo no te sirve para decidir si es caro o barato para TU caso. Dame 10 minutos de preguntas y te digo exactamente qué resolvería para vos — y si no aplica, te lo digo yo primero. ¿Va?»",
+      "porQue": "Al dominante no se le esquiva (huele debilidad) ni se le obedece (perdés el marco). Dar el rango respeta su estilo directo; el permiso con motivo recupera el orden correcto: sin dolor cuantificado, cualquier precio es caro.",
+      "principioId": "p-dolor-antes-precio",
+      "dificultad": 3,
+      "tags": [
+        "precio",
+        "dominante",
+        "marco"
+      ]
+    },
+    {
+      "id": "obj-023",
+      "tipo": "clasica",
+      "frente": "«Este año imposible, pero el año que viene lo hago sí o sí.»",
+      "dorso": "Explorá el plan fantasma: «¿Qué va a pasar entre hoy y entonces que lo haga posible?». Casi nunca hay respuesta real. Después la cuenta del peaje: «Me dijiste que esto te cuesta [X] por mes. De acá a enero son [meses × X], más otro año de [su dolor con sus palabras]. ¿Ese es el precio que querés pagar por esperar?»",
+      "porQue": "El 'año que viene' es el statu quo con fecha elegante: promete acción sin costo presente. Ponerle precio a la espera —en plata y en su propio dolor— lo convierte en lo que es: la opción más cara de la mesa.",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 2,
+      "tags": [
+        "procrastinacion",
+        "timing"
+      ]
+    },
+    {
+      "id": "obj-024",
+      "tipo": "clasica",
+      "frente": "META: ¿Cuál es la secuencia para manejar CUALQUIER objeción, y por qué ese orden?",
+      "dorso": "1) VALIDAR la emoción (sin 'pero'). 2) EXPLORAR/AISLAR: «si resolvemos esto, ¿avanzamos o hay algo más?». 3) REENCUADRAR la objeción real (no la pantalla) con el principio que corresponda. 4) CONFIRMAR: «¿esto te lo resuelve?». 5) CERRAR de nuevo: «entonces, ¿lo arrancamos?». El orden no se altera: validar abre el canal, aislar encuentra el blanco, y recién ahí tiene sentido disparar.",
+      "porQue": "Nadie escucha en modo defensa (por eso validar va primero) y la primera objeción rara vez es la real (por eso aislar va antes de responder). Responder primero es disparar con el canal cerrado y al blanco equivocado.",
+      "principioId": "p-acuerdo-antes-rebatir",
+      "dificultad": 1,
+      "tags": [
+        "meta",
+        "secuencia"
+      ]
+    },
+    {
+      "id": "obj-101",
+      "tipo": "clasica",
+      "frente": "«Lo tengo que pensar.» Ya validaste y te dijo qué necesita pensar. ¿Cuál es el movimiento que hace desaparecer la objeción?",
+      "dorso": "Redefinir qué es pensar: «Si tuvieras la certeza absoluta de que vas a tener resultados, avanzarías ahora, ¿no? Entonces pensar es querer certeza de un futuro que no podés ver. Para eso necesitás confiar en tres cosas: en el servicio, en nosotros, y en vos mismo. ¿Cuál de los tres sentís que no está del todo firme?»",
+      "porQue": "«Lo tengo que pensar» es una cortina de humo: no se ataca, se corre. Al ofrecerle tres opciones concretas, el prospecto elige una y ahí aparece la objeción real. La original se evapora sola.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 3,
+      "tags": [
+        "pensar",
+        "framework"
+      ]
+    },
+    {
+      "id": "obj-102",
+      "tipo": "clasica",
+      "frente": "«Lo tengo que pensar.» Variante que rompe la barrera en una sola pregunta.",
+      "dorso": "«¿Necesitás dos días o dos semanas para pensarlo?» Da igual qué conteste. Y después: «En esas 24 horas te vas a hacer tres preguntas: ¿tengo el dinero?, ¿confío en que me pueden ayudar?, ¿estoy 100% comprometido? ¿Cuál de las tres ronda más en tu cabeza?»",
+      "porQue": "Al dar dos plazos concretos, el prospecto sale del «lo pienso» abstracto y entra en una negociación de tiempo que ya asume que va a decidir. Las tres preguntas son las tres únicas razones por las que alguien no toma acción: dinero, confianza y compromiso.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 3,
+      "tags": [
+        "pensar",
+        "doble-opcion"
+      ]
+    },
+    {
+      "id": "obj-103",
+      "tipo": "clasica",
+      "frente": "Identificaste que lo que frena es el dinero, después de correr la cortina del «lo tengo que pensar». ¿Cómo seguís?",
+      "dorso": "«Si fuera gratis, ¿lo harías?» → «¿Cuándo empezarías?» → «¿Y hoy?» Y el permiso para explorar: «Si te ayudo a que antes de terminar la llamada encontremos una forma, ¿estarías dispuesto a que exploremos todas las opciones?»",
+      "porQue": "Separar el deseo del obstáculo confirma que quiere, y a partir de ahí ya no estás vendiendo: están resolviendo un problema juntos. El permiso explícito evita que explorar opciones se sienta como presión.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 3,
+      "tags": [
+        "dinero",
+        "aislar"
+      ]
+    },
+    {
+      "id": "obj-104",
+      "tipo": "clasica",
+      "frente": "«Me parece caro.» ¿Cuál es la pregunta de apertura que cambia el terreno de la discusión?",
+      "dorso": "«Cuando decís que se te hace un número fuerte para tu caso particular, o sea que vos lo percibís como mucho: ¿eso es una CAUSA o una CONSECUENCIA de que tengas este problema hoy en día?» Casi siempre concede que es consecuencia.",
+      "porQue": "En el momento en que admite que le parece caro PORQUE todavía no resolvió su problema, dejás de discutir el precio y pasás a discutir su situación. Y esa la discutís con datos que él mismo te dio.",
+      "principioId": "p-dolor-antes-precio",
+      "dificultad": 3,
+      "tags": [
+        "caro",
+        "reencuadre"
+      ]
+    },
+    {
+      "id": "obj-105",
+      "tipo": "clasica",
+      "frente": "«Me parece caro.» Ya aceptó que es consecuencia. ¿Cómo construís el número que vuelve chico al precio?",
+      "dorso": "«¿Cuánto creés que podrías estar facturando de más si esto estuviera resuelto?» → «¿Y hace cuánto que estás con este problema?» → y multiplicás en voz alta: «me dijiste dos mil por mes y seis meses: ya venís dieciocho mil perdidos. Y si seguís igual, en tres meses son seis mil más.»",
+      "porQue": "El precio es el único número que el prospecto tiene en la cabeza, y por eso pesa. Los dos números los tiene que decir él: si la cifra salió de su boca, no la puede discutir.",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 3,
+      "tags": [
+        "caro",
+        "costo-oportunidad"
+      ]
+    },
+    {
+      "id": "obj-106",
+      "tipo": "clasica",
+      "frente": "«No tengo el dinero.» ¿Cuál es la pregunta que distingue si es falta real o percepción?",
+      "dorso": "«¿Te referís a que no tenés absolutamente nada disponible, o a que ahora lo tenés destinado a otra cosa? ¿O que podrías conseguirlo pero no estás seguro de si vale la pena?»",
+      "porQue": "Son tres situaciones distintas con tres salidas distintas, y tratarlas igual es perder. Si tiene el dinero, es objeción pura y hay que trabajar el miedo. Si puede conseguirlo pero no quiere, no le duele lo suficiente quedarse como está: se vuelve al dolor, no al dinero.",
+      "principioId": "p-razon-vs-objecion",
+      "dificultad": 3,
+      "tags": [
+        "dinero",
+        "diagnostico"
+      ]
+    },
+    {
+      "id": "obj-107",
+      "tipo": "clasica",
+      "frente": "«No tengo el dinero.» El reencuadre de prioridad, y el de carácter.",
+      "dorso": "Prioridad: «¿Realmente no tenés el dinero… o no lo tenés para esto? Porque la plata no desaparece, se redirige a lo que priorizamos. ¿Dónde estás priorizando vos?» Carácter: «No se trata de tener la plata. Se trata de ser la persona que se las ingenia para conseguirla cuando sabe que algo vale la pena. Hacerlo con dinero es fácil; el tema es cuando no lo tenés.»",
+      "porQue": "El primero convierte una imposibilidad en una decisión de asignación, que sí se puede discutir. El segundo mueve la conversación del bolsillo a la identidad, que es donde de verdad se decide.",
+      "principioId": "p-quiere-no-necesita",
+      "dificultad": 3,
+      "tags": [
+        "dinero",
+        "identidad"
+      ]
+    },
+    {
+      "id": "obj-108",
+      "tipo": "clasica",
+      "frente": "«Lo tengo que consultar con mi socio / mi pareja.» ¿Qué tenés que haber hecho ANTES para que el framework funcione?",
+      "dorso": "Haberlo preguntado en Química o en el Marco —«¿hay alguien más que tenga que estar?»— y que te haya dicho que no. Si nunca lo preguntaste, no tenés con qué contrastar y la objeción es legítima: se reagenda con los dos.",
+      "porQue": "Sin la pregunta previa no hay incongruencia que señalar, y toda la técnica se vuelve presión. Con la pregunta previa, la objeción contradice algo que él mismo dijo hace cuarenta minutos.",
+      "principioId": "p-marco-previo",
+      "dificultad": 2,
+      "tags": [
+        "socio",
+        "prevencion"
+      ]
+    },
+    {
+      "id": "obj-109",
+      "tipo": "clasica",
+      "frente": "«Lo tengo que consultar con mi pareja.» ¿Cuál es la distinción que decide cómo lo resolvés?",
+      "dorso": "Si va a buscar APROBACIÓN o VALIDACIÓN. Se pregunta directo: «¿qué vas a buscar cuando lo consultes: aprobación o validación?» Si es aprobación: «¿qué te hace creer que necesitás permiso, cuando el único que va a hacer el programa sos vos?» Si es validación: «¿qué te hace creer que necesitás que te valide alguien que no estuvo en esta llamada y no conoce el servicio?»",
+      "porQue": "Son dos problemas distintos: uno es de autonomía y el otro de autoconfianza. La misma respuesta para los dos falla en uno de los dos casos.",
+      "principioId": "p-el-cliente-da-la-solucion",
+      "dificultad": 3,
+      "tags": [
+        "socio",
+        "framework"
+      ]
+    },
+    {
+      "id": "obj-110",
+      "tipo": "clasica",
+      "frente": "«Lo tengo que consultar con mi mujer.» El ángulo del espejo personal, paso a paso.",
+      "dorso": "«¿Cómo se llama tu mujer?» → «Si [nombre] es como la mía, te va a decir que sí. ¿Querés saber por qué? Porque nosotros podemos tomar decisiones sin estar los dos, pero con una premisa: ¿esta decisión nos beneficia como familia? Si la respuesta es sí, la tomo. ¿Esto los beneficia?» → «¿Por qué no le damos la mejor de las noticias hoy?» → «¿Cómo lo van a celebrar?»",
+      "porQue": "Preguntar el nombre convierte una abstracción en una persona y crea complicidad. Y le das un criterio de decisión que no es tuyo ni de ella: es una regla compartida, mucho más fácil de aceptar que una presión.",
+      "principioId": "p-adaptarse-al-perfil",
+      "dificultad": 3,
+      "tags": [
+        "socio",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-111",
+      "tipo": "clasica",
+      "frente": "«Lo tengo que consultar con mi socio.» El ángulo del testigo ausente.",
+      "dorso": "«¿Cuánto hace que lo conocés? ¿Tres años? Conociéndolo tanto, si hubiera escuchado toda esta conversación, ¿qué creés que te diría: hacelo, o hay algo que no me huele bien?»",
+      "porQue": "Le hacés simular la conversación que iba a tener después, y ahí se ve si la objeción es real. Si contesta que le diría que sí, la objeción se cayó sola. Si duda, apareció la verdadera.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 3,
+      "tags": [
+        "socio",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-112",
+      "tipo": "clasica",
+      "frente": "«No confío en ustedes.» ¿Cuál es el reframe que cambia toda la conversación?",
+      "dorso": "«Yo no necesito que confíes en mí como si fuéramos amigos de toda la vida. Necesito que confíes en VOS, en tu criterio, para evaluar si lo que hacemos tiene sentido o no.» Y antes, validando: «es sano que no confíes; si te pasa eso, quiere decir que tenés criterio.»",
+      "porQue": "Pedir confianza es pedir algo que no se puede dar por decreto. Mover el objeto de la confianza —de vos a él— convierte un obstáculo insalvable en algo que sí está bajo su control.",
+      "principioId": "p-desapego",
+      "dificultad": 3,
+      "tags": [
+        "confianza",
+        "framework"
+      ]
+    },
+    {
+      "id": "obj-113",
+      "tipo": "clasica",
+      "frente": "«No confío en ustedes.» ¿Cuál es la pregunta que le muestra el costo de su desconfianza?",
+      "dorso": "«¿Cuántas veces antes desconfiaste… y esa desconfianza te alejó de una oportunidad que sí era para vos? Porque si esta fuera esa, ¿cuál sería el precio de seguir con la duda?»",
+      "porQue": "La desconfianza se siente gratis y prudente. Ponerle un costo histórico —que él mismo reconoce— la convierte en una decisión con consecuencias en vez de una virtud.",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 3,
+      "tags": [
+        "confianza",
+        "costo"
+      ]
+    },
+    {
+      "id": "obj-114",
+      "tipo": "clasica",
+      "frente": "«No creo que pueda tener resultados / no confío en mí mismo.» ¿Cuál es el reencuadre central?",
+      "dorso": "«La falta de confianza no es un problema. Es un SÍNTOMA: de que las veces anteriores que tuviste que avanzar, no lo hiciste. Por eso lógicamente no tenés evidencia para sostenerla.» Y después: «No vas a tener el six pack ANTES de empezar el gimnasio. ¿Qué decisión vas a tomar hoy sin confianza, para que en el futuro sí puedas tenerla?»",
+      "porQue": "Convierte la confianza de requisito en resultado. Mientras la trate como requisito, la decisión es imposible por definición; como resultado, la decisión de hoy es justamente lo que la construye.",
+      "principioId": "p-emocion-decide-logica-justifica",
+      "dificultad": 3,
+      "tags": [
+        "identidad",
+        "framework"
+      ]
+    },
+    {
+      "id": "obj-115",
+      "tipo": "clasica",
+      "frente": "«No tengo tiempo.» ¿Por qué no se discute el tiempo, y qué se discute en su lugar?",
+      "dorso": "Porque no habla del reloj, habla de prioridades: significa «no lo prioricé todavía». Se discute el retorno: «Esto no es tiempo que se te va, es tiempo que se te devuelve. El problema que tenés hoy, ¿cuánto tiempo ya te está consumiendo emocional y mentalmente?» Y el remate: «La pregunta no es si hoy tenés tiempo. Es si esto es lo suficientemente importante como para que te HAGAS el tiempo.»",
+      "porQue": "Discutir agenda es entrar en un terreno donde siempre pierde, porque efectivamente no le sobra. Discutir prioridad lo devuelve a una decisión que sí controla.",
+      "principioId": "p-quiere-no-necesita",
+      "dificultad": 2,
+      "tags": [
+        "tiempo",
+        "framework"
+      ]
+    },
+    {
+      "id": "obj-116",
+      "tipo": "clasica",
+      "frente": "«¿Me podés garantizar que esto va a funcionar para mí?» ¿Cuál es el movimiento, y cuál el error que te hace perder el control?",
+      "dorso": "El movimiento es devolver la responsabilidad: «No lo sé, decime vos. ¿Qué otras cosas probaste? ¿Te funcionaron?» o directamente «no te lo puedo garantizar. ¿Vos me podés garantizar que vas a hacer todo lo que te diga?» El error es contestar que sí y salir a respaldarlo con casos de éxito.",
+      "porQue": "En el momento en que salís a justificar por qué sos bueno, ya perdiste: entraste en su marco a rendir examen. Y el «sí, te lo garantizo» tiene respuesta preparada: «eso mismo me dijeron los anteriores».",
+      "principioId": "p-quien-pregunta-lidera",
+      "dificultad": 3,
+      "tags": [
+        "garantia",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-117",
+      "tipo": "clasica",
+      "frente": "«Esto suena demasiado bueno para ser verdad, casi me parece una estafa.» ¿Cómo respondés?",
+      "dorso": "«Podría ser una estafa. No lo sé, pero podría serlo. ¿Para vos cómo sería una estafa?» Y esperás: lo que responde es el miedo real, que casi nunca es el que vos suponías.",
+      "porQue": "Defenderte confirma la sospecha; darle la razón la desactiva y te deja indagar. En el roleplay del curso el miedo real no era la falta de testimonios: era cargar la tarjeta por internet. Eso no lo dice nadie si no se lo preguntás.",
+      "principioId": "p-el-cliente-da-la-solucion",
+      "dificultad": 3,
+      "tags": [
+        "confianza",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-118",
+      "tipo": "clasica",
+      "frente": "«¿Por qué tengo que pagar tanto si hay empresas que cobran menos?» ¿Cuál es la respuesta, y qué tiene de particular la forma?",
+      "dorso": "Se espeja la expresión exacta que usó, sin suavizarla: «¿cobráis una barbaridad?» → «¿por qué creés que cobramos una barbaridad?». Y después: «¿estás buscando presupuestos o estás buscando resultados?» / «¿cómo podrías justificar pagar los mil quinientos de más?»",
+      "porQue": "Repetir su palabra exacta —no una versión educada— demuestra que no te incomodó y devuelve la pregunta sin defensa. Reformularla en tono más suave delata que a vos también te parece mucho.",
+      "principioId": "p-espejo-del-closer",
+      "dificultad": 3,
+      "tags": [
+        "precio",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-119",
+      "tipo": "clasica",
+      "frente": "Está comparando con la competencia. ¿Cuáles son las dos reglas absolutas?",
+      "dorso": "Uno: jamás hablar mal de la competencia, sin excepciones. Dos: si insiste en credenciales, ofrecé derivarlo con seguridad total: «conocemos a dos personas que podrían encajarte mejor, ¿querés el contacto?» O el filtro: «¿preferís veinte certificaciones o preferís resultados? Porque si preferís las certificaciones, te tenés que ir a la competencia.»",
+      "porQue": "Hablar mal de otro te baja al nivel de discusión que él eligió y resta autoridad. Ofrecer derivarlo sin titubear demuestra que no lo necesitás, y eso es lo que hace que se quede.",
+      "principioId": "p-desapego",
+      "dificultad": 3,
+      "tags": [
+        "competencia",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-120",
+      "tipo": "clasica",
+      "frente": "«Mandame más información.» ¿Cuáles son las dos preguntas, y cuál es la que no podés olvidar?",
+      "dorso": "Primero: «¿Qué información necesitás que te mande para poder tomar la decisión hoy?» Y la que no se puede olvidar: «Si te mando toda esa información, ¿cuál sería el siguiente paso?»",
+      "porQue": "La primera te dice si hay una duda concreta o es una salida elegante. La segunda es la que evita mandar el PDF al vacío: sin ella, el seguimiento no existe y te enterás dos semanas después.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 2,
+      "tags": [
+        "informacion",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-121",
+      "tipo": "clasica",
+      "frente": "«Necesito mirar mis finanzas / chequear mis números.» ¿Cuál es la pregunta, y cuál es el error que cometen casi todos?",
+      "dorso": "«Cuando mires tu cuenta, ¿qué vas a encontrar?» El error es adelantarse y decir «entonces no tenés el dinero», poniéndole en la boca una objeción que él nunca dijo.",
+      "porQue": "La pregunta llega a la verdad en un solo movimiento en vez de cuatro. Y ponerle objeciones en la boca te crea problemas que no existían: le acabás de dar una salida servida.",
+      "principioId": "p-quien-pregunta-lidera",
+      "dificultad": 3,
+      "tags": [
+        "dinero",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-122",
+      "tipo": "clasica",
+      "frente": "«Si me dieras una garantía del 100%, lo haría.» ¿Cómo se invierte?",
+      "dorso": "«¿Vos me das el 100% de que vas a poner toda la carne en el asador?» → «¿Seguro? ¿Cómo me demostrarías que vas a por todas?»",
+      "porQue": "Rompe el patrón: dejás de hablar de tu garantía y pasás a hablar de su compromiso. La responsabilidad vuelve a donde tiene que estar, y él no puede exigir certeza absoluta si no la ofrece.",
+      "principioId": "p-espejo-del-closer",
+      "dificultad": 3,
+      "tags": [
+        "garantia",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-123",
+      "tipo": "clasica",
+      "frente": "«¿Y si lo hago y no lo consigo?» ¿Cuál es la secuencia?",
+      "dorso": "«Vamos a imaginar que fuera así. ¿Qué tendría que pasar para que sí o sí lo consiguieras?» → él responde algo como «que me acompañen hasta lograrlo» → «Ese es exactamente nuestro compromiso. ¿Entonces empezamos? ¿Cuándo?»",
+      "porQue": "Él define la condición y vos la cumplís, así que la objeción se cierra con su propia respuesta. Es el ejemplo más limpio de hacerlo cerrar solo.",
+      "principioId": "p-el-cliente-da-la-solucion",
+      "dificultad": 3,
+      "tags": [
+        "resultados",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-124",
+      "tipo": "clasica",
+      "frente": "Prospecto rudo o despectivo: «contame de qué va este rollo, no me marees». ¿Qué hacés?",
+      "dorso": "Rompés el patrón, con tono cuidado: «¿siempre sos así de rudo con la gente?» o «¿normalmente atendés así?». Y acto seguido, naturalidad total, como si no hubiera pasado: «¿cuál es el problema que realmente tenés?». Si no se calma, se descualifica.",
+      "porQue": "Seguirle el juego te instala como subordinado el resto de la llamada. Lo que descalifica al closer es responder con soberbia —«¿vos qué te creés?»—: la ruptura tiene que ser una pregunta, no un contraataque.",
+      "principioId": "p-desapego",
+      "dificultad": 3,
+      "tags": [
+        "hostil",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-125",
+      "tipo": "clasica",
+      "frente": "«Yo hoy no pensaba comprar.» ¿La respuesta?",
+      "dorso": "«Es que yo tampoco pensaba venderte hoy. Yo estoy acá para entender tu situación y ver si te podemos ayudar.»",
+      "porQue": "Rompe el guion que él tenía preparado. Esperaba resistencia y encuentra acuerdo, con lo cual la defensa que venía armando se queda sin objeto.",
+      "principioId": "p-desapego",
+      "dificultad": 2,
+      "tags": [
+        "cierre",
+        "cdv"
+      ]
+    },
+    {
+      "id": "obj-126",
+      "tipo": "clasica",
+      "frente": "Te pide el precio en los primeros minutos, antes de cualquier descubrimiento. ¿Qué decís?",
+      "dorso": "«Te va a costar más de lo que vos querés pagar y menos de lo que a mí me gustaría cobrar. Pero como todavía no sé ni siquiera si esto es para vos, ¿qué te parece si te hago un par de preguntas y lo averiguamos?»",
+      "porQue": "No esquiva ni entrega la cifra: reencuadra. Y comunica sin decirlo que jugás en otra liga — él intentó llevarte a su campo, y vos volviste al tuyo sin pelear.",
+      "principioId": "p-dolor-antes-precio",
+      "dificultad": 3,
+      "tags": [
+        "precio",
+        "cdv",
+        "control"
+      ]
+    }
+  ]
+}

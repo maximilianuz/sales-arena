@@ -14,6 +14,7 @@ import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
 import MethodScores from '../components/MethodScores';
 import { LeadActorView } from '../components/ScenarioPanel';
+import { crearLineaDeTiempo, guardarSesionDeVoz } from '../modules/training/roleplay/sesionVoz';
 
 // Expresión emocional del lead por turno (la emite la IA en `emotion`).
 // El emoji + etiqueta le dan al closer feedback inmediato de cómo cayó su técnica.
@@ -82,7 +83,7 @@ function Meter({ meter, value, isEn }) {
   );
 }
 
-export default function SoloPractice({ onBack }) {
+export default function SoloPractice({ onBack, onOpenTraining }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
 
@@ -140,6 +141,11 @@ export default function SoloPractice({ onBack }) {
   useEffect(() => () => { runIdRef.current++; }, []);
   const [elapsed, setElapsed] = useState(0); // segundos de llamada
   const recorderRef = useRef(null);
+  // Línea de tiempo con timestamps reales para la auditoría del módulo Training:
+  // es lo que permite medir silencios, que en la simulación escrita no se pueden
+  // medir. No es estado: los timestamps no se dibujan y no deben re-renderizar.
+  const lineaRef = useRef(crearLineaDeTiempo());
+  const guardadoRef = useRef(false); // una llamada se guarda una sola vez
   const scrollRef = useRef(null);
 
   const MAX_SECONDS = 60 * 60; // tope duro de 60 minutos
@@ -180,6 +186,18 @@ export default function SoloPractice({ onBack }) {
   // (start/submitTurn se recrean cada render, así que capturan el voiceOn actual.)
   // `onStart` se dispara cuando la voz EMPIEZA a sonar (no al pedir el TTS): la
   // UI revela el texto recién ahí → burbuja, boca y audio quedan sincronizados.
+  // Al colgar, la llamada se guarda como sesión del módulo Training: pasa por
+  // las mismas 5 métricas deterministas que la simulación escrita y alimenta el
+  // plan. Solo el modo closer — en "Ser Lead" y Observador el que vende no sos
+  // vos, así que medirte ahí no significaría nada.
+  useEffect(() => {
+    if (phase !== 'ended' || mode !== 'closer' || guardadoRef.current) return;
+    guardadoRef.current = true;
+    guardarSesionDeVoz(lineaRef.current.turnos, {
+      escenario: scenario, resultado: outcome, duracionSeg: elapsed,
+    }).catch(() => { /* practicar no puede fallar porque falle el registro */ });
+  }, [phase, mode, scenario, outcome, elapsed]);
+
   const playBuyerVoice = async (reply, sc, emotion = 'neutral', onStart) => {
     let revealed = false;
     const reveal = () => { if (!revealed) { revealed = true; onStart?.(); } };
@@ -199,6 +217,10 @@ export default function SoloPractice({ onBack }) {
     } finally {
       reveal(); // si el TTS falló antes de arrancar, el texto no se pierde
       setSpeaking(false);
+      // El turno del prospecto se anota cuando su audio TERMINA, no cuando
+      // arranca: el silencio que mide la auditoría es el hueco entre que él dejó
+      // de hablar y vos empezaste.
+      lineaRef.current.prospecto(reply);
     }
   };
 
@@ -309,6 +331,8 @@ export default function SoloPractice({ onBack }) {
       setElapsed(0);
       setPaused(false);
       pausedRef.current = false;
+      lineaRef.current.limpiar();
+      guardadoRef.current = false;
       const runId = ++runIdRef.current;
       setPhase('live');
 
@@ -345,6 +369,9 @@ export default function SoloPractice({ onBack }) {
     const nextHistory = [...messages, { role: 'user', content: text }];
     setMessages(nextHistory);
     setBusy(true);
+    // Se anota con el momento en que arrancó a hablar, no con el de ahora: entre
+    // medio corrió Whisper, y esa latencia no es un silencio suyo.
+    if (mode === 'closer') lineaRef.current.closer(text);
     try {
       if (mode === 'lead') {
         // Vos sos el LEAD: responde el closer experto (en el history user = lead).
@@ -390,6 +417,7 @@ export default function SoloPractice({ onBack }) {
     unlockAudio(); // gesto del usuario → desbloquea audio en móvil
     const text = input.trim();
     if (!text) return;
+    lineaRef.current.marcarInicioDeTurno();
     setInput('');
     submitTurn(text);
   };
@@ -416,6 +444,7 @@ export default function SoloPractice({ onBack }) {
       try {
         unlockAudio(); // gesto del usuario → desbloquea audio en móvil
         recorderRef.current = await startRecording();
+        lineaRef.current.marcarInicioDeTurno(); // arrancó a hablar: acá corta el silencio
         setRecording(true);
       } catch {
         setError(isEn ? 'Microphone access denied.' : 'No se pudo acceder al micrófono.');
@@ -535,9 +564,18 @@ export default function SoloPractice({ onBack }) {
     return (
       <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
         <div style={{ maxWidth: '520px', width: '100%' }}>
-          <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-            <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.5rem' }}>
+            <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
+            </button>
+            {/* Acceso directo al módulo de entrenamiento (flashcards + base de
+                conocimiento): la práctica diaria vive al lado del roleplay. */}
+            {onOpenTraining && (
+              <button className="btn btn-outline" onClick={onOpenTraining} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: 'auto', color: '#22d3ee', borderColor: 'rgba(34,211,238,0.4)' }}>
+                <BookOpen size={16} /> {isEn ? 'Closer Training' : 'Entrenamiento'}
+              </button>
+            )}
+          </div>
           <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎯</div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: '600', margin: '0 0 0.75rem' }}>

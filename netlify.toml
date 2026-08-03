@@ -80,6 +80,24 @@
   force = true
 
 [[redirects]]
+  from = "/api/training-feynman"
+  to = "/.netlify/functions/training-feynman"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/training-roleplay"
+  to = "/.netlify/functions/training-roleplay"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/training-feedback"
+  to = "/.netlify/functions/training-feedback"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/nvidia/*"
   to = "https://integrate.api.nvidia.com/:splat"
   status = 200
