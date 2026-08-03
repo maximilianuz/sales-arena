@@ -87,7 +87,7 @@ export default function LevelCard() {
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '700' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '700' }}>
               {isEn ? 'Commission account' : 'Cuenta de comisiones'}
             </div>
             <button onClick={() => setShowCountry(true)} title={isEn ? 'Set your country' : 'Poné tu país'}
@@ -131,8 +131,8 @@ export default function LevelCard() {
       {showSpirit && (
         <div style={{ marginTop: '0.6rem', fontSize: '0.75rem', fontWeight: '600', color: spiritActive ? 'var(--success)' : 'var(--accent)' }}>
           {spiritActive
-            ? (isEn ? '🤝 Team spirit active: +10% on commissions' : '🤝 Espíritu de equipo activo: +10% en comisiones')
-            : (isEn ? '⚠️ Play Lead or Observer this week to avoid -15%' : '⚠️ Hacé de Lead u Observador esta semana para evitar el -15%')}
+            ? (isEn ? 'Team spirit active: +10% on commissions' : 'Espíritu de equipo activo: +10% en comisiones')
+            : (isEn ? 'Play Lead or Observer this week to avoid -15%' : 'Hacé de Lead u Observador esta semana para evitar el -15%')}
         </div>
       )}
 

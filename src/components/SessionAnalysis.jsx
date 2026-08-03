@@ -80,14 +80,14 @@ export default function SessionAnalysis({ roomData, stages, onClose }) {
     : { rapport: 'Rapport', objectionHandling: 'Manejo de Objeciones', closing: 'Cierre', activeListening: 'Escucha Activa' };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 'var(--z-modal)', padding: '1rem' }}>
       <div className="glass-panel" style={{ maxWidth: '560px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
         <button onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
           <X size={20} />
         </button>
 
         <h2 style={{ margin: '0 0 1.5rem', fontSize: '1.4rem', fontWeight: '600' }}>
-          {isEn ? '📊 Session Analysis' : '📊 Análisis de Sesión'}
+          {isEn ? 'Session Analysis' : 'Análisis de Sesión'}
         </h2>
 
         {!analysis && (

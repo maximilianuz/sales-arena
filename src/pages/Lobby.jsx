@@ -43,9 +43,9 @@ const ROLE_META = {
 function SectionLabel({ children, badge, badgeAccent = '139,92,246' }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.9rem' }}>
-      <span style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{children}</span>
+      <span style={{ fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{children}</span>
       {badge && (
-        <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.12rem 0.55rem', borderRadius: '2rem', background: `rgba(${badgeAccent},0.12)`, border: `1px solid rgba(${badgeAccent},0.35)`, color: `rgb(${badgeAccent})`, whiteSpace: 'nowrap' }}>{badge}</span>
+        <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.12rem 0.55rem', borderRadius: '2rem', background: `rgba(${badgeAccent},0.12)`, border: `1px solid rgba(${badgeAccent},0.35)`, color: `rgb(${badgeAccent})`, whiteSpace: 'nowrap' }}>{badge}</span>
       )}
       <span style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
     </div>
@@ -130,14 +130,14 @@ export default function Lobby() {
     setJoining(true); setJoinMsg('');
     try {
       await joinCohort(cohortCodeInput);
-      setJoinMsg(isEn ? '✓ Joined! Your sessions will be shared with your trainer.' : '✓ ¡Te uniste! Tus sesiones se compartirán con tu trainer.');
+      setJoinMsg(isEn ? 'Joined! Your sessions will be shared with your trainer.' : '¡Te uniste! Tus sesiones se compartirán con tu trainer.');
       setCohortCodeInput('');
       setTimeout(() => setShowJoinCohort(false), 2000);
     } catch (e) {
       const msg = e.message === 'code_not_found' ? (isEn ? 'Code not found.' : 'Código no encontrado.')
         : e.message === 'cant_join_own' ? (isEn ? "You can't join your own cohort." : 'No podés unirte a tu propio cohorte.')
         : e.message;
-      setJoinMsg('⚠️ ' + msg);
+      setJoinMsg('' + msg);
     } finally {
       setJoining(false);
     }
@@ -255,7 +255,7 @@ export default function Lobby() {
 
       {/* ── Top navigation bar ─────────────────────────────── */}
       <nav className="lobby-nav" style={{
-        position: 'absolute', top: '1rem', left: '1rem', right: '1rem', zIndex: 10,
+        position: 'absolute', top: '1rem', left: '1rem', right: '1rem', zIndex: 'var(--z-sticky)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}>
         {/* Left: plan badge */}
@@ -268,7 +268,7 @@ export default function Lobby() {
               border: isPaid ? '1px solid rgba(48,209,88,0.4)' : '1px solid rgba(255,255,255,0.12)',
               color: isPaid ? 'var(--success)' : 'var(--text-muted)'
             }}>
-              {isPaid ? '⚡ Pro' : isEn ? 'Free plan' : 'Plan Gratis'}
+              {isPaid ? 'Pro' : isEn ? 'Free plan' : 'Plan Gratis'}
             </span>
           )}
         </div>
@@ -401,7 +401,7 @@ export default function Lobby() {
       {!GROUP_ONLY_MODE && workspace === 'individual' && (<>
       {/* ── Sección: Práctica individual ───────────────────── */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
-        <SectionLabel badge={isEn ? '👤 1 player' : '👤 1 jugador'} badgeAccent="48,209,88">
+        <SectionLabel badge={isEn ? '1 player' : '1 jugador'} badgeAccent="48,209,88">
           {isEn ? 'Individual practice' : 'Práctica individual'}
         </SectionLabel>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -488,7 +488,7 @@ export default function Lobby() {
       {workspace === 'team' && (<>
       {/* ── Sección: Sesión en equipo ──────────────────────── */}
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '720px', margin: '2rem auto 0', padding: '0 1rem', boxSizing: 'border-box' }}>
-        <SectionLabel badge={isEn ? '👥 Multiplayer' : '👥 Multijugador'} badgeAccent="139,92,246">
+        <SectionLabel badge={isEn ? 'Multiplayer' : 'Multijugador'} badgeAccent="139,92,246">
           {isEn ? 'Group practice' : 'Práctica grupal'}
         </SectionLabel>
         {/* Cohorte: pertenece al mundo grupal (código del trainer → progreso compartido) */}
@@ -532,7 +532,7 @@ export default function Lobby() {
           {/* Step 1 — Nombre */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>1</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>1</span>
               <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.yourName')}</label>
             </div>
             <input
@@ -545,7 +545,7 @@ export default function Lobby() {
           {/* Step 2 — Sala */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>2</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>2</span>
               <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.roomId')}</label>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -568,7 +568,7 @@ export default function Lobby() {
           {/* Step 3 — Rol */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>3</span>
+              <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>3</span>
               <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.chooseRole')}</label>
             </div>
             <div role="radiogroup" aria-label={isEn ? 'Choose your role' : 'Elegí tu rol'} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
@@ -654,7 +654,7 @@ export default function Lobby() {
       {showScoutingModal && <ScoutingModal onClose={() => setShowScoutingModal(false)} />}
 
       {showJoinCohort && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 'var(--z-modal)', padding: '1rem' }}>
           <div style={{ maxWidth: '400px', width: '100%', background: 'rgba(15,15,30,0.95)', backdropFilter: 'blur(24px)', borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.08)', padding: '2rem', position: 'relative' }}>
             <button onClick={() => { setShowJoinCohort(false); setJoinMsg(''); }} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
               <X size={20} />

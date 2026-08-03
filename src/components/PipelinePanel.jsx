@@ -97,7 +97,7 @@ export default function PipelinePanel({ activeStageIndex, setActiveStageIndex, p
           </div>
           <div className="pipeline-cards" style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', marginBottom: '1rem' }}>
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '0.75rem', flex: 1, border: '1px solid var(--glass-border)', borderTop: '1px solid var(--glass-border-highlight)' }}>
-              <strong style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}><Target size={14} /> {t('pipeline.objective')}</strong> 
+              <strong style={{ color: 'var(--primary-text)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}><Target size={14} /> {t('pipeline.objective')}</strong> 
               <span style={{ color: 'var(--text-muted)' }}>{activeStage.objective}</span>
             </div>
             <div style={{ background: 'rgba(48, 209, 88, 0.05)', padding: '1rem', borderRadius: '0.75rem', flex: 1, border: '1px solid rgba(48, 209, 88, 0.2)', borderTop: '1px solid rgba(48, 209, 88, 0.3)' }}>

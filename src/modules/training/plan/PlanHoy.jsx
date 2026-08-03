@@ -1,9 +1,5 @@
 import { useMemo, useState } from 'react';
-import {
-  Check, ChevronDown, ChevronRight, Play, CalendarCheck, Sparkles, Trophy,
-  TrendingUp, Flag, Layers, Headphones, BookOpen, PenLine, Package, Target, Mic,
-  Sprout, Compass, Circle,
-} from 'lucide-react';
+import { Check, ChevronDown, ChevronRight, Play, CalendarCheck, Sparkles, Trophy, TrendingUp, Flag, Layers, Headphones, BookOpen, PenLine, Package, Target, Mic, Sprout, Compass, Circle, CircleCheck, CircleX, DoorOpen, RotateCcw } from 'lucide-react';
 import { getNode, setNode, logActivity, todayKey } from '../db';
 import { hidratarBloques, diaActual, progreso, planTerminado } from './generator';
 import { marcarBloqueHecho, cerrarDia, continuarConBloques } from './store';
@@ -256,7 +252,7 @@ export default function PlanHoy({ plan, estado, ctx, onLanzar, onLanzarVoz, onIr
 
       {completo && (
         <div style={{ ...panel, textAlign: 'center', borderColor: 'rgba(48,209,88,0.4)', background: 'rgba(48,209,88,0.07)' }}>
-          <div style={{ fontSize: '1.8rem', marginBottom: '0.4rem' }}>✅</div>
+          <CircleCheck size={27} color={ACENTO.progreso} strokeWidth={1.9} style={{ marginBottom: '0.4rem' }} />
           <p style={{ fontWeight: 700, margin: '0 0 0.3rem' }}>Día {dia.n} terminado</p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.83rem', margin: '0 0 1rem', lineHeight: 1.5 }}>
             {ultimoDia
@@ -325,7 +321,14 @@ function CaminoAlNivel({ camino, abierto, onToggle, nivel }) {
               display: 'flex', alignItems: 'baseline', gap: '0.5rem',
               padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.83rem',
             }}>
-              <span style={{ flexShrink: 0 }}>{s.ok ? '🟢' : '🔴'}</span>
+              {/* Forma distinta además del color: un semáforo que solo cambia
+                  de color no lo puede leer alguien daltónico, y es 1 de cada 12
+                  hombres. Tilde vs. cruz se distinguen sin ver el color. */}
+              <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }} aria-label={s.ok ? 'cumplido' : 'pendiente'}>
+                {s.ok
+                  ? <CircleCheck size={15} color={ACENTO.progreso} strokeWidth={2.4} />
+                  : <CircleX size={15} color={ACENTO.error} strokeWidth={2.4} />}
+              </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600 }}>{s.label}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
@@ -354,7 +357,7 @@ function FinDeBloque({ resultado, motivoDeFondo, onSeguir, onIrA }) {
     const causa = resultado.cierre.faltan[0] || 'Todavía faltan señales en verde.';
     return (
       <div style={{ ...panel, textAlign: 'center' }}>
-        <div style={{ fontSize: '2.2rem', marginBottom: '0.5rem' }}>🔁</div>
+        <RotateCcw size={33} color={ACENTO.atencion} strokeWidth={1.9} style={{ marginBottom: '0.5rem' }} />
         <p style={{ fontWeight: 700, margin: '0 0 0.4rem', fontSize: '1.05rem' }}>El bloque se extiende</p>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1rem', lineHeight: 1.55 }}>
           {causa} No es volver a empezar: son unos días más, enfocados justo en eso.
@@ -363,7 +366,8 @@ function FinDeBloque({ resultado, motivoDeFondo, onSeguir, onIrA }) {
         <div style={{ textAlign: 'left', marginBottom: '1.1rem' }}>
           {resultado.cierre.senales.filter(s => !s.ok).map(s => (
             <div key={s.id} style={{ fontSize: '0.82rem', padding: '0.3rem 0', color: 'var(--text-muted)' }}>
-              🔴 <strong style={{ color: 'var(--text)' }}>{s.label}</strong> — {s.valor}, objetivo {s.objetivo}
+              <CircleX size={13} color={ACENTO.error} strokeWidth={2.4} style={{ verticalAlign: '-2px', marginRight: '0.35rem' }} />
+              <strong style={{ color: 'var(--text)' }}>{s.label}</strong> — {s.valor}, objetivo {s.objetivo}
             </div>
           ))}
         </div>
@@ -377,7 +381,9 @@ function FinDeBloque({ resultado, motivoDeFondo, onSeguir, onIrA }) {
 
   return (
     <div style={{ ...panel, textAlign: 'center', borderColor: 'rgba(48,209,88,0.4)', background: 'rgba(48,209,88,0.07)' }}>
-      <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>{porValvula ? '🚪' : '🏆'}</div>
+      {porValvula
+            ? <DoorOpen size={34} color={ACENTO.atencion} strokeWidth={1.9} style={{ marginBottom: '0.4rem' }} />
+            : <Trophy size={34} color={ACENTO.progreso} strokeWidth={1.9} style={{ marginBottom: '0.4rem' }} />}
       <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#30d158' }}>
         Nivel {resultado.nivelNuevo}
       </div>
@@ -801,7 +807,7 @@ function BloqueCompleto({ estado, bloque }) {
           const actual = d.n === (estado.dia || 1);
           return (
             <span key={d.n} style={{
-              fontSize: '0.68rem', padding: '0.15rem 0.45rem', borderRadius: '0.4rem',
+              fontSize: '0.72rem', padding: '0.15rem 0.45rem', borderRadius: '0.4rem',
               background: actual ? 'rgba(48,209,88,0.18)' : 'rgba(255,255,255,0.06)',
               color: actual ? '#30d158' : 'var(--text-muted)',
               opacity: pasado ? 0.45 : 1,
@@ -820,7 +826,7 @@ function PlanV1Terminado({ plan, onIrA }) {
   const [yendo, setYendo] = useState(false);
   return (
     <div style={{ ...panel, textAlign: 'center' }}>
-      <div style={{ fontSize: '2.2rem', marginBottom: '0.5rem' }}>🏁</div>
+      <Flag size={33} color={ACENTO.progreso} strokeWidth={1.9} style={{ marginBottom: '0.5rem' }} />
       <p style={{ fontWeight: 700, margin: '0 0 0.4rem', fontSize: '1.05rem' }}>Terminaste las cuatro semanas</p>
       <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1.2rem', lineHeight: 1.55 }}>
         Eso vale un nivel. A partir de acá el entrenamiento sigue por bloques: cada uno más

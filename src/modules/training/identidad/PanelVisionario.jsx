@@ -29,6 +29,7 @@ const diasHasta = (fecha) => {
 
 export default function PanelVisionario({ identidad, onEmpezar }) {
   const [editandoTexto, setEditandoTexto] = useState(false);
+  const [guardandoTexto, setGuardandoTexto] = useState(false);
   const [borrador, setBorrador] = useState('');
 
   if (!identidad?.declaracion?.texto) {
@@ -57,8 +58,12 @@ export default function PanelVisionario({ identidad, onEmpezar }) {
   const dossier = progresoDossier(identidad);
 
   const guardarTexto = async () => {
+    if (guardandoTexto) return;
+    setGuardandoTexto(true);
+    try {
     await guardarDeclaracion({ partes: identidad.declaracion.partes || {}, texto: borrador });
     setEditandoTexto(false);
+    } finally { setGuardandoTexto(false); }
   };
 
   return (
@@ -125,7 +130,7 @@ export default function PanelVisionario({ identidad, onEmpezar }) {
             <textarea rows={10} value={borrador} onChange={(e) => setBorrador(e.target.value)}
               style={{ ...inputBase, resize: 'vertical', lineHeight: 1.65 }} />
             <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.6rem' }}>
-              <button className="btn btn-primary" onClick={guardarTexto} style={{ fontSize: '0.82rem' }}>
+              <button className="btn btn-primary" onClick={guardarTexto} disabled={guardandoTexto} style={{ fontSize: '0.82rem', minHeight: '44px' }}>
                 <Check size={14} style={{ marginRight: '0.3rem', verticalAlign: '-2px' }} /> Guardar
               </button>
               <button className="btn btn-outline" onClick={() => setEditandoTexto(false)} style={{ fontSize: '0.82rem' }}>

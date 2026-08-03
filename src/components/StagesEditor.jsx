@@ -160,7 +160,7 @@ export default function StagesEditor({ stages, setStages }) {
             onChange={importFromCSV} 
             style={{ display: 'none' }} 
           />
-          <button className="btn btn-outline" onClick={handleImportClick} style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', borderColor: 'var(--primary)', color: 'var(--primary)' }}>
+          <button className="btn btn-outline" onClick={handleImportClick} style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', borderColor: 'var(--primary)', color: 'var(--primary-text)' }}>
             <Upload size={16} /> Subir CSV
           </button>
           <button className="btn btn-outline" onClick={downloadTemplate} style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', borderColor: 'var(--text-muted)', color: 'var(--text-muted)' }}>
@@ -190,7 +190,7 @@ export default function StagesEditor({ stages, setStages }) {
                   <button onClick={(e) => { e.stopPropagation(); moveStage(index, 'down'); }} disabled={index === stages.length - 1} style={{ background: 'transparent', border: 'none', color: index === stages.length - 1 ? 'rgba(255,255,255,0.1)' : 'var(--text-muted)', cursor: index === stages.length - 1 ? 'default' : 'pointer' }}><ChevronDown size={14}/></button>
                 </div>
                 
-                <div style={{ flex: 1, fontWeight: 'bold', color: 'var(--primary)' }}>
+                <div style={{ flex: 1, fontWeight: 'bold', color: 'var(--primary-text)' }}>
                   {index + 1}. {stage.label || 'Sin Título'}
                 </div>
                 

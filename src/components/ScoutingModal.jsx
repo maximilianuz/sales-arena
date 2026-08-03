@@ -42,7 +42,7 @@ export default function ScoutingModal({ onClose }) {
     try {
       await setScoutingProfile({ openToWork, name, headline, contactEmail, country });
       setMsg(openToWork
-        ? (isEn ? '✅ You are visible to recruiters.' : '✅ Ya estás visible para reclutadores.')
+        ? (isEn ? 'You are visible to recruiters.' : 'Ya estás visible para reclutadores.')
         : (isEn ? 'Profile removed from scouting.' : 'Perfil retirado de la cantera.'));
       setTimeout(onClose, 1400);
     } catch (e) {
@@ -67,7 +67,7 @@ export default function ScoutingModal({ onClose }) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 'var(--z-modal)', padding: '1rem' }}>
       <div className="glass-panel" style={{ maxWidth: '480px', width: '100%', position: 'relative', maxHeight: '90vh', overflowY: 'auto' }}>
         <button onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
           <X size={20} />
@@ -96,7 +96,7 @@ export default function ScoutingModal({ onClose }) {
             color: 'white', fontWeight: '700', fontSize: '0.9rem'
           }}
         >
-          <span>{isEn ? '💼 Visible in the talent pool' : '💼 Visible en la cantera'}</span>
+          <span>{isEn ? 'Visible in the talent pool' : 'Visible en la cantera'}</span>
           <span style={{
             width: '42px', height: '24px', borderRadius: '12px', position: 'relative', flexShrink: 0,
             background: openToWork ? 'var(--success)' : 'rgba(255,255,255,0.15)', transition: 'background 0.2s'

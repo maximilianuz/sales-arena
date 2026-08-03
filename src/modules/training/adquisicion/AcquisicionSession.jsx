@@ -487,7 +487,7 @@ function Shell({ onBack, title, children }) {
     <div style={{ maxWidth: '640px', margin: '0 auto', padding: '1rem 1.1rem 2.5rem' }}>
       <style>{CSS_INTERACCION}</style>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '1rem' }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '0.3rem', display: 'flex' }}>
+        <button aria-label="Volver" onClick={onBack} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '0.3rem', display: 'flex' }}>
           <ArrowLeft size={18} />
         </button>
         <h2 style={{ margin: 0, fontSize: '1.05rem' }}>{title || 'Adquisición'}</h2>

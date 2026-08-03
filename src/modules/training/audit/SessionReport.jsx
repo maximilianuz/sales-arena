@@ -13,7 +13,7 @@ const panel = {
 };
 
 const titulo = {
-  fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em',
+  fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em',
   textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.7rem',
 };
 
@@ -21,7 +21,7 @@ export default function SessionReport({ metricas, feedback, nuevasCartas = [], p
   return (
     <div>
       <div style={{ ...panel, textAlign: 'center', marginBottom: '0.8rem' }}>
-        <div style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+        <div style={{ fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
           Auditoría · {perfil?.nombre}
         </div>
         {feedback?.puntaje != null && (

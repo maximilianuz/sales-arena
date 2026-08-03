@@ -24,7 +24,7 @@ export default function AdminPanel({ user, onBack }) {
           gap: '0.5rem',
           background: 'none',
           border: 'none',
-          color: 'var(--primary)',
+          color: 'var(--primary-text)',
           cursor: 'pointer',
           fontSize: '0.95rem',
           fontWeight: '600',

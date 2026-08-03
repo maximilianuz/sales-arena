@@ -64,7 +64,7 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
     <div className="modal-overlay">
       <div className="modal-content" style={{ maxWidth: '600px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary)', fontSize: '1.5rem' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, color: 'var(--primary-text)', fontSize: '1.5rem' }}>
             <Settings size={24} color="var(--accent)" />
             {t('settings.title')}
           </h2>

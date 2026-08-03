@@ -1,7 +1,9 @@
 import { EyeOff, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useCerrarConEscape } from '../hooks/useCerrarConEscape';
 
 export default function PrivateInfoModal({ info, rootCauses, onClose }) {
+  useCerrarConEscape(onClose);
   const { t, i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   // Causas profundas en capas (si el escenario las trae): la más honda al final.
@@ -27,7 +29,7 @@ export default function PrivateInfoModal({ info, rootCauses, onClose }) {
 
         {roots.length > 0 && (
           <div style={{ marginTop: '0.875rem', background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: '0.875rem', padding: '1rem 1.25rem' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.5rem' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.5rem' }}>
               🧅 {isEn ? 'Root causes (deepest last)' : 'Causas profundas (la más honda al final)'}
             </div>
             {roots.map((r, i) => (

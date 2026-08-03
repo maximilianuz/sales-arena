@@ -10,27 +10,27 @@ import { useTranslation } from 'react-i18next';
 function StatusBadge({ status, isEn }) {
   if (!status || !status.uid) {
     return (
-      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
+      <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
         {isEn ? 'Pending login' : 'Pendiente de ingreso'}
       </span>
     );
   }
   if (status.subscriptionStatus === 'active') {
     return (
-      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.35)', color: 'var(--success)' }}>
+      <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.35)', color: 'var(--success)' }}>
         {isEn ? 'Active' : 'Activo'}
       </span>
     );
   }
   if (status.subscriptionStatus === 'revoked') {
     return (
-      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--danger)' }}>
+      <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--danger)' }}>
         {isEn ? 'Revoked' : 'Revocado'}
       </span>
     );
   }
   return (
-    <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
+    <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
       {isEn ? 'No access yet' : 'Sin acceso aún'}
     </span>
   );
@@ -198,7 +198,7 @@ export default function AdminAuthorizedEmails({ adminUid }) {
       marginTop: '2rem'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-        <Mail size={20} style={{ color: 'var(--primary)' }} />
+        <Mail size={20} style={{ color: 'var(--primary-text)' }} />
         <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>
           {isEn ? 'Authorized Emails' : 'Correos Autorizados'}
         </h2>
@@ -359,8 +359,8 @@ export default function AdminAuthorizedEmails({ adminUid }) {
         lineHeight: '1.4'
       }}>
         {isEn
-          ? '💡 Emails added here will automatically receive access to the Trainer plan when they log in or register.'
-          : '💡 Los correos agregados aquí obtendrán acceso automático al plan Trainer al iniciar sesión o registrarse.'}
+          ? 'Emails added here will automatically receive access to the Trainer plan when they log in or register.'
+          : 'Los correos agregados aquí obtendrán acceso automático al plan Trainer al iniciar sesión o registrarse.'}
       </div>
     </div>
   );

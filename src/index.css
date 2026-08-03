@@ -19,12 +19,28 @@
   --bg-card: rgba(24, 24, 27, 0.75);
 
   --text-main: #f5f5f7; /* Gris claro Apple */
+  /* El violeta de marca (#5e5ce6) da 3.93:1 sobre el fondo: alcanza para
+     bordes y rellenos (3:1) pero NO para texto (4.5:1). Como se estaba usando
+     de las dos formas, hay una variante aclarada solo para texto. */
+  --primary-text: #a5a3f5;
+
   --text-muted: #b4b4bd; /* gris secundario — subido para mejor legibilidad sobre fondo oscuro */
 
   /* Superficies: sombras definidas en lugar de glassmorphism pesado */
   --glass-border: rgba(255, 255, 255, 0.06);
   --glass-border-highlight: rgba(255, 255, 255, 0.12);
   --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Escala de apilado. Antes había nueve valores sueltos entre 10 y 2000, y
+     CUATRO modales distintos en 1000 — cuando dos se abrían juntos el que
+     quedaba arriba lo decidía el orden del DOM, no la intención. Los saltos son
+     de 100 para que quepan capas intermedias sin volver a inventar números. */
+  --z-base: 1;
+  --z-sticky: 100;      /* headers y barras que quedan fijas al scrollear */
+  --z-overlay: 200;     /* paneles laterales y popovers sobre el contenido */
+  --z-modal: 300;       /* diálogos: el nivel por defecto de cualquier modal */
+  --z-modal-alto: 400;  /* un modal abierto DESDE otro modal */
+  --z-toast: 500;       /* avisos: siempre por encima de todo lo demás */
 
   /* Escala de sombras */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
@@ -250,7 +266,7 @@ input::placeholder, textarea::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal);
   padding: 1rem;
   animation: fadeIn 0.25s ease;
 }

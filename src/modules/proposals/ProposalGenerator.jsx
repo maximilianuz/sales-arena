@@ -60,7 +60,7 @@ function ProposalCard({ p, onEdit, onDelete, onDuplicate }) {
           )}
         </div>
         <span style={{
-          fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+          fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
           padding: '0.2rem 0.6rem', borderRadius: '2rem', whiteSpace: 'nowrap',
           background: p.status === 'sent' ? `rgba(${p.accent},0.15)` : 'rgba(255,255,255,0.06)',
           border: p.status === 'sent' ? `1px solid rgba(${p.accent},0.4)` : '1px solid rgba(255,255,255,0.12)',
@@ -84,7 +84,7 @@ function ProposalCard({ p, onEdit, onDelete, onDuplicate }) {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', color: `rgb(${p.accent})`, fontSize: '1.05rem', fontWeight: 600 }}>
               {m.icon}{m.val}
             </div>
-            <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{m.label}</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{m.label}</div>
           </div>
         ))}
       </div>
@@ -329,7 +329,7 @@ function Builder({ initial, onBack, onSaved }) {
 
       {/* ── Columna derecha: preview en vivo ── */}
       <div style={{ position: 'sticky', top: '1rem' }}>
-        <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <Eye size={13} /> Preview en vivo
         </div>
         <div style={{ borderRadius: '14px', overflow: 'hidden', border: `1px solid rgba(${p.accent},0.3)`, maxHeight: '80vh', overflowY: 'auto' }}>
@@ -428,7 +428,7 @@ function ProposalPreview({ p }) {
           </div>
         </div>
       )}
-      <div style={{ fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: `rgb(${p.accent})`, fontWeight: 700 }}>
+      <div style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: `rgb(${p.accent})`, fontWeight: 700 }}>
         Propuesta VIP {p.prospectName ? `· para ${p.prospectName}` : ''}
       </div>
       <h1 style={{ fontSize: '1.6rem', fontWeight: 700, margin: '0.4rem 0 0', lineHeight: 1.15 }}>

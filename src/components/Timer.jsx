@@ -128,7 +128,7 @@ export default function Timer({ stages, activeStageIndex, timerState, updateTime
           </div>
           {isSessionWarning && (
             <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: isSessionDanger ? 'var(--danger)' : 'var(--accent)' }}>
-              {isSessionDanger ? '⚠️ ¡Último minuto! Upgradeá para continuar.' : '⚡ Menos de 5 min en el plan gratuito.'}
+              {isSessionDanger ? '¡Último minuto! Upgradeá para continuar.' : 'Menos de 5 min en el plan gratuito.'}
             </p>
           )}
         </div>

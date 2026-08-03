@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Flame, BookOpen, Layers, ClipboardList, Loader, Download, GraduationCap, MessageSquare, TrendingUp, Target, RotateCcw, Compass, X, Lock, Package } from 'lucide-react';
+import { ArrowLeft, Flame, BookOpen, Layers, ClipboardList, Loader, Download, GraduationCap, MessageSquare, TrendingUp, Target, RotateCcw, Compass, X, Lock, Package, AlertTriangle } from 'lucide-react';
 import { subscribeList, subscribeNode, setNode, getNode, computeStreak, todayKey } from './db';
 import { auth } from '../../utils/db';
 import { subscribeToAuthState } from '../../utils/auth';
@@ -71,6 +71,34 @@ function AccesoDenegado({ onBack }) {
   );
 }
 
+// El servidor no pudo consultar la whitelist. En producción es un incidente; en
+// local es casi siempre que faltan las credenciales de Firebase, y sin este
+// caso la pantalla decía "acceso restringido" — mandando a pedir permiso por
+// mail a quien es el dueño de la app.
+function AccesoSinVerificar({ onBack }) {
+  return (
+    <Page onBack={onBack} header={<h2 style={{ margin: 0, fontSize: '1.15rem' }}>Entrenamiento Closer</h2>}>
+      <div style={{ ...panel, borderColor: 'rgba(255,159,10,0.35)' }}>
+        <AlertTriangle size={26} color={ACENTO.atencion} strokeWidth={2} style={{ marginBottom: '0.5rem' }} />
+        <p style={{ fontWeight: 700, margin: '0 0 0.4rem' }}>No se pudo verificar el acceso</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.8rem', lineHeight: 1.55 }}>
+          El servidor no pudo consultar la lista de habilitados. Si estás corriendo la app en tu
+          máquina, casi seguro faltan las credenciales de Firebase en <code>.env.local</code>:
+          <br />
+          <code style={{ fontSize: '0.8rem' }}>FIREBASE_SERVICE_ACCOUNT</code> (el JSON entero) o
+          bien <code style={{ fontSize: '0.8rem' }}>FIREBASE_CLIENT_EMAIL</code> +{' '}
+          <code style={{ fontSize: '0.8rem' }}>FIREBASE_PRIVATE_KEY</code> +{' '}
+          <code style={{ fontSize: '0.8rem' }}>FIREBASE_PROJECT_ID</code>, más{' '}
+          <code style={{ fontSize: '0.8rem' }}>FIREBASE_DATABASE_URL</code>.
+        </p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>
+          El detalle exacto sale por consola en la ventana del servidor.
+        </p>
+      </div>
+    </Page>
+  );
+}
+
 // `onPracticaVoz` lleva a Práctica individual (la llamada con micrófono, que ya
 // existía fuera del módulo). El plan la usa para los bloques de voz: el que
 // navega es el lobby, acá solo se deja la marca de qué bloque la pidió.
@@ -130,9 +158,15 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
             body: JSON.stringify({ uid: user?.uid }),
           });
           const data = await res.json().catch(() => ({}));
-          if (vivo) setAcceso(res.ok && data.allowed ? 'allowed' : 'denied');
+          if (!vivo) return;
+          if (res.ok && data.allowed) setAcceso('allowed');
+          // El servidor no pudo verificar (falta configuración, típicamente en
+          // local). No es lo mismo que no tener acceso, y decirlo evita que
+          // alguien pida permiso por mail cuando le falta una env var.
+          else if (data.motivo === 'sin-verificar') setAcceso('sin-verificar');
+          else setAcceso('denied');
         } catch {
-          if (vivo) setAcceso('denied');
+          if (vivo) setAcceso('sin-verificar');
         }
       })();
     });
@@ -186,6 +220,7 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
   // Nada del módulo se monta sin acceso: ni el seed, ni el plan, ni una llamada.
   if (acceso === 'checking') return <AccesoVerificando onBack={onBack} />;
   if (acceso === 'denied') return <AccesoDenegado onBack={onBack} />;
+  if (acceso === 'sin-verificar') return <AccesoSinVerificar onBack={onBack} />;
 
   const handleImport = async () => {
     setImporting(true);
@@ -422,7 +457,7 @@ function PatronesView({ errores, sesiones, principios }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
       {grupos.length > 0 && (
         <div style={panel}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.7rem' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.7rem' }}>
             Errores recurrentes
           </div>
           {grupos.map(g => {
@@ -453,7 +488,7 @@ function PatronesView({ errores, sesiones, principios }) {
 
       {ultimas.length > 0 && (
         <div style={panel}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.7rem' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.7rem' }}>
             Evolución (últimas {ultimas.length} llamadas)
           </div>
           <div style={{ overflowX: 'auto' }}>
@@ -503,8 +538,14 @@ function RegistroView({ logMap }) {
   const [auto, setAuto] = useState(hoy.autoevaluacion || '');
   const [notas, setNotas] = useState(hoy.notas || '');
   const [saved, setSaved] = useState(false);
+  const [guardando, setGuardando] = useState(false);
 
   const guardar = async () => {
+    // Sin este flag el botón acepta clicks mientras la escritura viaja, y cada
+    // uno vuelve a leer y reescribir el mismo nodo.
+    if (guardando) return;
+    setGuardando(true);
+    try {
     const prev = (await getNode(`log/${key}`)) || {};
     await setNode(`log/${key}`, {
       ...prev,
@@ -515,6 +556,7 @@ function RegistroView({ logMap }) {
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
+    } finally { setGuardando(false); }
   };
 
   const dias = Object.entries(logMap || {}).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 30);
@@ -522,7 +564,7 @@ function RegistroView({ logMap }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
       <div style={panel}>
-        <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>Hoy — {key}</div>
+        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>Hoy — {key}</div>
         <label style={{ display: 'block', marginBottom: '0.7rem' }}>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Autoevaluación (1-10): ¿contratarías hoy a este closer?</span>
           <input type="number" min={1} max={10} value={auto} onChange={(e) => setAuto(e.target.value)}
@@ -533,13 +575,14 @@ function RegistroView({ logMap }) {
           <textarea rows={3} value={notas} onChange={(e) => setNotas(e.target.value)}
             style={{ display: 'block', marginTop: '0.3rem', width: '100%', boxSizing: 'border-box', padding: '0.6rem', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.3)', color: 'white', font: 'inherit', fontSize: '0.85rem', resize: 'vertical' }} />
         </label>
-        <button className="btn btn-outline" onClick={guardar} style={{ marginTop: '0.7rem', fontSize: '0.82rem' }}>
-          {saved ? '✓ Guardado' : 'Guardar'}
+        <button className="btn btn-outline" onClick={guardar} disabled={guardando}
+          style={{ marginTop: '0.7rem', fontSize: '0.82rem', minHeight: `${TOQUE_MIN}px` }}>
+          {guardando ? 'Guardando…' : saved ? 'Guardado' : 'Guardar'}
         </button>
       </div>
 
       <div style={panel}>
-        <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>Últimos 30 días</div>
+        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>Últimos 30 días</div>
         {dias.length === 0 && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Sin registros todavía.</p>}
         {dias.map(([d, v]) => (
           <div key={d} style={{ display: 'flex', gap: '0.7rem', alignItems: 'baseline', padding: '0.35rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.83rem' }}>
@@ -561,7 +604,7 @@ function RegistroView({ logMap }) {
 function SinIdentidad({ onEmpezar, onSaltear }) {
   return (
     <div style={{ ...panel, textAlign: 'center' }}>
-      <div style={{ fontSize: '2rem', marginBottom: '0.6rem' }}>🧭</div>
+      <Compass size={30} color={ACENTO.frio} strokeWidth={1.9} style={{ marginBottom: '0.6rem' }} />
       <p style={{ fontWeight: 700, margin: '0 0 0.4rem', fontSize: '1.02rem' }}>Antes del plan: para qué entrenás</p>
       <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1.1rem', lineHeight: 1.55 }}>
         Cinco pantallas, cuatro minutos. Escribís tu declaración —quién sos vendiendo, qué
@@ -611,7 +654,7 @@ function AvisoIdentidad({ onEmpezar, onCerrar }) {
 function SinPlan({ onEmpezar }) {
   return (
     <div style={{ ...panel, textAlign: 'center' }}>
-      <div style={{ fontSize: '2rem', marginBottom: '0.6rem' }}>🎯</div>
+      <Target size={30} color={ACENTO.progreso} strokeWidth={1.9} style={{ marginBottom: '0.6rem' }} />
       <p style={{ fontWeight: 700, margin: '0 0 0.4rem', fontSize: '1.02rem' }}>Armá tu plan de entrenamiento</p>
       <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1.2rem', lineHeight: 1.6 }}>
         Seis preguntas y listo. Después, cada vez que entres vas a ver <strong>qué te toca hoy</strong> y
@@ -647,7 +690,7 @@ function ActualizarContenido({ importing, onImport }) {
       </div>
       <button className="btn btn-outline" disabled={importing} onClick={correr}
         style={{ fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
-        {importing ? <><Loader size={13} className="spin" /> Importando…</> : hecho ? '✓ Actualizado' : <><Download size={14} /> Actualizar</>}
+        {importing ? <><Loader size={13} className="spin" /> Importando…</> : hecho ? 'Actualizado' : <><Download size={14} /> Actualizar</>}
       </button>
     </div>
   );
@@ -670,7 +713,7 @@ function Page({ onBack, header, children }) {
     <div className="app-container" style={{ alignItems: 'stretch', overflowY: 'auto' }}>
       <div style={{ width: '100%', maxWidth: '720px', margin: '0 auto', padding: '1.2rem 1rem 3rem', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '1.1rem' }}>
-          <button className="btn btn-outline" onClick={onBack} style={{ padding: '0.4rem 0.7rem', flexShrink: 0 }}><ArrowLeft size={15} /></button>
+          <button aria-label="Volver" className="btn btn-outline" onClick={onBack} style={{ padding: '0.4rem 0.7rem', flexShrink: 0 }}><ArrowLeft size={15} /></button>
           <div style={{ flex: 1, minWidth: 0 }}>{header || null}</div>
         </div>
         {children}
