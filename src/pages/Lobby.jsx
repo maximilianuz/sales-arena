@@ -20,6 +20,7 @@ import Scouting from './Scouting';
 import ScoutingModal from '../components/ScoutingModal';
 import LevelCard from '../components/LevelCard';
 import ProgressPath from '../components/ProgressPath';
+import { subscribeToAuthState } from '../utils/auth';
 // Carga diferida: SoloPractice arrastra la librería de avatares (DiceBear); solo
 // se baja cuando el usuario abre "Practicar solo".
 const SoloPractice = lazy(() => import('./SoloPractice'));
@@ -185,15 +186,28 @@ export default function Lobby() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // `auth.currentUser` es null de forma SÍNCRONA hasta que Firebase termina de
+  // restaurar la sesión, que es asíncrono. Este efecto salía temprano cuando eso
+  // pasaba y, con las dependencias vacías, no volvía a correr nunca: el admin
+  // quedaba marcado como no-admin para siempre y el botón del panel no aparecía.
+  //
+  // Era una carrera, así que fallaba de manera intermitente — funcionaba si la
+  // sesión estaba caliente y no si el bundle tardaba un poco más en montar.
+  //
+  // Mismo arreglo que ya se hizo en SoloPractice para el chequeo de acceso solo:
+  // esperar a que Firebase resuelva antes de preguntar.
   useEffect(() => {
-    if (!auth.currentUser) return;
-    const adminRef = ref(db, `admin/admins/${auth.currentUser.uid}`);
-    const unsub = onValue(adminRef, (snap) => {
-      setIsAdmin(snap.exists());
-    }, () => {
-      setIsAdmin(false);
+    let unsubAdmin = null;
+    const unsubAuth = subscribeToAuthState((user) => {
+      if (unsubAdmin) { unsubAdmin(); unsubAdmin = null; }
+      if (!user) { setIsAdmin(false); return; }
+      unsubAdmin = onValue(
+        ref(db, `admin/admins/${user.uid}`),
+        (snap) => setIsAdmin(snap.exists()),
+        () => setIsAdmin(false),
+      );
     });
-    return () => unsub();
+    return () => { if (unsubAdmin) unsubAdmin(); unsubAuth(); };
   }, []);
 
   useEffect(() => {
