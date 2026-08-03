@@ -204,7 +204,18 @@ export default function Lobby() {
       unsubAdmin = onValue(
         ref(db, `admin/admins/${user.uid}`),
         (snap) => setIsAdmin(snap.exists()),
-        () => setIsAdmin(false),
+        (error) => {
+          // El error se tragaba en silencio, y eso vuelve indiagnosticable el
+          // caso más común: que las reglas vivas en Firebase no tengan el nodo
+          // `admin` (el archivo del repo no se aplica solo — hace falta
+          // `firebase deploy --only database`). Sin este log, "no aparece el
+          // botón" es indistinguible de "no sos admin".
+          console.warn(
+            `[admin] No se pudo leer admin/admins/${user.uid}:`, error?.message || error,
+            '\nSi dice permission_denied, faltan desplegar las reglas: firebase deploy --only database',
+          );
+          setIsAdmin(false);
+        },
       );
     });
     return () => { if (unsubAdmin) unsubAdmin(); unsubAuth(); };
