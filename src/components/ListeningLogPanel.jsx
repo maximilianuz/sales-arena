@@ -42,9 +42,11 @@ export default function ListeningLogPanel({ listeningLog, updateListeningLog, ca
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {FIELDS.map((f) => (
           <div key={f.id}>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: '600' }}>{isEn ? f.en : f.es}</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>{isEn ? f.hintEn : f.hintEs}</div>
+            <label htmlFor={`listen-${f.id}`} style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: '600' }}>{isEn ? f.en : f.es}</label>
+            <div id={`listen-hint-${f.id}`} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>{isEn ? f.hintEn : f.hintEs}</div>
             <textarea
+              id={`listen-${f.id}`}
+              aria-describedby={`listen-hint-${f.id}`}
               value={local[f.id] || ''}
               onChange={(e) => setLocal({ ...local, [f.id]: e.target.value })}
               onBlur={commit}

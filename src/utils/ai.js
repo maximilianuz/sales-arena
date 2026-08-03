@@ -23,13 +23,26 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
       finalUrl = "/api/nvidia/v1/chat/completions";
     }
     headers["Authorization"] = `Bearer ${apiKey}`;
-    requestBody = {
-      model: apiModel || "meta/llama-3.1-8b-instruct",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: maxTokens,
-      response_format: { type: "json_object" }
-    };
+
+    // Detectar si es Flowise (contiene /prediction/)
+    const isFlowise = finalUrl.includes("/prediction/");
+
+    if (isFlowise) {
+      // Flowise usa formato diferente (question en lugar de messages)
+      requestBody = {
+        question: prompt,
+        chatId: auth.currentUser?.uid
+      };
+    } else {
+      // OpenAI-compatible
+      requestBody = {
+        model: apiModel || "meta/llama-3.1-8b-instruct",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: maxTokens,
+        response_format: { type: "json_object" }
+      };
+    }
   }
 
   try {
@@ -79,10 +92,18 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
 
     const data = await response.json();
 
-    // Blindaje: el proveedor puede devolver un shape inesperado (choices vacío,
-    // message nulo, content no-string). Sin estos guards, se cae con un
-    // "Cannot read properties of undefined" críptico en vez de un mensaje útil.
-    const content = data?.choices?.[0]?.message?.content;
+    // Detectar si la respuesta es de Flowise o formato OpenAI
+    const isFlowise = useOwnKey && finalUrl.includes("/prediction/");
+    let content;
+
+    if (isFlowise) {
+      // Flowise devuelve {text, chatId, ...}
+      content = data?.text || data?.message || '';
+    } else {
+      // OpenAI-compatible devuelve {choices: [{message: {content: ...}}]}
+      content = data?.choices?.[0]?.message?.content;
+    }
+
     if (typeof content !== 'string' || content.trim() === '') {
       throw new Error("La IA devolvió una respuesta vacía o con un formato inesperado. Probá de nuevo.");
     }
@@ -109,7 +130,8 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
   }
 }
 
-export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language = 'es') {
+export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language) {
+  const lang = language && typeof language === 'string' ? (language.startsWith('en') ? 'en' : 'es') : 'es';
   const activeStages = stages && stages.length > 0 ? stages : [
     { id: 'apertura', label: 'Apertura', baseQuestions: 'Romper hielo', baseObjections: '' }
   ];
@@ -143,7 +165,7 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     targetObjection: selectedObjectionKey,
     specificObjectionFramework,
     activeStages,
-    language,
+    language: lang,
     personalityHint,
     realProduct
   });
@@ -171,9 +193,17 @@ export async function generateSurpriseEvent(apiKey, apiUrl, apiModel, scenario, 
   if (!scenario) {
     throw new Error("No hay un escenario activo para generar el evento.");
   }
-  
+
+  // Idioma de salida: español por defecto; inglés solo si la página está en inglés.
+  const isEn = typeof language === 'string' && language.startsWith('en');
+  const langInstruction = isEn
+    ? 'OUTPUT LANGUAGE: write "eventText" entirely in ENGLISH.'
+    : 'IDIOMA DE SALIDA: escribí "eventText" íntegramente en ESPAÑOL (sin una palabra en inglés).';
+
   const prompt = `
 Actúa como un director de simulaciones de ventas. Tienes que crear UN EVENTO SORPRESA ALEATORIO (tipo "plot twist") para el siguiente Lead con el que un vendedor está hablando en este momento.
+
+${langInstruction}
 
 Contexto del Lead:
 - Nombre: ${scenario.demographics?.name || 'Cliente'}
@@ -188,6 +218,7 @@ Requisitos del evento sorpresa:
 4. Tienes un pool mental de más de 100 tipos de eventos diferentes (ej: llamadas entrantes, emergencias en su empresa, confesiones inesperadas, la aparición repentina de un socio/jefe en la sala, problemas técnicos, revelaciones de la competencia, interrupciones externas, etc.). Elige uno al azar.
 5. Redáctalo en 1 o 2 oraciones, de forma impactante.
 
+${langInstruction}
 Responde ÚNICAMENTE en formato JSON con la siguiente estructura:
 {
   "eventText": "Texto del evento sorpresa que debe leer el actor."

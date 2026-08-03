@@ -118,7 +118,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <MessageSquare size={14} color="rgba(139,92,246,0.8)" />
-          <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+          <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>
             {isEn ? 'Evaluation' : 'Evaluación'}
           </span>
         </div>
@@ -150,7 +150,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
         {/* Live moment markers */}
         {updateNotes && (
           <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '0.875rem', padding: '0.875rem', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '0.6rem' }}>
+            <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '0.6rem' }}>
               ⚡ {isEn ? 'Live moment markers' : 'Marcadores en vivo'}
             </div>
             <input
@@ -172,7 +172,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
         {/* Moments timeline */}
         {(roomNotes?.moments || []).length > 0 && (
           <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: '0.75rem', padding: '0.75rem', border: '1px solid rgba(255,255,255,0.05)', maxHeight: '140px', overflowY: 'auto' }}>
-            <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '0.5rem' }}>
+            <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.58)', marginBottom: '0.5rem' }}>
               {isEn ? 'Timeline' : 'Línea de tiempo'}
             </div>
             {(roomNotes.moments || []).slice().reverse().map((m, i) => {
@@ -181,8 +181,8 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
               return (
                 <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', marginBottom: '0.35rem', fontSize: '0.78rem' }}>
                   <span>{marker.emoji}</span>
-                  <span style={{ color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>{mins === 0 ? (isEn ? 'Just now' : 'Ahora') : `${mins}m`}{m.stage ? ` · ${m.stage}` : ''}</span>
-                  {m.note && <span style={{ color: 'rgba(255,255,255,0.65)' }}>{m.note}</span>}
+                  <span style={{ color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>{mins === 0 ? (isEn ? 'Just now' : 'Ahora') : `${mins}m`}{m.stage ? ` · ${m.stage}` : ''}</span>
+                  {m.note && <span style={{ color: 'rgba(255,255,255,0.88)' }}>{m.note}</span>}
                 </div>
               );
             })}

@@ -80,7 +80,7 @@ export default function ScenarioLibrary({ mode, currentScenario, currentConfig, 
 
         {/* List */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
-          <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '0.75rem' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '0.75rem' }}>
             {isEn ? `Saved (${items.length})` : `Guardados (${items.length})`}
           </div>
 

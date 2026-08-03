@@ -30,7 +30,7 @@ async function getAccessToken() {
   const header = { alg: 'RS256', typ: 'JWT' };
   const claimSet = {
     iss: serviceAccount.client_email,
-    scope: 'https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email',
+    scope: 'https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/identitytoolkit',
     aud: 'https://oauth2.googleapis.com/token',
     exp: now + 3600,
     iat: now
@@ -96,6 +96,67 @@ async function dbSet(path, data) {
 export async function getUserData(uid) {
   const data = await dbGet(`/users/${uid}`);
   return data || {};
+}
+
+// Email REAL del usuario según Firebase Auth (Identity Toolkit), no el que manda
+// el cliente. Sirve como anti-spoofing: antes de autorizar por email, confirmamos
+// que ese email efectivamente pertenece al uid autenticado. Devuelve null si no
+// existe. Requiere el scope 'identitytoolkit' (agregado arriba en el JWT).
+export async function getUserEmail(uid) {
+  const token = await getAccessToken();
+  const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:lookup', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ localId: [uid] })
+  });
+  if (!res.ok) throw new Error(`accounts:lookup falló: ${res.status}`);
+  const data = await res.json();
+  return data.users?.[0]?.email || null;
+}
+
+// Busca un usuario de Firebase Auth por email (Identity Toolkit). Devuelve el
+// registro (incluye localId = uid) o info del fallo. Útil para el flujo inverso:
+// del email de la whitelist al uid del usuario.
+export async function lookupUserByEmail(email) {
+  const token = await getAccessToken();
+  const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:lookup', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: [email] })
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, user: data.users?.[0] || null, error: data.error?.message || null };
+}
+
+// ¿Este uid está en admin/admins/? Se usa tanto para el gate de práctica solo
+// como para autorizar endpoints exclusivos de admin (gestionar accesos, etc.).
+export async function isAdmin(uid) {
+  if (!uid) return false;
+  try {
+    const admin = await dbGet(`/admin/admins/${uid}`);
+    return !!admin;
+  } catch {
+    return false;
+  }
+}
+
+// ¿Este usuario puede usar la práctica solo (que consume tokens de la API)?
+// Se decide SOLO por uid (no por email del cliente → no se puede spoofear):
+//   • es admin (admin/admins/{uid}), o
+//   • tiene el flag users/{uid}/soloApproved === true, o
+//   • tiene suscripción activa (users/{uid}/subscriptionStatus === 'active').
+// Los correos que el admin agrega a admin/authorizedEmails se convierten en
+// 'active' por el flujo verificado de verify-authorized-email al iniciar sesión,
+// así que agregar un email a esa lista habilita también la práctica solo.
+export async function isSoloAuthorized(uid) {
+  if (!uid) return false;
+  if (await isAdmin(uid)) return true;
+  try {
+    const u = await getUserData(uid);
+    if (u?.soloApproved === true) return true;
+    if (u?.subscriptionStatus === 'active') return true;
+  } catch { /* sin datos → no autorizado */ }
+  return false;
 }
 
 export async function getSubscriptionStatus(uid) {

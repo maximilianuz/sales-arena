@@ -31,7 +31,7 @@ export default function PrivateInfoModal({ info, rootCauses, onClose }) {
               🧅 {isEn ? 'Root causes (deepest last)' : 'Causas profundas (la más honda al final)'}
             </div>
             {roots.map((r, i) => (
-              <div key={i} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.75)', lineHeight: '1.5', marginBottom: '0.35rem' }}>
+              <div key={i} style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.92)', lineHeight: '1.5', marginBottom: '0.35rem' }}>
                 {i + 1}. {r}
               </div>
             ))}

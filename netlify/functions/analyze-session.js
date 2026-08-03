@@ -1,7 +1,6 @@
 import { getUserData, getPath, setPath, patchPath } from './lib/firebaseAdmin.js';
-
-const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_MODEL = "llama-3.1-8b-instant";
+import { llmChat } from './lib/llm.js';
+import { GROUP_ONLY_MODE, FREE_ACCESS_MODE } from './lib/appMode.js';
 
 export const handler = async (event) => {
   const headers = {
@@ -22,15 +21,21 @@ export const handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "uid y scenario son requeridos." }) };
   }
 
-  // Verificar suscripción (solo closer/trainer pueden guardar historial)
-  let userData;
+  // Verificar suscripción (solo closer/trainer pueden guardar historial).
+  // En modo solo-grupal o acceso-gratis el análisis está habilitado para TODOS
+  // los usuarios autenticados (la app es gratuita): no se exige plan pago.
+  const freeAccess = GROUP_ONLY_MODE || FREE_ACCESS_MODE;
+  let userData = {};
   try {
     userData = await getUserData(uid);
-    if (userData.subscriptionStatus !== 'active') {
+    if (!freeAccess && userData.subscriptionStatus !== 'active') {
       return { statusCode: 403, headers, body: JSON.stringify({ error: "Se requiere plan pago para guardar historial." }) };
     }
   } catch (e) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: "Error verificando suscripción." }) };
+    if (!freeAccess) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Error verificando suscripción." }) };
+    }
+    // En modo gratis seguimos con datos vacíos: el análisis no depende del plan.
   }
 
   // La comisión y el progreso se acreditan al CLOSER (quien practicó), no a quien
@@ -226,28 +231,16 @@ Respondé ÚNICAMENTE en JSON válido con esta estructura exacta:
 Significado de methodScores: frameControl = lideró el marco con desapego (sin necesidad); painDepth = llegó al dolor real/emocional, no a la excusa de superficie; objectionIsolation = aisló la objeción verdadera con contrapreguntas en vez de justificar; detachment = confianza relajada sin ansiedad por cerrar; microCommitments = metió micro-cierres y preguntas auto-concluyentes.`;
 
   try {
-    const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
-    const model = process.env.AI_DEFAULT_MODEL || DEFAULT_MODEL;
-
-    const res = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.AI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.5,
-        max_tokens: 800,
-        response_format: { type: "json_object" }
-      })
+    // Cadena de proveedores (tier 'fast'); si el principal está agotado, respaldo.
+    const { content } = await llmChat({
+      tier: 'fast',
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.5,
+      max_tokens: 800,
+      timeoutMs: 8000,
+      budgetMs: 8500,
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error?.message || "Error en IA");
-
-    const content = data.choices[0].message.content;
     const analysis = JSON.parse(content.match(/\{[\s\S]*\}/)[0]);
 
     // Guardar en Firebase vía REST

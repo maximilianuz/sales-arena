@@ -178,6 +178,23 @@
 
   /* Títulos hero más chicos en móvil */
   h1 { font-size: 1.6rem !important; }
+
+  /* PipelinePanel: el detalle de etapa (objetivo | preguntas | navegación) es
+     una fila de 3 columnas en desktop; en móvil se apila para no desbordar. */
+  .pipeline-detail { flex-direction: column !important; gap: 1rem !important; }
+  .pipeline-cards { flex-direction: column !important; }
+  .pipeline-detail-side {
+    border-left: none !important;
+    padding-left: 0 !important;
+    border-top: 1px solid var(--glass-border);
+    padding-top: 1rem;
+  }
+  /* Prev/Next pasan a fila y ocupan el ancho completo (targets cómodos). */
+  .pipeline-nav { flex-direction: row !important; }
+  .pipeline-nav .btn { flex: 1; }
+
+  /* La barra de etapas ya scrollea en X; damos aire al tap en móvil. */
+  .center-column { align-items: stretch !important; }
 }
 
 /* Grids que se auto-colapsan en móvil sin depender de media queries inline.

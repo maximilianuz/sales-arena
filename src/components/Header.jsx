@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Settings, Cpu, ChessKnight, Copy, CheckCircle2, User, BookOpen, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { signOutUser } from '../utils/auth';
+import RoomAccessBadge from './RoomAccessBadge';
 
-export default function Header({ title, roomId, role, onTitleChange, onOpenSettings }) {
+export default function Header({ title, roomId, role, onTitleChange, onOpenSettings, ownerIsPaid, userIsPaid, ownerLoading }) {
   const { t, i18n } = useTranslation();
   const [copied, setCopied] = useState(false);
 
@@ -43,6 +44,8 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
             <span>{t(`lobby.roles.${role}`, role)}</span>
           </div>
         )}
+
+        <RoomAccessBadge ownerIsPaid={ownerIsPaid} userIsPaid={userIsPaid} ownerLoading={ownerLoading} />
 
         {roomId && (
           <button 
@@ -92,7 +95,7 @@ export default function Header({ title, roomId, role, onTitleChange, onOpenSetti
         <button
           onClick={signOutUser}
           title={i18n.language?.startsWith('en') ? 'Sign out' : 'Cerrar sesión'}
-          style={{ background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.25)', color: 'rgba(255,255,255,0.5)', borderRadius: '0.5rem', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          style={{ background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.25)', color: 'rgba(255,255,255,0.74)', borderRadius: '0.5rem', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           <LogOut size={16} />
         </button>

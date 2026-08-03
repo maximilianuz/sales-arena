@@ -18,4 +18,12 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // Código Node: funciones serverless de Netlify y scripts de utilería.
+    // Tienen process, Buffer, etc. — sin esto ESLint los marca como no-undef.
+    files: ['netlify/**/*.js', 'scripts/**/*.js'],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
 ])

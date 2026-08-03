@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRoomSync } from '../hooks/useRoomSync';
+import { useRoomOwnerPlan } from '../hooks/useRoomOwnerPlan';
 import { auth } from '../utils/db';
 import Header from '../components/Header';
 import PipelinePanel from '../components/PipelinePanel';
@@ -24,7 +25,8 @@ import CloserCommandPanel from '../components/CloserCommandPanel';
 import RoleOnboarding from '../components/RoleOnboarding';
 import WorldClockPanel from '../components/WorldClockPanel';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
-import { Dices, X, Lock, Globe } from 'lucide-react';
+import { GROUP_ONLY_MODE } from '../config/appMode';
+import { Dices, X, Lock, Globe, ShoppingCart, CheckCircle2, BarChart2 } from 'lucide-react';
 import { getDefaultStages } from '../utils/defaultStages';
 import '../App.css';
 
@@ -33,10 +35,18 @@ export default function Room() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { isFree, isPaid } = useSubscriptionContext() || { isFree: false, isPaid: false };
+  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, registerLead, registerObserver, updateListeningLog } = useRoomSync(roomId);
+  const { ownerIsPaid, ownerLoading } = useRoomOwnerPlan(roomData);
+
+  // Si el propietario es Pro, todos heredan acceso Pro en esta sala.
+  // En modo solo-grupal la sala está 100% desbloqueada para todos (gratis):
+  // sesiones ilimitadas, Evento Sorpresa, Debrief, Votación, etapas y análisis.
+  const effectivelyPaid = GROUP_ONLY_MODE || isPaid || ownerIsPaid;
+  const effectivelyFree = GROUP_ONLY_MODE ? false : (isFree && !ownerIsPaid);
+
   const [upgradeModal, setUpgradeModal] = useState(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [showClocks, setShowClocks] = useState(false);
-  const { roomData, loading, error: syncError, updateScenario, updateTimer, updateActiveStage, updateQuestions, updateDebriefNotes, triggerSurpriseEvent, updateProductPresentation, updateSessionStartedAt, enableCheckout, updateCheckoutPhase, updateRubric, updateConfig, registerCloser, registerLead, registerObserver, updateListeningLog } = useRoomSync(roomId);
 
   const [sessionTitle, setSessionTitle] = useState(t('lobby.title'));
   const [showSettings, setShowSettings] = useState(false);
@@ -228,8 +238,11 @@ export default function Room() {
         onTitleChange={isFacilitator ? (newTitle) => {
           setSessionTitle(newTitle);
           localStorage.setItem('session_title', newTitle);
-        } : undefined} 
-        onOpenSettings={isFacilitator ? () => setShowSettings(true) : undefined} 
+        } : undefined}
+        onOpenSettings={isFacilitator ? () => setShowSettings(true) : undefined}
+        ownerIsPaid={ownerIsPaid}
+        userIsPaid={isPaid}
+        ownerLoading={ownerLoading}
       />
       
       <main className="dashboard-wrapper">
@@ -239,7 +252,7 @@ export default function Room() {
             setActiveStageIndex={isFacilitator ? handleStageChange : undefined}
             pipelineQuestions={currentScenario?.pipelineQuestions}
             stages={stagesEff}
-            isFree={isFree}
+            isFree={effectivelyFree}
             onUpgradeStage={() => setUpgradeModal({ feature: 'Cualificación y Cierre', requiredPlan: 'closer' })}
           />
         )}
@@ -272,13 +285,13 @@ export default function Room() {
               {isObserver && stagesEff[activeStageIndex || 0] && (
                 <div className="glass-panel" style={{ padding: '1.25rem' }}>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                    Camino del Closer (Etapa {activeStageIndex + 1})
+                    {isEn ? `Closer's path (Stage ${activeStageIndex + 1})` : `Camino del Closer (Etapa ${activeStageIndex + 1})`}
                   </div>
                   <div style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
                     {stagesEff[activeStageIndex || 0].label}
                   </div>
                   <div style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                    <strong>Objetivo:</strong> {stagesEff[activeStageIndex || 0].objective}
+                    <strong>{isEn ? 'Objective:' : 'Objetivo:'}</strong> {stagesEff[activeStageIndex || 0].objective}
                   </div>
                 </div>
               )}
@@ -307,9 +320,9 @@ export default function Room() {
                 activeStageIndex={activeStageIndex || 0}
                 timerState={timerState}
                 updateTimer={isFacilitator ? updateTimer : undefined}
-                maxMinutes={isFree ? 30 : null}
+                maxMinutes={effectivelyFree ? 30 : null}
                 sessionStartedAt={roomData?.sessionStartedAt || null}
-                onTimeLimitReached={isFree ? () => setUpgradeModal({ feature: 'Sesiones ilimitadas', requiredPlan: 'closer' }) : null}
+                onTimeLimitReached={effectivelyFree ? () => setUpgradeModal({ feature: 'Sesiones ilimitadas', requiredPlan: 'closer' }) : null}
               />
             )}
             
@@ -331,17 +344,17 @@ export default function Room() {
                     onClick={enableCheckout}
                     style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                   >
-                    🛒 {i18n.language?.startsWith('en') ? 'Enable Closing Phase' : 'Habilitar Fase de Cierre'}
+                    <ShoppingCart size={16} /> {i18n.language?.startsWith('en') ? 'Enable Closing Phase' : 'Habilitar Fase de Cierre'}
                   </button>
                 )}
                 {isFacilitator && roomData?.checkout?.enabled && !roomData?.checkout?.result && (
-                  <div style={{ fontSize: '0.82rem', color: 'var(--success)', textAlign: 'center', padding: '0.4rem 0.8rem', background: 'rgba(48,209,88,0.1)', borderRadius: '1rem', border: '1px solid rgba(48,209,88,0.3)' }}>
-                    ✅ {i18n.language?.startsWith('en') ? 'Closing phase active' : 'Fase de Cierre activa'}
+                  <div style={{ fontSize: '0.82rem', color: 'var(--success)', textAlign: 'center', padding: '0.4rem 0.8rem', background: 'rgba(48,209,88,0.1)', borderRadius: '1rem', border: '1px solid rgba(48,209,88,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                    <CheckCircle2 size={14} /> {i18n.language?.startsWith('en') ? 'Closing phase active' : 'Fase de Cierre activa'}
                   </div>
                 )}
 
                 {showSurpriseBtn && (
-                  isFree ? (
+                  effectivelyFree ? (
                     <button
                       className="btn btn-outline"
                       style={{ opacity: 0.5, display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -382,7 +395,7 @@ export default function Room() {
                   updateNotes={isObserver || isFacilitator ? updateDebriefNotes : undefined}
                   isFacilitator={isFacilitator}
                 />
-                {isFree && (
+                {effectivelyFree && (
                   <div
                     onClick={() => setUpgradeModal({ feature: 'Debrief completo', requiredPlan: 'closer' })}
                     style={{
@@ -431,7 +444,7 @@ export default function Room() {
                     updateQuestions={updateQuestions}
                     activeStage={stagesEff[activeStageIndex || 0]}
                   />
-                  {isFree && (
+                  {effectivelyFree && (
                     <div
                       onClick={() => setUpgradeModal({ feature: 'Panel de Votación', requiredPlan: 'closer' })}
                       style={{
@@ -469,13 +482,13 @@ export default function Room() {
         >
           <Globe size={15} /> {i18n.language?.startsWith('en') ? 'Time zones' : 'Husos horarios'}
         </button>
-        {isPaid && currentScenario && (
+        {effectivelyPaid && currentScenario && (
           <button
             className="btn btn-primary"
             onClick={() => setShowAnalysis(true)}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
           >
-            📊 {i18n.language?.startsWith('en') ? 'Analyze Session' : 'Analizar Sesión'}
+            <BarChart2 size={15} /> {i18n.language?.startsWith('en') ? 'Analyze Session' : 'Analizar Sesión'}
           </button>
         )}
       </footer>
@@ -524,7 +537,7 @@ export default function Room() {
           stages={Array.isArray(stages) ? stages : []}
           onSave={handleSaveSettings}
           onClose={() => setShowSettings(false)}
-          isFree={isFree}
+          isFree={effectivelyFree}
           onUpgradeStages={() => setUpgradeModal({ feature: 'Personalización de etapas', requiredPlan: 'closer' })}
           roomConfig={roomData?.config}
           onSaveConfig={updateConfig}

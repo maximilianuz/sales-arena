@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen, Shuffle, Package, ChevronDown, ChevronUp, Lock, Lightbulb, Pause, Play, Theater, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Send, Loader, Phone, PhoneOff, Flame, Shield, Clock, Eye, Sparkles, Trophy, Mic, Square, Volume2, VolumeX, BookOpen, Shuffle, Package, ChevronDown, ChevronUp, Lock, Lightbulb, Pause, Play, Theater, TrendingUp, Mail } from 'lucide-react';
 import { auth } from '../utils/db';
+import { subscribeToAuthState } from '../utils/auth';
 import { generateAIScenario } from '../utils/ai';
 import { buyerTurn, closerTurn, initialBuyerState } from '../utils/roleplayClient';
 import { openingLine } from '../utils/buyerPrompt';
@@ -15,6 +16,10 @@ import SoloCoachPanel from '../components/SoloCoachPanel';
 import MethodScores from '../components/MethodScores';
 import { LeadActorView } from '../components/ScenarioPanel';
 import { crearLineaDeTiempo, guardarSesionDeVoz } from '../modules/training/roleplay/sesionVoz';
+
+// Correo del admin al que se pide validación para practicar solo (protege los
+// tokens de la API). Configurable por env; default al contacto ya usado en la app.
+const SOLO_ACCESS_EMAIL = import.meta.env.VITE_ACCESS_REQUEST_EMAIL || 'contacto.maximilianoc@gmail.com';
 
 // Expresión emocional del lead por turno (la emite la IA en `emotion`).
 // El emoji + etiqueta le dan al closer feedback inmediato de cómo cayó su técnica.
@@ -105,8 +110,13 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
   const [leadEmotion, setLeadEmotion] = useState('neutral'); // emoción del último turno → cara del avatar
   const [transcribing, setTranscribing] = useState(false);
   const [showCoach, setShowCoach] = useState(false);
+  // Candado de la práctica solo: solo usuarios validados por el admin pueden
+  // practicar (protege los tokens de la API). 'checking' | 'allowed' | 'denied'.
+  const [soloAccess, setSoloAccess] = useState('checking');
   // Producto a vender: visible al arrancar (clima) y colapsable para no tapar el chat.
-  const [showProduct, setShowProduct] = useState(true);
+  // Colapsado por defecto: el foco de la pantalla es la CHARLA, no el producto
+  // (se despliega con un tap cuando el closer lo necesita consultar).
+  const [showProduct, setShowProduct] = useState(false);
   // Modo de práctica: 'closer' (vendés vos, el clásico) | 'lead' (te llama un
   // closer experto y vos sos el cliente) | 'observer' (mirás un partido IA vs IA
   // como un partido de tenis). Los modos lead/observer enseñan la metodología
@@ -160,6 +170,33 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
 
   useEffect(() => { warmUpVoices(); }, []);
   useEffect(() => () => stopSpeaking(), []); // cortar la voz al desmontar
+
+  // Verifica en el servidor si el usuario está validado para practicar solo.
+  // auth.currentUser es null de forma SÍNCRONA hasta que Firebase termina de
+  // restaurar la sesión (proceso asíncrono) — leerlo directo en el mount podía
+  // mandar uid=undefined y quedar en 'denied' para siempre aunque el usuario
+  // estuviera autorizado. Por eso esperamos a subscribeToAuthState (mismo
+  // patrón que App.jsx) antes de consultar /api/solo-access.
+  useEffect(() => {
+    let alive = true;
+    const unsubscribe = subscribeToAuthState((user) => {
+      (async () => {
+        try {
+          // Sin uid (user null → sin sesión), el server responde 401 → denied.
+          const res = await fetch('/api/solo-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uid: user?.uid })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (alive) setSoloAccess(res.ok && data.allowed ? 'allowed' : 'denied');
+        } catch {
+          if (alive) setSoloAccess('denied');
+        }
+      })();
+    });
+    return () => { alive = false; unsubscribe(); };
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -527,6 +564,57 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
     : mode === 'observer' ? (messages[messages.length - 1]?.role === 'closer' ? leadName : closerName)
     : leadName;
 
+  // ── Candado de acceso a la práctica solo ───────────────────────────────────
+  // Verifica contra el servidor si el usuario está validado. Mientras chequea,
+  // muestra un loader; si no está validado, una pantalla para PEDIR validación
+  // por email (no se genera ningún escenario ni se gasta un token hasta acá).
+  if (soloAccess === 'checking') {
+    return (
+      <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
+        <p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Checking access…' : 'Verificando acceso…'}</p>
+      </div>
+    );
+  }
+  if (soloAccess === 'denied') {
+    const email = auth.currentUser?.email || '';
+    const subject = isEn ? 'Solo practice access request — Sales Arena' : 'Pedido de acceso a la práctica solo — Sales Arena';
+    const bodyLines = isEn
+      ? `Hi, I'd like access to solo practice.\n\nMy account email: ${email}\n\nThanks!`
+      : `Hola, quisiera acceso a la práctica solo.\n\nMail de mi cuenta: ${email}\n\n¡Gracias!`;
+    const mailto = `mailto:${SOLO_ACCESS_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines)}`;
+    return (
+      <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
+        <div style={{ maxWidth: '480px', width: '100%' }}>
+          <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
+          </button>
+          <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+              <Lock size={28} color="var(--primary)" />
+            </div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: '700', margin: '0 0 0.75rem' }}>
+              {isEn ? 'Solo practice needs validation' : 'La práctica solo requiere validación'}
+            </h1>
+            <p style={{ color: 'var(--text-main)', fontSize: '0.95rem', lineHeight: 1.55, margin: '0 0 1.5rem' }}>
+              {isEn
+                ? 'To keep AI usage under control, solo practice is enabled per user. Request access by email and you\'ll be validated shortly.'
+                : 'Para cuidar el uso de la IA, la práctica solo se habilita por usuario. Pedí acceso por email y te validamos a la brevedad.'}
+            </p>
+            <a href={mailto}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%', padding: '0.85rem 1rem', borderRadius: '0.75rem', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: 'white', textDecoration: 'none', fontWeight: '700', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(100,210,255,0.35)' }}>
+              <Mail size={17} /> {isEn ? 'Request access by email' : 'Pedir acceso por email'}
+            </a>
+            {email && (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: '1rem 0 0' }}>
+                {isEn ? 'Your account:' : 'Tu cuenta:'} {email}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── Intro ────────────────────────────────────────────────────────────────
   if (phase === 'intro' || phase === 'loading') {
     // Mismas opciones que el Trainer (ScenarioPanel): dificultad y temperatura.
@@ -607,7 +695,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
                   <button type="button" key={m.id} onClick={() => setMode(m.id)}
                     style={{ flex: 1, padding: '0.6rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(139,92,246,0.65)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(139,92,246,0.16)' : 'rgba(255,255,255,0.02)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', fontSize: '0.82rem', fontWeight: '700' }}>{m.icon} {m.l}</div>
-                    <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.15rem' }}>{m.d}</div>
+                    <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.15rem' }}>{m.d}</div>
                   </button>
                 );
               })}
@@ -626,7 +714,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
               </div>
 
               {/* Industria / rubro */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Industry' : 'Rubro / Industria'}
               </label>
               <select value={genConfig.theme} onChange={e => setGenConfig(c => ({ ...c, theme: e.target.value }))}
@@ -644,7 +732,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
               </select>
 
               {/* Dificultad */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Difficulty' : 'Dificultad'}
               </label>
               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
@@ -654,7 +742,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
                     <button type="button" key={l.v} onClick={() => setGenConfig(c => ({ ...c, level: l.v }))}
                       style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(100,210,255,0.6)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(100,210,255,0.15)' : 'rgba(255,255,255,0.02)' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{l.l}</div>
-                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{l.d}</div>
+                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{l.d}</div>
                       <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: l.m > 1 ? 'var(--accent)' : l.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{l.m}</div>
                     </button>
                   );
@@ -662,7 +750,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
               </div>
 
               {/* Temperatura */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Lead Temperature' : 'Temperatura'}
               </label>
               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
@@ -672,7 +760,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
                     <button type="button" key={t.v} onClick={() => setGenConfig(c => ({ ...c, leadTemperature: t.v }))}
                       style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(255,159,10,0.5)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(255,159,10,0.1)' : 'rgba(255,255,255,0.02)' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{t.l}</div>
-                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{t.d}</div>
+                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{t.d}</div>
                       <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: t.m > 1 ? 'var(--accent)' : t.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{t.m}</div>
                     </button>
                   );
@@ -680,7 +768,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
               </div>
 
               {/* Objeción principal a enfrentar */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Main objection' : 'Objeción principal'}
               </label>
               <select value={genConfig.targetObjection} onChange={e => setGenConfig(c => ({ ...c, targetObjection: e.target.value }))}
@@ -929,7 +1017,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
                 name={closerName}
                 seed={`closer-${closerName}`}
                 isEn={isEn}
-                size={120}
+                size={104}
                 subtitle={isEn ? 'Expert closer' : 'Closer experto'}
               />
             ) : (
@@ -940,7 +1028,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
                 name={leadName}
                 seed={leadName}
                 isEn={isEn}
-                size={120}
+                size={104}
               />
             )}
           </div>
@@ -956,14 +1044,11 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
             prompter (rota cada 2 turnos — ayuda al principiante sin dictarle). */}
         {mode === 'closer' && (
           <div className="glass-panel" style={{ padding: '0.55rem 0.9rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-            <span style={{ fontWeight: '800', fontSize: '1.05rem', fontVariantNumeric: 'tabular-nums', color: elapsed >= MAX_SECONDS - 300 ? 'var(--danger)' : 'white', flexShrink: 0 }}>
-              {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
-            </span>
-            <span style={{ fontSize: '0.68rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(100,210,255,0.1)', border: '1px solid rgba(100,210,255,0.25)', padding: '0.15rem 0.5rem', borderRadius: '2rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(100,210,255,0.1)', border: '1px solid rgba(100,210,255,0.25)', padding: '0.2rem 0.6rem', borderRadius: '2rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
               {promptStage?.label}
             </span>
             {prompterOn && promptTip && (
-              <span style={{ flex: 1, fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.3 }}>
+              <span style={{ flex: 1, fontSize: '0.82rem', color: 'var(--text-main)', fontStyle: 'italic', lineHeight: 1.35 }}>
                 💡 “{promptTip}”
               </span>
             )}
@@ -995,7 +1080,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
         )}
 
         {/* Mensajes */}
-        <div ref={scrollRef} className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '1rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+        <div ref={scrollRef} className="glass-panel" style={{ flex: 1, overflowY: 'auto', padding: '1.1rem', marginBottom: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
           {messages.map((m, i) => {
             // Derecha = quien "vende" o el humano: user (closer/lead humano) y el
             // closer del partido IA vs IA. Izquierda = el comprador.
@@ -1021,10 +1106,12 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
                   </div>
                 )}
                 <div style={{
-                  padding: '0.6rem 0.85rem', borderRadius: '12px', fontSize: '0.9rem', lineHeight: 1.4,
-                  background: right ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.06)',
-                  color: 'white', borderBottomRightRadius: right ? '0.2rem' : '12px',
-                  borderBottomLeftRadius: right ? '12px' : '0.2rem',
+                  padding: '0.7rem 0.95rem', borderRadius: '14px', fontSize: '0.98rem', lineHeight: 1.5,
+                  background: right ? 'linear-gradient(135deg, var(--primary), #8b5cf6)' : 'rgba(255,255,255,0.12)',
+                  border: right ? 'none' : '1px solid rgba(255,255,255,0.16)',
+                  color: 'white', borderBottomRightRadius: right ? '0.25rem' : '14px',
+                  borderBottomLeftRadius: right ? '14px' : '0.25rem',
+                  boxShadow: right ? '0 2px 10px rgba(99,102,241,0.28)' : '0 1px 6px rgba(0,0,0,0.25)',
                 }}>
                   {m.content}
                 </div>

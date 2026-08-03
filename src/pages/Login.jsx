@@ -1,35 +1,99 @@
-import React, { useState } from 'react';
-import { ChessKnight, Mail, Lock, ArrowRight, Smartphone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChessKnight, Mail, Lock, ArrowRight, ExternalLink, Copy, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { signInWithGoogle, registerWithEmail, signInWithEmail } from '../utils/auth';
+import { signInWithGoogle, registerWithEmail, signInWithEmail, resetPassword, getGoogleRedirectResult, isInAppBrowser } from '../utils/auth';
+
+// Traduce los códigos de error de Firebase a mensajes claros y accionables,
+// en vez de mostrar el crudo "Firebase: Error (auth/...)" en inglés.
+function friendlyAuthError(code, isEn) {
+  const map = {
+    'auth/invalid-email': [isEn ? 'That email address is not valid.' : 'Ese email no es válido.'],
+    'auth/user-not-found': [isEn ? 'No account with that email. Try signing up.' : 'No hay cuenta con ese email. Probá registrándote.'],
+    'auth/wrong-password': [isEn ? 'Incorrect password.' : 'Contraseña incorrecta.'],
+    'auth/invalid-credential': [isEn ? 'Email or password is incorrect.' : 'El email o la contraseña son incorrectos.'],
+    'auth/email-already-in-use': [isEn ? 'That email is already registered. Sign in instead.' : 'Ese email ya está registrado. Iniciá sesión.'],
+    'auth/weak-password': [isEn ? 'Password must be at least 6 characters.' : 'La contraseña debe tener al menos 6 caracteres.'],
+    'auth/popup-blocked': [isEn ? 'Your browser blocked the sign-in window. Redirecting…' : 'El navegador bloqueó la ventana. Redirigiendo…'],
+    'auth/popup-closed-by-user': [isEn ? 'The sign-in window was closed before finishing.' : 'Se cerró la ventana antes de terminar.'],
+    'auth/network-request-failed': [isEn ? 'Network error. Check your connection and try again.' : 'Error de red. Revisá tu conexión e intentá de nuevo.'],
+    'auth/too-many-requests': [isEn ? 'Too many attempts. Please wait a moment and retry.' : 'Demasiados intentos. Esperá un momento y reintentá.'],
+    'auth/unauthorized-domain': [isEn ? 'This domain is not authorized for sign-in. Contact the administrator.' : 'Este dominio no está autorizado para iniciar sesión. Avisá al administrador.'],
+    'auth/operation-not-allowed': [isEn ? 'This sign-in method is disabled. Contact the administrator.' : 'Este método de acceso está deshabilitado. Avisá al administrador.'],
+    'auth/account-exists-with-different-credential': [isEn ? 'This email is registered with a different method. Try email/password.' : 'Ese email está registrado con otro método. Probá con email y contraseña.'],
+  };
+  const fallback = isEn ? "Couldn't authenticate. Please try again." : 'No se pudo autenticar. Intentá de nuevo.';
+  return (map[code] && map[code][0]) || fallback;
+}
 
 export default function Login() {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
-  // URL absoluta de descarga del APK (para el QR): origin + /descargar-app, que
-  // el redirect de netlify.toml resuelve al APK más nuevo de GitHub Releases.
-  const appDownloadUrl = (typeof window !== 'undefined' ? window.location.origin : 'https://sales-arena.netlify.app') + '/descargar-app';
   const [mode, setMode] = useState('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [inApp, setInApp] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // Aviso de navegador in-app: Google bloquea OAuth en webviews embebidos.
+  useEffect(() => {
+    setInApp(isInAppBrowser());
+  }, []);
+
+  // Al volver de un login con redirect (móvil), recogemos el posible error.
+  // El éxito lo maneja onAuthStateChanged en App, que avanza solo.
+  useEffect(() => {
+    getGoogleRedirectResult().catch((e) => {
+      setError(friendlyAuthError(e?.code, isEn));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const copyLink = () => {
+    try {
+      navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2500);
+    } catch { /* sin portapapeles */ }
+  };
 
   const handleGoogle = async () => {
     setError(''); setLoading(true);
     try { await signInWithGoogle(); }
-    catch (e) { setError(e.message || (isEn ? "Couldn't sign in with Google." : 'No se pudo iniciar sesión con Google.')); }
+    catch (e) { setError(friendlyAuthError(e?.code, isEn)); }
     finally { setLoading(false); }
+  };
+
+  const [resetMessage, setResetMessage] = useState('');
+
+  const handleForgot = async (e) => {
+    e.preventDefault();
+    setError('');
+    setResetMessage('');
+    if (!email.trim()) {
+      setError(isEn ? 'Please enter your email address first.' : 'Por favor ingresá tu email primero.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await resetPassword(email.trim());
+      setResetMessage(isEn ? 'Password reset email sent. Check your inbox.' : 'Te enviamos un email para restablecer tu contraseña.');
+    } catch (e) {
+      setError(friendlyAuthError(e?.code, isEn));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    setError(''); setLoading(true);
+    setError(''); setResetMessage(''); setLoading(true);
     try {
       if (mode === 'signup') await registerWithEmail(email, password);
       else await signInWithEmail(email, password);
     } catch (e) {
-      setError(e.message || (isEn ? "Couldn't authenticate." : 'No se pudo autenticar.'));
+      setError(friendlyAuthError(e?.code, isEn));
     } finally { setLoading(false); }
   };
 
@@ -74,6 +138,37 @@ export default function Login() {
           </p>
         </div>
 
+        {/* Aviso: navegador in-app (LinkedIn/Instagram/etc.) — Google bloquea
+            el login OAuth aquí. Guiamos a abrir en Chrome/Safari o usar email. */}
+        {inApp && (
+          <div role="alert" style={{
+            display: 'flex', flexDirection: 'column', gap: '0.6rem',
+            background: 'rgba(255,159,10,0.1)', border: '1px solid rgba(255,159,10,0.35)',
+            borderRadius: '0.875rem', padding: '0.9rem 1rem', marginBottom: '1.1rem'
+          }}>
+            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
+              <ExternalLink size={18} color="var(--accent)" style={{ flexShrink: 0, marginTop: '1px' }} />
+              <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.45 }}>
+                <strong style={{ color: 'var(--accent)' }}>{isEn ? 'Open in your browser' : 'Abrí en tu navegador'}</strong>
+                <div style={{ marginTop: '0.2rem', color: 'rgba(255,255,255,0.9)' }}>
+                  {isEn
+                    ? "You're inside an app's browser, where Google sign-in is blocked. Open this page in Chrome or Safari — or just use email below."
+                    : 'Estás en el navegador de una app, donde Google bloquea el acceso. Abrí esta página en Chrome o Safari — o usá tu email acá abajo.'}
+                </div>
+              </div>
+            </div>
+            <button type="button" onClick={copyLink} style={{
+              alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.4rem',
+              background: 'rgba(255,159,10,0.15)', border: '1px solid rgba(255,159,10,0.4)',
+              color: 'var(--accent)', fontWeight: 700, fontSize: '0.8rem',
+              padding: '0.4rem 0.75rem', borderRadius: '2rem', cursor: 'pointer'
+            }}>
+              {linkCopied ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+              {linkCopied ? (isEn ? 'Link copied' : 'Enlace copiado') : (isEn ? 'Copy link' : 'Copiar enlace')}
+            </button>
+          </div>
+        )}
+
         {/* Google */}
         <button type="button" onClick={handleGoogle} disabled={loading}
           style={{
@@ -89,20 +184,21 @@ export default function Login() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.25rem 0' }}>
           <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
-          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem' }}>{isEn ? 'or with email' : 'o con tu email'}</span>
+          <span style={{ color: 'rgba(255,255,255,0.58)', fontSize: '0.78rem' }}>{isEn ? 'or with email' : 'o con tu email'}</span>
           <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
         </div>
 
         <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <div style={{ position: 'relative' }}>
-            <Mail size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+            <Mail size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.58)' }} />
             <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" style={{ paddingLeft: '2.5rem' }} />
           </div>
           <div style={{ position: 'relative' }}>
-            <Lock size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+            <Lock size={16} style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.58)' }} />
             <input type="password" required minLength={6} value={password} onChange={e => setPassword(e.target.value)} placeholder={isEn ? 'Password (min. 6)' : 'Contraseña (mín. 6)'} style={{ paddingLeft: '2.5rem' }} />
           </div>
           {error && <div style={{ color: 'var(--danger)', fontSize: '0.82rem' }}>{error}</div>}
+          {resetMessage && <div style={{ color: 'var(--success)', fontSize: '0.82rem' }}>{resetMessage}</div>}
           <button type="submit" disabled={loading}
             style={{
               width: '100%', padding: '0.8rem', marginTop: '0.25rem', borderRadius: '0.875rem', cursor: 'pointer',
@@ -113,6 +209,13 @@ export default function Login() {
             {mode === 'signup' ? (isEn ? 'Create account' : 'Crear cuenta') : (isEn ? 'Sign in' : 'Entrar')}
             <ArrowRight size={17} />
           </button>
+          {mode === 'signin' && (
+            <div style={{ textAlign: 'right', marginTop: '0.2rem' }}>
+              <a href="#" onClick={handleForgot} style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.74)', textDecoration: 'underline' }}>
+                {isEn ? 'Forgot password?' : '¿Olvidaste tu contraseña?'}
+              </a>
+            </div>
+          )}
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
@@ -128,35 +231,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* App Android: el QR vive SOLO acá (pantalla inicial). Apunta a
-          /descargar-app → redirect (netlify.toml) al APK más nuevo publicado en
-          GitHub Releases del repo móvil. Absoluto (window.location.origin) para
-          que se pueda escanear con la cámara del celular. */}
-      <div style={{
-        marginTop: '1.25rem', background: 'rgba(15,15,30,0.75)', backdropFilter: 'blur(24px)',
-        borderRadius: '1.25rem', border: '1px solid rgba(255,255,255,0.07)',
-        padding: '1.1rem 1.4rem', display: 'flex', alignItems: 'center', gap: '1.25rem', boxSizing: 'border-box'
-      }}>
-        <a href="/descargar-app" target="_blank" rel="noopener noreferrer"
-          style={{ background: 'white', padding: '0.45rem', borderRadius: '0.65rem', display: 'inline-block', flexShrink: 0 }}>
-          <img
-            src={`https://api.qrserver.com/v1/create-qr-code/?size=96x96&ecc=H&data=${encodeURIComponent(appDownloadUrl)}`}
-            alt={isEn ? 'QR to download the Android app' : 'QR para descargar la app Android'}
-            style={{ display: 'block', width: '96px', height: '96px' }}
-          />
-        </a>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.3rem' }}>
-            <Smartphone size={16} color="#a5b4fc" />
-            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'white' }}>{isEn ? 'Android App' : 'App Android'}</span>
-          </div>
-          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: 1.45 }}>
-            {isEn
-              ? 'Scan the QR with your phone to download and install the app, and train from anywhere.'
-              : 'Escaneá el QR con tu celular para descargar e instalar la app y entrenar desde donde estés.'}
-          </p>
-        </div>
-      </div>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { generateSurpriseEvent } from '../utils/ai';
 
 export default function SurpriseEventButton({ triggerEvent, apiKey, apiUrl, apiModel, currentScenario }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
@@ -12,10 +12,11 @@ export default function SurpriseEventButton({ triggerEvent, apiKey, apiUrl, apiM
       alert("Genera un escenario primero para poder crear un evento sorpresa personalizado.");
       return;
     }
-    
+
     setLoading(true);
     try {
-      const eventText = await generateSurpriseEvent(apiKey, apiUrl, apiModel, currentScenario);
+      // Idioma según la página: español por defecto, inglés solo si está en inglés.
+      const eventText = await generateSurpriseEvent(apiKey, apiUrl, apiModel, currentScenario, i18n.language);
       triggerEvent(eventText);
     } catch (error) {
       alert("Error al generar evento sorpresa: " + error.message);

@@ -1,16 +1,18 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ref, onValue } from 'firebase/database';
 import {
   Shuffle, Copy, ChessKnight, BookOpen,
   Zap, History, Target, TrendingUp, Theater, Eye,
-  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, X, Trophy, Briefcase, Target as TargetIcon,
-  FileText, Lock
+  ArrowRight, CheckCircle2, LogOut, BarChart2, Users, User, X, Trophy, Briefcase, Target as TargetIcon,
+  FileText, Lock, Shield
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
+import { GROUP_ONLY_MODE } from '../config/appMode';
 import { signOutUser } from '../utils/auth';
 import { joinCohort } from '../utils/cohort';
-import { auth } from '../utils/db';
+import { auth, db } from '../utils/db';
 import HistoryPage from './History';
 import TrainerAnalytics from './TrainerAnalytics';
 import Leaderboard from './Leaderboard';
@@ -26,6 +28,8 @@ const ProposalGenerator = lazy(() => import('../modules/proposals/ProposalGenera
 // Entrenamiento de closing high ticket (flashcards FSRS, base de conocimiento,
 // registro de práctica). Diferido: arrastra los seeds JSON del contenido.
 const TrainingHome = lazy(() => import('../modules/training/TrainingHome'));
+// Panel de Administración: solo para admins
+const AdminPanel = lazy(() => import('./AdminPanel'));
 
 const ROLE_META = {
   Facilitador: { icon: <Target size={22} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' },
@@ -95,6 +99,7 @@ export default function Lobby() {
   const [showSolo, setShowSolo] = useState(false);
   const [showTraining, setShowTraining] = useState(false);
   const [showProposals, setShowProposals] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const [showJoinCohort, setShowJoinCohort] = useState(false);
   const [cohortCodeInput, setCohortCodeInput] = useState('');
   const [joinMsg, setJoinMsg] = useState('');
@@ -103,13 +108,17 @@ export default function Lobby() {
   const [role, setRole] = useState('');
   const [roomId, setRoomId] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   // Espacio de trabajo: '' = todavía no eligió (muestra las 2 tarjetas grandes),
   // 'individual' | 'team'. Se persiste para aterrizar siempre donde trabaja,
   // con un switcher para cambiar. Así no se ve TODO en una misma pantalla.
   const [workspace, setWorkspace] = useState(() => {
+    // Modo solo-grupal: siempre se aterriza en "Equipos"; no hay espacio individual.
+    if (GROUP_ONLY_MODE) return 'team';
     try { return localStorage.getItem('lobbyWorkspace') || ''; } catch { return ''; }
   });
   const chooseWorkspace = (w) => {
+    if (GROUP_ONLY_MODE) return; // en modo solo-grupal no se cambia de espacio
     setWorkspace(w);
     try { localStorage.setItem('lobbyWorkspace', w); } catch { /* sin storage */ }
   };
@@ -141,6 +150,23 @@ export default function Lobby() {
     { id: 'Observador',  label: t('lobby.roles.Observador'),  desc: t('lobby.roles.ObservadorDesc') }
   ];
 
+  // Navegación con teclado dentro del grupo de roles (patrón radiogroup):
+  // ← ↑ anterior, → ↓ siguiente, Home/End extremos. Selecciona al mover.
+  const handleRoleKeyDown = (e, idx) => {
+    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (e.key in keys) {
+      e.preventDefault();
+      const next = (idx + keys[e.key] + roles.length) % roles.length;
+      setRole(roles[next].id);
+      document.getElementById(`role-opt-${roles[next].id}`)?.focus();
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      const target = e.key === 'Home' ? 0 : roles.length - 1;
+      setRole(roles[target].id);
+      document.getElementById(`role-opt-${roles[target].id}`)?.focus();
+    }
+  };
+
   const handleJoin = (e) => {
     e.preventDefault();
     if (!name || !role || !roomId) return;
@@ -158,6 +184,17 @@ export default function Lobby() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  useEffect(() => {
+    if (!auth.currentUser) return;
+    const adminRef = ref(db, `admin/admins/${auth.currentUser.uid}`);
+    const unsub = onValue(adminRef, (snap) => {
+      setIsAdmin(snap.exists());
+    }, () => {
+      setIsAdmin(false);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     if (window.particlesJS) {
@@ -206,13 +243,18 @@ export default function Lobby() {
       <ProposalGenerator onBack={() => setShowProposals(false)} />
     </Suspense>
   );
+  if (showAdmin && isAdmin) return (
+    <Suspense fallback={<div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}><p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Loading…' : 'Cargando…'}</p></div>}>
+      <AdminPanel user={auth.currentUser} onBack={() => setShowAdmin(false)} />
+    </Suspense>
+  );
 
   return (
     <div className="app-container" style={{ alignItems: 'center', overflowY: 'auto', position: 'relative', padding: '1.5rem 1rem 3rem' }}>
       <div id="lobby-particles" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
 
       {/* ── Top navigation bar ─────────────────────────────── */}
-      <nav style={{
+      <nav className="lobby-nav" style={{
         position: 'absolute', top: '1rem', left: '1rem', right: '1rem', zIndex: 10,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}>
@@ -233,7 +275,7 @@ export default function Lobby() {
 
         {/* Right: utility actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          {isFree && openPlans && (
+          {!GROUP_ONLY_MODE && isFree && openPlans && (
             <button onClick={openPlans} style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
               background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
@@ -244,16 +286,26 @@ export default function Lobby() {
               <Zap size={13} /> {isEn ? 'Upgrade' : 'Mejorar Plan'}
             </button>
           )}
+          {isAdmin && (
+            <button onClick={() => setShowAdmin(true)} title={isEn ? 'Admin panel' : 'Panel de admin'} style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              background: 'rgba(139,92,246,0.1)', color: 'rgba(255,255,255,0.9)',
+              border: '1px solid rgba(139,92,246,0.35)', padding: '0.35rem 0.8rem',
+              borderRadius: '2rem', cursor: 'pointer', textDecoration: 'none', fontSize: '0.82rem'
+            }}>
+              <Shield size={13} /> {isEn ? 'Admin' : 'Admin'}
+            </button>
+          )}
           <a href={isEn ? "/presentacion_en.html" : "/presentacion.html"} target="_blank" rel="noopener noreferrer"
             style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              background: 'rgba(48,209,88,0.1)', color: 'rgba(255,255,255,0.7)',
+              background: 'rgba(48,209,88,0.1)', color: 'rgba(255,255,255,0.9)',
               border: '1px solid rgba(48,209,88,0.35)', padding: '0.35rem 0.8rem',
               borderRadius: '2rem', cursor: 'pointer', textDecoration: 'none', fontSize: '0.82rem'
             }}>
             <BookOpen size={13} /> {isEn ? 'Guide' : 'Guía'}
           </a>
-          <select onChange={e => i18n.changeLanguage(e.target.value)} value={(i18n.language || 'es').split('-')[0]}
+          <select aria-label={isEn ? 'Change language' : 'Cambiar idioma'} onChange={e => i18n.changeLanguage(e.target.value)} value={(i18n.language || 'es').split('-')[0]}
             style={{
               background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)',
               border: '1px solid var(--glass-border)', padding: '0.35rem 0.6rem',
@@ -265,7 +317,7 @@ export default function Lobby() {
           <button onClick={signOutUser} title={isEn ? 'Sign out' : 'Cerrar sesión'}
             style={{
               background: 'rgba(255,69,58,0.07)', border: '1px solid rgba(255,69,58,0.2)',
-              color: 'rgba(255,255,255,0.35)', borderRadius: '2rem', padding: '0.35rem 0.6rem',
+              color: 'rgba(255,255,255,0.6)', borderRadius: '2rem', padding: '0.35rem 0.6rem',
               cursor: 'pointer', display: 'flex', alignItems: 'center', fontSize: '0.75rem', gap: '0.3rem'
             }}>
             <LogOut size={13} /> {isEn ? 'Exit' : 'Salir'}
@@ -295,7 +347,9 @@ export default function Lobby() {
 
       {/* ── Elegí tu espacio: Individual o Equipos ──────────
           Primera vez: dos tarjetas grandes. Después: switcher de pestañas.
-          Solo se muestra el contenido del espacio elegido. */}
+          Solo se muestra el contenido del espacio elegido.
+          En modo solo-grupal NO se muestra el selector: se entra directo a Equipos. */}
+      {!GROUP_ONLY_MODE && (
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2.75rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
         {!workspace ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
@@ -323,26 +377,28 @@ export default function Lobby() {
         ) : (
           <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(0,0,0,0.25)', borderRadius: '0.9rem', padding: '0.3rem', border: '1px solid rgba(255,255,255,0.06)' }}>
             {[
-              { id: 'individual', l: isEn ? '👤 Individual Work' : '👤 Trabajo Individual' },
-              { id: 'team', l: isEn ? '👥 Team Work' : '👥 Trabajo en Equipos' },
+              { id: 'individual', icon: <User size={15} />, l: isEn ? 'Individual Work' : 'Trabajo Individual' },
+              { id: 'team', icon: <Users size={15} />, l: isEn ? 'Team Work' : 'Trabajo en Equipos' },
             ].map(tab => {
               const active = workspace === tab.id;
               return (
                 <button key={tab.id} onClick={() => chooseWorkspace(tab.id)} style={{
                   flex: 1, padding: '0.6rem 0.5rem', borderRadius: '0.65rem', cursor: 'pointer', font: 'inherit',
                   fontSize: '0.88rem', fontWeight: 700, border: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem',
                   background: active ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'transparent',
                   color: active ? 'white' : 'var(--text-muted)',
                 }}>
-                  {tab.l}
+                  {tab.icon} {tab.l}
                 </button>
               );
             })}
           </div>
         )}
       </div>
+      )}
 
-      {workspace === 'individual' && (<>
+      {!GROUP_ONLY_MODE && workspace === 'individual' && (<>
       {/* ── Sección: Práctica individual ───────────────────── */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
         <SectionLabel badge={isEn ? '👤 1 player' : '👤 1 jugador'} badgeAccent="48,209,88">
@@ -477,7 +533,7 @@ export default function Lobby() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
               <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>1</span>
-              <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.yourName')}</label>
+              <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.yourName')}</label>
             </div>
             <input
               type="text" required value={name} onChange={e => setName(e.target.value)}
@@ -490,7 +546,7 @@ export default function Lobby() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
               <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>2</span>
-              <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.roomId')}</label>
+              <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.roomId')}</label>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <input
@@ -498,12 +554,12 @@ export default function Lobby() {
                 className="form-input" placeholder={t('lobby.roomIdPlaceholder')}
                 style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.95rem', letterSpacing: '0.05em' }}
               />
-              <button type="button" onClick={generateRoomId} title={isEn ? 'Generate random ID' : 'Generar ID al azar'}
-                style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
+              <button type="button" onClick={generateRoomId} aria-label={isEn ? 'Generate random room ID' : 'Generar ID de sala al azar'} title={isEn ? 'Generate random ID' : 'Generar ID al azar'}
+                style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', cursor: 'pointer', color: 'rgba(255,255,255,0.74)', transition: 'all 0.2s' }}>
                 <Shuffle size={18} />
               </button>
-              <button type="button" onClick={copyRoomId} disabled={!roomId} title={isEn ? 'Copy ID' : 'Copiar ID'}
-                style={{ padding: '0.6rem 0.8rem', background: copied ? 'rgba(48,209,88,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(48,209,88,0.5)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '0.75rem', cursor: 'pointer', color: copied ? 'var(--success)' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
+              <button type="button" onClick={copyRoomId} disabled={!roomId} aria-label={isEn ? 'Copy room ID' : 'Copiar ID de sala'} title={isEn ? 'Copy ID' : 'Copiar ID'}
+                style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.6rem 0.8rem', background: copied ? 'rgba(48,209,88,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(48,209,88,0.5)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '0.75rem', cursor: copied || roomId ? 'pointer' : 'not-allowed', color: copied ? 'var(--success)' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s' }}>
                 {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
               </button>
             </div>
@@ -513,16 +569,27 @@ export default function Lobby() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
               <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(100,210,255,0.2)', border: '1px solid rgba(100,210,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: '600', color: '#a5b4fc', flexShrink: 0 }}>3</span>
-              <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.chooseRole')}</label>
+              <label style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.8rem', fontWeight: '600', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t('lobby.chooseRole')}</label>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
-              {roles.map(r => {
+            <div role="radiogroup" aria-label={isEn ? 'Choose your role' : 'Elegí tu rol'} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+              {roles.map((r, idx) => {
                 const meta = ROLE_META[r.id] || { icon: <Target size={20} />, color: '#6366f1', gradient: 'linear-gradient(135deg,#6366f1,#8b5cf6)' };
                 const isActive = role === r.id;
+                // Roving tabindex: solo el rol activo (o el primero si no hay
+                // ninguno) es tabbable; el resto se navega con flechas.
+                const isTabbable = role ? isActive : idx === 0;
                 return (
-                  <div
-                    key={r.id} onClick={() => setRole(r.id)}
+                  <button
+                    type="button"
+                    key={r.id}
+                    id={`role-opt-${r.id}`}
+                    role="radio"
+                    aria-checked={isActive}
+                    tabIndex={isTabbable ? 0 : -1}
+                    onClick={() => setRole(r.id)}
+                    onKeyDown={(e) => handleRoleKeyDown(e, idx)}
                     style={{
+                      textAlign: 'left', font: 'inherit', width: '100%',
                       padding: '1rem 1rem 0.85rem',
                       borderRadius: '1rem', cursor: 'pointer',
                       border: `1px solid ${isActive ? meta.color : 'rgba(255,255,255,0.07)'}`,
@@ -551,10 +618,10 @@ export default function Lobby() {
                     <div style={{ fontWeight: '700', fontSize: '0.95rem', color: isActive ? 'white' : 'rgba(255,255,255,0.7)', marginBottom: '0.2rem' }}>
                       {r.label}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', lineHeight: '1.3' }}>
+                    <div style={{ fontSize: '0.75rem', color: isActive ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.58)', lineHeight: '1.3' }}>
                       {r.desc}
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>

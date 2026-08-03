@@ -1,21 +1,59 @@
-import { getUserData } from './lib/firebaseAdmin.js';
+import { isSoloAuthorized } from './lib/firebaseAdmin.js';
+import { llmChat } from './lib/llm.js';
 
-// Un turno del COMPRADOR IA (modo práctica solo). Recibe el system prompt del
-// buyer (construido en el cliente con buyerPrompt.js) + el historial de la
-// conversación, y devuelve la respuesta estructurada del lead. NO toca los
-// contadores de sesión: el "consumo" de la práctica solo es la generación del
-// escenario (que ya pasa por /api/generate) — el chat en sí es liviano y no
-// debe agotar el límite de 1 sesión del plan free por cada mensaje.
+// Extrae el turno del comprador de la respuesta cruda del modelo. El modelo
+// rápido (8B) y algunos proveedores (NVIDIA rechaza json_object) a veces
+// devuelven JSON con prosa alrededor, comas colgantes, comillas tipográficas o
+// TRUNCADO (se corta por max_tokens). En vez de tumbar la charla con un 502,
+// intentamos varias estrategias y, como último recurso, usamos el texto plano
+// como respuesta: la conversación NUNCA se corta por un JSON imperfecto.
+function extractBuyerTurn(raw) {
+  const tryParse = (s) => { try { return JSON.parse(s); } catch { return null; } };
 
-const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-// El comprador usa un modelo MÁS GRANDE que la generación de escenarios: acá la
-// respuesta es corta (320 tokens) así que el 70b entra cómodo en los 10s de
-// Netlify, y a cambio actúa el personaje mucho mejor, razona sobre la técnica
-// del closer y respeta el JSON con más fiabilidad. La generación de escenarios
-// (salida larga ~2800 tokens) sigue en 8b para no pasarse del timeout. Además,
-// usar otro modelo separa el cupo de rate limit del de la generación.
-// Override con la env var ROLEPLAY_MODEL si hiciera falta.
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+  let text = String(raw || '').trim()
+    // saca cercos de código markdown ```json ... ```
+    .replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+
+  // 1) Objeto balanceado desde el primer '{' (respetando strings y escapes).
+  const start = text.indexOf('{');
+  if (start !== -1) {
+    let depth = 0, inStr = false, esc = false, end = -1;
+    for (let i = start; i < text.length; i++) {
+      const c = text[i];
+      if (inStr) {
+        if (esc) esc = false;
+        else if (c === '\\') esc = true;
+        else if (c === '"') inStr = false;
+      } else if (c === '"') inStr = true;
+      else if (c === '{') depth++;
+      else if (c === '}') { depth--; if (depth === 0) { end = i; break; } }
+    }
+    let candidate = end !== -1 ? text.slice(start, end + 1) : text.slice(start);
+    // Si quedó truncado (sin cierre): cerramos string abierto y las llaves.
+    if (end === -1) {
+      if (inStr) candidate += '"';
+      candidate += '}'.repeat(Math.max(1, depth));
+    }
+    const repaired = candidate
+      .replace(/[“”]/g, '"').replace(/[‘’]/g, "'")
+      .replace(/,\s*([}\]])/g, '$1'); // comas colgantes
+    const obj = tryParse(candidate) || tryParse(repaired);
+    if (obj && typeof obj === 'object') return obj;
+  }
+
+  // 2) Último recurso: rescatar solo el campo "reply" si está.
+  const m = text.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  if (m) return { reply: m[1].replace(/\\"/g, '"').replace(/\\n/g, ' ').trim() };
+
+  // 3) Nada parseable: usar el texto plano (sin llaves ni claves) como reply.
+  const plain = text.replace(/[{}[\]]/g, '').replace(/"\w+"\s*:/g, '').replace(/\s+/g, ' ').trim();
+  return { reply: plain || '...' };
+}
+
+// Un turno del COMPRADOR IA. Recibe el system prompt del buyer + el historial y
+// devuelve la respuesta estructurada del lead. El modelo/proveedor (y sus
+// respaldos) viven en lib/llm.js — tier 'fast' = modelo rápido (8b por
+// defecto) para diálogo natural y respuestas inmediatas en roleplay.
 
 export const handler = async (event) => {
   const headers = {
@@ -27,8 +65,6 @@ export const handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
   if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
 
-  const apiKey = process.env.AI_API_KEY;
-  if (!apiKey) return { statusCode: 500, headers, body: JSON.stringify({ error: "AI_API_KEY no configurada." }) };
 
   let body;
   try { body = JSON.parse(event.body || "{}"); } catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
@@ -39,13 +75,12 @@ export const handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "system y messages son requeridos." }) };
   }
 
-  // Verificación liviana: el usuario debe existir. No exigimos plan pago acá
-  // (el modo solo es el gancho de conversión), pero sí que esté autenticado y
-  // registrado para evitar abuso anónimo del proxy.
-  try {
-    await getUserData(uid);
-  } catch {
-    return { statusCode: 403, headers, body: JSON.stringify({ error: "Usuario no encontrado." }) };
+  // Autorización de práctica solo: este endpoint es EXCLUSIVO del modo solo (las
+  // salas grupales no lo usan), y consume tokens de la API en cada turno. Solo
+  // pueden usarlo los usuarios validados por el admin (por uid → no spoofeable).
+  // Los demás deben pedir validación por email antes de practicar.
+  if (!(await isSoloAuthorized(uid))) {
+    return { statusCode: 403, headers, body: JSON.stringify({ error: "solo_not_authorized" }) };
   }
 
   // Recortamos el historial: los últimos ~16 turnos alcanzan para coherencia y
@@ -57,58 +92,22 @@ export const handler = async (event) => {
     .filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'))
     .map(m => ({ role: m.role, content: m.content }));
 
-  const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
-  const model = process.env.ROLEPLAY_MODEL || DEFAULT_MODEL;
-
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 9000);
   try {
-    const callOnce = () => fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: "system", content: system }, ...trimmed],
-        temperature: 0.85, // variación natural, sin desbordar el personaje
-        max_tokens: 320,   // respuesta hablada corta + JSON de estado
-        response_format: { type: "json_object" }
-      }),
-      signal: controller.signal
+    // Cadena de proveedores (tier 'fast' = modelo rápido 8B para diálogo ágil). Si el
+    // principal está agotado (429/límite), salta al de respaldo en vez de esperar.
+    // Timeouts optimizados para Netlify (10s hard limit): consultas de diálogo son
+    // más rápidas que scenario generation, así que podemos ser más agresivos.
+    const { content } = await llmChat({
+      tier: 'fast',
+      messages: [{ role: "system", content: system }, ...trimmed],
+      temperature: 0.85,
+      max_tokens: 420, // margen para que el JSON no se trunque (reply + thought + state)
+      timeoutMs: 6500,
+      budgetMs: 8000,
     });
 
-    let upstream = await callOnce();
-    // Rate limit de Groq (6000 TPM en free): suele pedir esperar <1s. Reintentamos
-    // una vez dentro del presupuesto de 10s de Netlify en vez de fallarle al usuario.
-    if (upstream.status === 429) {
-      let waitMs = 1200;
-      try {
-        const rl = await upstream.clone().json();
-        const m = /try again in ([\d.]+)\s*s/i.exec(rl?.error?.message || '');
-        if (m) waitMs = Math.min(Math.ceil(parseFloat(m[1]) * 1000) + 300, 4000);
-      } catch { /* usar default */ }
-      await sleep(waitMs);
-      upstream = await callOnce();
-    }
-
-    const data = await upstream.json();
-    if (!upstream.ok) {
-      const message = data?.error?.message || data?.message || "Error en la API de IA.";
-      return { statusCode: upstream.status, headers, body: JSON.stringify({ error: message }) };
-    }
-
-    const content = data?.choices?.[0]?.message?.content;
-    if (typeof content !== 'string') {
-      return { statusCode: 502, headers, body: JSON.stringify({ error: "Respuesta vacía de la IA." }) };
-    }
-
-    let turn;
-    try {
-      turn = JSON.parse(content.match(/\{[\s\S]*\}/)[0]);
-    } catch {
-      return { statusCode: 502, headers, body: JSON.stringify({ error: "JSON malformado de la IA." }) };
-    }
+    // Parseo tolerante a fallas: nunca cortamos la charla por un JSON imperfecto.
+    const turn = extractBuyerTurn(content);
 
     // Blindaje del shape antes de devolverlo al cliente.
     const clamp = (n, def) => {
@@ -134,9 +133,11 @@ export const handler = async (event) => {
       })
     };
   } catch (error) {
-    const isTimeout = error.name === 'AbortError';
-    return { statusCode: isTimeout ? 504 : 502, headers, body: JSON.stringify({ error: isTimeout ? "timeout_upstream" : "Error al contactar la IA." }) };
-  } finally {
-    clearTimeout(timer);
+    const isTimeout = /timeout/i.test(error.message || '');
+    return {
+      statusCode: error.allFailed ? 429 : (isTimeout ? 504 : 502),
+      headers,
+      body: JSON.stringify({ error: error.allFailed ? "El servicio de IA está saturado en todos los proveedores. Probá en unos segundos." : (isTimeout ? "timeout_upstream" : "Error al contactar la IA.") })
+    };
   }
 };

@@ -119,7 +119,7 @@ function StudentRow({ student, uid, isEn }) {
               <span style={{ color: 'var(--text-muted)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {s.scenario?.name || 'Lead'} · {s.scenario?.industry || ''}
               </span>
-              <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.75rem' }}>
+              <span style={{ color: 'rgba(255,255,255,0.58)', fontSize: '0.75rem' }}>
                 {new Date(s.savedAt).toLocaleDateString(isEn ? 'en-US' : 'es-AR', { day: '2-digit', month: 'short' })}
               </span>
             </div>
@@ -258,7 +258,7 @@ export default function TrainerAnalytics({ onBack }) {
         <CohortLeaderboard students={students} isEn={isEn} lng={i18n.language} />
 
         {/* Students list */}
-        <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'rgba(255,255,255,0.6)', marginBottom: '0.75rem' }}>
+        <h2 style={{ fontSize: '1rem', fontWeight: '700', color: 'rgba(255,255,255,0.86)', marginBottom: '0.75rem' }}>
           {isEn ? 'Students' : 'Alumnos'}
         </h2>
 

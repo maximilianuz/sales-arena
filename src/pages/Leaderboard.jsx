@@ -161,7 +161,7 @@ export default function Leaderboard({ onBack }) {
           ))}
         </div>
 
-        <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: '1rem' }}>
+        <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginTop: '1rem' }}>
           {isEn
             ? 'Commissions are simulated practice earnings. Helping as Lead or Observer earns a +10% team-spirit bonus; not helping for a week costs -15%.'
             : 'Las comisiones son ganancias simuladas de práctica. Ayudar como Lead u Observador da +10% de bonus; una semana sin ayudar descuenta 15%.'}

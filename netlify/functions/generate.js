@@ -1,4 +1,6 @@
 import { getUserData, setFreePlanUsage, activateSubscription } from './lib/firebaseAdmin.js';
+import { llmChat } from './lib/llm.js';
+import { GROUP_ONLY_MODE, FREE_ACCESS_MODE } from './lib/appMode.js';
 
 // Lista de emails con acceso admin/dev (bypass de límites). Se configura en
 // Netlify como variable de entorno ADMIN_EMAILS, separados por coma.
@@ -9,13 +11,9 @@ function isAdminEmail(email) {
   return admins.includes(email.toLowerCase());
 }
 
-const DEFAULT_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-// Netlify Functions en plan Free/Starter tienen un límite duro de 10s por invocación
-// (no configurable por código). "llama-3.1-8b-instant" es sustancialmente más rápido
-// en Groq que los modelos 70b, lo que da margen real para completar antes del corte.
-// Si en el futuro se sube a Netlify Pro (timeout hasta 26s), se puede volver a un
-// modelo más grande seteando AI_DEFAULT_MODEL en las variables de entorno.
-const DEFAULT_MODEL = "llama-3.1-8b-instant";
+// El modelo y la URL viven en lib/llm.js (cadena de proveedores con respaldo).
+// El default sigue siendo Groq llama-3.1-8b-instant (rápido, entra en el límite
+// de ~10s de Netlify Functions).
 
 export const handler = async (event) => {
   const headers = {
@@ -32,10 +30,6 @@ export const handler = async (event) => {
     return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
-  const apiKey = process.env.AI_API_KEY;
-  if (!apiKey) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: "AI_API_KEY no configurada en el servidor." }) };
-  }
 
   let body;
   try {
@@ -46,8 +40,16 @@ export const handler = async (event) => {
 
   const { prompt, temperature, max_tokens, uid, email, byok } = body;
 
-  // Chequeo de suscripción — se saltea solo si el usuario usa su propia key (BYOK)
-  if (!byok) {
+  // Chequeo de suscripción — se saltea si el usuario usa su propia key (BYOK) o
+  // si la app corre en modo solo-grupal o acceso-gratis (todo gratis e
+  // ilimitado): ahí solo exigimos autenticación y NO aplicamos el límite de
+  // sesiones del plan free. Saltear el viaje a Firebase además libera
+  // presupuesto de tiempo para la IA.
+  if (!byok && (GROUP_ONLY_MODE || FREE_ACCESS_MODE)) {
+    if (!uid) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: "Se requiere autenticación." }) };
+    }
+  } else if (!byok) {
     if (!uid) {
       return { statusCode: 401, headers, body: JSON.stringify({ error: "Se requiere autenticación." }) };
     }
@@ -86,57 +88,33 @@ export const handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Falta 'prompt' (string) en el body." }) };
   }
 
-  const apiUrl = process.env.AI_API_URL || DEFAULT_API_URL;
-  const model = process.env.AI_DEFAULT_MODEL || DEFAULT_MODEL;
-
-  const callUpstream = async (timeoutMs) => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const upstream = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: "user", content: prompt }],
-          temperature: typeof temperature === "number" ? temperature : 0.7,
-          max_tokens: typeof max_tokens === "number" ? max_tokens : 1500,
-          response_format: { type: "json_object" }
-        }),
-        signal: controller.signal
-      });
-      return upstream;
-    } finally {
-      clearTimeout(timer);
-    }
-  };
-
-  // Una sola llamada por invocación: el límite duro de Netlify Functions es ~10s
-  // total (incluye el chequeo de suscripción previo), así que NO reintentamos
-  // dentro de la misma invocación — eso agotaba el presupuesto y Netlify mataba
-  // la función a nivel de plataforma antes de poder devolver un error legible.
-  // El reintento vive del lado del cliente (ai.js), que dispara una invocación
-  // nueva con presupuesto de tiempo fresco.
+  // Cadena de proveedores (tier 'smart' = modelo potente 70B para razonamiento profundo).
+  // La generación de buyer persona requiere análisis psicológico complejo.
+  // Si el principal está agotado (429/límite diario), salta solo al de respaldo.
+  // Reintento adicional del lado del cliente (ai.js) con presupuesto de tiempo fresco.
+  // Timeouts optimizados para Netlify (10s hard limit): fallar rápido en cada proveedor
+  // permite que Flowise/NVIDIA/Groq se intenten sin exceder el límite.
   try {
-    const upstream = await callUpstream(8000);
-    const data = await upstream.json();
-
-    if (!upstream.ok) {
-      const message = data?.error?.message || data?.message || "Error en la API de IA.";
-      return { statusCode: upstream.status, headers, body: JSON.stringify({ error: message }) };
-    }
-
-    return { statusCode: 200, headers, body: JSON.stringify(data) };
+    const { content } = await llmChat({
+      tier: 'smart',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: typeof temperature === 'number' ? temperature : 0.7,
+      max_tokens: typeof max_tokens === 'number' ? max_tokens : 1500,
+      timeoutMs: 9000,
+      budgetMs: 9300,
+      // Carrera: si NVIDIA no arranca en ~1.2s, se dispara Groq en paralelo y
+      // gana el primero. Evita que un NVIDIA lento/encolado agote el presupuesto.
+      hedgeMs: 1200,
+    });
+    // Devolvemos el shape que espera el cliente (choices[0].message.content).
+    return { statusCode: 200, headers, body: JSON.stringify({ choices: [{ message: { content } }] }) };
   } catch (error) {
-    console.error("generate handler error:", error);
-    const isTimeout = error.name === 'AbortError';
+    console.error("generate handler error:", error.message);
+    const isTimeout = /timeout/i.test(error.message || '');
     return {
-      statusCode: isTimeout ? 504 : 502,
+      statusCode: error.allFailed ? 429 : (isTimeout ? 504 : 502),
       headers,
-      body: JSON.stringify({ error: isTimeout ? "timeout_upstream" : "Error al contactar al proveedor de IA." })
+      body: JSON.stringify({ error: error.allFailed ? "Todos los proveedores de IA están saturados. Probá en unos minutos." : (isTimeout ? "timeout_upstream" : "Error al contactar al proveedor de IA.") })
     };
   }
 };

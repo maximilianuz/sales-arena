@@ -19,7 +19,7 @@
   --bg-card: rgba(24, 24, 27, 0.75);
 
   --text-main: #f5f5f7; /* Gris claro Apple */
-  --text-muted: #98989d; /* systemGray Apple dark */
+  --text-muted: #b4b4bd; /* gris secundario — subido para mejor legibilidad sobre fondo oscuro */
 
   /* Superficies: sombras definidas en lugar de glassmorphism pesado */
   --glass-border: rgba(255, 255, 255, 0.06);
@@ -41,6 +41,17 @@
 
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color-scheme: dark;
+}
+
+/* Ocultar elementos de debug/UID que se muestren en la página */
+[style*="UID"], [style*="uid"], [class*="uid"], [class*="debug"], [data-testid*="uid"] {
+  display: none !important;
+}
+
+/* Ocultar badges o elementos dinámicos que muestren información de sesión */
+div:has(> :contains("UID:")),
+div:has(> :contains("V8AGEhfn")) {
+  display: none !important;
 }
 
 * {
@@ -197,6 +208,19 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 2px rgba(94, 92, 230, 0.25);
 }
 
+/* Anillo de foco visible para navegación con teclado.
+   Solo aparece con :focus-visible (teclado), nunca al hacer click con mouse,
+   para no romper la estética. Cubre botones, links, radios y celdas clickables. */
+button:focus-visible,
+a:focus-visible,
+[role="radio"]:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand-cyan);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
 select option {
   background-color: var(--bg-dark);
   color: var(--text-main);
@@ -304,5 +328,83 @@ input::placeholder, textarea::placeholder {
 @media (max-width: 900px) {
   .proposal-builder-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Mobile Responsive: Lobby Navigation ─────────────────────────── */
+@media (max-width: 900px) {
+  .lobby-nav {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    align-items: flex-start !important;
+  }
+
+  .lobby-nav > div {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.35rem !important;
+  }
+
+  .lobby-nav button,
+  .lobby-nav a,
+  .lobby-nav select {
+    font-size: 0.75rem !important;
+    padding: 0.3rem 0.55rem !important;
+    margin: 0 !important;
+  }
+
+  .lobby-nav svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .lobby-nav {
+    gap: 0.3rem !important;
+  }
+
+  .lobby-nav > div:first-child {
+    flex: 0 0 100% !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  .lobby-nav > div:last-child {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.25rem !important;
+    justify-content: flex-start !important;
+  }
+
+  .lobby-nav button,
+  .lobby-nav a,
+  .lobby-nav select {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.4rem !important;
+    flex: 0 0 auto !important;
+  }
+
+  .lobby-nav select {
+    width: auto !important;
+  }
+
+  .lobby-nav svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+}
+
+/* Accesibilidad: respetar la preferencia del sistema de movimiento reducido.
+   Anula animaciones/transiciones/parallax para quienes marean o tienen
+   sensibilidad vestibular, sin quitar la funcionalidad. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

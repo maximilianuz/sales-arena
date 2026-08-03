@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Target, TrendingUp, Theater, Eye, X, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -96,6 +96,7 @@ export default function RoleOnboarding({ role }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const [show, setShow] = useState(false);
+  const confirmRef = useRef(null);
 
   const storageKey = `sa_onboarded_${role}`;
 
@@ -104,6 +105,21 @@ export default function RoleOnboarding({ role }) {
       setShow(true);
     }
   }, [role]);
+
+  // Cerrar con Escape y llevar el foco al botón de confirmar al abrir
+  // (buena práctica de diálogo: teclado + lectores de pantalla).
+  useEffect(() => {
+    if (!show) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        localStorage.setItem(storageKey, '1');
+        setShow(false);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    const focusTimer = setTimeout(() => confirmRef.current?.focus(), 50);
+    return () => { window.removeEventListener('keydown', onKey); clearTimeout(focusTimer); };
+  }, [show, storageKey]);
 
   if (!show || !GUIDES[role]) return null;
   const g = GUIDES[role];
@@ -115,8 +131,8 @@ export default function RoleOnboarding({ role }) {
 
   return (
     <div className="modal-overlay" onClick={dismiss}>
-      <div className="modal-content" style={{ maxWidth: '440px' }} onClick={e => e.stopPropagation()}>
-        <button onClick={dismiss} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+      <div className="modal-content" role="dialog" aria-modal="true" aria-label={g.title[isEn ? 'en' : 'es']} style={{ maxWidth: '440px' }} onClick={e => e.stopPropagation()}>
+        <button onClick={dismiss} aria-label={isEn ? 'Close' : 'Cerrar'} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
           <X size={20} />
         </button>
 
@@ -134,12 +150,12 @@ export default function RoleOnboarding({ role }) {
           {g.steps[isEn ? 'en' : 'es'].map((step, i) => (
             <div key={i} style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}>
               <span style={{ width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, background: `${g.color}22`, border: `1px solid ${g.color}55`, color: g.color, fontSize: '0.72rem', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1px' }}>{i + 1}</span>
-              <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.78)', lineHeight: '1.45' }}>{step}</span>
+              <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.92)', lineHeight: '1.45' }}>{step}</span>
             </div>
           ))}
         </div>
 
-        <button onClick={dismiss} style={{ width: '100%', padding: '0.8rem', borderRadius: '0.875rem', cursor: 'pointer', background: `linear-gradient(135deg, ${g.color}, ${g.color}bb)`, color: 'white', border: 'none', fontWeight: '700', fontSize: '0.95rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+        <button ref={confirmRef} onClick={dismiss} style={{ width: '100%', padding: '0.8rem', borderRadius: '0.875rem', cursor: 'pointer', background: `linear-gradient(135deg, ${g.color}, ${g.color}bb)`, color: 'white', border: 'none', fontWeight: '700', fontSize: '0.95rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
           <CheckCircle2 size={17} /> {isEn ? "Got it, let's go" : 'Entendido, a jugar'}
         </button>
       </div>

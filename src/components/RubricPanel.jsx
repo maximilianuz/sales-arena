@@ -41,12 +41,14 @@ export default function RubricPanel({ rubric, updateRubric, canScore }) {
             <div key={c.id}>
               <div style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '600' }}>{label}</div>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>{hint}</div>
-              <div style={{ display: 'flex', gap: '0.4rem' }}>
+              <div role="group" aria-label={label} style={{ display: 'flex', gap: '0.4rem' }}>
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
                     onClick={() => setScore(c.id, n)}
                     disabled={!canScore}
+                    aria-label={isEn ? `Score ${n} of 5 — ${label}` : `Puntaje ${n} de 5 — ${label}`}
+                    aria-pressed={n === val}
                     style={{
                       flex: 1, padding: '0.45rem 0', borderRadius: '0.5rem',
                       border: `1px solid ${n <= val ? 'var(--primary)' : 'var(--glass-border)'}`,
