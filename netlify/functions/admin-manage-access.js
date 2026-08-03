@@ -61,6 +61,10 @@ export const handler = async (event) => {
             email: normalized,
             uid,
             subscriptionStatus: u?.subscriptionStatus ?? null,
+            // Se devuelve aparte del estado general: son dos permisos
+            // distintos y el panel tiene que poder mostrarlos por separado.
+            soloApproved: u?.soloApproved === true,
+            subscriptionProvider: u?.subscriptionProvider ?? null,
             authorizedAt: u?.authorizedAt ?? null
           };
         } catch {
@@ -114,6 +118,33 @@ export const handler = async (event) => {
         authorizedMethod: 'admin-panel'
       });
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, uid }) };
+    }
+
+    // Habilitar o quitar la PRÁCTICA INDIVIDUAL para un email.
+    //
+    // Es una acción aparte de `grant` a propósito. `grant` da acceso general a
+    // la app (la whitelist); esto da la práctica individual, que consume muchos
+    // más tokens. Mezclarlas fue el problema: cualquiera en la whitelist
+    // quedaba habilitado también acá sin que nadie lo hubiera decidido.
+    if (action === 'solo') {
+      const email = String(body.email || '').toLowerCase().trim();
+      if (!email) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Falta email' }) };
+      const permitir = body.permitir !== false;
+
+      const lookup = await lookupUserByEmail(email);
+      const uid = lookup.user?.localId;
+      if (!uid) {
+        return {
+          statusCode: 404, headers,
+          body: JSON.stringify({ error: 'Esa persona todavía no inició sesión, así que no hay a quién habilitar. Que entre una vez y volvé a intentar.' }),
+        };
+      }
+
+      await patchPath(`/users/${uid}`, {
+        soloApproved: permitir,
+        soloApprovedAt: permitir ? new Date().toISOString() : null,
+      });
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, uid, soloApproved: permitir }) };
     }
 
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Acción desconocida' }) };

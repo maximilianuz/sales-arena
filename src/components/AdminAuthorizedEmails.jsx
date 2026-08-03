@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ref, onValue, push, remove } from 'firebase/database';
 import { db } from '../utils/db';
-import { Trash2, Plus, Mail, Copy, Check, ShieldOff, ShieldCheck } from 'lucide-react';
+import { Trash2, Plus, Mail, Copy, Check, ShieldOff, ShieldCheck, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // Estado real de acceso de un email: 'active' (ya inició sesión y tiene
@@ -158,6 +158,31 @@ export default function AdminAuthorizedEmails({ adminUid }) {
   // el chequeo automático del cliente solo corre cuando subscriptionStatus
   // es 'none', así que una vez 'revoked' queda pegado ahí para siempre salvo
   // que el admin lo reactive a mano desde acá.
+  // La práctica individual se aprueba APARTE del acceso general. Estar en esta
+  // lista da acceso a la app; esto da los roleplays individuales, que consumen
+  // muchos más tokens. Antes iban juntos y por eso cualquiera de la lista
+  // entraba al Entrenamiento Closer sin que nadie lo hubiera decidido.
+  const handleSolo = async (emailId, email, permitir) => {
+    setGrantingId(emailId);
+    try {
+      const res = await fetch('/api/admin-manage-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callerUid: adminUid, action: 'solo', email, permitir })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) throw new Error(data.error || 'No se pudo cambiar el permiso');
+      await refreshStatus(emails.map(e => e.email));
+      setMessage(permitir ? 'Práctica individual habilitada' : 'Práctica individual quitada');
+      setTimeout(() => setMessage(''), 2500);
+    } catch (error) {
+      setMessage(error.message);
+      setTimeout(() => setMessage(''), 4000);
+    } finally {
+      setGrantingId(null);
+    }
+  };
+
   const handleGrantAccess = async (emailId, email) => {
     setGrantingId(emailId);
     try {
@@ -305,6 +330,27 @@ export default function AdminAuthorizedEmails({ adminUid }) {
                 >
                   {copiedId === item.email ? <Check size={16} /> : <Copy size={16} />}
                 </button>
+                {/* Práctica individual: permiso SEPARADO del acceso general.
+                    Estar en esta lista da acceso a la app; esto da los roleplays
+                    individuales, que consumen mucho más. Antes iban juntos. */}
+                {accessStatus[item.email]?.uid && (
+                  <button
+                    onClick={() => handleSolo(item.id, item.email, !accessStatus[item.email]?.soloApproved)}
+                    disabled={grantingId === item.id}
+                    title={accessStatus[item.email]?.soloApproved
+                      ? 'Quitar práctica individual'
+                      : 'Habilitar práctica individual'}
+                    style={{
+                      background: 'none', border: 'none', padding: '0.4rem',
+                      marginRight: '0.4rem', display: 'flex', alignItems: 'center',
+                      cursor: grantingId === item.id ? 'wait' : 'pointer',
+                      opacity: grantingId === item.id ? 0.5 : 1,
+                      color: accessStatus[item.email]?.soloApproved ? 'var(--success)' : 'var(--text-muted)',
+                    }}
+                  >
+                    <User size={16} />
+                  </button>
+                )}
                 {accessStatus[item.email]?.subscriptionStatus !== 'active' && (
                   <button
                     onClick={() => handleGrantAccess(item.id, item.email)}

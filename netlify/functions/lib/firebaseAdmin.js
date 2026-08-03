@@ -163,21 +163,41 @@ export async function isAdmin(uid) {
   }
 }
 
-// ¿Este usuario puede usar la práctica solo (que consume tokens de la API)?
-// Se decide SOLO por uid (no por email del cliente → no se puede spoofear):
-//   • es admin (admin/admins/{uid}), o
-//   • tiene el flag users/{uid}/soloApproved === true, o
-//   • tiene suscripción activa (users/{uid}/subscriptionStatus === 'active').
-// Los correos que el admin agrega a admin/authorizedEmails se convierten en
-// 'active' por el flujo verificado de verify-authorized-email al iniciar sesión,
-// así que agregar un email a esa lista habilita también la práctica solo.
+// Proveedores que significan que ALGUIEN PAGÓ de verdad. Los otorgamientos
+// internos (whitelist de emails, panel de admin, bypass por ADMIN_EMAILS)
+// también dejan `subscriptionStatus: 'active'`, así que el estado por sí solo
+// no distingue a un cliente de alguien que agregaste a una lista.
+const PROVEEDORES_DE_PAGO = ['stripe', 'mercadopago', 'nowpayments'];
+
+// ¿Este usuario puede usar la PRÁCTICA INDIVIDUAL (que consume muchos tokens)?
+// Se decide SOLO por uid, nunca por el email que manda el cliente.
+//
+// Antes bastaba `subscriptionStatus === 'active'`, y eso resultó demasiado
+// amplio: la whitelist `admin/authorizedEmails` otorga ese mismo estado, así
+// que CUALQUIERA agregado a esa lista —aunque fuera para darle acceso general
+// a la app o a la práctica en equipo— quedaba habilitado también para la
+// individual. En la práctica, una cuenta cualquiera entraba al Entrenamiento
+// Closer sin que nadie lo hubiera decidido.
+//
+// Ahora son tres caminos EXPLÍCITOS:
+//   1. es admin (admin/admins/{uid})
+//   2. tiene users/{uid}/soloApproved === true — el visto bueno del admin,
+//      que es una decisión aparte de estar en la whitelist
+//   3. pagó de verdad: suscripción activa CON un proveedor de pago real
+//
+// Estar en la whitelist ya no alcanza por sí solo. Eso es a propósito: la
+// whitelist es acceso general a la app; la práctica individual es otra cosa y
+// se aprueba por separado.
 export async function isSoloAuthorized(uid) {
   if (!uid) return false;
   if (await isAdmin(uid)) return true;
   try {
     const u = await getUserData(uid);
     if (u?.soloApproved === true) return true;
-    if (u?.subscriptionStatus === 'active') return true;
+    if (u?.subscriptionStatus === 'active'
+        && PROVEEDORES_DE_PAGO.includes(String(u?.subscriptionProvider || '').toLowerCase())) {
+      return true;
+    }
   } catch { /* sin datos → no autorizado */ }
   return false;
 }
