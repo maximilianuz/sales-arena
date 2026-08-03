@@ -15,10 +15,18 @@
         "country": {
           ".write": "$uid === auth.uid && newData.isString() && newData.val().length <= 2"
         },
-        "subscriptionPlan": { ".write": false },
-        "sessionsUsed": { ".write": false },
-        "subscriptionExpiry": { ".write": false },
-        "subscriptionProvider": { ".write": false },
+        "subscriptionPlan": {
+          ".write": false
+        },
+        "sessionsUsed": {
+          ".write": false
+        },
+        "subscriptionExpiry": {
+          ".write": false
+        },
+        "subscriptionProvider": {
+          ".write": false
+        },
         "history": {
           "$sessionId": {
             ".read": "$uid === auth.uid",
@@ -45,6 +53,35 @@
             "$erroreId": {
               ".validate": "newData.hasChildren(['principioId', 'ts'])"
             }
+          },
+          "principios": {
+            ".indexOn": [
+              "nombre"
+            ]
+          },
+          "flashcards": {
+            ".indexOn": [
+              "tipo",
+              "dificultad"
+            ]
+          },
+          "srs": {
+            ".indexOn": [
+              "lastReview",
+              "nextReview"
+            ]
+          },
+          "logs": {
+            ".indexOn": [
+              "timestamp",
+              "sessionId"
+            ]
+          },
+          "patterns": {
+            ".indexOn": [
+              "count",
+              "createdAt"
+            ]
           }
         }
       }
