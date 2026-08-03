@@ -469,7 +469,10 @@ function BloqueFila({ bloque, hecho, esSiguiente, expandido, fecha, identidad, o
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             fontWeight: activo ? 700 : 600, fontSize: '0.9rem',
-            textDecoration: hecho ? 'line-through' : 'none',
+            // Tachar implica "lo hiciste". Un repaso que quedó vacío porque
+            // estaba todo en pausa se cierra para no trabar el día, pero no se
+            // hizo: tacharlo sería contar como trabajo algo que no pasó.
+            textDecoration: hecho && !bloque.vacio ? 'line-through' : 'none',
             display: 'flex', alignItems: 'center', gap: '0.4rem',
           }}>
             {!hecho && !activo && null}
@@ -492,7 +495,7 @@ function BloqueFila({ bloque, hecho, esSiguiente, expandido, fecha, identidad, o
               porque todavía no cerraste ningún lote. Decirlo con la hora a la
               que se libera es la diferencia entre "el sistema anda mal" y
               "esto es el sistema andando". */}
-          {bloque.tipo === 'flashcards' && bloque.vacio && !hecho && (
+          {bloque.tipo === 'flashcards' && bloque.vacio && (
             <div style={{ fontSize: '0.72rem', color: '#ff9f0a', marginTop: '0.25rem', lineHeight: 1.45 }}>
               {bloque.enPausa?.length
                 ? <>Todo en pausa hasta que consolide. {textoLiberacion(bloque.enPausa[0])}</>
