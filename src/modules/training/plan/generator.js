@@ -28,7 +28,7 @@ import { agruparErrores, UMBRAL_PATRON } from '../audit/patterns';
 import { evaluarCierre, exigenciaDeNivel, rangoDeNivel, ejeMasDebil } from './dificultad';
 import { generarMesociclo, prorrogarMesociclo, sesionesObjetivoDe } from './mesociclo';
 import { siguientesUnidades, unidadPorId } from './curriculum';
-import { estadosDeTodas } from './consolidacion';
+import { estadosDeTodas, cartasBloqueadas, unidadesEnPausa } from './consolidacion';
 import { preguntaDeHoy } from '../identidad/dossier';
 
 export const PLAN_VERSION = 2;
@@ -262,6 +262,14 @@ export function hidratarBloques(dia, ctx) {
     progresoUnidad = {}, cursoAdquisicion = null, logMap = null,
   } = ctx;
 
+  // LA COMPUERTA. Sin esto, consolidacion.js entero no tiene efecto sobre lo que
+  // el usuario practica: `dueCards` acepta `bloqueadas` desde siempre, pero nadie
+  // se lo pasaba. Material introducido hace diez minutos aparecía en las
+  // flashcards de la misma sesión, que es exactamente lo que la regla de ≥14 h y
+  // cambio de día existe para impedir.
+  const bloqueadas = cartasBloqueadas(progresoUnidad);
+  const enPausa = unidadesEnPausa(progresoUnidad);
+
   const patrones = agruparErrores(errores);
   const patronTop = patrones.find(p => p.cantidad >= UMBRAL_PATRON) || patrones[0] || null;
   // El principio a leer: el que más fallás. Si no hay errores todavía, se rota
@@ -271,14 +279,18 @@ export function hidratarBloques(dia, ctx) {
   const bloques = dia.bloques.map(b => {
     if (b.tipo === 'flashcards') {
       const pool = b.mazo ? cards.filter(c => c.mazo === b.mazo) : cards;
-      const disponibles = dueCards(pool, srsMap).length;
+      const disponibles = dueCards(pool, srsMap, undefined, { bloqueadas }).length;
       if (disponibles === 0 && b.mazo) {
         // Nada vencido en el mazo del día: en vez de saltear el bloque, se
         // reemplaza por una mixta. Perder el bloque sería perder el hábito.
-        const mixtas = dueCards(cards, srsMap).length;
-        return { ...b, mazo: null, disponibles: mixtas, sustituido: `No hay nada vencido en ${nombreMazo(b.mazo)}`, vacio: mixtas === 0 };
+        const mixtas = dueCards(cards, srsMap, undefined, { bloqueadas }).length;
+        return {
+          ...b, mazo: null, disponibles: mixtas, bloqueadas: [...bloqueadas],
+          sustituido: `No hay nada vencido en ${nombreMazo(b.mazo)}`,
+          vacio: mixtas === 0, enPausa,
+        };
       }
-      return { ...b, disponibles, vacio: disponibles === 0 };
+      return { ...b, disponibles, bloqueadas: [...bloqueadas], vacio: disponibles === 0, enPausa };
     }
 
     if (b.tipo === 'lectura') {

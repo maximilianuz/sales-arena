@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Flame, BookOpen, Layers, ClipboardList, Loader, Download, GraduationCap, MessageSquare, TrendingUp, Target, RotateCcw, Compass, X } from 'lucide-react';
 import { subscribeList, subscribeNode, setNode, getNode, computeStreak, todayKey } from './db';
 import { deckStats } from './srs/fsrs';
+import { cartasBloqueadas } from './plan/consolidacion';
 import { importSeed, isSeeded, DECKS } from './seedImport';
 import KnowledgeBase from './kb/KnowledgeBase';
 import StudySession from './flashcards/StudySession';
@@ -81,6 +82,10 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
   useEffect(() => subscribeNode(NODO_ADQUISICION, (v) => setCursoAdquisicion(v || null)), []);
 
   const streak = useMemo(() => computeStreak(logMap), [logMap]);
+  // Las cartas en pausa por consolidación. El panel tiene que contar lo MISMO
+  // que abre la sesión: sin esto el mazo diría "18 para repasar" y la sesión
+  // abriría 4, que es peor que no mostrar el número.
+  const bloqueadas = useMemo(() => cartasBloqueadas(progresoUnidad), [progresoUnidad]);
   const hoy = logMap?.[todayKey()];
 
   // Contexto con el que se hidratan los bloques del día. Memoizado porque
@@ -197,7 +202,7 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
 
               {DECKS.map(d => {
                 const deckCards = cards.filter(c => c.mazo === d.id);
-                const st = deckStats(deckCards, srsMap);
+                const st = deckStats(deckCards, srsMap, undefined, { bloqueadas });
                 const pendientes = st.vencidas + st.nuevas;
                 return (
                   <div key={d.id} style={{ ...panel, display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.85rem 1rem' }}>
@@ -205,6 +210,7 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
                       <div style={{ fontWeight: 700, fontSize: '0.92rem', color: `rgb(${d.color})` }}>{d.nombre}</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
                         {st.total} cartas · {st.vencidas} vencidas · {st.nuevas} nuevas · {st.aprendidas} al día
+                        {st.enPausa > 0 && <> · <span style={{ color: '#ff9f0a' }}>{st.enPausa} en pausa</span></>}
                       </div>
                     </div>
                     <button className="btn btn-outline" disabled={pendientes === 0} onClick={() => setStudyDeck(d.id)} style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }}>

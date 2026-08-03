@@ -58,9 +58,14 @@ export const UNIDADES = [
   { id: 'u-fase-descubrimiento', titulo: 'Fase 3 · Descubrimiento', tipo: 'fase', semana: 1,
     cartas: ['gui-005'], requiere: ['u-fase-marco', 'u-mind-pregunta-lidera'], fuente: 'Guion fusionado' },
   { id: 'u-fase-transicion', titulo: 'Fase 4 · Transición', tipo: 'fase', semana: 2,
-    cartas: ['gui-013', 'gui-014', 'pri-021'], requiere: ['u-fase-descubrimiento'], fuente: 'Guion fusionado' },
+    cartas: ['gui-013', 'gui-014', 'pri-021', 'fase-010', 'fase-011'], requiere: ['u-fase-descubrimiento'], fuente: 'Guion fusionado' },
   { id: 'u-fase-pitch', titulo: 'Fase 5 · Pitch', tipo: 'fase', semana: 2,
-    cartas: ['gui-015', 'gui-016', 'fase-108'], requiere: ['u-fase-transicion'], fuente: 'Guion fusionado' },
+    cartas: ['gui-015', 'gui-016', 'fase-108', 'fase-013'], requiere: ['u-fase-transicion'], fuente: 'Guion fusionado' },
+  // fase-014 y fase-109 no son "qué es el pitch" sino cómo se ejecuta mientras
+  // lo estás dando: chequear temperatura y usar el lenguaje del prospecto. Van
+  // aparte porque se pueden fallar sabiendo perfectamente la estructura.
+  { id: 'u-pitch-ejecucion', titulo: 'Pitchear sin perder al otro', tipo: 'fase', semana: 2,
+    cartas: ['fase-014', 'fase-109'], requiere: ['u-fase-pitch', 'u-mind-palabras'], fuente: 'Guion fusionado' },
   { id: 'u-fase-compromiso', titulo: 'Fase 6 · Compromiso', tipo: 'fase', semana: 2,
     cartas: ['gui-017', 'gui-018', 'fase-110'], requiere: ['u-fase-pitch'], fuente: 'Guion fusionado' },
   { id: 'u-fase-cierre', titulo: 'Fase 7 · Cierre', tipo: 'fase', semana: 2,
@@ -118,17 +123,26 @@ export const UNIDADES = [
   { id: 'u-perf-esmeralda', titulo: 'ESMERALDA · datos y orden', tipo: 'perfil', semana: 4,
     cartas: ['perf-004'], requiere: ['u-perf-fundamento'], fuente: 'Piedras Preciosas' },
   { id: 'u-perf-desafio', titulo: 'La frase que enciende a uno y destruye a dos', tipo: 'perfil', semana: 4,
-    cartas: ['perf-102', 'perf-103'], requiere: ['u-perf-rubi', 'u-perf-perla', 'u-perf-esmeralda'], fuente: 'CDV S3' },
+    cartas: ['perf-102', 'perf-103', 'perf-107'], requiere: ['u-perf-rubi', 'u-perf-perla', 'u-perf-esmeralda'], fuente: 'CDV S3' },
   { id: 'u-perf-espejo-closer', titulo: 'Actuar los cuatro, no solo el propio', tipo: 'perfil', semana: 4,
-    cartas: ['perf-104'], requiere: ['u-perf-desafio'], fuente: 'CDV S3' },
+    cartas: ['perf-104', 'perf-013'], requiere: ['u-perf-desafio'], fuente: 'CDV S3' },
   { id: 'u-perf-tono', titulo: 'Bajar una octava al indagar el dolor', tipo: 'perfil', semana: 4,
     cartas: ['perf-105'], requiere: ['u-perf-fundamento', 'u-cual-problema'], fuente: 'CDV S3' },
+  // Detectar el perfil en vivo es otra habilidad que nombrar los cuatro motores:
+  // en la llamada no viene etiquetado. Estas dos unidades son escenas de
+  // apertura reales, y por eso requieren tener los cuatro perfiles vistos.
+  { id: 'u-perf-deteccion-apertura', titulo: 'Leer el perfil en los primeros dos minutos', tipo: 'perfil', semana: 4,
+    cartas: ['perf-005', 'perf-006', 'perf-007', 'perf-008'],
+    requiere: ['u-perf-desafio'], fuente: 'Piedras Preciosas' },
+  { id: 'u-perf-deteccion-enganosa', titulo: 'Cuando la primera impresión miente', tipo: 'perfil', semana: 4,
+    cartas: ['perf-009', 'perf-010', 'perf-011', 'perf-012'],
+    requiere: ['u-perf-deteccion-apertura'], fuente: 'Piedras Preciosas' },
 
   // ── Semana 5 · Clasificar antes de responder ──────────────
   { id: 'u-tipo-razon', titulo: 'Razón no es lo mismo que objeción', tipo: 'tipoObjecion', semana: 5,
     cartas: ['tip-001', 'pri-016'], requiere: ['u-guion-esqueleto'], fuente: 'Psycho Selling' },
   { id: 'u-tipo-definicion', titulo: 'Qué es una objeción y por qué miente', tipo: 'tipoObjecion', semana: 5,
-    cartas: ['tip-002', 'prin-015'], requiere: ['u-tipo-razon'], fuente: 'Psycho Selling' },
+    cartas: ['tip-002', 'prin-015', 'prin-004'], requiere: ['u-tipo-razon'], fuente: 'Psycho Selling' },
   { id: 'u-tipo-taxonomia', titulo: 'Los cuatro tipos', tipo: 'tipoObjecion', semana: 5,
     cartas: ['tip-003'], requiere: ['u-tipo-definicion'], fuente: 'Psycho Selling' },
   { id: 'u-tipo-estructural', titulo: 'Estructural y defensiva', tipo: 'tipoObjecion', semana: 5,
@@ -191,6 +205,10 @@ export const UNIDADES = [
     requiere: ['u-cierre-graduales'], fuente: 'Psycho Selling' },
   { id: 'u-cierre-precio-valor', titulo: 'Precio y valor no son lo mismo', tipo: 'mentalidad', semana: 6,
     cartas: ['prin-001', 'fase-110'], requiere: ['u-obj-caro'], fuente: 'Psycho Selling' },
+  // Donde las dos ramas se cruzan: la misma objeción de precio cambia de ángulo
+  // según con quién estés hablando. Requiere las dos, y por eso va al final.
+  { id: 'u-perf-precio-por-perfil', titulo: 'La misma objeción de precio, cuatro ángulos', tipo: 'perfil', semana: 6,
+    cartas: ['perf-106'], requiere: ['u-obj-caro', 'u-perf-desafio'], fuente: 'Piedras Preciosas + CDV S5' },
 ];
 
 // ── Índices y consultas ─────────────────────────────────────

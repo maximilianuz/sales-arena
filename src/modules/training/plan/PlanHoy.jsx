@@ -430,8 +430,20 @@ function BloqueFila({ bloque, hecho, esSiguiente, expandido, fecha, identidad, o
           {bloque.tipo === 'roleplay-voz' && !hecho && (
             <div style={{ fontSize: '0.72rem', color: '#22d3ee', marginTop: '0.2rem' }}>{bloque.detalle}</div>
           )}
-          {bloque.sustituido && (
+          {bloque.sustituido && !bloque.vacio && (
             <div style={{ fontSize: '0.72rem', color: '#22d3ee', marginTop: '0.2rem' }}>{bloque.sustituido} — va mixto</div>
+          )}
+          {/* Un bloque de repaso vacío no es un error: con la compuerta de
+              consolidación encendida, los primeros días TODO está en pausa
+              porque todavía no cerraste ningún lote. Decirlo con la hora a la
+              que se libera es la diferencia entre "el sistema anda mal" y
+              "esto es el sistema andando". */}
+          {bloque.tipo === 'flashcards' && bloque.vacio && !hecho && (
+            <div style={{ fontSize: '0.72rem', color: '#ff9f0a', marginTop: '0.25rem', lineHeight: 1.45 }}>
+              {bloque.enPausa?.length
+                ? <>Todo en pausa hasta que consolide. {textoLiberacion(bloque.enPausa[0])}</>
+                : <>Nada vencido: no hay repaso que hacer hoy.</>}
+            </div>
           )}
           {bloque.ajustado && (
             <div style={{ fontSize: '0.72rem', color: '#a78bfa', marginTop: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -454,6 +466,17 @@ function BloqueFila({ bloque, hecho, esSiguiente, expandido, fecha, identidad, o
       )}
     </div>
   );
+}
+
+// Cuándo se libera lo que está consolidando. Se muestra en horas si es hoy y
+// como "mañana" si cruza la medianoche — que es el caso normal, porque la regla
+// exige que amanezca.
+function textoLiberacion(unidad) {
+  if (!unidad?.liberaEn) return 'Se libera sola.';
+  const falta = unidad.liberaEn - Date.now();
+  if (falta <= 0) return 'Ya se está liberando.';
+  const horas = Math.ceil(falta / (60 * 60 * 1000));
+  return horas <= 12 ? `Se libera en ${horas} h.` : 'Se libera mañana.';
 }
 
 // ── Una pregunta del dossier ────────────────────────────────

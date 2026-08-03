@@ -4,6 +4,7 @@ import { auth } from '../../../utils/db';
 import { subscribeList, subscribeNode, setItem, logActivity } from '../db';
 import { review, dueCards } from '../srs/fsrs';
 import { DECKS } from '../seedImport';
+import { cartasBloqueadas } from '../plan/consolidacion';
 
 // Sesión de repaso con FSRS. Cartas clásicas: frente → respondés EN VOZ ALTA →
 // dorso + por qué + autocalificación. Cartas Feynman: escribís tu explicación,
@@ -33,14 +34,19 @@ export default function StudySession({ deckId, onBack, limite = null, onDone = n
   const [cards, setCards] = useState(null);
   const [srsMap, setSrsMap] = useState(null);
   const [principiosMap, setPrincipiosMap] = useState({});
+  // La compuerta de consolidación. Practicar suelto no puede ser la puerta
+  // trasera que la esquiva: si el material se introdujo hoy, no se recupera hoy,
+  // se entre por el plan o por el botón de Practicar.
+  const [progresoUnidad, setProgresoUnidad] = useState(null);
 
   useEffect(() => subscribeList('cards', (list) => { setCards(list); }), []);
   useEffect(() => subscribeNode('srs', (v) => { setSrsMap(v || {}); }), []);
+  useEffect(() => subscribeNode('progresoUnidad', (v) => { setProgresoUnidad(v || {}); }), []);
   useEffect(() => subscribeList('kb/principios', (list) => {
     setPrincipiosMap(Object.fromEntries(list.map(p => [p.id, p])));
   }), []);
   // La sesión arranca cuando llegó el primer snapshot de cartas y de SRS.
-  const ready = cards !== null && srsMap !== null;
+  const ready = cards !== null && srsMap !== null && progresoUnidad !== null;
 
   const deckName = deckId ? (DECKS.find(d => d.id === deckId)?.nombre || deckId) : 'Todos los mazos';
 
@@ -58,6 +64,7 @@ export default function StudySession({ deckId, onBack, limite = null, onDone = n
       deckName={deckName}
       pool={pool}
       srsMap={srsMap}
+      bloqueadas={cartasBloqueadas(progresoUnidad)}
       principiosMap={principiosMap}
       onBack={onBack}
       limite={limite}
@@ -66,10 +73,10 @@ export default function StudySession({ deckId, onBack, limite = null, onDone = n
   );
 }
 
-function SessionRunner({ deckName, pool, srsMap, principiosMap, onBack, limite, onDone }) {
+function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBack, limite, onDone }) {
   // Cola congelada al montar: los props posteriores no la reconstruyen.
   const [queue, setQueue] = useState(() => {
-    const q = dueCards(pool, srsMap);
+    const q = dueCards(pool, srsMap, undefined, { bloqueadas });
     return limite ? q.slice(0, limite) : q;
   });
   const [idx, setIdx] = useState(0);
