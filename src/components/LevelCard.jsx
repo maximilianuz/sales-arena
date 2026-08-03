@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { ref, onValue } from 'firebase/database';
 import { useTranslation } from 'react-i18next';
 import { Flame, Target, Wallet, HandHeart } from 'lucide-react';
-import { db, auth } from '../utils/db';
+import { db } from '../utils/db';
+import { subscribeToAuthState } from '../utils/auth';
 import { tierFromEarnings, tierLabel, formatMoney, TIERS } from '../utils/gamification';
 import { earnedBadges, badgeLabel } from '../utils/badges';
 import { flagEmoji } from '../utils/countries';
@@ -23,10 +24,17 @@ export default function LevelCard() {
   // del compiler no permite Date.now() en render).
   const [now] = useState(() => Date.now());
 
+  // Igual que en Lobby: `auth.currentUser` todavía es null mientras Firebase
+  // restaura la sesión, y con deps vacías este efecto no volvía a intentar. La
+  // tarjeta se quedaba sin stats de forma intermitente, según qué tan rápido
+  // montara.
   useEffect(() => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
-    const unsub = onValue(ref(db, `users/${uid}/stats`), (s) => {
+    let unsubStats = null;
+    const unsubAuth = subscribeToAuthState((user) => {
+      if (unsubStats) { unsubStats(); unsubStats = null; }
+      const uid = user?.uid;
+      if (!uid) return;
+      unsubStats = onValue(ref(db, `users/${uid}/stats`), (s) => {
       const val = s.val();
       setStats(val);
       if (!val) return;
@@ -41,15 +49,19 @@ export default function LevelCard() {
         setTimeout(() => setLevelUp(null), 3500);
       }
       localStorage.setItem(LAST_TIER_KEY, curTier.id);
+      });
     });
-    return () => unsub();
+    return () => { if (unsubStats) unsubStats(); unsubAuth(); };
   }, []);
 
   useEffect(() => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
-    const unsub = onValue(ref(db, `users/${uid}/country`), (s) => setCountry(s.val()));
-    return () => unsub();
+    let unsubPais = null;
+    const unsubAuth = subscribeToAuthState((user) => {
+      if (unsubPais) { unsubPais(); unsubPais = null; }
+      if (!user?.uid) return;
+      unsubPais = onValue(ref(db, `users/${user.uid}/country`), (s) => setCountry(s.val()));
+    });
+    return () => { if (unsubPais) unsubPais(); unsubAuth(); };
   }, []);
 
   const total = stats?.totalEarnings || 0;
