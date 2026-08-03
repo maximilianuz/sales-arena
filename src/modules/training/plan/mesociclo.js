@@ -18,7 +18,7 @@
 // no haya techo sin que el nodo `plan` crezca sin límite.
 
 import { exigenciaDeNivel } from './dificultad';
-import { repartirDia, cargaDeFranja, FRANJAS } from './franjas';
+import { repartirDia, cargaDeFranja, FRANJAS, unidadesQueEntran, esDiaDeIntegracion } from './franjas';
 
 // ── Temas ───────────────────────────────────────────────────
 //
@@ -248,10 +248,22 @@ function ordenarDias(conteo, dias) {
 // solo aparece si la sesión es de al menos tanto" — así 40 minutos dan más
 // bloques que 10, en vez de dar los mismos bloques estirados.
 
+// El día de teoría del camino corto lleva material fresco, y es el único que lo
+// lleva. Sin esto, quien entrena 40 minutos por día NUNCA avanza el currículum:
+// la franja de adquisición no aparece por debajo de 75 y el camino corto no
+// tenía ningún bloque que introdujera unidades nuevas. Quedaba repasando para
+// siempre las mismas cartas del seed.
+//
+// Que entre acá y no en otro lado no es arbitrario: teoría ya era el día de
+// material nuevo, y como el lote se extiende a lo largo de varios días, un
+// bloque de 14 minutos no es un recorrido de mentira — es el mismo recorrido,
+// avanzando dos pasos por vez. Lo que cambia con las horas es el ritmo, no la
+// profundidad.
 const PLANTILLA_DIA = {
   teoria: [
-    { tipo: 'lectura', peso: 0.35 },
-    { tipo: 'flashcards', peso: 0.65, mazo: 'principios' },
+    { tipo: 'adquisicion', peso: 0.4 },
+    { tipo: 'lectura', peso: 0.2, minMinutos: 25 },
+    { tipo: 'flashcards', peso: 0.4, mazo: 'principios' },
   ],
   practica: [
     { tipo: 'flashcards', peso: 0.55, mazo: 'FOCO' },
@@ -462,7 +474,13 @@ function construirDia({ tipoDia, diaIdx, n, nivel, mazoFoco, config, exigencia, 
     return construirDiaLargo({ tipoDia, diaIdx, n, nivel, mazoFoco, exigencia, indiceLlamada, totalLlamadas, franjas });
   }
 
-  const specs = repartirMinutos(plantillaDia(tipoDia, nivel), presupuesto);
+  // El día de integración y el currículum terminado sacan el material fresco
+  // también del camino corto: son las mismas dos razones por las que
+  // `repartirDia` no arma la franja de adquisición.
+  const admiteFresco = hayMaterialFresco && !esDiaDeIntegracion(fecha || new Date(), config.diaIntegracion);
+  const plantilla = plantillaDia(tipoDia, nivel)
+    .filter(s => s.tipo !== 'adquisicion' || admiteFresco);
+  const specs = repartirMinutos(plantilla, presupuesto);
 
   const bloques = specs.map((s, i) => {
     // Prefijo `m` contra los `s1d1b1` del plan v1: cero colisión en `hechos`,
@@ -487,6 +505,11 @@ function construirDia({ tipoDia, diaIdx, n, nivel, mazoFoco, config, exigencia, 
       // mismo, este bloque se convierte en el repaso de ese.
       return { ...base, principioId: null, titulo: 'Leer un principio' };
     }
+    if (s.tipo === 'adquisicion') {
+      // Mismo bloque que en la jornada larga: las unidades las resuelve
+      // `hidratarBloques` y el recorrido lo lleva el lote, que se extiende.
+      return { ...base, maxUnidades: unidadesQueEntran(s.minutos), unidades: null, titulo: 'Material nuevo' };
+    }
     return { ...base, titulo: 'Revisar tus patrones' };
   });
 
@@ -496,14 +519,17 @@ function construirDia({ tipoDia, diaIdx, n, nivel, mazoFoco, config, exigencia, 
   // ya lo consume —PlanHoy, el marcado de hechos, el progreso— siga funcionando
   // sin cambios; `sesiones` es la capa nueva que agrega carga y corte.
   //
-  // Acá no puede haber adquisición: si la hubiera, `construirDia` ya habría
-  // derivado a la jornada larga.
+  // Acá SÍ puede haber adquisición: el día de teoría del camino corto la lleva,
+  // aunque `repartirDia` no haya armado la franja (por eso estamos en este
+  // camino). Por eso la definición se busca en FRANJAS y no en el reparto del
+  // día — si no, la franja quedaba etiquetada con su id crudo y marcada como
+  // material 'disponible' cuando es la única que toca material fresco.
   const sesiones = [];
   for (const b of bloques) {
     const franjaId = b.tipo === 'adquisicion' ? 'adquisicion' : (FRANJA_DE_BLOQUE[b.tipo] || 'consolidacion');
     let s = sesiones.find(x => x.franja === franjaId);
     if (!s) {
-      const def = franjas.find(f => f.franja === franjaId);
+      const def = franjas.find(f => f.franja === franjaId) || FRANJAS.find(f => f.id === franjaId);
       s = {
         id: `m${n}d${diaIdx + 1}s${franjaId}`,
         franja: franjaId,

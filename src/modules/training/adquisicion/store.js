@@ -100,10 +100,15 @@ async function completarPaso(curso, paso, { unidadId = null, progreso = null } =
 
 // Un paso del lote (carga, exposición, codificación): no toca el progreso por
 // unidad, solo avanza el recorrido.
-export async function pasoDelLoteHecho(paso, hoy = todayKey()) {
+//
+// `criterio` lo escribe el paso de carga definida y se guarda en el lote, no en
+// el paso: tiene que seguir a mano tres días después, cuando llega la
+// codificación y hay que contestarlo.
+export async function pasoDelLoteHecho(paso, { criterio = null } = {}, hoy = todayKey()) {
   const curso = await leerCurso(hoy);
   if (!curso) return null;
-  return completarPaso(curso, paso, {}, hoy);
+  const base = criterio ? { ...curso, criterio } : curso;
+  return completarPaso(base, paso, {}, hoy);
 }
 
 // La compuerta. `solapamiento` sale de solapamientoConFuente() sobre el texto

@@ -221,15 +221,30 @@ export function avanceDelLote(pasos = [], hechos = {}) {
 
 // ── Reparto del día ─────────────────────────────────────────
 
-// Cuántas unidades frescas entran en la franja de adquisición. El tope duro es
-// 3: pasado eso no se consolida nada, se acumula. Y cada unidad necesita
-// recorrer los cinco pasos, así que por debajo de ~25 minutos por unidad el
-// recorrido se hace de mentira.
+// Cuántas unidades frescas entran en un lote. El tope duro es 3: pasado eso no
+// se consolida nada, se acumula.
 export const MAX_UNIDADES_FRESCAS = 3;
-const MINUTOS_POR_UNIDAD = 25;
 
-export function unidadesQueEntran(minutos) {
-  return Math.max(1, Math.min(MAX_UNIDADES_FRESCAS, Math.floor(minutos / MINUTOS_POR_UNIDAD)));
+// El lote ya no se mide contra los minutos de UN día —desde que se extiende, esa
+// cuenta no significa nada— sino contra cuántos días queremos tenerlo abierto.
+//
+// Dos es el número, y no es cosmético: mientras el lote está abierto sus
+// unidades siguen en `introducida`, o sea que sus cartas están bloqueadas para
+// recuperación. Un lote de tres unidades en una jornada corta tardaría ocho días
+// en cerrar y durante ocho días ese material no entra a FSRS. Es la diferencia
+// entre "voy despacio" y "no avanzo".
+//
+// Y acá es donde las horas declaradas deciden CÓMO se entrega el material, que
+// es distinto de cuánto se recorta: con más horas el lote es más grande y cierra
+// igual de rápido; con menos, el lote es más chico y el recorrido es el mismo,
+// entero, repartido en más días. Nadie recibe una versión comprimida.
+export const DIAS_PARA_CERRAR_LOTE = 2;
+
+export function unidadesQueEntran(minutosDeLaFranja) {
+  const presupuesto = Math.max(0, minutosDeLaFranja) * DIAS_PARA_CERRAR_LOTE;
+  let n = 1;
+  while (n < MAX_UNIDADES_FRESCAS && minutosDelLote(n + 1) <= presupuesto) n++;
+  return n;
 }
 
 // Carga de cada franja: cerrada, medible, y nunca expresada en tiempo. Es lo

@@ -87,6 +87,16 @@ export default function AcquisicionSession({ bloque, onBack, onDone = null }) {
     }).catch(() => {});
   }, [avance.terminado, cerrado, onDone]);
 
+  // El bloque del día se da por cumplido TAMBIÉN cuando se agota la franja con
+  // el lote a medias. Es la contraparte de `adquisicionCerradaHoy` en la capa de
+  // PlanHoy, que marca por id de bloque: sin esto el bloque queda pendiente para
+  // siempre, "Continuar" sigue apuntando acá y el resto del día no se abre nunca.
+  // Los ids son por día del mesociclo (`m1d3badq`), así que marcar el de hoy no
+  // toca el de mañana.
+  useEffect(() => {
+    if (sinTiempoHoy && onDone) onDone();
+  }, [sinTiempoHoy, onDone]);
+
   if (curso === undefined) {
     return <Shell onBack={onBack}><p style={{ color: 'var(--text-muted)' }}><Loader size={14} className="spin" /> Cargando…</p></Shell>;
   }
@@ -118,6 +128,8 @@ export default function AcquisicionSession({ bloque, onBack, onDone = null }) {
         <Paso
           paso={avance.paso}
           unidad={avance.paso?.unidadIdx != null ? unidades[avance.paso.unidadIdx] : null}
+          todasLasUnidades={unidades}
+          criterio={curso.criterio || null}
           cards={cards}
           umbral={calibracion.umbral}
           observando={!calibracion.listo}
@@ -193,7 +205,7 @@ function LoteCerrado({ resultado, onBack }) {
 
 // ── Los pasos ───────────────────────────────────────────────
 
-function Paso({ paso, unidad, cards, umbral, observando, faltanMuestras, onHecho, onMuestra }) {
+function Paso({ paso, unidad, todasLasUnidades, criterio, cards, umbral, observando, faltanMuestras, onHecho, onMuestra }) {
   if (!paso) return null;
 
   const cabecera = (
@@ -221,13 +233,37 @@ function Paso({ paso, unidad, cards, umbral, observando, faltanMuestras, onHecho
     );
   }
 
+  if (paso.id === 'carga') {
+    return (
+      <div style={panel}>
+        {cabecera}
+        <CargaDefinida paso={paso} unidades={todasLasUnidades} onHecho={onHecho} />
+      </div>
+    );
+  }
+
   return (
     <div style={panel}>
       {cabecera}
       <p style={{ margin: '0 0 1rem', fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>
         {paso.detalle}
       </p>
-      {paso.id === 'exposicion' && unidad && <MaterialDeUnidad unidad={unidad} cards={cards} />}
+      {paso.id === 'exposicion' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1rem' }}>
+          {todasLasUnidades.map(u => <MaterialDeUnidad key={u.id} unidad={u} cards={cards} />)}
+        </div>
+      )}
+      {paso.id === 'codificacion' && criterio && (
+        <div style={{
+          marginBottom: '1rem', padding: '0.7rem 0.85rem', borderRadius: '0.6rem',
+          background: 'rgba(48,209,88,0.08)', border: '1px solid rgba(48,209,88,0.25)',
+        }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+            Lo que dijiste que ibas a poder hacer
+          </div>
+          <div style={{ fontSize: '0.88rem', lineHeight: 1.5 }}>{criterio}</div>
+        </div>
+      )}
       <button
         className="btn btn-primary"
         style={{ width: '100%' }}
@@ -238,9 +274,73 @@ function Paso({ paso, unidad, cards, umbral, observando, faltanMuestras, onHecho
           if (r) onHecho(r);
         }}
       >
-        Listo
+        {paso.id === 'codificacion' ? 'Puedo hacerlo — cerrar el lote' : 'Listo'}
       </button>
     </div>
+  );
+}
+
+// El primer paso no es un trámite: es donde la carga deja de ser tiempo y pasa a
+// ser un criterio verificable. "Estudio dos horas" no se puede cumplir ni
+// incumplir; "puedo explicar por qué la transición va antes del precio" sí. Por
+// eso lo que se escribe acá queda guardado y vuelve al final, en la codificación:
+// si no se puede contestar contra lo escrito, el recorrido no cerró.
+function CargaDefinida({ paso, unidades, onHecho }) {
+  const [criterio, setCriterio] = useState('');
+  const [guardando, setGuardando] = useState(false);
+
+  const guardar = async () => {
+    setGuardando(true);
+    try {
+      const r = await pasoDelLoteHecho(paso, { criterio: criterio.trim() });
+      if (r) onHecho(r);
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  return (
+    <>
+      <p style={{ margin: '0 0 0.9rem', fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>
+        {paso.detalle}
+      </p>
+
+      <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '0.6rem', padding: '0.7rem 0.85rem', marginBottom: '0.9rem' }}>
+        <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+          Entra en este lote
+        </div>
+        {unidades.map(u => (
+          <div key={u.id} style={{ fontSize: '0.87rem', padding: '0.15rem 0' }}>· {u.titulo}</div>
+        ))}
+      </div>
+
+      <label style={{ display: 'block', fontSize: '0.84rem', marginBottom: '0.45rem' }}>
+        ¿Cómo vas a saber que lo entendiste?
+      </label>
+      <textarea
+        value={criterio}
+        onChange={(e) => setCriterio(e.target.value)}
+        rows={3}
+        placeholder="Ej: puedo explicar por qué esta fase va antes que el precio, sin mirar el guion."
+        style={{
+          width: '100%', padding: '0.7rem', borderRadius: '0.6rem', resize: 'vertical',
+          background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.12)',
+          color: 'inherit', font: 'inherit', fontSize: '0.87rem', lineHeight: 1.5,
+        }}
+      />
+      <p style={{ margin: '0.5rem 0 0', fontSize: '0.76rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+        Tiene que poder fallar. Si no se puede contestar que no, no es un criterio.
+      </p>
+
+      <button
+        className="btn btn-primary"
+        style={{ width: '100%', marginTop: '0.9rem' }}
+        disabled={guardando || criterio.trim().length < 10}
+        onClick={guardar}
+      >
+        {guardando ? <><Loader size={14} className="spin" /> Guardando…</> : 'Abrir el material'}
+      </button>
+    </>
   );
 }
 
