@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Loader, Lock, Clock, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Loader, Lock, Clock, AlertTriangle, ClipboardList, BookOpen, PenLine, Lightbulb, Zap, Hand, Sprout } from 'lucide-react';
 import { subscribeList } from '../db';
 import { unidadPorId } from '../plan/curriculum';
 import { avanceDelLote, pasosQueEntran, adquisicionCerradaHoy } from '../plan/franjas';
 import { solapamientoConFuente } from '../audit/metrics';
 import { calibrarUmbral, SOLAPAMIENTO_OK, SOLAPAMIENTO_ADVERTENCIA } from '../plan/consolidacion';
+import { panel, ACENTO, degradeProgreso, CSS_INTERACCION } from '../ui';
 import {
   leerCurso, abrirLote, pasoDelLoteHecho, guardarDescomposicion, guardarFeynman,
   cerrarLote, muestrasDeSolapamiento, pasosDeCurso,
@@ -24,13 +25,15 @@ import {
 // · el estado por unidad y sus compuertas son de `consolidacion.js`
 // · cuándo arranca el reloj de consolidación lo decide `cerrarLote`
 
-const panel = {
-  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '0.9rem', padding: '1.1rem 1.2rem',
-};
-
+// Un icono por paso. El recorrido es siempre el mismo, así que el icono es lo
+// que te dice dónde estás sin tener que leer el título — sobre todo cuando
+// retomás un lote tres días después.
 const ICONO = {
-  carga: '📋', exposicion: '📖', descomposicion: '✍️', feynman: '💡', codificacion: '⚡',
+  carga: ClipboardList,
+  exposicion: BookOpen,
+  descomposicion: PenLine,
+  feynman: Lightbulb,
+  codificacion: Zap,
 };
 
 export default function AcquisicionSession({ bloque, onBack, onDone = null }) {
@@ -157,7 +160,7 @@ function Cabecera({ avance, hoy, unidades }) {
         {unidades.map(u => u.titulo).join(' · ')}
       </div>
       <div style={{ height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg,#30d158,#06b6d4)' }} />
+        <div style={{ width: `${pct}%`, height: '100%', background: degradeProgreso }} />
       </div>
       <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', gap: '0.9rem', flexWrap: 'wrap' }}>
         <span>{avance.hechos} de {avance.total} pasos</span>
@@ -172,7 +175,7 @@ function Cabecera({ avance, hoy, unidades }) {
 function CorteDelDia({ avance, onBack }) {
   return (
     <div style={{ ...panel, borderColor: 'rgba(48,209,88,0.35)' }}>
-      <div style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>✋</div>
+      <Hand size={26} color={ACENTO.progreso} strokeWidth={2} style={{ marginBottom: '0.5rem' }} />
       <p style={{ fontWeight: 700, margin: '0 0 0.45rem' }}>Hasta acá el material nuevo de hoy.</p>
       <p style={{ margin: '0 0 0.9rem', fontSize: '0.86rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>
         Quedan {avance.total - avance.hechos} pasos del lote y los vas a retomar mañana, donde los
@@ -189,7 +192,7 @@ function LoteCerrado({ resultado, onBack }) {
   return (
     <Shell onBack={onBack} title="Lote cerrado">
       <div style={{ ...panel, textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🌱</div>
+        <Sprout size={30} color={ACENTO.progreso} strokeWidth={2} style={{ marginBottom: '0.5rem' }} />
         <p style={{ fontWeight: 700, margin: '0 0 0.45rem' }}>
           {n === 1 ? 'Unidad introducida' : `${n} unidades introducidas`}
         </p>
@@ -482,6 +485,7 @@ function Rechazo({ proporcion, tramos, umbral }) {
 function Shell({ onBack, title, children }) {
   return (
     <div style={{ maxWidth: '640px', margin: '0 auto', padding: '1rem 1.1rem 2.5rem' }}>
+      <style>{CSS_INTERACCION}</style>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '1rem' }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '0.3rem', display: 'flex' }}>
           <ArrowLeft size={18} />

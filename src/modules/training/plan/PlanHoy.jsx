@@ -1,5 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Check, ChevronDown, ChevronRight, Play, Lock, CalendarCheck, Sparkles, Trophy, TrendingUp, Flag } from 'lucide-react';
+import {
+  Check, ChevronDown, ChevronRight, Play, CalendarCheck, Sparkles, Trophy,
+  TrendingUp, Flag, Layers, Headphones, BookOpen, PenLine, Package, Target, Mic,
+  Sprout, Compass, Circle,
+} from 'lucide-react';
 import { getNode, setNode, logActivity, todayKey } from '../db';
 import { hidratarBloques, diaActual, progreso, planTerminado } from './generator';
 import { marcarBloqueHecho, cerrarDia, continuarConBloques } from './store';
@@ -9,6 +13,7 @@ import CheckinSemanal from './CheckinSemanal';
 import { recordatorioDeHoy, recordatorioDeNivel } from '../identidad/continuidad';
 import Recordatorio, { RecordatorioDeNivel } from '../identidad/Recordatorio';
 import { marcarCheckManana, marcarCheckNoche, responderDossier } from '../identidad/store';
+import { panel, surface, ACENTO, degradeProgreso, transicion, TOQUE_MIN, CSS_INTERACCION } from '../ui';
 
 // Vista "Hoy": el día del plan como una lista lineal. La regla de diseño es que
 // nunca haya más de una decisión en pantalla — hay un solo botón que importa
@@ -23,15 +28,40 @@ import { marcarCheckManana, marcarCheckNoche, responderDossier } from '../identi
 // esas pantallas ocupan toda la vista. Los livianos —leer un principio, revisar
 // patrones, el check de identidad, cerrar el día— se resuelven acá mismo.
 
-const panel = {
-  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '0.9rem', padding: '1.1rem 1.2rem',
+// Iconos por tipo de bloque. Eran emoji, y el emoji como icono es lo primero
+// que delata una interfaz sin terminar: cada plataforma lo dibuja distinto, no
+// hereda el color del texto y no escala con el tipo. Estos son del mismo set que
+// el resto de la app.
+const ICONO_TIPO = {
+  flashcards: Layers,
+  roleplay: Headphones,
+  lectura: BookOpen,
+  revision: TrendingUp,
+  cierre: PenLine,
+  kb: Package,
+  'identidad-manana': Target,
+  'roleplay-voz': Mic,
+  adquisicion: Sprout,
+  dossier: Compass,
 };
 
-const ICONO_TIPO = {
-  flashcards: '🗂', roleplay: '🎧', lectura: '📖', revision: '📈', cierre: '✍️', kb: '📦',
-  'identidad-manana': '🎯', 'roleplay-voz': '🎤', adquisicion: '🌱', dossier: '🧭',
+// Cada bloque se lee por color además de por forma: el tipo de trabajo se
+// reconoce de un vistazo sin tener que leer el título.
+const COLOR_TIPO = {
+  adquisicion: ACENTO.progreso,
+  flashcards: ACENTO.frio,
+  roleplay: ACENTO.atencion,
+  'roleplay-voz': ACENTO.atencion,
+  lectura: ACENTO.frio,
+  revision: ACENTO.foco,
+  dossier: ACENTO.foco,
+  'identidad-manana': ACENTO.progreso,
 };
+
+function IconoBloque({ tipo, size = 15 }) {
+  const Cmp = ICONO_TIPO[tipo] || Circle;
+  return <Cmp size={size} color={COLOR_TIPO[tipo] || 'var(--text-muted)'} strokeWidth={2.2} />;
+}
 
 export default function PlanHoy({ plan, estado, ctx, onLanzar, onLanzarVoz, onIrA }) {
   const [expandido, setExpandido] = useState(null);
@@ -123,11 +153,15 @@ export default function PlanHoy({ plan, estado, ctx, onLanzar, onLanzarVoz, onIr
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+      {/* Hover, focus-visible y active no se pueden expresar inline. Se inyectan
+          una vez acá en vez de reescribir el módulo entero a clases. */}
+      <style>{CSS_INTERACCION}</style>
+
       {/* Encabezado: dónde estás parado. El rango va primero porque es lo que se
           gana; el número de bloque es contexto. */}
       <div style={{ ...panel, padding: '0.9rem 1.1rem' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#30d158' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: ACENTO.progreso }}>
             {bloque.rango.nombre} · Bloque {bloque.n}
           </span>
           <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -144,7 +178,7 @@ export default function PlanHoy({ plan, estado, ctx, onLanzar, onLanzarVoz, onIr
         </div>
         <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>{bloque.objetivo}</p>
         <div style={{ marginTop: '0.8rem', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-          <div style={{ width: `${prog.pct}%`, height: '100%', background: 'linear-gradient(90deg,#30d158,#06b6d4)' }} />
+          <div style={{ width: `${prog.pct}%`, height: '100%', background: degradeProgreso }} />
         </div>
       </div>
 
@@ -393,33 +427,47 @@ function BloqueFila({ bloque, hecho, esSiguiente, expandido, fecha, identidad, o
 
   return (
     <div style={{
-      ...panel, padding: 0, overflow: 'hidden',
-      borderColor: hecho ? 'rgba(255,255,255,0.06)' : activo ? 'rgba(48,209,88,0.45)' : 'rgba(255,255,255,0.08)',
-      background: activo ? 'rgba(48,209,88,0.07)' : 'rgba(255,255,255,0.03)',
-      opacity: hecho ? 0.55 : 1,
+      // El bloque activo es el ÚNICO elevado de la pantalla. Si se elevaran
+      // todos, ninguno lo estaría: la jerarquía es lo que hace que "Continuar"
+      // no necesite explicación.
+      ...(activo ? surface.raised : surface.sunken), padding: 0, overflow: 'hidden',
+      borderColor: hecho ? 'rgba(255,255,255,0.06)' : activo ? 'rgba(48,209,88,0.45)' : 'rgba(255,255,255,0.07)',
+      opacity: hecho ? 0.5 : 1,
+      transition: transicion('opacity, border-color, background-color'),
     }}>
-      <div
+      <button
+        type="button"
+        className={hecho ? undefined : 'tr-fila'}
+        disabled={hecho}
+        aria-expanded={inline && !hecho ? !!expandido : undefined}
         onClick={() => (hecho ? null : inline ? onToggle() : onLanzar())}
         style={{
-          display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.75rem 1rem',
+          display: 'flex', alignItems: 'center', gap: '0.7rem', width: '100%',
+          padding: '0.7rem 1rem', minHeight: `${TOQUE_MIN}px`, textAlign: 'left',
+          background: 'transparent', border: 'none', font: 'inherit', color: 'inherit',
           cursor: hecho ? 'default' : 'pointer',
         }}
       >
         <div style={{
-          width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem',
-          border: `1.5px solid ${hecho ? '#30d158' : activo ? '#30d158' : 'rgba(255,255,255,0.2)'}`,
-          background: hecho ? 'rgba(48,209,88,0.2)' : 'transparent',
+          width: '26px', height: '26px', borderRadius: '50%', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: `1.5px solid ${hecho ? ACENTO.progreso : activo ? ACENTO.progreso : 'rgba(255,255,255,0.18)'}`,
+          background: hecho ? 'rgba(48,209,88,0.18)' : activo ? 'rgba(48,209,88,0.12)' : 'transparent',
+          transition: transicion(),
         }}>
-          {hecho ? <Check size={13} color="#30d158" /> : activo ? <Play size={10} color="#30d158" /> : <Lock size={10} color="rgba(255,255,255,0.3)" />}
+          {hecho ? <Check size={14} color={ACENTO.progreso} strokeWidth={2.6} />
+            : activo ? <Play size={11} color={ACENTO.progreso} fill={ACENTO.progreso} />
+            : <IconoBloque tipo={bloque.tipo} size={13} />}
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             fontWeight: activo ? 700 : 600, fontSize: '0.9rem',
             textDecoration: hecho ? 'line-through' : 'none',
+            display: 'flex', alignItems: 'center', gap: '0.4rem',
           }}>
-            {ICONO_TIPO[bloque.tipo]} {bloque.titulo}
+            {!hecho && !activo && null}
+            {bloque.titulo}
           </div>
           <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.12rem' }}>
             {bloque.minutos} min
@@ -453,7 +501,7 @@ function BloqueFila({ bloque, hecho, esSiguiente, expandido, fecha, identidad, o
         </div>
 
         {!hecho && inline && (expandido ? <ChevronDown size={15} color="var(--text-muted)" /> : <ChevronRight size={15} color="var(--text-muted)" />)}
-      </div>
+      </button>
 
       {expandido && !hecho && (
         <div style={{ padding: '0 1rem 1rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>

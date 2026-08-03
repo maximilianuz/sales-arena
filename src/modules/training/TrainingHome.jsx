@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Flame, BookOpen, Layers, ClipboardList, Loader, Download, GraduationCap, MessageSquare, TrendingUp, Target, RotateCcw, Compass, X } from 'lucide-react';
+import { ArrowLeft, Flame, BookOpen, Layers, ClipboardList, Loader, Download, GraduationCap, MessageSquare, TrendingUp, Target, RotateCcw, Compass, X, Lock, Package } from 'lucide-react';
 import { subscribeList, subscribeNode, setNode, getNode, computeStreak, todayKey } from './db';
 import { auth } from '../../utils/db';
 import { subscribeToAuthState } from '../../utils/auth';
@@ -18,15 +18,11 @@ import IdentidadOnboarding from './identidad/IdentidadOnboarding';
 import PanelVisionario from './identidad/PanelVisionario';
 import AcquisicionSession from './adquisicion/AcquisicionSession';
 import { NODO as NODO_ADQUISICION } from './adquisicion/store';
+import { panel, ACENTO, CSS_INTERACCION, TOQUE_MIN } from './ui';
 
 // Hub del módulo de entrenamiento de closing high ticket. Accesible desde
 // Trabajo Individual y desde Practicar Solo. Todo el contenido vive en
 // users/{uid}/training — acá solo hay estructura y navegación.
-
-const panel = {
-  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '0.9rem', padding: '1.1rem 1.2rem',
-};
 
 const NAV = [
   { id: 'hoy', label: 'Hoy', icon: <Target size={15} /> },
@@ -61,7 +57,7 @@ function AccesoDenegado({ onBack }) {
   return (
     <Page onBack={onBack} header={<h2 style={{ margin: 0, fontSize: '1.15rem' }}>Entrenamiento Closer</h2>}>
       <div style={{ ...panel, textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem', marginBottom: '0.6rem' }}>🔒</div>
+        <Lock size={30} color={ACENTO.atencion} strokeWidth={2} style={{ marginBottom: '0.6rem' }} />
         <p style={{ fontWeight: 700, margin: '0 0 0.4rem' }}>Acceso restringido</p>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1rem', lineHeight: 1.55 }}>
           El Entrenamiento Closer se habilita por usuario. Pedí acceso por email y te validamos.
@@ -241,7 +237,7 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
 
       {seeded === false && (
         <div style={{ ...panel, textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '0.6rem' }}>📦</div>
+          <Package size={30} color={ACENTO.frio} strokeWidth={2} style={{ marginBottom: '0.6rem' }} />
           <p style={{ fontWeight: 700, margin: '0 0 0.4rem' }}>Importar contenido inicial</p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1rem', lineHeight: 1.5 }}>
             70 flashcards en 4 mazos, 15 principios, la oferta "Método Reinicio" con su guion
@@ -258,13 +254,21 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
         <>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1.1rem' }}>
             {NAV.map(n => (
-              <button key={n.id} onClick={() => setView(n.id)} style={{
-                display: 'flex', alignItems: 'center', gap: '0.4rem',
-                padding: '0.45rem 0.9rem', borderRadius: '2rem', cursor: 'pointer', font: 'inherit',
-                fontSize: '0.82rem', fontWeight: 700, border: '1px solid rgba(255,255,255,0.12)',
-                background: view === n.id ? 'linear-gradient(135deg,#30d158,#06b6d4)' : 'rgba(255,255,255,0.04)',
-                color: view === n.id ? '#04241a' : 'var(--text-muted)',
-              }}>{n.icon}{n.label}</button>
+              <button
+                key={n.id}
+                className="tr-int"
+                onClick={() => setView(n.id)}
+                aria-current={view === n.id ? 'page' : undefined}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  // 44px de alto: abajo de eso se falla el toque en el celular,
+                  // que es donde se entrena.
+                  padding: '0.5rem 0.95rem', minHeight: `${TOQUE_MIN}px`,
+                  borderRadius: '2rem', cursor: 'pointer', font: 'inherit',
+                  fontSize: '0.82rem', fontWeight: 700, border: '1px solid rgba(255,255,255,0.12)',
+                  background: view === n.id ? 'linear-gradient(135deg,#30d158,#06b6d4)' : 'rgba(255,255,255,0.04)',
+                  color: view === n.id ? '#04241a' : 'var(--text-muted)',
+                }}>{n.icon}{n.label}</button>
             ))}
           </div>
 
@@ -661,6 +665,8 @@ function FullScreen({ children }) {
 
 function Page({ onBack, header, children }) {
   return (
+    <>
+    <style>{CSS_INTERACCION}</style>
     <div className="app-container" style={{ alignItems: 'stretch', overflowY: 'auto' }}>
       <div style={{ width: '100%', maxWidth: '720px', margin: '0 auto', padding: '1.2rem 1rem 3rem', boxSizing: 'border-box' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '1.1rem' }}>
@@ -670,5 +676,6 @@ function Page({ onBack, header, children }) {
         {children}
       </div>
     </div>
+    </>
   );
 }

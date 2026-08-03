@@ -5,6 +5,7 @@ import { subscribeList, subscribeNode, setItem, logActivity } from '../db';
 import { review, dueCards } from '../srs/fsrs';
 import { DECKS } from '../seedImport';
 import { cartasBloqueadas } from '../plan/consolidacion';
+import { panel, surface, CSS_INTERACCION, TOQUE_MIN } from '../ui';
 
 // Sesión de repaso con FSRS. Cartas clásicas: frente → respondés EN VOZ ALTA →
 // dorso + por qué + autocalificación. Cartas Feynman: escribís tu explicación,
@@ -21,11 +22,6 @@ const RATINGS = [
   { value: 3, label: 'Bien', color: '48,209,88' },
   { value: 4, label: 'Fácil', color: '34,211,238' },
 ];
-
-const panel = {
-  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '0.9rem', padding: '1.1rem 1.2rem',
-};
 
 // `limite` lo pone el plan: un bloque de 8 minutos no debería abrir 40 cartas.
 // `onDone` avisa que el bloque quedó cumplido — se dispara al repasar al menos
@@ -229,7 +225,7 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
   return (
     <Shell onBack={onBack} title={deckName} progress={`${done} hechas · ${Math.max(0, queue.length - idx)} en cola`}>
       {/* FRENTE */}
-      <div style={{ ...panel, marginBottom: '0.8rem' }}>
+      <div style={{ ...surface.raised, padding: '1.2rem 1.3rem', marginBottom: '0.8rem' }}>
         <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
           {DECKS.find(d => d.id === carta.mazo)?.nombre || carta.mazo}{isFeynman ? ' · Modo Feynman' : ''}
         </div>
@@ -342,9 +338,9 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
             {RATINGS.map(r => {
               const suggested = evalResult?.ratingSugerido === r.value;
               return (
-                <button key={r.value} onClick={() => rate(r.value)} style={{
+                <button key={r.value} className="tr-int" onClick={() => rate(r.value)} style={{
                   padding: '0.65rem 0.3rem', borderRadius: '0.65rem', cursor: 'pointer', font: 'inherit',
-                  fontSize: '0.8rem', fontWeight: 700,
+                  minHeight: `${TOQUE_MIN}px`, fontSize: '0.8rem', fontWeight: 700,
                   border: `1px solid rgba(${r.color},${suggested ? 0.9 : 0.35})`,
                   background: suggested ? `rgba(${r.color},0.25)` : `rgba(${r.color},0.08)`,
                   color: `rgb(${r.color})`,
@@ -363,6 +359,8 @@ function SessionRunner({ deckName, pool, srsMap, bloqueadas, principiosMap, onBa
 
 function Shell({ onBack, title, progress, children }) {
   return (
+    <>
+    <style>{CSS_INTERACCION}</style>
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', marginBottom: '1rem' }}>
         <button className="btn btn-outline" onClick={onBack} style={{ padding: '0.4rem 0.7rem' }}><ArrowLeft size={15} /></button>
@@ -371,5 +369,6 @@ function Shell({ onBack, title, progress, children }) {
       </div>
       {children}
     </div>
+    </>
   );
 }
