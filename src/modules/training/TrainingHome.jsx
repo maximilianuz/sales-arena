@@ -333,7 +333,12 @@ export default function TrainingHome({ onBack, onPracticaVoz }) {
                       </div>
                     </div>
                     <button className="btn btn-outline" disabled={pendientes === 0} onClick={() => setStudyDeck(d.id)} style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
-                      {pendientes === 0 ? 'Al día ✓' : `Practicar (${pendientes})`}
+                      {/* "Al día" y "todo en pausa" son cosas OPUESTAS y el botón las
+                          decía igual: con las 159 cartas bloqueadas por consolidación
+                          mostraba "Al día ✓", lo contrario de lo que estaba pasando. */}
+                      {pendientes > 0
+                        ? `Practicar (${pendientes})`
+                        : st.enPausa > 0 ? 'En pausa' : 'Al día'}
                     </button>
                   </div>
                 );

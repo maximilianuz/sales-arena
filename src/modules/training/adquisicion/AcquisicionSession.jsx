@@ -36,6 +36,24 @@ const ICONO = {
   codificacion: Zap,
 };
 
+// Renderizar {ICONO[paso.id]} directo pasaba el COMPONENTE como hijo y React
+// tiraba el error #31 (objeto con $$typeof/render). Quedó del pase de diseño,
+// cuando ICONO dejó de tener emoji y pasó a tener componentes de lucide.
+function IconoPaso({ paso, size = 17 }) {
+  const Cmp = ICONO[paso.id];
+  if (!Cmp) return null;
+  return (
+    <span style={{
+      width: '34px', height: '34px', flexShrink: 0, borderRadius: '0.6rem',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: paso.compuerta ? 'rgba(255,159,10,0.12)' : 'rgba(48,209,88,0.12)',
+      border: `1px solid ${paso.compuerta ? 'rgba(255,159,10,0.3)' : 'rgba(48,209,88,0.28)'}`,
+    }}>
+      <Cmp size={size} color={paso.compuerta ? ACENTO.atencion : ACENTO.progreso} strokeWidth={2.2} />
+    </span>
+  );
+}
+
 export default function AcquisicionSession({ bloque, onBack, onDone = null }) {
   const [curso, setCurso] = useState(undefined); // undefined = cargando
   const [cards, setCards] = useState([]);
@@ -213,7 +231,7 @@ function Paso({ paso, unidad, todasLasUnidades, criterio, cards, umbral, observa
 
   const cabecera = (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.7rem', marginBottom: '0.8rem' }}>
-      <span style={{ fontSize: '1.35rem', lineHeight: 1 }}>{ICONO[paso.id]}</span>
+        <IconoPaso paso={paso} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 700, fontSize: '0.98rem' }}>{paso.titulo}</div>
         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>

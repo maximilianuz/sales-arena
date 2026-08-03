@@ -13,6 +13,8 @@ import guionPropio from '../../../content/seed/oferta.guion-propio.json';
 import ofertaSeed from '../../../content/seed/oferta.metodo-reinicio.json';
 import perfilesProspecto from '../../../content/seed/perfiles-prospecto.json';
 import { bulkWrite, getNode, setNode } from './db';
+import { UNIDADES } from './plan/curriculum';
+import { otorgarUnidadBase } from './plan/consolidacion';
 
 // El orden importa: es el orden en que se muestran en Practicar, y también el
 // orden en que conviene aprenderlos. Guion primero porque es el esqueleto donde
@@ -30,6 +32,10 @@ export const DECKS = [
 export async function isSeeded() {
   return !!(await getNode('meta/seededAt'));
 }
+
+// Qué semana del currículum se otorga al importar. Es 1 porque esas 11 unidades
+// no tienen prerrequisitos fuera de su propio grupo: darlas no saltea orden.
+const SEMANA_BASE = 1;
 
 export async function importSeed() {
   const entries = {};
@@ -62,6 +68,20 @@ export async function importSeed() {
   for (const perfil of perfilesProspecto.perfiles) {
     const { id, ...rest } = perfil;
     entries[`kb/perfiles/${id}`] = rest;
+  }
+
+  // Las unidades base quedan disponibles desde el arranque. Sin esto, con la
+  // compuerta de consolidación encendida, el día 1 muestra los seis mazos en
+  // pausa y no hay nada que practicar hasta cerrar el primer lote — dos o tres
+  // días con la pantalla vacía. Ver `otorgarUnidadBase`.
+  //
+  // No se pisan las que ya tengan progreso: re-importar el seed no puede
+  // borrar lo que la persona hizo.
+  const previo = (await getNode('progresoUnidad')) || {};
+  const ahora = Date.now();
+  for (const u of UNIDADES.filter(x => x.semana === SEMANA_BASE)) {
+    if (previo[u.id]?.introducidaAt) continue;
+    entries[`progresoUnidad/${u.id}`] = otorgarUnidadBase(u.id, ahora);
   }
 
   await bulkWrite(entries);
