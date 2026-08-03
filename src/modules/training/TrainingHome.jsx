@@ -651,6 +651,16 @@ function AvisoIdentidad({ onEmpezar, onCerrar }) {
 // Estado vacío de "Hoy": lo primero que ve alguien que recién importó el
 // contenido. La promesa tiene que ser concreta —seis preguntas, un plan— o el
 // botón se lee como otro menú más.
+//
+// El texto decía "cuatro semanas". Era copia de la v1 que sobrevivió a la
+// migración a mesociclos: hoy el bloque se mide en SESIONES —max(9, días×3)—,
+// se cierra por rendimiento y no por calendario, se PRORROGA si no alcanzaste
+// los criterios, y al cerrarse nace el siguiente. No hay techo.
+//
+// Prometer cuatro semanas era peor que impreciso. A quien entrena tres días por
+// semana el primer bloque le lleva tres semanas de calendario; a quien falta una
+// semana, cuatro o cinco. Con esa promesa, esa persona cree que se atrasó cuando
+// en realidad el sistema está haciendo exactamente lo que debe.
 function SinPlan({ onEmpezar }) {
   return (
     <div style={{ ...panel, textAlign: 'center' }}>
@@ -659,7 +669,8 @@ function SinPlan({ onEmpezar }) {
       <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1.2rem', lineHeight: 1.6 }}>
         Seis preguntas y listo. Después, cada vez que entres vas a ver <strong>qué te toca hoy</strong> y
         un solo botón para arrancar — sin elegir mazo, sin elegir prospecto, sin decidir nada.
-        Cuatro semanas, ajustadas a los días y minutos que tengas de verdad.
+        El plan <strong>no tiene fecha de fin</strong>: avanza con las sesiones que hacés,
+        no con el calendario. Si una semana no podés, no perdés nada — retomás donde quedaste.
       </p>
       <button className="btn btn-primary" onClick={onEmpezar}>Responder las 6 preguntas</button>
     </div>
