@@ -18,3 +18,16 @@ export const GROUP_ONLY_MODE = false;
 //   suscripción y la pantalla de pagos se reactivan). Ningún código de pagos se
 //   borró: solo se saltea con este flag.
 export const FREE_ACCESS_MODE = true;
+
+// TRAINING_MODULE_ENABLED = false → Oculta el botón "Entrenamiento Closer" del
+//   Lobby. El módulo Training (currículum, sesiones de adquisición, roleplay
+//   de práctica) llama a las MISMAS API keys de NVIDIA/Groq que usa la
+//   generación de escenarios de Sales Arena (netlify/functions/lib/llm.js) —
+//   con ambos activos compiten por la misma cuota compartida y gatillan el
+//   cartel de "servicio de IA saturado" más seguido.
+//
+//   Mientras no se use el módulo Training, se apaga acá para dejar toda la
+//   cuota disponible para Práctica Solo / generación de escenarios. Nada del
+//   código de Training se borró: poné esto en true para reactivarlo (o
+//   conseguí API keys separadas para Training y reactivalo sin este problema).
+export const TRAINING_MODULE_ENABLED = false;
