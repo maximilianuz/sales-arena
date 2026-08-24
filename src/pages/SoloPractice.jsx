@@ -93,6 +93,8 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
   const isEn = i18n.language?.startsWith('en');
 
   const [phase, setPhase] = useState('intro'); // intro | loading | live | ended
+  // Fase de la generación del escenario: 'lead' (llamada 1) | 'oferta' (llamada 2).
+  const [genPhase, setGenPhase] = useState('lead');
   const [scenario, setScenario] = useState(null);
   const [state, setState] = useState(initialBuyerState());
   const [messages, setMessages] = useState([]); // {role, content}
@@ -343,6 +345,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
 
   const start = async () => {
     setPhase('loading');
+    setGenPhase('lead');
     setError('');
     try {
       // Reusamos el generador de escenarios del room (personalidad DISC incluida)
@@ -354,7 +357,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
         theme: genConfig.theme,
         leadTemperature: genConfig.leadTemperature,
         targetObjection: genConfig.targetObjection,
-      }, stagesList, i18n.language, { soloMode: true });
+      }, stagesList, i18n.language, { soloMode: true, onProgress: setGenPhase });
       if (!sc || typeof sc !== 'object') throw new Error(isEn ? 'Could not generate the buyer.' : 'No se pudo generar el comprador.');
       setScenario(sc);
 
@@ -819,7 +822,9 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
             {error && <p style={{ color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '1rem' }}>{error}</p>}
             <button className="btn btn-primary btn-large" onClick={start} disabled={phase === 'loading'} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
               {phase === 'loading'
-                ? <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> {mode === 'lead' ? (isEn ? 'Generating your character...' : 'Generando tu personaje...') : mode === 'observer' ? (isEn ? 'Setting up the match...' : 'Armando el partido...') : (isEn ? 'Generating buyer...' : 'Generando comprador...')}</>
+                ? <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> {genPhase === 'oferta'
+                    ? (isEn ? 'Designing the offer & objections...' : 'Diseñando la oferta y las objeciones...')
+                    : (mode === 'lead' ? (isEn ? 'Generating your character...' : 'Generando tu personaje...') : mode === 'observer' ? (isEn ? 'Setting up the match...' : 'Armando el partido...') : (isEn ? 'Generating buyer...' : 'Generando comprador...'))}</>
                 : <><Phone size={18} /> {mode === 'lead' ? (isEn ? 'Take the call' : 'Recibir la llamada') : mode === 'observer' ? (isEn ? 'Watch the match' : 'Ver el partido') : (isEn ? 'Start the call' : 'Iniciar la llamada')}</>}
             </button>
           </div>

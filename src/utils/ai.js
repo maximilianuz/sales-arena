@@ -1,5 +1,5 @@
 import { OBJECTIONS_THEORY_GENERAL, OBJECTIONS_DICTIONARY } from './objectionsKnowledgeBase';
-import { getFullScenarioPrompt } from './prompts/fullScenarioPrompt';
+import { getLeadPrompt, getOfferPrompt } from './prompts/fullScenarioPrompt';
 import { auth } from './db';
 import { logError } from './telemetry';
 import { randomPersonality, personalityView } from './leadPersonalities';
@@ -89,6 +89,10 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
         throw new Error("La IA tardó demasiado en responder. Intentá de nuevo — si persiste, probá en unos minutos.");
       }
       if (response.status === 429) {
+        // El servidor manda el detalle real del fallo de cada proveedor en
+        // `detail` (nombre + causa: timeout/status). Lo logueamos para poder
+        // diagnosticar: el mensaje de UI es genérico a propósito.
+        if (errorData?.detail) console.error("AI providers detail:", errorData.detail);
         throw new Error("El servicio de IA está saturado en este momento. Esperá unos segundos y volvé a intentar.");
       }
       throw new Error(errorData?.error?.message || errorData?.error || errorData?.message || "Error en la API");
@@ -134,7 +138,7 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
   }
 }
 
-export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language, { soloMode = false } = {}) {
+export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language, { soloMode = false, onProgress = () => {} } = {}) {
   const lang = language && typeof language === 'string' ? (language.startsWith('en') ? 'en' : 'es') : 'es';
   const activeStages = stages && stages.length > 0 ? stages : [
     { id: 'apertura', label: 'Apertura', baseQuestions: 'Romper hielo', baseObjections: '' }
@@ -150,9 +154,13 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     specificObjectionFramework = OBJECTIONS_DICTIONARY[selectedObjectionKey] || '';
   }
 
-  // UNA sola llamada consolidada (antes eran 3). Baja el consumo de tokens de
-  // ~7500 a ~2700 (bajo el límite de 6000 TPM de Groq free tier), evita el rate
-  // limit y reduce la latencia ~3x (mitiga los 504 de Netlify).
+  // DOS llamadas secuenciales (antes: una sola de ~3000 tokens de salida, que no
+  // entraba en el corte duro de 10s de Netlify y siempre terminaba en 429).
+  // Cada llamada es su propia invocación de la función → presupuesto de ~9s
+  // independiente, y ninguna tiene que producir más de ~1500 tokens.
+  // El input NO se duplica (que fue el motivo de consolidar en su momento, por el
+  // TPM de Groq free tier): la 2ª llamada NO repite el andamiaje psicológico,
+  // recibe un resumen COMPACTO del lead ya generado.
   // Personalidad del lead (DISC): la elegimos acá y la estampamos en el escenario
   // (no confiamos en que el modelo la eche). El prompt hace que el lead la encarne.
   const personality = randomPersonality();
@@ -162,46 +170,88 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
   // Producto real del dueño (si lo configuró): el lead se genera para venderle ESTO.
   const realProduct = config.realProduct && config.realProduct.name ? config.realProduct : null;
 
-  const fullPrompt = getFullScenarioPrompt({
+  // ── Llamada 1: el lead (personaje + psicología) ────────────────────────────
+  onProgress('lead');
+  const leadPrompt = getLeadPrompt({
     level: config.level,
     theme: config.theme,
     leadTemperature: config.leadTemperature,
     targetObjection: selectedObjectionKey,
-    specificObjectionFramework,
-    activeStages,
     language: lang,
     personalityHint,
     realProduct
   });
-
-  // 3000 tokens de salida acomoda los campos nuevos (behavioralCues, decisionStyle,
-  // triggerEvent, rootCauses) sin acercarse al límite de 6000 TPM.
-  const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 3000, soloMode);
-  if (scenario && typeof scenario === 'object') {
-    scenario.personality = personality.id;
-    // Guardamos la dificultad/temperatura elegidas: el scoring las usa para
-    // escalar la recompensa (cerrar un lead hostil vale más que uno amigable).
-    scenario.level = config.level || null;
-    scenario.leadTemperature = config.leadTemperature || null;
-    // Si hay producto real, lo estampamos EXACTO (no dependemos del modelo) con
-    // el mismo shape estructurado que el producto generado por IA.
-    if (realProduct) {
-      scenario.productName = realProduct.name;
-      scenario.differentiator = realProduct.description;
-      scenario.includes = [];
-      scenario.outcome = '';
-      const p = parseInt(realProduct.price, 10);
-      if (p > 0) scenario.price = p;
-    }
-    // Campos de compatibilidad: `productToSell` (string legible, lo consumen los
-    // prompts de comprador/vendedor IA y el panel editable del Trainer) y
-    // `productPrice` (lo consume el scoring). Se derivan de los campos
-    // estructurados (productName/differentiator/includes/outcome/price) para no
-    // tener que tocar cada consumidor existente.
-    scenario.productPrice = Number.isFinite(scenario.price) ? scenario.price : (parseInt(scenario.price, 10) || null);
-    scenario.productToSell = buildProductBrief(scenario, lang === 'en');
+  const lead = await makeAIPromptCall(leadPrompt, apiKey, apiUrl, apiModel, 2, 1600, soloMode);
+  if (!lead || typeof lead !== 'object') {
+    throw new Error("No se pudo generar el perfil del lead. Probá de nuevo en unos segundos.");
   }
+
+  // ── Llamada 2: la oferta y las objeciones ──────────────────────────────────
+  // Ve al lead concreto (resumen compacto), así producto y objeciones salen
+  // coherentes con él en vez de todo inventado de un tiro.
+  onProgress('oferta');
+  const offerPrompt = getOfferPrompt({
+    leadSummary: buildLeadSummary(lead, lang === 'en'),
+    level: config.level,
+    targetObjection: selectedObjectionKey,
+    specificObjectionFramework,
+    activeStages,
+    language: lang,
+    realProduct
+  });
+  const offer = await makeAIPromptCall(offerPrompt, apiKey, apiUrl, apiModel, 2, 1600, soloMode);
+  if (!offer || typeof offer !== 'object') {
+    throw new Error("No se pudo generar la oferta y las objeciones. Probá de nuevo en unos segundos.");
+  }
+
+  // Contrato de salida IDÉNTICO al de la llamada única: mismo objeto, mismos
+  // campos, mismos derivados. Nada aguas abajo se entera del cambio.
+  const scenario = { ...lead, ...offer };
+  scenario.personality = personality.id;
+  // Guardamos la dificultad/temperatura elegidas: el scoring las usa para
+  // escalar la recompensa (cerrar un lead hostil vale más que uno amigable).
+  scenario.level = config.level || null;
+  scenario.leadTemperature = config.leadTemperature || null;
+  // Si hay producto real, lo estampamos EXACTO (no dependemos del modelo) con
+  // el mismo shape estructurado que el producto generado por IA.
+  if (realProduct) {
+    scenario.productName = realProduct.name;
+    scenario.differentiator = realProduct.description;
+    scenario.includes = [];
+    scenario.outcome = '';
+    const p = parseInt(realProduct.price, 10);
+    if (p > 0) scenario.price = p;
+  }
+  // Campos de compatibilidad: `productToSell` (string legible, lo consumen los
+  // prompts de comprador/vendedor IA y el panel editable del Trainer) y
+  // `productPrice` (lo consume el scoring). Se derivan de los campos
+  // estructurados (productName/differentiator/includes/outcome/price) para no
+  // tener que tocar cada consumidor existente.
+  scenario.productPrice = Number.isFinite(scenario.price) ? scenario.price : (parseInt(scenario.price, 10) || null);
+  scenario.productToSell = buildProductBrief(scenario, lang === 'en');
   return scenario;
+}
+
+// Resumen COMPACTO del lead para la 2ª llamada. Texto plano de pocas líneas —
+// NUNCA el JSON entero: el objetivo es que el input de la llamada 2 quede en el
+// orden de ~800-1000 tokens y no se choque contra el límite de TPM.
+function buildLeadSummary(lead, isEn) {
+  const d = lead.demographics || {};
+  const p = lead.psychology || {};
+  const s = lead.currentSituation || {};
+  const roots = Array.isArray(lead.rootCauses) ? lead.rootCauses.slice(0, 3) : [];
+  const L = isEn
+    ? { who: 'Who', problem: 'Problem', fear: 'Deep fear', desire: 'Real desire', style: 'Communication style', roots: 'Root causes' }
+    : { who: 'Quién', problem: 'Problema', fear: 'Miedo profundo', desire: 'Deseo real', style: 'Estilo de comunicación', roots: 'Causas profundas' };
+  const lines = [
+    `- ${L.who}: ${d.name || '—'}, ${d.age || '—'}, ${d.role || '—'} — ${d.industry || '—'} (${d.companySize || '—'})`,
+    `- ${L.problem}: ${s.problem || '—'}`,
+    `- ${L.fear}: ${p.primaryFear || '—'}`,
+    `- ${L.desire}: ${p.primaryDesire || '—'}`,
+    `- ${L.style}: ${p.communicationStyle || '—'}`
+  ];
+  if (roots.length > 0) lines.push(`- ${L.roots}: ${roots.join(' | ')}`);
+  return lines.join('\n');
 }
 
 // Arma un texto legible y bien estructurado a partir de los campos del

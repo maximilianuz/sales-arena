@@ -134,7 +134,13 @@ export const handler = async (event) => {
     return {
       statusCode: error.allFailed ? 429 : (isTimeout ? 504 : 502),
       headers,
-      body: JSON.stringify({ error: error.allFailed ? "Todos los proveedores de IA están saturados. Probá en unos minutos." : (isTimeout ? "timeout_upstream" : "Error al contactar al proveedor de IA.") })
+      // `error` se mantiene tal cual (el cliente lo mapea a mensajes de UI) y el
+      // detalle real de por qué falló cada proveedor (nombre + timeout/status,
+      // sin nada sensible) viaja aparte en `detail` para poder diagnosticar.
+      body: JSON.stringify({
+        error: error.allFailed ? "Todos los proveedores de IA están saturados. Probá en unos minutos." : (isTimeout ? "timeout_upstream" : "Error al contactar al proveedor de IA."),
+        detail: error.message || ''
+      })
     };
   }
 };
