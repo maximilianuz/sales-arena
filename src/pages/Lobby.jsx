@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionContext } from '../contexts/SubscriptionContext';
-import { GROUP_ONLY_MODE } from '../config/appMode';
+import { GROUP_ONLY_MODE, TRAINING_MODULE_ENABLED } from '../config/appMode';
 import { signOutUser } from '../utils/auth';
 import { joinCohort } from '../utils/cohort';
 import { auth, db } from '../utils/db';
@@ -260,7 +260,7 @@ export default function Lobby() {
   );
   if (showSolo) return (
     <Suspense fallback={<div className="app-container" style={{ alignItems: 'center', justifyContent: 'center' }}><p style={{ color: 'var(--text-muted)' }}>{isEn ? 'Loading…' : 'Cargando…'}</p></div>}>
-      <SoloPractice onBack={() => setShowSolo(false)} onOpenTraining={() => { setShowSolo(false); setShowTraining(true); }} />
+      <SoloPractice onBack={() => setShowSolo(false)} onOpenTraining={TRAINING_MODULE_ENABLED ? () => { setShowSolo(false); setShowTraining(true); } : undefined} />
     </Suspense>
   );
   if (showProposals) return (
@@ -436,12 +436,14 @@ export default function Lobby() {
             accent="48,209,88"
             onClick={() => setShowSolo(true)}
           />
-          <FeatureButton
-            icon={<BookOpen size={16} />}
-            label={isEn ? 'Closer Training' : 'Entrenamiento Closer'}
-            accent="6,182,212"
-            onClick={() => setShowTraining(true)}
-          />
+          {TRAINING_MODULE_ENABLED && (
+            <FeatureButton
+              icon={<BookOpen size={16} />}
+              label={isEn ? 'Closer Training' : 'Entrenamiento Closer'}
+              accent="6,182,212"
+              onClick={() => setShowTraining(true)}
+            />
+          )}
           {isPaid && (
             <FeatureButton
               icon={<History size={16} />}
