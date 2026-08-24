@@ -7,10 +7,11 @@ import { GROUP_ONLY_MODE } from '../config/appMode';
 import ScenarioLibrary from './ScenarioLibrary';
 import { INDUSTRY_CATEGORIES, randomIndustryValue } from '../utils/industries';
 
+// Fases REALES de la generación: una llamada a la IA por paso (ver
+// generateAIScenario). El índice lo maneja el callback onProgress, no un timer.
 const GENERATION_STEPS = [
-  { es: 'Construyendo identidad del Lead...', en: 'Building Lead identity...' },
-  { es: 'Generando objeciones y psicología...', en: 'Generating objections & psychology...' },
-  { es: 'Armando guía de pipeline...', en: 'Building pipeline guide...' }
+  { es: 'Generando el perfil del lead...', en: 'Building the lead profile...' },
+  { es: 'Diseñando la oferta y las objeciones...', en: 'Designing the offer & objections...' }
 ];
 
 // ─── Config form ─────────────────────────────────────────────────────────────
@@ -94,7 +95,7 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
       {isGenerating ? (
         <div style={{ background: 'rgba(100,210,255,0.07)', border: '1px solid rgba(100,210,255,0.2)', borderRadius: '0.875rem', padding: '1.25rem 1rem' }}>
           {GENERATION_STEPS.map((step, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: i < 2 ? '0.875rem' : 0 }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: i < GENERATION_STEPS.length - 1 ? '0.875rem' : 0 }}>
               <div style={{ width: '18px', height: '18px', borderRadius: '50%', flexShrink: 0, background: i < generatingStep ? 'var(--success)' : i === generatingStep ? 'var(--primary)' : 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: i === generatingStep ? 'pulse 1.2s infinite' : 'none' }}>
                 {i < generatingStep && <span style={{ fontSize: '9px', color: 'white' }}>✓</span>}
               </div>
@@ -338,16 +339,15 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
     setIsGenerating(true);
     setGeneratingStep(0);
     setGenError('');
-    const t1 = setTimeout(() => setGeneratingStep(1), 2200);
-    const t2 = setTimeout(() => setGeneratingStep(2), 5000);
     try {
       const genConfig = { ...(customConfig || config), realProduct: roomConfig?.realProduct || null };
-      const scenario = await generateAIScenario(apiKey, apiUrl, apiModel, genConfig, stages, i18n.language);
+      const scenario = await generateAIScenario(apiKey, apiUrl, apiModel, genConfig, stages, i18n.language, {
+        onProgress: (fase) => setGeneratingStep(fase === 'oferta' ? 1 : 0)
+      });
       await setCurrentScenario(scenario);
     } catch (error) {
       setGenError(error.message || 'Error al generar el escenario.');
     } finally {
-      clearTimeout(t1); clearTimeout(t2);
       setIsGenerating(false); setGeneratingStep(0);
     }
   };
