@@ -4,7 +4,9 @@
 // haya al menos un proveedor con cupo. Clave para que planificar un escenario
 // (buyer persona + escenario del closer) SIEMPRE devuelva respuesta.
 //
-// Orden: NVIDIA #1 → NVIDIA #2 → Groq (fallback)
+// Orden por defecto: Groq → NVIDIA #1 → NVIDIA #2
+// (Groq primero por velocidad: ver la nota al final de providerChain().
+//  Se puede cambiar con LLM_PRIMARY_PROVIDER sin tocar código.)
 //
 // Overrides opcionales por proveedor (si cambian nombres de modelo):
 //   <PROV>_MODEL_FAST, <PROV>_MODEL_SMART, <PROV>_MODEL, <PROV>_URL
@@ -59,12 +61,29 @@ function providerChain() {
     process.env.NVIDIA_API_KEY_2,
     'meta/llama-3.2-3b-instruct', 'meta/llama-3.3-70b-instruct', false);
 
-  // 3. Groq (fallback final) — sí soporta json_object.
+  // 3. Groq — sí soporta json_object.
   add('groq', 'GROQ',
     process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
     process.env.GROQ_API_KEY || process.env.AI_API_KEY,
     process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
     process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile', true);
+
+  // Quién va PRIMERO. Por defecto Groq: su hardware (LPU) genera mucho más
+  // rápido que el free tier de NVIDIA, y como Netlify corta las funciones a
+  // los 10s, la velocidad es justamente lo que decide si la generación entra o
+  // se cae con "todos los proveedores fallaron". Además Groq acepta
+  // response_format:json_object (NVIDIA lo rechaza con 400), así que de paso el
+  // JSON vuelve mejor formado.
+  //
+  // Los demás quedan detrás en su orden original como respaldo: si Groq se
+  // queda sin cupo (429), la cadena sigue con NVIDIA igual que antes.
+  //
+  // Cambiable sin redeploy con LLM_PRIMARY_PROVIDER (valores: groq, nvidia-1,
+  // nvidia-2). Si el nombre no existe o ese proveedor no tiene key cargada, se
+  // ignora y queda el orden del catálogo.
+  const preferred = (process.env.LLM_PRIMARY_PROVIDER || 'groq').trim().toLowerCase();
+  const i = chain.findIndex((p) => p.name === preferred);
+  if (i > 0) chain.unshift(chain.splice(i, 1)[0]);
 
   return chain;
 }
