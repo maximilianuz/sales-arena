@@ -3,6 +3,7 @@ import { Target, MessageSquare, ChevronDown, ChevronUp, Package, Zap, Ear, Brain
 import { useTranslation } from 'react-i18next';
 import { getStageCoaching } from '../utils/coachingKnowledge';
 import { getPersonality, personalityView } from '../utils/leadPersonalities';
+import ThreePillarsGuide from './ThreePillarsGuide';
 
 // Fila compacta del coach de etapa: icono + etiqueta + consejo.
 function CoachRow({ Icon, color, label, text }) {
@@ -173,8 +174,16 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
         )}
       </div>
 
-      {/* Product — collapsible */}
-      {productPresentation && (
+      {/* Framework de pitch del dueño del producto: chuleta estática, solo
+          consulta para el Closer — colapsada por defecto. */}
+      <ThreePillarsGuide />
+
+      {/* Product — collapsible. Si el escenario trae los campos estructurados
+          (productName/differentiator/includes/outcome/price, generados por IA
+          o estampados del producto real de la sala) se renderiza con
+          jerarquía visual; si no, cae al texto plano que el Trainer haya
+          editado a mano en productPresentation (compatibilidad hacia atrás). */}
+      {(currentScenario?.productName || productPresentation) && (
         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '0.75rem', overflow: 'hidden' }}>
           <button
             onClick={() => setShowProduct(!showProduct)}
@@ -184,12 +193,47 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
             <span style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               {isEn ? 'Product reference' : 'Referencia del producto'}
             </span>
+            {(currentScenario?.price || currentScenario?.productPrice) > 0 && (
+              <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--success)' }}>
+                · USD {Number(currentScenario.price || currentScenario.productPrice).toLocaleString('en-US')}
+              </span>
+            )}
             <span style={{ marginLeft: 'auto' }}>{showProduct ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</span>
           </button>
           {showProduct && (
-            <div style={{ padding: '0 1rem 1rem', fontSize: '0.9rem', color: 'rgba(255,255,255,0.88)', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
-              {productPresentation}
-            </div>
+            currentScenario?.productName ? (
+              <div style={{ padding: '0 1rem 1.1rem', display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                <div style={{ fontSize: '1.05rem', fontWeight: '800', color: 'white', lineHeight: 1.3 }}>
+                  {currentScenario.productName}
+                </div>
+                {currentScenario.differentiator && (
+                  <p style={{ margin: 0, fontSize: '0.88rem', color: 'rgba(255,255,255,0.88)', lineHeight: '1.55' }}>
+                    {currentScenario.differentiator}
+                  </p>
+                )}
+                {Array.isArray(currentScenario.includes) && currentScenario.includes.length > 0 && (
+                  <ul style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    {currentScenario.includes.map((item, i) => (
+                      <li key={i} style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.85)', lineHeight: '1.45' }}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+                {currentScenario.outcome && (
+                  <div style={{ padding: '0.55rem 0.75rem', background: 'rgba(48,209,88,0.08)', borderLeft: '2px solid var(--success)', borderRadius: '0.4rem' }}>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)', lineHeight: '1.45' }}>{currentScenario.outcome}</p>
+                  </div>
+                )}
+                {(currentScenario.price || currentScenario.productPrice) > 0 && (
+                  <div style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--success)' }}>
+                    {isEn ? 'Investment' : 'Inversión'}: USD {Number(currentScenario.price || currentScenario.productPrice).toLocaleString('en-US')}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ padding: '0 1rem 1rem', fontSize: '0.9rem', color: 'rgba(255,255,255,0.88)', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                {productPresentation}
+              </div>
+            )
           )}
         </div>
       )}

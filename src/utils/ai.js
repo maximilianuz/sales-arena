@@ -183,14 +183,47 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
     // escalar la recompensa (cerrar un lead hostil vale más que uno amigable).
     scenario.level = config.level || null;
     scenario.leadTemperature = config.leadTemperature || null;
-    // Si hay producto real, lo estampamos EXACTO (no dependemos del modelo).
+    // Si hay producto real, lo estampamos EXACTO (no dependemos del modelo) con
+    // el mismo shape estructurado que el producto generado por IA.
     if (realProduct) {
-      scenario.productToSell = `${realProduct.name} — ${realProduct.description} (USD ${realProduct.price})`;
+      scenario.productName = realProduct.name;
+      scenario.differentiator = realProduct.description;
+      scenario.includes = [];
+      scenario.outcome = '';
       const p = parseInt(realProduct.price, 10);
-      if (p > 0) scenario.productPrice = p;
+      if (p > 0) scenario.price = p;
     }
+    // Campos de compatibilidad: `productToSell` (string legible, lo consumen los
+    // prompts de comprador/vendedor IA y el panel editable del Trainer) y
+    // `productPrice` (lo consume el scoring). Se derivan de los campos
+    // estructurados (productName/differentiator/includes/outcome/price) para no
+    // tener que tocar cada consumidor existente.
+    scenario.productPrice = Number.isFinite(scenario.price) ? scenario.price : (parseInt(scenario.price, 10) || null);
+    scenario.productToSell = buildProductBrief(scenario, lang === 'en');
   }
   return scenario;
+}
+
+// Arma un texto legible y bien estructurado a partir de los campos del
+// producto (productName/differentiator/includes/outcome/price). Lo usan los
+// consumidores que solo esperan un string: prompts de IA (buyerPrompt,
+// closerPrompt), la presentación editable del Trainer (ProductPanel) y el
+// fallback de los paneles que sí saben renderizar los campos estructurados.
+function buildProductBrief(scenario, isEn) {
+  const lines = [];
+  if (scenario.productName) lines.push(scenario.productName);
+  if (scenario.differentiator) { lines.push(''); lines.push(scenario.differentiator); }
+  if (Array.isArray(scenario.includes) && scenario.includes.length > 0) {
+    lines.push('');
+    lines.push(isEn ? 'Includes:' : 'Incluye:');
+    scenario.includes.forEach(item => { if (item) lines.push(`- ${item}`); });
+  }
+  if (scenario.outcome) { lines.push(''); lines.push(scenario.outcome); }
+  if (scenario.price > 0) {
+    lines.push('');
+    lines.push(`${isEn ? 'Investment' : 'Inversión'}: USD ${Number(scenario.price).toLocaleString('en-US')}`);
+  }
+  return lines.join('\n');
 }
 
 export async function generateSurpriseEvent(apiKey, apiUrl, apiModel, scenario, language = 'es') {

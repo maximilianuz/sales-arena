@@ -5,6 +5,7 @@ import { getDefaultStages } from '../utils/defaultStages';
 import { getStageCoaching } from '../utils/coachingKnowledge';
 import { LEAD_PERSONALITIES, personalityView } from '../utils/leadPersonalities';
 import { useCerrarConEscape } from '../hooks/useCerrarConEscape';
+import ThreePillarsGuide from './ThreePillarsGuide';
 
 // Guía del closer para el modo práctica solo: qué producto vende, la chuleta de
 // los 4 perfiles DISC (SIN revelar cuál es este lead — eso lo descubre
@@ -118,6 +119,12 @@ export default function SoloCoachPanel({ onClose }) {
           </p>
           {stages.map(s => <StageRow key={s.id} stage={s} isEn={isEn} />)}
         </Section>
+
+        {/* Framework de pitch del dueño del producto: chuleta estática, solo
+            consulta — colapsada por defecto para no tapar el resto del coach. */}
+        <div style={{ marginBottom: '0.5rem' }}>
+          <ThreePillarsGuide />
+        </div>
       </div>
     </div>
   );
