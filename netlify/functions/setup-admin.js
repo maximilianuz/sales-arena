@@ -1,47 +1,40 @@
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getDatabase } from 'firebase-admin/database';
+import { setPath } from './lib/firebaseAdmin.js';
 
-const serviceAccount = {
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-};
+// Utilidad de setup: agrega un uid como admin (admin/admins/{uid}). Protegida
+// por un token secreto en el header x-setup-token (SETUP_SECRET_TOKEN).
+//
+// Reescrito para Netlify: usaba el paquete 'firebase-admin' (no instalado) y
+// la firma (req,res) de Vercel, así que nunca cargaba — cualquier llamada a
+// /api/setup-admin fallaba siempre. Se pasa a la librería liviana
+// firebaseAdmin.js (REST + JWT, misma FIREBASE_SERVICE_ACCOUNT que el resto
+// de las funciones) y al handler estándar de Netlify.
+export const handler = async (event) => {
+  const headers = { 'Content-Type': 'application/json' };
 
-const app = initializeApp({
-  credential: cert(serviceAccount),
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
-});
-
-const db = getDatabase(app);
-
-export default async (req, res) => {
-  // Solo aceptar solicitudes con el token secreto correcto
-  const secretToken = req.headers['x-setup-token'];
-  if (secretToken !== process.env.SETUP_SECRET_TOKEN) {
-    return res.status(403).json({ error: 'Unauthorized' });
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  const secretToken = event.headers['x-setup-token'] || event.headers['X-Setup-Token'];
+  const expected = process.env.SETUP_SECRET_TOKEN;
+  // Si no hay token configurado en el server, denegamos por defecto (fail
+  // closed) — nunca dejamos este endpoint abierto sin protección.
+  if (!expected || secretToken !== expected) {
+    return { statusCode: 403, headers, body: JSON.stringify({ error: 'Unauthorized' }) };
   }
 
-  const { uid } = req.body;
-  if (!uid) {
-    return res.status(400).json({ error: 'Missing uid' });
-  }
+  let body;
+  try { body = JSON.parse(event.body || '{}'); }
+  catch { return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) }; }
+
+  const { uid } = body;
+  if (!uid) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing uid' }) };
 
   try {
-    // Agregar el usuario como admin
-    await db.ref(`admin/admins/${uid}`).set({
-      addedAt: new Date().toISOString()
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: `User ${uid} is now an admin`
-    });
+    await setPath(`/admin/admins/${uid}`, { addedAt: new Date().toISOString() });
+    return { statusCode: 200, headers, body: JSON.stringify({ success: true, message: `User ${uid} is now an admin` }) };
   } catch (error) {
-    console.error('Error setting up admin:', error);
-    return res.status(500).json({ error: error.message });
+    console.error('[setup-admin] error:', error.message);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
 };

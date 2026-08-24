@@ -1,40 +1,38 @@
 import { useState, useEffect } from 'react';
-import { ref, onValue } from 'firebase/database';
-import { db } from '../utils/db';
 
+// Consulta al servidor si el dueño de la sala tiene plan pago activo (feature
+// "el owner paga y el resto entra gratis"). No lee users/{ownerId} directo:
+// las reglas de Firebase solo permiten que cada usuario lea su propio nodo,
+// así que un participante que no es el dueño recibiría PERMISSION_DENIED.
 export function useRoomOwnerPlan(roomData) {
   const [ownerIsPaid, setOwnerIsPaid] = useState(false);
   const [ownerLoading, setOwnerLoading] = useState(true);
 
   useEffect(() => {
-    if (!roomData?.ownerId) {
-      setOwnerIsPaid(false);
-      setOwnerLoading(false);
-      return;
-    }
-
-    const ownerRef = ref(db, `users/${roomData.ownerId}`);
-    const unsub = onValue(
-      ownerRef,
-      (snap) => {
-        const ownerData = snap.val() || {};
-        const ownerStatus = ownerData.subscriptionStatus || 'none';
-        const ownerExpiry = ownerData.subscriptionExpiry;
-
-        // El propietario es Pro si:
-        // 1. Su estado es 'active'
-        // 2. No tiene fecha de expiración O la fecha no ha pasado
-        const isActive = ownerStatus === 'active' && (!ownerExpiry || ownerExpiry > Date.now());
-        setOwnerIsPaid(isActive);
-        setOwnerLoading(false);
-      },
-      () => {
-        setOwnerIsPaid(false);
-        setOwnerLoading(false);
+    const ownerId = roomData?.ownerId;
+    let alive = true;
+    (async () => {
+      if (!ownerId) {
+        if (alive) { setOwnerIsPaid(false); setOwnerLoading(false); }
+        return;
       }
-    );
+      if (alive) setOwnerLoading(true);
+      try {
+        const res = await fetch('/api/room-owner-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ownerId })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (alive) setOwnerIsPaid(res.ok && !!data.isPaid);
+      } catch {
+        if (alive) setOwnerIsPaid(false);
+      } finally {
+        if (alive) setOwnerLoading(false);
+      }
+    })();
 
-    return () => unsub();
+    return () => { alive = false; };
   }, [roomData?.ownerId]);
 
   return { ownerIsPaid, ownerLoading };
