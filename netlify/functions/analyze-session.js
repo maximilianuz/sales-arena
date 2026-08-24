@@ -1,4 +1,4 @@
-import { getUserData, getPath, setPath, patchPath } from './lib/firebaseAdmin.js';
+import { getUserData, getPath, setPath, patchPath, isSoloAuthorized } from './lib/firebaseAdmin.js';
 import { llmChat } from './lib/llm.js';
 import { GROUP_ONLY_MODE, FREE_ACCESS_MODE } from './lib/appMode.js';
 
@@ -36,6 +36,20 @@ export const handler = async (event) => {
       return { statusCode: 500, headers, body: JSON.stringify({ error: "Error verificando suscripción." }) };
     }
     // En modo gratis seguimos con datos vacíos: el análisis no depende del plan.
+  }
+
+  // El análisis de una sesión INDIVIDUAL pasa por el candado de práctica
+  // individual; el de una sesión en equipo no. Es el mismo endpoint para las
+  // dos, así que el criterio no puede ser el endpoint sino qué se está
+  // analizando — y eso lo dice `soloMode`, que ya venía en el body.
+  if (soloMode) {
+    try {
+      if (!(await isSoloAuthorized(uid))) {
+        return { statusCode: 403, headers, body: JSON.stringify({ error: "Tu cuenta no tiene acceso a la práctica individual." }) };
+      }
+    } catch {
+      return { statusCode: 403, headers, body: JSON.stringify({ error: "No se pudo verificar el acceso." }) };
+    }
   }
 
   // La comisión y el progreso se acreditan al CLOSER (quien practicó), no a quien

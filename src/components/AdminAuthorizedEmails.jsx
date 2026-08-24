@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ref, onValue, push, remove } from 'firebase/database';
 import { db } from '../utils/db';
-import { Trash2, Plus, Mail, Copy, Check, ShieldOff, ShieldCheck } from 'lucide-react';
+import { Trash2, Plus, Mail, Copy, Check, ShieldOff, ShieldCheck, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 // Estado real de acceso de un email: 'active' (ya inició sesión y tiene
@@ -10,27 +10,27 @@ import { useTranslation } from 'react-i18next';
 function StatusBadge({ status, isEn }) {
   if (!status || !status.uid) {
     return (
-      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
+      <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
         {isEn ? 'Pending login' : 'Pendiente de ingreso'}
       </span>
     );
   }
   if (status.subscriptionStatus === 'active') {
     return (
-      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.35)', color: 'var(--success)' }}>
+      <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.35)', color: 'var(--success)' }}>
         {isEn ? 'Active' : 'Activo'}
       </span>
     );
   }
   if (status.subscriptionStatus === 'revoked') {
     return (
-      <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--danger)' }}>
+      <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--danger)' }}>
         {isEn ? 'Revoked' : 'Revocado'}
       </span>
     );
   }
   return (
-    <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
+    <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: '1rem', background: 'rgba(255,255,255,0.08)', color: 'var(--text-muted)' }}>
       {isEn ? 'No access yet' : 'Sin acceso aún'}
     </span>
   );
@@ -158,6 +158,31 @@ export default function AdminAuthorizedEmails({ adminUid }) {
   // el chequeo automático del cliente solo corre cuando subscriptionStatus
   // es 'none', así que una vez 'revoked' queda pegado ahí para siempre salvo
   // que el admin lo reactive a mano desde acá.
+  // La práctica individual se aprueba APARTE del acceso general. Estar en esta
+  // lista da acceso a la app; esto da los roleplays individuales, que consumen
+  // muchos más tokens. Antes iban juntos y por eso cualquiera de la lista
+  // entraba al Entrenamiento Closer sin que nadie lo hubiera decidido.
+  const handleSolo = async (emailId, email, permitir) => {
+    setGrantingId(emailId);
+    try {
+      const res = await fetch('/api/admin-manage-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callerUid: adminUid, action: 'solo', email, permitir })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) throw new Error(data.error || 'No se pudo cambiar el permiso');
+      await refreshStatus(emails.map(e => e.email));
+      setMessage(permitir ? 'Práctica individual habilitada' : 'Práctica individual quitada');
+      setTimeout(() => setMessage(''), 2500);
+    } catch (error) {
+      setMessage(error.message);
+      setTimeout(() => setMessage(''), 4000);
+    } finally {
+      setGrantingId(null);
+    }
+  };
+
   const handleGrantAccess = async (emailId, email) => {
     setGrantingId(emailId);
     try {
@@ -198,7 +223,7 @@ export default function AdminAuthorizedEmails({ adminUid }) {
       marginTop: '2rem'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-        <Mail size={20} style={{ color: 'var(--primary)' }} />
+        <Mail size={20} style={{ color: 'var(--primary-text)' }} />
         <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>
           {isEn ? 'Authorized Emails' : 'Correos Autorizados'}
         </h2>
@@ -305,6 +330,27 @@ export default function AdminAuthorizedEmails({ adminUid }) {
                 >
                   {copiedId === item.email ? <Check size={16} /> : <Copy size={16} />}
                 </button>
+                {/* Práctica individual: permiso SEPARADO del acceso general.
+                    Estar en esta lista da acceso a la app; esto da los roleplays
+                    individuales, que consumen mucho más. Antes iban juntos. */}
+                {accessStatus[item.email]?.uid && (
+                  <button
+                    onClick={() => handleSolo(item.id, item.email, !accessStatus[item.email]?.soloApproved)}
+                    disabled={grantingId === item.id}
+                    title={accessStatus[item.email]?.soloApproved
+                      ? 'Quitar práctica individual'
+                      : 'Habilitar práctica individual'}
+                    style={{
+                      background: 'none', border: 'none', padding: '0.4rem',
+                      marginRight: '0.4rem', display: 'flex', alignItems: 'center',
+                      cursor: grantingId === item.id ? 'wait' : 'pointer',
+                      opacity: grantingId === item.id ? 0.5 : 1,
+                      color: accessStatus[item.email]?.soloApproved ? 'var(--success)' : 'var(--text-muted)',
+                    }}
+                  >
+                    <User size={16} />
+                  </button>
+                )}
                 {accessStatus[item.email]?.subscriptionStatus !== 'active' && (
                   <button
                     onClick={() => handleGrantAccess(item.id, item.email)}
@@ -359,8 +405,8 @@ export default function AdminAuthorizedEmails({ adminUid }) {
         lineHeight: '1.4'
       }}>
         {isEn
-          ? '💡 Emails added here will automatically receive access to the Trainer plan when they log in or register.'
-          : '💡 Los correos agregados aquí obtendrán acceso automático al plan Trainer al iniciar sesión o registrarse.'}
+          ? 'Emails added here will automatically receive access to the Trainer plan when they log in or register.'
+          : 'Los correos agregados aquí obtendrán acceso automático al plan Trainer al iniciar sesión o registrarse.'}
       </div>
     </div>
   );

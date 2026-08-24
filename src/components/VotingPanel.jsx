@@ -27,7 +27,7 @@ export default function VotingPanel({ isObserver, isFacilitator, questions = [],
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <BarChart2 size={14} color="rgba(100,210,255,0.7)" />
-          <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)' }}>
             {t('voting.title')}
           </span>
         </div>
@@ -54,7 +54,7 @@ export default function VotingPanel({ isObserver, isFacilitator, questions = [],
             <div key={q.id}>
               <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'rgba(255,255,255,0.92)', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 {q.question}
-                <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.58)', fontWeight: '400' }}>{totalVotes} {isEn ? 'votes' : 'votos'}</span>
+                <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.58)', fontWeight: '400' }}>{totalVotes} {isEn ? 'votes' : 'votos'}</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {q.options.map((opt, oIndex) => {

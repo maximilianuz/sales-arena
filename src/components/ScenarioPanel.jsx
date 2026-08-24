@@ -19,18 +19,18 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
   const isEn = i18n.language?.startsWith('en');
 
   const LEVELS = isEn
-    ? [{ v: 'Principiante', l: '🟢 Beginner', d: 'Friendly' }, { v: 'Intermedio', l: '🟡 Intermediate', d: 'Skeptical' }, { v: 'Avanzado', l: '🔴 Advanced', d: 'Hostile' }]
-    : [{ v: 'Principiante', l: '🟢 Principiante', d: 'Amigable' }, { v: 'Intermedio', l: '🟡 Intermedio', d: 'Escéptico' }, { v: 'Avanzado', l: '🔴 Avanzado', d: 'Hostil' }];
+    ? [{ v: 'Principiante', l: 'Beginner', d: 'Friendly' }, { v: 'Intermedio', l: 'Intermediate', d: 'Skeptical' }, { v: 'Avanzado', l: 'Advanced', d: 'Hostile' }]
+    : [{ v: 'Principiante', l: 'Principiante', d: 'Amigable' }, { v: 'Intermedio', l: 'Intermedio', d: 'Escéptico' }, { v: 'Avanzado', l: 'Avanzado', d: 'Hostil' }];
 
   const TEMPS = isEn
-    ? [{ v: 'Frío', l: '🧊 Cold', d: "Doesn't know you" }, { v: 'Templado', l: '☀️ Warm', d: 'Saw your ad' }, { v: 'Caliente', l: '🔥 Hot', d: 'Referral' }]
-    : [{ v: 'Frío', l: '🧊 Frío', d: 'No te conoce' }, { v: 'Templado', l: '☀️ Templado', d: 'Vio tu anuncio' }, { v: 'Caliente', l: '🔥 Caliente', d: 'Referido' }];
+    ? [{ v: 'Frío', l: 'Cold', d: "Doesn't know you" }, { v: 'Templado', l: 'Warm', d: 'Saw your ad' }, { v: 'Caliente', l: 'Hot', d: 'Referral' }]
+    : [{ v: 'Frío', l: 'Frío', d: 'No te conoce' }, { v: 'Templado', l: 'Templado', d: 'Vio tu anuncio' }, { v: 'Caliente', l: 'Caliente', d: 'Referido' }];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {/* Industry */}
       <div>
-        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
+        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
           {isEn ? 'Industry' : 'Rubro / Industria'}
         </label>
         <select value={config.theme} onChange={e => setConfig({ ...config, theme: e.target.value })}
@@ -43,39 +43,41 @@ function ScenarioConfig({ config, setConfig, onGenerate, onRandom, isGenerating,
             </optgroup>
           ))}
           <optgroup label={isEn ? 'Random' : 'Aleatorio'}>
-            <option value="Aleatorio (Sorpréndeme)">{isEn ? '🎲 Surprise me' : '🎲 Sorpréndeme'}</option>
+            <option value="Aleatorio (Sorpréndeme)">{isEn ? 'Surprise me' : 'Sorpréndeme'}</option>
           </optgroup>
         </select>
       </div>
 
       {/* Level pills */}
       <div>
-        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
+        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
           {isEn ? 'Difficulty' : 'Dificultad'}
         </label>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div role="radiogroup" aria-label={isEn ? 'Difficulty level' : 'Nivel de dificultad'} style={{ display: 'flex', gap: '0.5rem' }}>
           {LEVELS.map(l => (
-            <div key={l.v} onClick={() => setConfig({ ...config, level: l.v })}
-              style={{ flex: 1, padding: '0.6rem 0.4rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', border: `1px solid ${config.level === l.v ? 'rgba(100,210,255,0.6)' : 'rgba(255,255,255,0.07)'}`, background: config.level === l.v ? 'rgba(100,210,255,0.15)' : 'rgba(255,255,255,0.02)', transition: 'all 0.2s' }}>
+            <button key={l.v} type="button" role="radio" aria-checked={config.level === l.v}
+              onClick={() => setConfig({ ...config, level: l.v })}
+              style={{ flex: 1, font: 'inherit', color: 'inherit', minHeight: '44px', padding: '0.6rem 0.4rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', border: `1px solid ${config.level === l.v ? 'rgba(100,210,255,0.6)' : 'rgba(255,255,255,0.07)'}`, background: config.level === l.v ? 'rgba(100,210,255,0.15)' : 'rgba(255,255,255,0.02)', transition: 'all 0.2s' }}>
               <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>{l.l}</div>
-              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{l.d}</div>
-            </div>
+              <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.72)', marginTop: '0.1rem' }}>{l.d}</div>
+            </button>
           ))}
         </div>
       </div>
 
       {/* Temperature pills */}
       <div>
-        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
+        <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.5rem' }}>
           {isEn ? 'Lead Temperature' : 'Temperatura'}
         </label>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div role="radiogroup" aria-label={isEn ? 'Lead temperature' : 'Temperatura del lead'} style={{ display: 'flex', gap: '0.5rem' }}>
           {TEMPS.map(t => (
-            <div key={t.v} onClick={() => setConfig({ ...config, leadTemperature: t.v })}
-              style={{ flex: 1, padding: '0.6rem 0.4rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', border: `1px solid ${config.leadTemperature === t.v ? 'rgba(255,159,10,0.5)' : 'rgba(255,255,255,0.07)'}`, background: config.leadTemperature === t.v ? 'rgba(255,159,10,0.1)' : 'rgba(255,255,255,0.02)', transition: 'all 0.2s' }}>
+            <button key={t.v} type="button" role="radio" aria-checked={config.leadTemperature === t.v}
+              onClick={() => setConfig({ ...config, leadTemperature: t.v })}
+              style={{ flex: 1, font: 'inherit', color: 'inherit', minHeight: '44px', padding: '0.6rem 0.4rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', border: `1px solid ${config.leadTemperature === t.v ? 'rgba(255,159,10,0.5)' : 'rgba(255,255,255,0.07)'}`, background: config.leadTemperature === t.v ? 'rgba(255,159,10,0.1)' : 'rgba(255,255,255,0.02)', transition: 'all 0.2s' }}>
               <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>{t.l}</div>
-              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{t.d}</div>
-            </div>
+              <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.72)', marginTop: '0.1rem' }}>{t.d}</div>
+            </button>
           ))}
         </div>
       </div>
@@ -128,7 +130,7 @@ export function LeadActorView({ scenario }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Identity */}
       <div style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.12),rgba(255,55,95,0.08))', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '1rem', padding: '1.125rem' }}>
-        <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.4rem' }}>🎭 {isEn ? 'You are playing' : 'Vos sos'}</div>
+        <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.4rem' }}>🎭 {isEn ? 'You are playing' : 'Vos sos'}</div>
         <div style={{ fontSize: '1.35rem', fontWeight: '600', color: 'white', marginBottom: '0.15rem' }}>{scenario.demographics?.name}</div>
         <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.74)' }}>{scenario.demographics?.role} · {scenario.demographics?.industry}{scenario.demographics?.age && ` · ${scenario.demographics.age} años`}</div>
       </div>
@@ -136,7 +138,7 @@ export function LeadActorView({ scenario }) {
       {/* Acting instruction */}
       {scenario.roleplayGuide?.actorAdvice && (
         <div style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.22)', borderLeft: '3px solid #8b5cf6', borderRadius: '0.75rem', padding: '0.875rem 1rem' }}>
-          <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.35rem' }}>{isEn ? 'Acting note' : 'Actuación'}</div>
+          <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', marginBottom: '0.35rem' }}>{isEn ? 'Acting note' : 'Actuación'}</div>
           <p style={{ margin: 0, fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.92)', lineHeight: '1.5' }}>"{scenario.roleplayGuide.actorAdvice}"</p>
         </div>
       )}
@@ -146,20 +148,20 @@ export function LeadActorView({ scenario }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {scenario.behavioralCues.verbalStyle && (
             <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '0.75rem', padding: '0.7rem 0.875rem' }}>
-              <div style={{ fontSize: '0.66rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.25rem' }}>{isEn ? 'How you talk' : 'Cómo hablás'}</div>
+              <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.25rem' }}>{isEn ? 'How you talk' : 'Cómo hablás'}</div>
               <p style={{ margin: 0, fontSize: '0.83rem', color: 'rgba(255,255,255,0.9)', lineHeight: '1.4' }}>{scenario.behavioralCues.verbalStyle}</p>
             </div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             {scenario.behavioralCues.opensUpWhen && (
               <div style={{ background: 'rgba(48,209,88,0.06)', border: '1px solid rgba(48,209,88,0.18)', borderRadius: '0.75rem', padding: '0.7rem' }}>
-                <div style={{ fontSize: '0.64rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.25rem' }}>{isEn ? 'You open up when' : 'Te abrís si'}</div>
+                <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.25rem' }}>{isEn ? 'You open up when' : 'Te abrís si'}</div>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.86)', lineHeight: '1.35' }}>{scenario.behavioralCues.opensUpWhen}</p>
               </div>
             )}
             {scenario.behavioralCues.shutsDownWhen && (
               <div style={{ background: 'rgba(255,69,58,0.06)', border: '1px solid rgba(255,69,58,0.18)', borderRadius: '0.75rem', padding: '0.7rem' }}>
-                <div style={{ fontSize: '0.64rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--danger)', marginBottom: '0.25rem' }}>{isEn ? 'You shut down when' : 'Te cerrás si'}</div>
+                <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--danger)', marginBottom: '0.25rem' }}>{isEn ? 'You shut down when' : 'Te cerrás si'}</div>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: 'rgba(255,255,255,0.86)', lineHeight: '1.35' }}>{scenario.behavioralCues.shutsDownWhen}</p>
               </div>
             )}
@@ -169,7 +171,7 @@ export function LeadActorView({ scenario }) {
 
       {/* Main objection */}
       <div style={{ background: 'rgba(255,55,95,0.08)', border: '2px solid rgba(255,55,95,0.4)', borderRadius: '1rem', padding: '1.125rem' }}>
-        <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--secondary)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+        <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--secondary)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
           <ShieldAlert size={12} /> {isEn ? 'Your main objection' : 'Tu objeción principal'}
         </div>
         <p style={{ margin: 0, fontSize: '1.15rem', fontWeight: '700', fontStyle: 'italic', color: 'white', lineHeight: '1.4' }}>"{scenario.visibleObjection}"</p>
@@ -178,11 +180,11 @@ export function LeadActorView({ scenario }) {
       {/* Pain + fear */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
         <div style={{ background: 'rgba(48,209,88,0.07)', border: '1px solid rgba(48,209,88,0.18)', borderRadius: '0.75rem', padding: '0.8rem' }}>
-          <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.35rem' }}>{isEn ? 'Your pain' : 'Tu dolor'}</div>
+          <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: '0.35rem' }}>{isEn ? 'Your pain' : 'Tu dolor'}</div>
           <p style={{ margin: 0, fontSize: '0.82rem', color: 'rgba(255,255,255,0.88)', lineHeight: '1.4' }}>{scenario.currentSituation?.problem}</p>
         </div>
         <div style={{ background: 'rgba(255,159,10,0.07)', border: '1px solid rgba(255,159,10,0.18)', borderRadius: '0.75rem', padding: '0.8rem' }}>
-          <div style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.35rem' }}>{isEn ? 'Core fear' : 'Tu miedo'}</div>
+          <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.35rem' }}>{isEn ? 'Core fear' : 'Tu miedo'}</div>
           <p style={{ margin: 0, fontSize: '0.82rem', color: 'rgba(255,255,255,0.88)', lineHeight: '1.4' }}>{scenario.psychology?.primaryFear}</p>
         </div>
       </div>
@@ -223,7 +225,7 @@ function CompactObserverView({ scenario }) {
         {scenario.currentSituation?.problem}
       </div>
       <div style={{ background: 'rgba(255,55,95,0.07)', padding: '0.65rem 0.75rem', borderRadius: '0.5rem', borderLeft: '2px solid var(--secondary)' }}>
-        <div style={{ fontSize: '0.65rem', color: 'var(--secondary)', fontWeight: '700', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Objeción</div>
+        <div style={{ fontSize: '0.72rem', color: 'var(--secondary)', fontWeight: '700', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Objeción</div>
         <div style={{ fontSize: '0.85rem', fontStyle: 'italic' }}>"{scenario.visibleObjection}"</div>
       </div>
     </div>
@@ -246,7 +248,7 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
 
   const F = ({ label, value, accent = '255,255,255' }) => (
     <div style={{ marginBottom: '0.6rem', background: `rgba(${accent},0.03)`, borderLeft: `2px solid rgba(${accent},0.18)`, padding: '0.65rem 0.8rem', borderRadius: '0.5rem' }}>
-      <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.09em', textTransform: 'uppercase', color: `rgba(${accent},0.45)`, marginBottom: '0.25rem' }}>{label}</div>
+      <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.09em', textTransform: 'uppercase', color: `rgba(${accent},0.45)`, marginBottom: '0.25rem' }}>{label}</div>
       <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.92)', lineHeight: '1.5' }}>{value}</div>
     </div>
   );
@@ -276,7 +278,7 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
       </div>);
       case 'objeciones': return (<div>
         <div style={{ background: 'rgba(255,55,95,0.08)', border: '1px solid rgba(255,55,95,0.28)', borderRadius: '0.75rem', padding: '0.875rem', marginBottom: '0.6rem' }}>
-          <div style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.35rem' }}>{isEn ? 'Main objection' : 'Objeción principal'}</div>
+          <div style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.35rem' }}>{isEn ? 'Main objection' : 'Objeción principal'}</div>
           <p style={{ margin: 0, fontStyle: 'italic', fontWeight: '600', fontSize: '0.95rem' }}>"{scenario.visibleObjection}"</p>
         </div>
         {scenario.secondaryObjections?.map((obj, i) => (
@@ -291,7 +293,7 @@ function TrainerView({ scenario, isReadOnly, onRegenerate, isGenerating }) {
         <F label={isEn ? 'Competing goal' : 'Conflicto interno'} value={scenario.roleplayGuide?.competingGoal} accent="139,92,246" />
         <F label={isEn ? 'Market fatigue' : 'Fatiga de mercado'} value={scenario.roleplayGuide?.vendorFatigue} accent="139,92,246" />
         <div style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.1),rgba(255,55,95,0.08))', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '0.75rem', padding: '0.875rem', marginTop: '0.25rem' }}>
-          <div style={{ color: '#a78bfa', fontSize: '0.65rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.4rem' }}>🎭 {isEn ? 'Acting tip' : 'Tip de actuación'}</div>
+          <div style={{ color: '#a78bfa', fontSize: '0.72rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.4rem' }}>🎭 {isEn ? 'Acting tip' : 'Tip de actuación'}</div>
           <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.9rem', lineHeight: '1.5', color: 'rgba(255,255,255,0.8)' }}>"{scenario.roleplayGuide?.actorAdvice}"</p>
         </div>
       </div>);
@@ -371,7 +373,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
     );
     return (
       <div className="glass-panel" style={{ flex: 1 }}>
-        <div style={{ fontSize: '0.68rem', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(139,92,246,0.65)', marginBottom: '1rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ fontSize: '0.72rem', fontWeight: '600', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(139,92,246,0.65)', marginBottom: '1rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           🎭 {isEn ? 'Your character' : 'Tu personaje'}
         </div>
         <LeadActorView scenario={currentScenario} />
@@ -389,7 +391,7 @@ export default function ScenarioPanel({ currentScenario, setCurrentScenario, api
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.125rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <UserCircle size={14} color="rgba(100,210,255,0.7)" />
-          <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)' }}>
             {currentScenario ? 'Buyer Persona' : (isEn ? 'Configure Scenario' : 'Configurar Escenario')}
           </span>
         </div>

@@ -1,0 +1,429 @@
+{
+  "version": 2,
+  "mazo": "preguntas-por-fase",
+  "descripcion": "3 cartas por cada una de las 6 fases (Química, Marco, Descubrimiento, Transición, Pitch, Cierre). Frente: la situación en la fase. Dorso: la pregunta o movimiento + POR QUÉ funciona. Practicalas EN VOZ ALTA: el objetivo es que la pregunta salga natural, no memorizada.",
+  "cartas": [
+    {
+      "id": "fase-001",
+      "tipo": "clasica",
+      "fase": "quimica",
+      "frente": "QUÍMICA — Arranca la llamada. ¿Cómo abrís los primeros 2 minutos sin sonar a vendedor?",
+      "dorso": "Como una persona, no como un rol: «¡[Nombre]! ¿Cómo va? ¿De dónde me estás hablando?» — interés genuino en su contexto, un comentario humano, y espejá su energía (si viene tranquilo, bajá; si viene arriba, subí). Nada de arrancar con la agenda ni con el producto en frío.",
+      "porQue": "La gente le compra a quien percibe como un par, no a quien percibe como un cazador. Los primeros 2 minutos definen la categoría en la que te pone: 'persona con la que se habla bien' o 'vendedor del que me defiendo'. Todo lo que sigue es más fácil o más difícil según esa etiqueta.",
+      "principioId": "p-desapego",
+      "dificultad": 1,
+      "tags": [
+        "apertura",
+        "rapport"
+      ]
+    },
+    {
+      "id": "fase-002",
+      "tipo": "clasica",
+      "fase": "quimica",
+      "frente": "QUÍMICA — Ya hay clima. ¿Cuál es LA pregunta que convierte la charla en llamada con propósito?",
+      "dorso": "«Contame, ¿qué te motivó a agendar esta llamada justo ahora?» — y escuchá con atención especial el 'justo ahora'. Su respuesta te da el disparador (algo pasó: un susto, un límite, un hartazgo) y su primera formulación del problema, con sus palabras. Anotala textual.",
+      "porQue": "El 'justo ahora' revela el evento que rompió la inercia — la energía real de la venta. Y quien explica por qué agendó se está recordando a sí mismo que fue él quien vino a buscar algo: el marco queda derecho desde el arranque (vos no lo perseguiste).",
+      "principioId": "p-quien-pregunta-lidera",
+      "dificultad": 1,
+      "tags": [
+        "apertura",
+        "disparador"
+      ]
+    },
+    {
+      "id": "fase-003",
+      "tipo": "clasica",
+      "fase": "quimica",
+      "frente": "QUÍMICA — ¿Qué es 'espejar' y qué cosas concretas espejás en los primeros minutos?",
+      "dorso": "Adaptar tu forma a la suya: ritmo (rápido/pausado), volumen y energía, formalidad ('vos' relajado vs. profesional), longitud de frases (al escueto no lo ahogues, al conversador no lo cortes). No es imitarlo — es reducir la distancia de estilo para que hablar con vos le resulte cómodo.",
+      "porQue": "Confiamos en lo que se parece a nosotros: la similitud percibida baja la guardia a nivel pre-racional, antes de cualquier argumento. Un estilo único para todos los prospectos significa que con la mitad de ellos vas a chocar por pura forma, sin importar el fondo.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 2,
+      "tags": [
+        "rapport",
+        "espejo"
+      ]
+    },
+    {
+      "id": "fase-004",
+      "tipo": "clasica",
+      "fase": "marco",
+      "frente": "MARCO — ¿Cómo planteás la agenda de la llamada? (palabras + los 2 elementos que no pueden faltar)",
+      "dorso": "«Te cuento cómo suelo manejar estas llamadas: primero te hago varias preguntas para entender bien tu situación. Si veo que puedo ayudarte, te cuento exactamente cómo trabajo; y si no, también te lo digo. Y al final decidís vos, sin vueltas. ¿Te cierra?». Elementos: el ORDEN (preguntas → propuesta → decisión) y el micro-sí final («¿te cierra?»).",
+      "porQue": "La agenda aceptada es un contrato: te autoriza a preguntar en profundidad sin que sea raro, y a volver al orden cuando el prospecto se adelanta («¿precio? ya llegamos, primero dejame entender tu caso — como acordamos»). El '¿te cierra?' lo convierte de anuncio en acuerdo invocable.",
+      "principioId": "p-marco-previo",
+      "dificultad": 1,
+      "tags": [
+        "agenda",
+        "marco"
+      ]
+    },
+    {
+      "id": "fase-005",
+      "tipo": "clasica",
+      "fase": "marco",
+      "frente": "MARCO — ¿Por qué y cómo le das permiso explícito de decirte que NO?",
+      "dorso": "«Una cosa más: si en algún momento ves que esto no es para vos, decímelo tranquilo — un 'no' honesto me sirve mil veces más que un 'lo voy a pensar' de compromiso. ¿Trato?». Dicho con total naturalidad, sin solemnidad.",
+      "porQue": "Doble efecto: baja la defensa (nadie se atrinchera contra quien le dio la salida) y mata por adelantado la evasión — cuando al final aparezca 'lo tengo que pensar', tenés el trato para invocar: «quedamos en honestidad total: ¿qué te frena de verdad?». El desapego explícito, además, te sube de estatus: no necesitás cazarlo.",
+      "principioId": "p-marco-previo",
+      "dificultad": 2,
+      "tags": [
+        "marco",
+        "permiso-de-no"
+      ]
+    },
+    {
+      "id": "fase-006",
+      "tipo": "clasica",
+      "fase": "marco",
+      "frente": "MARCO — ¿Qué acuerdo sembrás sobre la DECISIÓN, y cómo lo preguntás sin presionar?",
+      "dorso": "«Si al final de la llamada ves que esto tiene sentido para vos, ¿estás en condiciones de tomar la decisión hoy, o hay alguien más que participa?». Tono de logística pura, como preguntar la hora. Si hay pareja/socio, lo sabés AHORA y podés incluirlo — no en el minuto 50.",
+      "porQue": "Las condiciones de decisión se averiguan cuando no cuestan nada, no cuando la venta está en juego. Pedir el compromiso por adelantado ('decidir hoy') activa la consistencia al final; y destapar terceros temprano transforma 'lo hablo con mi pareja' de emboscada final en dato de planificación.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 2,
+      "tags": [
+        "marco",
+        "decision"
+      ]
+    },
+    {
+      "id": "fase-007",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — ¿Cómo abrís la exploración del estado actual (punto A) para conseguir escenas y no etiquetas?",
+      "dorso": "«Contame cómo es un día tuyo hoy, de la mañana a la noche, con respecto a [tema]». Y después bajá a escenas: «¿Cómo fue la última vez que [situación]? ¿Qué pasó exactamente?». Buscás película, no diagnóstico: 'llego a las 7 y no me da el cuerpo ni para jugar con mis hijos' vale oro; 'tengo estrés' no vale nada.",
+      "porQue": "Las etiquetas ('estrés', 'cansancio') son abstracciones sin carga emocional: se dicen sin sentir nada. Las escenas concretas obligan a revivir — y la emoción que decide compras vive en las escenas. Además las escenas te dan las palabras exactas que vas a usar en el pitch.",
+      "principioId": "p-futuro-vs-presente",
+      "dificultad": 2,
+      "tags": [
+        "descubrimiento",
+        "punto-a"
+      ]
+    },
+    {
+      "id": "fase-008",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — Ya apareció el problema. ¿Cómo lo cuantificás? (las 3 monedas)",
+      "dorso": "«¿Qué te está costando esto por mes?» en tres monedas: PLATA («entre médicos, energía baja en el trabajo, oportunidades que dejaste pasar, ¿cuánto es?»), TIEMPO («¿cuántas horas por semana te roba?») y VIDA («¿qué dejaste de hacer por esto?»). Conseguí NÚMEROS y anotalos: son el ancla del precio.",
+      "porQue": "El dolor sin número es opinión; con número es una cuenta. Ese número es el objeto contra el que se va a comparar tu precio en el Pitch — sin él, el precio se compara contra el bolsillo y pierde. Y el número lo tiene que decir ÉL: tu estimación es discutible, la suya no.",
+      "principioId": "p-dolor-antes-precio",
+      "dificultad": 1,
+      "tags": [
+        "descubrimiento",
+        "cuantificar"
+      ]
+    },
+    {
+      "id": "fase-009",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — ¿Cómo construís el punto B (futuro deseado) para que sea concreto y no fantasía?",
+      "dorso": "«Imaginate que en 6 meses esto está resuelto. ¿Qué hacés distinto un martes cualquiera?» — martes, no 'tu vida': lo cotidiano obliga a concretar. Profundizá: «¿Y eso qué te cambiaría con [su familia/trabajo, según lo que contó]?». Después medí la brecha: «Del 1 al 10, ¿qué tan importante es para vos llegar ahí este año? ... ¿Por qué no un [n−2]?»",
+      "porQue": "Sin B concreto no hay deseo, solo queja. El 'martes cualquiera' genera una escena visualizable (la emoción vive ahí). Y el «¿por qué no un 5?» hace que ÉL argumente a favor de la importancia — la gente cree lo que se escucha decir, no lo que le decís vos.",
+      "principioId": "p-futuro-vs-presente",
+      "dificultad": 2,
+      "tags": [
+        "descubrimiento",
+        "punto-b",
+        "escala"
+      ]
+    },
+    {
+      "id": "fase-010",
+      "tipo": "clasica",
+      "fase": "transicion",
+      "frente": "TRANSICIÓN — ¿Qué es el resumen espejo y cómo lo hacés antes de pasar al pitch?",
+      "dorso": "Recapitulás su situación usando SUS palabras textuales: «Dejame ver si entendí bien: hace 2 años que [su frase], probaste [lo que probó] y no funcionó porque [su explicación], te está costando [su número] por mes, y lo que querés es [su punto B]. ¿Es así o me falta algo?» — y esperás su confirmación explícita.",
+      "porQue": "Triple función: demuestra que escuchaste TODO (casi nadie lo hace — la confianza pega un salto), le hace escuchar su propio caso completo y ordenado (la brecha A→B junta duele más que en cuotas), y su «sí, es así» es el micro-sí que autoriza el pitch: ya no le vendés — le respondés.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 1,
+      "tags": [
+        "transicion",
+        "resumen"
+      ]
+    },
+    {
+      "id": "fase-011",
+      "tipo": "clasica",
+      "fase": "transicion",
+      "frente": "TRANSICIÓN — Confirmó el resumen. ¿Cómo pedís permiso para pitchear (y por qué pedirlo)?",
+      "dorso": "«Bien. Por lo que me contás, esto es exactamente el tipo de caso con el que trabajo. ¿Querés que te cuente cómo sería para vos?» — y esperá el sí. Si el Descubrimiento mostró que NO hay fit, acá es donde lo decís y cerrás la llamada con elegancia.",
+      "porQue": "Un pitch pedido se escucha con apertura; un pitch impuesto se escucha con defensa. El «¿querés que te cuente?» convierte el monólogo en respuesta a su invitación — un micro-sí más en la cadena. Y poder NO pitchear cuando no hay fit es la prueba máxima de que sos médico, no vendedor.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 1,
+      "tags": [
+        "transicion",
+        "permiso"
+      ]
+    },
+    {
+      "id": "fase-012",
+      "tipo": "clasica",
+      "fase": "transicion",
+      "frente": "TRANSICIÓN — ¿Qué 4 cosas tenés que tener ANTES de pasar al pitch? (si falta una, seguís preguntando)",
+      "dorso": "1) El problema descrito con SUS palabras (anotadas). 2) El costo cuantificado en al menos una moneda (plata/tiempo/vida). 3) Qué intentó antes y por qué cree que falló. 4) El punto B concreto + su importancia declarada (la escala 1-10). Checklist mental antes de cruzar: ¿tengo las 4? Si no, la transición es prematura.",
+      "porQue": "El pitch es la receta: sin estos 4 elementos no hay diagnóstico terminado, y recetar sin diagnosticar destruye la autoridad que venías construyendo. Además cada elemento es un insumo directo del pitch — sin ellos, pitcheás genérico, y lo genérico no cierra high ticket.",
+      "principioId": "p-vender-es-diagnosticar",
+      "dificultad": 2,
+      "tags": [
+        "transicion",
+        "checklist"
+      ]
+    },
+    {
+      "id": "fase-013",
+      "tipo": "clasica",
+      "fase": "pitch",
+      "frente": "PITCH — ¿Cuál es la estructura del pitch high ticket y cuánto debería durar?",
+      "dorso": "Puente A→B en 3-5 minutos, no catálogo: «Vos hoy estás en [A con sus palabras]. Querés llegar a [B con sus palabras]. El camino es [mecanismo en 3 pasos simples, cada uno conectado a POR QUÉ resuelve lo que a él le falló antes]». Prueba social: UN caso parecido a él, con detalle. Módulos, bonuses y letra chica: después, o si pregunta.",
+      "porQue": "El prospecto no compra un programa: compra su punto B. Cada minuto de features diluye la emoción que el Descubrimiento construyó — entender no es querer. El pitch corto y quirúrgico mantiene la energía en la brecha; el catálogo la disuelve en información.",
+      "principioId": "p-emocion-decide-logica-justifica",
+      "dificultad": 2,
+      "tags": [
+        "pitch",
+        "estructura"
+      ]
+    },
+    {
+      "id": "fase-014",
+      "tipo": "clasica",
+      "fase": "pitch",
+      "frente": "PITCH — ¿Cada cuánto y con qué palabras chequeás temperatura durante el pitch?",
+      "dorso": "Cada 60-90 segundos, un chequeo corto: «¿Cómo lo ves hasta acá?», «¿Te hace sentido?», «¿Esto es lo que buscabas cuando agendaste?». Y ESCUCHÁ la respuesta: un «sí...» tibio o un silencio raro es señal de frenar y preguntar «¿qué te genera dudas?» — no de seguir pitcheando más fuerte.",
+      "porQue": "Cada chequeo es termómetro y compromiso a la vez: te dice en tiempo real si lo seguís teniendo (la objeción detectada en el minuto 2 del pitch se resuelve barata; la que explota al final, carísima) y suma eslabones a la cadena de síes que hace natural el cierre.",
+      "principioId": "p-compromisos-graduales",
+      "dificultad": 2,
+      "tags": [
+        "pitch",
+        "temperatura"
+      ]
+    },
+    {
+      "id": "fase-015",
+      "tipo": "clasica",
+      "fase": "pitch",
+      "frente": "PITCH — ¿Cómo decís el precio? (el orden exacto del momento más temido)",
+      "dorso": "1) Reancla el costo del problema: «Me dijiste que esto te está costando unos [su número] por mes — [anual] al año». 2) Precio directo, sin preámbulo pedigüeño ni velocidad nerviosa: «La inversión del programa es [X]». 3) SILENCIO TOTAL. No cuotas, no descuentos, no 'sé que es un montón'. Las opciones de pago existen — cuando ÉL pregunte.",
+      "porQue": "El orden pone la comparación correcta en la mesa (precio vs. costo del problema, no precio vs. bolsillo) y el silencio lo obliga a posicionarse mientras tu calma comunica que el precio es serio. Hablar después del precio es cederle terreno que no pidió.",
+      "principioId": "p-silencio-trabaja",
+      "dificultad": 1,
+      "tags": [
+        "pitch",
+        "precio",
+        "silencio"
+      ]
+    },
+    {
+      "id": "fase-016",
+      "tipo": "clasica",
+      "fase": "cierre",
+      "frente": "CIERRE — El pitch cerró bien, la temperatura es alta. ¿Cuál es la pregunta de cierre y cómo la decís?",
+      "dorso": "Simple, directa, en calma: «¿Querés que lo arranquemos?» o «¿Lo hacemos?». Sin discurso previo, sin resumen extra de beneficios, sin apuro en la voz. Y después: silencio absoluto hasta que responda. Si la cadena de micro-síes está completa, esta pregunta es un trámite; si te da terror hacerla, faltaron eslabones antes.",
+      "porQue": "A esta altura, agregar palabras es restar: cada frase extra reabre lo que ya estaba cerrado y te muestra necesitado. La pregunta limpia + silencio le entrega la decisión entera — claridad, no presión — y tu calma es el último argumento de venta.",
+      "principioId": "p-silencio-trabaja",
+      "dificultad": 1,
+      "tags": [
+        "cierre",
+        "pregunta-de-cierre"
+      ]
+    },
+    {
+      "id": "fase-017",
+      "tipo": "clasica",
+      "fase": "cierre",
+      "frente": "CIERRE — Respondiste bien una objeción y el prospecto quedó conforme. ¿Cómo re-cerrás sin sonar insistente?",
+      "dorso": "Confirmá primero, cerrá después: «¿Con esto queda resuelto lo del [objeción]? ... Bien. ¿Algo más que te frene, o lo arrancamos?». Devolvés el control con la pregunta y esperás. Nunca re-cierres SIN confirmar antes que la objeción quedó resuelta — cerrar sobre una duda viva es presión.",
+      "porQue": "Confirmar-antes-de-cerrar es claridad operativa: verifica que no queda niebla y convierte la resolución de la objeción en un micro-sí más. El «¿algo más o avanzamos?» además re-aísla: si aparece OTRA objeción, sabés que estás ante pantallas y cambiás de estrategia.",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 2,
+      "tags": [
+        "cierre",
+        "re-cierre"
+      ]
+    },
+    {
+      "id": "fase-018",
+      "tipo": "clasica",
+      "fase": "cierre",
+      "frente": "CIERRE — El sí no va a llegar hoy (motivo real verificado). ¿Cómo terminás la llamada para que la venta siga viva?",
+      "dorso": "Próximo paso CONCRETO, nunca niebla: «Perfecto: hablalo con [pareja] y nos vemos el jueves 18hs, 15 minutos, y me confirmás — ¿te agendo?». Fecha + hora + qué va a pasar en ese contacto. Y recapitulá qué quedó acordado: «Entonces: el programa te cierra, lo único pendiente es X. ¿Correcto?». Prohibido: «cualquier cosa me escribís».",
+      "porQue": "«Quedamos en contacto» es donde las ventas van a morir: sin fecha, la emoción de hoy se enfría y el statu quo gana por abandono. El compromiso concreto agendado en caliente mantiene la decisión viva, y la recapitulación fija por escrito mental qué ya está acordado (consistencia para la próxima llamada).",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 2,
+      "tags": [
+        "cierre",
+        "seguimiento"
+      ]
+    },
+    {
+      "id": "fase-101",
+      "tipo": "clasica",
+      "fase": "quimica",
+      "frente": "QUÍMICA — Las cuatro preguntas de apertura antes de cualquier otra cosa.",
+      "dorso": "«¿Cómo estás? ¿Estás cómodo ahí? ¿Tenés tiempo para tomar la llamada? ¿Necesitás que haya alguien más?» La última es la que previene la objeción del socio o la pareja.",
+      "porQue": "Las tres primeras eliminan fricciones que después arruinan la llamada —incomodidad, apuro, interrupciones— y la cuarta desactiva una de las objeciones más frecuentes cuando todavía es barato hacerlo.",
+      "principioId": "p-marco-previo",
+      "dificultad": 1,
+      "tags": [
+        "apertura",
+        "prevencion"
+      ]
+    },
+    {
+      "id": "fase-102",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — La pregunta de urgencia que casi nadie hace, y que separa al que va a decidir del que va a postergar.",
+      "dorso": "«¿Por qué HOY y no hace un mes o dentro de un mes? ¿Por qué no seguirlo procrastinando? ¿Por qué no seguir haciendo lo que venías haciendo?»",
+      "porQue": "Obliga a verbalizar qué cambió, y esa respuesta es la que después usás en el cierre. Si no puede contestarla, no hay urgencia real y probablemente tampoco haya venta hoy.",
+      "principioId": "p-futuro-vs-presente",
+      "dificultad": 2,
+      "tags": [
+        "urgencia",
+        "arma-secreta"
+      ]
+    },
+    {
+      "id": "fase-103",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — ¿Qué son el costo de oportunidad y el costo hundido, y por qué necesitás los dos?",
+      "dorso": "Costo de oportunidad: todo lo que dejó de ganar por no actuar. Costo hundido: todo lo que ya invirtió en cosas que no funcionaron. Cuando reconoce que ya pagó caro por mantenerse como está, el precio deja de ser el problema.",
+      "porQue": "El precio es el único número que trae en la cabeza. Estos dos le ponen cifra a lo que hasta ahora se sentía gratis, y contra esas cifras tu precio es una fracción.",
+      "principioId": "p-costo-inaccion",
+      "dificultad": 3,
+      "tags": [
+        "costo",
+        "psycho-selling"
+      ]
+    },
+    {
+      "id": "fase-104",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — El prospecto no tiene un dolor claro, solo quiere mejorar. ¿Qué hacés?",
+      "dorso": "Fijás una situación soñada, la alejás lo máximo posible poniendo una barrera concreta, y mostrás que la única forma de cruzarla es con estructura y acompañamiento. Con este perfil conviene ir primero a Objetivos y no a Problema.",
+      "porQue": "Sin dolor no hay urgencia, y sin urgencia no hay decisión hoy. Si no podés profundizar hacia abajo, ampliás hacia arriba: la brecha entre donde está y donde quiere estar cumple la misma función.",
+      "principioId": "p-futuro-vs-presente",
+      "dificultad": 3,
+      "tags": [
+        "sin-dolor",
+        "tipo-2"
+      ]
+    },
+    {
+      "id": "fase-105",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — ¿Para qué sirve ubicar el dolor en la pirámide de Maslow?",
+      "dorso": "Para saber cuánta urgencia hay de verdad. Fisiológico y seguridad (ingresos, previsibilidad) mueven a decidir ya; pertenencia y reconocimiento mueven menos; autorrealización es el dolor más sutil y el más profundo. Cuanto más abajo está, más urgente es.",
+      "porQue": "Dos personas con el mismo problema declarado deciden distinto según qué necesidad tienen amenazada. Te dice si podés cerrar hoy o si primero hay que trabajar la urgencia.",
+      "principioId": "p-vender-es-diagnosticar",
+      "dificultad": 3,
+      "tags": [
+        "maslow",
+        "psycho-selling"
+      ]
+    },
+    {
+      "id": "fase-106",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — ¿Qué es la disonancia latente y cuáles son sus tres señales?",
+      "dorso": "Es saber internamente que algo no está bien y convencerse de que está bien igual. Las señales: sabe que está estancado pero cree que «es parte del proceso»; intuye que necesita ayuda pero se dice «todavía no es el momento»; siente que repite errores pero no los enfrenta.",
+      "porQue": "Reconocerla te dice que hay material para trabajar aunque el prospecto suene conforme. Nombrarla en voz alta es lo que rompe la negación suave.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 3,
+      "tags": [
+        "disonancia",
+        "psycho-selling"
+      ]
+    },
+    {
+      "id": "fase-107",
+      "tipo": "clasica",
+      "fase": "descubrimiento",
+      "frente": "DESCUBRIMIENTO — ¿Por qué preguntar «¿por qué confiás en nosotros?» y qué buscás en la respuesta?",
+      "dorso": "Buscás cuál de los tres pilares ya está firme y cuál falta: carácter (integridad y coherencia), competencia (sabe hacerlo) o cuidado (le importo). Lo que mencione te dice dónde apoyarte y qué reforzar antes del cierre.",
+      "porQue": "La confianza no es un bloque único: se puede confiar en tu método y no en tu intención, o al revés. Saber cuál falta evita reforzar el que ya estaba firme.",
+      "principioId": "p-vender-es-diagnosticar",
+      "dificultad": 3,
+      "tags": [
+        "confianza",
+        "psycho-selling"
+      ]
+    },
+    {
+      "id": "fase-108",
+      "tipo": "clasica",
+      "fase": "pitch",
+      "frente": "PITCH — ¿Cuándo NO presentás? Las tres condiciones eliminatorias.",
+      "dorso": "Si no sabés si está emocionalmente comprometido con su problema, no presentes. Si no recapitulaste, no presentes. Si él mismo no dijo que necesita ayuda, no presentes.",
+      "porQue": "Mientras está en alerta emocional el cerebro no evalúa propuestas: recién cuando siente alivio por ser comprendido se reactiva la parte que puede considerar tu oferta. Presentar antes es hablarle a alguien que no puede escuchar.",
+      "principioId": "p-dolor-antes-precio",
+      "dificultad": 3,
+      "tags": [
+        "timing",
+        "psycho-selling"
+      ]
+    },
+    {
+      "id": "fase-109",
+      "tipo": "clasica",
+      "fase": "pitch",
+      "frente": "PITCH — La fórmula para explicar un pilar usando el lenguaje del propio prospecto.",
+      "dorso": "«Como me dijiste [dolor lógico]… y te está haciendo sentir [dolor emocional]… lo que hacemos acá es [entregable]… para que puedas tener [beneficio lógico]… lo que te va a permitir [beneficio emocional]. ¿Tiene sentido?»",
+      "porQue": "Cada pilar queda anclado a algo que él dijo, así que no puede sonar genérico. Y el «¿tiene sentido?» al final ata: acumula síes y te avisa si perdiste a alguien en el camino.",
+      "principioId": "p-palabras-del-prospecto",
+      "dificultad": 3,
+      "tags": [
+        "pilares",
+        "formula"
+      ]
+    },
+    {
+      "id": "fase-110",
+      "tipo": "clasica",
+      "fase": "compromiso",
+      "frente": "COMPROMISO — ¿Qué error de fraseo delata inseguridad al decir el precio?",
+      "dorso": "Decir «el valor del programa es de X». Eso no es valor, es precio. El valor es lo que el cliente percibe que va a recibir; el precio es lo que paga. Suavizarlo con la palabra «valor» transmite que a vos también te incomoda.",
+      "porQue": "Suavizás algo que no necesita suavizarse, y el prospecto lo lee al instante. Precio simple, claro, y silencio: cualquier adorno baja el valor percibido.",
+      "principioId": "p-silencio-trabaja",
+      "dificultad": 2,
+      "tags": [
+        "precio",
+        "fraseo"
+      ]
+    },
+    {
+      "id": "fase-111",
+      "tipo": "clasica",
+      "fase": "cierre",
+      "frente": "CIERRE — No cerró. ¿Cómo decidís si merece seguimiento o hay que resolverlo ahora?",
+      "dorso": "Cuatro chequeos de congruencia: ¿reconoció su dolor? ¿admitió que necesita resolverlo? ¿mostró deseo genuino? ¿lo único que trajo fue un límite puntual de último momento? Si dan bien, está procesando y el seguimiento funciona. Si fue ambiguo o esquivo toda la llamada, va a repetir el patrón afuera.",
+      "porQue": "El comportamiento futuro espeja al pasado. Aceptar un «te aviso» de alguien que estuvo evasivo es regalar la venta y el tiempo; a esos hay que resolverlos en la llamada.",
+      "principioId": "p-congruencia",
+      "dificultad": 3,
+      "tags": [
+        "seguimiento",
+        "criterio"
+      ]
+    },
+    {
+      "id": "fase-112",
+      "tipo": "clasica",
+      "fase": "cierre",
+      "frente": "CIERRE — No cerró pero fue congruente. ¿Cuáles son los pasos del seguimiento que no se pueden saltear?",
+      "dorso": "Terminar en buenos términos, siempre. Agendar en la MISMA llamada, dentro de 24 a 48 horas, con doble alternativa de horario. Agendarlo vos, pedirle el mail y esperar a que confirme en sesión. Preguntarle qué puntos quiere profundizar. Y mandarle un audio o video con su plan de acción.",
+      "porQue": "«Avisame cuando lo pienses» es un no en cuotas. Y nunca hay que terminar mal: es alguien que se va con una impresión sobre si querías ayudarlo o sacarle la plata.",
+      "principioId": "p-congruencia",
+      "dificultad": 2,
+      "tags": [
+        "seguimiento",
+        "sop"
+      ]
+    }
+  ]
+}

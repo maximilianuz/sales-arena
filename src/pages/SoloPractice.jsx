@@ -15,6 +15,7 @@ import BuyerAvatar from '../components/BuyerAvatar';
 import SoloCoachPanel from '../components/SoloCoachPanel';
 import MethodScores from '../components/MethodScores';
 import { LeadActorView } from '../components/ScenarioPanel';
+import { crearLineaDeTiempo, guardarSesionDeVoz } from '../modules/training/roleplay/sesionVoz';
 
 // Correo del admin al que se pide validación para practicar solo (protege los
 // tokens de la API). Configurable por env; default al contacto ya usado en la app.
@@ -77,7 +78,7 @@ function Meter({ meter, value, isEn }) {
   const Icon = meter.icon;
   return (
     <div style={{ flex: 1 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
         <Icon size={11} color={meter.color} /> {isEn ? meter.en : meter.es}
       </div>
       <div style={{ height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
@@ -87,7 +88,7 @@ function Meter({ meter, value, isEn }) {
   );
 }
 
-export default function SoloPractice({ onBack }) {
+export default function SoloPractice({ onBack, onOpenTraining }) {
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
 
@@ -150,6 +151,11 @@ export default function SoloPractice({ onBack }) {
   useEffect(() => () => { runIdRef.current++; }, []);
   const [elapsed, setElapsed] = useState(0); // segundos de llamada
   const recorderRef = useRef(null);
+  // Línea de tiempo con timestamps reales para la auditoría del módulo Training:
+  // es lo que permite medir silencios, que en la simulación escrita no se pueden
+  // medir. No es estado: los timestamps no se dibujan y no deben re-renderizar.
+  const lineaRef = useRef(crearLineaDeTiempo());
+  const guardadoRef = useRef(false); // una llamada se guarda una sola vez
   const scrollRef = useRef(null);
 
   const MAX_SECONDS = 60 * 60; // tope duro de 60 minutos
@@ -217,6 +223,18 @@ export default function SoloPractice({ onBack }) {
   // (start/submitTurn se recrean cada render, así que capturan el voiceOn actual.)
   // `onStart` se dispara cuando la voz EMPIEZA a sonar (no al pedir el TTS): la
   // UI revela el texto recién ahí → burbuja, boca y audio quedan sincronizados.
+  // Al colgar, la llamada se guarda como sesión del módulo Training: pasa por
+  // las mismas 5 métricas deterministas que la simulación escrita y alimenta el
+  // plan. Solo el modo closer — en "Ser Lead" y Observador el que vende no sos
+  // vos, así que medirte ahí no significaría nada.
+  useEffect(() => {
+    if (phase !== 'ended' || mode !== 'closer' || guardadoRef.current) return;
+    guardadoRef.current = true;
+    guardarSesionDeVoz(lineaRef.current.turnos, {
+      escenario: scenario, resultado: outcome, duracionSeg: elapsed,
+    }).catch(() => { /* practicar no puede fallar porque falle el registro */ });
+  }, [phase, mode, scenario, outcome, elapsed]);
+
   const playBuyerVoice = async (reply, sc, emotion = 'neutral', onStart) => {
     let revealed = false;
     const reveal = () => { if (!revealed) { revealed = true; onStart?.(); } };
@@ -236,6 +254,10 @@ export default function SoloPractice({ onBack }) {
     } finally {
       reveal(); // si el TTS falló antes de arrancar, el texto no se pierde
       setSpeaking(false);
+      // El turno del prospecto se anota cuando su audio TERMINA, no cuando
+      // arranca: el silencio que mide la auditoría es el hueco entre que él dejó
+      // de hablar y vos empezaste.
+      lineaRef.current.prospecto(reply);
     }
   };
 
@@ -332,7 +354,7 @@ export default function SoloPractice({ onBack }) {
         theme: genConfig.theme,
         leadTemperature: genConfig.leadTemperature,
         targetObjection: genConfig.targetObjection,
-      }, stagesList, i18n.language);
+      }, stagesList, i18n.language, { soloMode: true });
       if (!sc || typeof sc !== 'object') throw new Error(isEn ? 'Could not generate the buyer.' : 'No se pudo generar el comprador.');
       setScenario(sc);
 
@@ -346,6 +368,8 @@ export default function SoloPractice({ onBack }) {
       setElapsed(0);
       setPaused(false);
       pausedRef.current = false;
+      lineaRef.current.limpiar();
+      guardadoRef.current = false;
       const runId = ++runIdRef.current;
       setPhase('live');
 
@@ -382,6 +406,9 @@ export default function SoloPractice({ onBack }) {
     const nextHistory = [...messages, { role: 'user', content: text }];
     setMessages(nextHistory);
     setBusy(true);
+    // Se anota con el momento en que arrancó a hablar, no con el de ahora: entre
+    // medio corrió Whisper, y esa latencia no es un silencio suyo.
+    if (mode === 'closer') lineaRef.current.closer(text);
     try {
       if (mode === 'lead') {
         // Vos sos el LEAD: responde el closer experto (en el history user = lead).
@@ -427,6 +454,7 @@ export default function SoloPractice({ onBack }) {
     unlockAudio(); // gesto del usuario → desbloquea audio en móvil
     const text = input.trim();
     if (!text) return;
+    lineaRef.current.marcarInicioDeTurno();
     setInput('');
     submitTurn(text);
   };
@@ -453,6 +481,7 @@ export default function SoloPractice({ onBack }) {
       try {
         unlockAudio(); // gesto del usuario → desbloquea audio en móvil
         recorderRef.current = await startRecording();
+        lineaRef.current.marcarInicioDeTurno(); // arrancó a hablar: acá corta el silencio
         setRecording(true);
       } catch {
         setError(isEn ? 'Microphone access denied.' : 'No se pudo acceder al micrófono.');
@@ -592,14 +621,14 @@ export default function SoloPractice({ onBack }) {
     // `m` = multiplicador de recompensa (debe coincidir con analyze-session): así
     // el closer ve el trade-off riesgo/recompensa ANTES de elegir.
     const LEVELS = isEn
-      ? [{ v: 'Principiante', l: '🟢 Beginner', d: 'Friendly', m: 0.8 }, { v: 'Intermedio', l: '🟡 Intermediate', d: 'Skeptical', m: 1.0 }, { v: 'Avanzado', l: '🔴 Advanced', d: 'Hostile', m: 1.4 }]
-      : [{ v: 'Principiante', l: '🟢 Principiante', d: 'Amigable', m: 0.8 }, { v: 'Intermedio', l: '🟡 Intermedio', d: 'Escéptico', m: 1.0 }, { v: 'Avanzado', l: '🔴 Avanzado', d: 'Hostil', m: 1.4 }];
+      ? [{ v: 'Principiante', l: 'Beginner', d: 'Friendly', m: 0.8 }, { v: 'Intermedio', l: 'Intermediate', d: 'Skeptical', m: 1.0 }, { v: 'Avanzado', l: 'Advanced', d: 'Hostile', m: 1.4 }]
+      : [{ v: 'Principiante', l: 'Principiante', d: 'Amigable', m: 0.8 }, { v: 'Intermedio', l: 'Intermedio', d: 'Escéptico', m: 1.0 }, { v: 'Avanzado', l: 'Avanzado', d: 'Hostil', m: 1.4 }];
     const TEMPS = isEn
-      ? [{ v: 'Frío', l: '🧊 Cold', d: "Doesn't know you", m: 1.15 }, { v: 'Templado', l: '☀️ Warm', d: 'Saw your ad', m: 1.0 }, { v: 'Caliente', l: '🔥 Hot', d: 'Referral', m: 0.9 }]
-      : [{ v: 'Frío', l: '🧊 Frío', d: 'No te conoce', m: 1.15 }, { v: 'Templado', l: '☀️ Templado', d: 'Vio tu anuncio', m: 1.0 }, { v: 'Caliente', l: '🔥 Caliente', d: 'Referido', m: 0.9 }];
+      ? [{ v: 'Frío', l: 'Cold', d: "Doesn't know you", m: 1.15 }, { v: 'Templado', l: 'Warm', d: 'Saw your ad', m: 1.0 }, { v: 'Caliente', l: 'Hot', d: 'Referral', m: 0.9 }]
+      : [{ v: 'Frío', l: 'Frío', d: 'No te conoce', m: 1.15 }, { v: 'Templado', l: 'Templado', d: 'Vio tu anuncio', m: 1.0 }, { v: 'Caliente', l: 'Caliente', d: 'Referido', m: 0.9 }];
     // Objeción principal que enfrentará el closer (misma idea que el Trainer).
     const OBJECTIONS = [
-      { v: 'Aleatoria (Sorpréndeme)', l: isEn ? '🎲 Surprise me' : '🎲 Sorpréndeme' },
+      { v: 'Aleatoria (Sorpréndeme)', l: isEn ? 'Surprise me' : 'Sorpréndeme' },
       { v: 'Lo tengo que pensar', l: isEn ? '“I need to think about it”' : '“Lo tengo que pensar”' },
       { v: 'Me parece caro', l: isEn ? '“It’s too expensive”' : '“Me parece caro”' },
       { v: 'No tengo el dinero', l: isEn ? '“I don’t have the money”' : '“No tengo el dinero”' },
@@ -623,9 +652,18 @@ export default function SoloPractice({ onBack }) {
     return (
       <div className="app-container" style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
         <div style={{ maxWidth: '520px', width: '100%' }}>
-          <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-            <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.5rem' }}>
+            <button className="btn btn-outline" onClick={onBack} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ArrowLeft size={16} /> {isEn ? 'Back' : 'Volver'}
+            </button>
+            {/* Acceso directo al módulo de entrenamiento (flashcards + base de
+                conocimiento): la práctica diaria vive al lado del roleplay. */}
+            {onOpenTraining && (
+              <button className="btn btn-outline" onClick={onOpenTraining} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: 'auto', color: '#22d3ee', borderColor: 'rgba(34,211,238,0.4)' }}>
+                <BookOpen size={16} /> {isEn ? 'Closer Training' : 'Entrenamiento'}
+              </button>
+            )}
+          </div>
           <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎯</div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: '600', margin: '0 0 0.75rem' }}>
@@ -657,7 +695,7 @@ export default function SoloPractice({ onBack }) {
                   <button type="button" key={m.id} onClick={() => setMode(m.id)}
                     style={{ flex: 1, padding: '0.6rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(139,92,246,0.65)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(139,92,246,0.16)' : 'rgba(255,255,255,0.02)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', fontSize: '0.82rem', fontWeight: '700' }}>{m.icon} {m.l}</div>
-                    <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.15rem' }}>{m.d}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.15rem' }}>{m.d}</div>
                   </button>
                 );
               })}
@@ -676,13 +714,13 @@ export default function SoloPractice({ onBack }) {
               </div>
 
               {/* Industria / rubro */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Industry' : 'Rubro / Industria'}
               </label>
               <select value={genConfig.theme} onChange={e => setGenConfig(c => ({ ...c, theme: e.target.value }))}
                 style={{ width: '100%', padding: '0.6rem 0.75rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.04)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.88rem', fontFamily: 'inherit', cursor: 'pointer', marginBottom: '0.85rem' }}>
                 <optgroup label={isEn ? 'Random' : 'Aleatorio'}>
-                  <option value="Aleatorio (Sorpréndeme)">{isEn ? '🎲 Surprise me' : '🎲 Sorpréndeme'}</option>
+                  <option value="Aleatorio (Sorpréndeme)">{isEn ? 'Surprise me' : 'Sorpréndeme'}</option>
                 </optgroup>
                 {INDUSTRY_CATEGORIES.map((cat) => (
                   <optgroup key={cat.es} label={isEn ? cat.en : cat.es}>
@@ -694,7 +732,7 @@ export default function SoloPractice({ onBack }) {
               </select>
 
               {/* Dificultad */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Difficulty' : 'Dificultad'}
               </label>
               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
@@ -704,15 +742,15 @@ export default function SoloPractice({ onBack }) {
                     <button type="button" key={l.v} onClick={() => setGenConfig(c => ({ ...c, level: l.v }))}
                       style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(100,210,255,0.6)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(100,210,255,0.15)' : 'rgba(255,255,255,0.02)' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{l.l}</div>
-                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{l.d}</div>
-                      <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: l.m > 1 ? 'var(--accent)' : l.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{l.m}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{l.d}</div>
+                      <div style={{ fontSize: '0.72rem', fontWeight: '700', marginTop: '0.15rem', color: l.m > 1 ? 'var(--accent)' : l.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{l.m}</div>
                     </button>
                   );
                 })}
               </div>
 
               {/* Temperatura */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Lead Temperature' : 'Temperatura'}
               </label>
               <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.85rem' }}>
@@ -722,15 +760,15 @@ export default function SoloPractice({ onBack }) {
                     <button type="button" key={t.v} onClick={() => setGenConfig(c => ({ ...c, leadTemperature: t.v }))}
                       style={{ flex: 1, padding: '0.55rem 0.3rem', borderRadius: '0.75rem', cursor: 'pointer', textAlign: 'center', font: 'inherit', color: 'white', border: `1px solid ${active ? 'rgba(255,159,10,0.5)' : 'rgba(255,255,255,0.07)'}`, background: active ? 'rgba(255,159,10,0.1)' : 'rgba(255,255,255,0.02)' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{t.l}</div>
-                      <div style={{ fontSize: '0.64rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{t.d}</div>
-                      <div style={{ fontSize: '0.62rem', fontWeight: '700', marginTop: '0.15rem', color: t.m > 1 ? 'var(--accent)' : t.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{t.m}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.6)', marginTop: '0.1rem' }}>{t.d}</div>
+                      <div style={{ fontSize: '0.72rem', fontWeight: '700', marginTop: '0.15rem', color: t.m > 1 ? 'var(--accent)' : t.m < 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)' }}>×{t.m}</div>
                     </button>
                   );
                 })}
               </div>
 
               {/* Objeción principal a enfrentar */}
-              <label style={{ display: 'block', fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.66)', marginBottom: '0.35rem' }}>
                 {isEn ? 'Main objection' : 'Objeción principal'}
               </label>
               <select value={genConfig.targetObjection} onChange={e => setGenConfig(c => ({ ...c, targetObjection: e.target.value }))}
@@ -750,7 +788,7 @@ export default function SoloPractice({ onBack }) {
                 {isEn ? 'What do you want to practice?' : '¿Qué querés practicar?'}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                {[{ id: 'all', label: isEn ? '📞 Full call (up to 60 min)' : '📞 Llamada completa (hasta 60 min)' },
+                {[{ id: 'all', label: isEn ? 'Full call (up to 60 min)' : 'Llamada completa (hasta 60 min)' },
                   ...stagesList.map(s => ({ id: s.id, label: s.label }))].map(opt => {
                   const active = effectiveFocusId === opt.id;
                   const locked = isFree && FREE_LOCKED_STAGES.includes(opt.id);
@@ -842,7 +880,7 @@ export default function SoloPractice({ onBack }) {
                 "Ser Lead" y "Observador" (sin puntaje: acá se aprende mirando). */}
             {mode !== 'closer' && techniques.length > 0 && (
               <div style={{ textAlign: 'left', marginTop: '1rem', padding: '1rem', background: 'rgba(100,210,255,0.07)', borderRadius: '0.75rem', border: '1px solid rgba(100,210,255,0.2)' }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--primary-text)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                   🎯 {isEn ? 'Techniques the expert closer used' : 'Técnicas que usó el closer experto'}
                 </div>
                 {[...new Set(techniques)].map((tq, i) => (
@@ -926,12 +964,12 @@ export default function SoloPractice({ onBack }) {
         <div className="glass-panel" style={{ padding: '0.85rem 1rem', marginBottom: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <button onClick={leaveCall} title={isEn ? 'Back to lobby' : 'Volver al lobby'} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}><ArrowLeft size={18} /></button>
+              <button aria-label={isEn ? 'Back to lobby' : 'Volver al lobby'} onClick={leaveCall} title={isEn ? 'Back to lobby' : 'Volver al lobby'} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}><ArrowLeft size={18} /></button>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem', fontWeight: '700', color: elapsed >= MAX_SECONDS - 300 ? 'var(--danger)' : 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
                 <Clock size={13} /> {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
               </span>
               {focusStage && (
-                <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.3)', padding: '0.15rem 0.5rem', borderRadius: '2rem' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--primary-text)', background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.3)', padding: '0.15rem 0.5rem', borderRadius: '2rem' }}>
                   {focusStage.label}
                 </span>
               )}
@@ -939,7 +977,7 @@ export default function SoloPractice({ onBack }) {
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               {mode === 'closer' && (
                 <button onClick={() => setShowCoach(true)} title={isEn ? 'Closer coach' : 'Coach del closer'}
-                  style={{ ...HEADER_BTN, background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', color: 'var(--primary)' }}>
+                  style={{ ...HEADER_BTN, background: 'rgba(100,210,255,0.12)', border: '1px solid rgba(100,210,255,0.35)', color: 'var(--primary-text)' }}>
                   <BookOpen size={16} /> {isEn ? 'Coach' : 'Coach'}
                 </button>
               )}
@@ -962,7 +1000,7 @@ export default function SoloPractice({ onBack }) {
                   {voiceOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
                 </button>
               )}
-              <button onClick={hangUp} title={isEn ? 'Hang up' : 'Colgar'}
+              <button aria-label={isEn ? 'Hang up' : 'Colgar'} onClick={hangUp} title={isEn ? 'Hang up' : 'Colgar'}
                 style={{ ...HEADER_BTN, background: 'rgba(255,69,58,0.12)', border: '1px solid rgba(255,69,58,0.3)', color: 'var(--danger)' }}>
                 <PhoneOff size={16} />
               </button>
@@ -1006,7 +1044,7 @@ export default function SoloPractice({ onBack }) {
             prompter (rota cada 2 turnos — ayuda al principiante sin dictarle). */}
         {mode === 'closer' && (
           <div className="glass-panel" style={{ padding: '0.55rem 0.9rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-            <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--primary)', background: 'rgba(100,210,255,0.1)', border: '1px solid rgba(100,210,255,0.25)', padding: '0.2rem 0.6rem', borderRadius: '2rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--primary-text)', background: 'rgba(100,210,255,0.1)', border: '1px solid rgba(100,210,255,0.25)', padding: '0.2rem 0.6rem', borderRadius: '2rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
               {promptStage?.label}
             </span>
             {prompterOn && promptTip && (
@@ -1029,7 +1067,7 @@ export default function SoloPractice({ onBack }) {
           <div className="glass-panel" style={{ padding: showProduct ? '0.75rem 0.9rem' : '0.5rem 0.9rem', marginBottom: '0.75rem', border: '1px solid rgba(48,209,88,0.25)', background: 'rgba(48,209,88,0.06)' }}>
             <button onClick={() => setShowProduct(v => !v)} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: 0, color: 'inherit' }}>
               <Package size={14} color="var(--success)" />
-              <span style={{ fontSize: '0.68rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--success)' }}>{isEn ? 'What you sell' : 'Qué vendés'}</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--success)' }}>{isEn ? 'What you sell' : 'Qué vendés'}</span>
               {scenario.productPrice > 0 && (
                 <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--success)' }}>· USD {Number(scenario.productPrice).toLocaleString('en-US')}</span>
               )}
@@ -1051,18 +1089,18 @@ export default function SoloPractice({ onBack }) {
               <div key={i} style={{ alignSelf: right ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
                 {/* Nombres en el partido IA vs IA (tenis): quién habla en cada lado */}
                 {mode === 'observer' && (
-                  <div style={{ fontSize: '0.64rem', fontWeight: '700', color: 'var(--text-muted)', margin: `0 0.3rem 0.15rem`, textAlign: right ? 'right' : 'left', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-muted)', margin: `0 0.3rem 0.15rem`, textAlign: right ? 'right' : 'left', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     {m.role === 'closer' ? `${closerName} · Closer` : leadName}
                   </div>
                 )}
                 {/* Técnica aplicada por el closer experto (aprendizaje en vivo) */}
                 {m.technique && (
-                  <div style={{ fontSize: '0.66rem', fontWeight: '700', color: '#a5b4fc', margin: '0 0.3rem 0.2rem', textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: '700', color: '#a5b4fc', margin: '0 0.3rem 0.2rem', textAlign: 'right' }}>
                     🎯 {m.technique}
                   </div>
                 )}
                 {!right && m.emotion && m.emotion !== 'neutral' && (
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', margin: '0 0 0.2rem 0.3rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0 0 0.2rem 0.3rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                     <span>{EMOTION_META[m.emotion]?.emoji}</span>
                     <span style={{ fontStyle: 'italic' }}>{isEn ? EMOTION_META[m.emotion]?.en : EMOTION_META[m.emotion]?.es}</span>
                   </div>
@@ -1121,7 +1159,7 @@ export default function SoloPractice({ onBack }) {
             disabled={busy || recording || transcribing}
             style={{ flex: 1, padding: '0.75rem 1rem', borderRadius: '0.75rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', color: 'white', fontSize: '0.9rem', outline: 'none' }}
           />
-          <button className="btn btn-primary" onClick={send} disabled={busy || !input.trim()} style={{ padding: '0 1.1rem', display: 'flex', alignItems: 'center' }}>
+          <button aria-label="Enviar" className="btn btn-primary" onClick={send} disabled={busy || !input.trim()} style={{ padding: '0 1.1rem', display: 'flex', alignItems: 'center' }}>
             <Send size={18} />
           </button>
         </div>
@@ -1133,7 +1171,7 @@ export default function SoloPractice({ onBack }) {
       {/* "Ser Lead": tu ficha de personaje — la MISMA vista que ve el Lead humano
           en las salas grupales (LeadActorView). Panel lateral, no tapa el chat. */}
       {showCharacter && scenario && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', justifyContent: 'flex-end' }} onClick={() => setShowCharacter(false)}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 'var(--z-overlay)', display: 'flex', justifyContent: 'flex-end' }} onClick={() => setShowCharacter(false)}>
           <div className="glass-panel" onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '420px', height: '100%', overflowY: 'auto', borderRadius: 0, padding: '1.5rem 1.25rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.25rem' }}>
               <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600', flex: 1 }}>🎭 {isEn ? 'Your character' : 'Tu personaje'}</h2>

@@ -25,7 +25,18 @@ export const handler = async (event) => {
     return { statusCode: 200, headers, body: JSON.stringify({ allowed }) };
   } catch (e) {
     console.error('[solo-access] error:', e.message);
-    // Ante un fallo de verificación, negamos por defecto (protege los tokens).
-    return { statusCode: 200, headers, body: JSON.stringify({ allowed: false }) };
+    // Ante un fallo de verificación seguimos negando: proteger los tokens es lo
+    // que este chequeo viene a hacer, y el bloqueo real está en los endpoints
+    // que gastan.
+    //
+    // Pero se distingue POR QUÉ. "No tenés acceso" y "no pude preguntarlo" son
+    // dos cosas distintas, y confundirlas manda a alguien a pedir permiso por
+    // mail cuando lo que falta es una variable de entorno. Pasa siempre en
+    // local: sin FIREBASE_SERVICE_ACCOUNT el admin se queda afuera de su propia
+    // app sin ninguna pista de por qué.
+    return {
+      statusCode: 200, headers,
+      body: JSON.stringify({ allowed: false, motivo: 'sin-verificar', detalle: e.message }),
+    };
   }
 };

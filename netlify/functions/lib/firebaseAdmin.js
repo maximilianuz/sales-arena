@@ -16,15 +16,38 @@ function base64url(input) {
     .replace(/=+$/, '');
 }
 
+// Las credenciales se aceptan en las DOS formas que circulan por el proyecto:
+// el JSON entero en FIREBASE_SERVICE_ACCOUNT, o las tres variables sueltas que
+// .env.example viene documentando desde siempre —y que hasta ahora el código no
+// leía, así que quien seguía el ejemplo al pie de la letra terminaba con las
+// functions caídas y sin ninguna pista de por qué.
+//
+// En la forma suelta la clave privada suele venir con los saltos de línea
+// escapados (\n literal), porque muchos paneles no aceptan multilínea. Si no se
+// desescapan, la firma RSA falla con un error que no menciona nada de esto.
+function credencialesDeEntorno() {
+  const crudo = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (crudo) {
+    try { return JSON.parse(crudo); }
+    catch { throw new Error('FIREBASE_SERVICE_ACCOUNT no es JSON válido.'); }
+  }
+  const privateKey = (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+  return {
+    client_email: process.env.FIREBASE_CLIENT_EMAIL || '',
+    private_key: privateKey,
+    project_id: process.env.FIREBASE_PROJECT_ID || '',
+  };
+}
+
 async function getAccessToken() {
   const now = Math.floor(Date.now() / 1000);
   if (cachedToken && cachedTokenExpiry > now + 60) {
     return cachedToken;
   }
 
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
+  const serviceAccount = credencialesDeEntorno();
   if (!serviceAccount.client_email || !serviceAccount.private_key) {
-    throw new Error('FIREBASE_SERVICE_ACCOUNT inválido o no configurado.');
+    throw new Error('Credenciales de Firebase no configuradas: falta FIREBASE_SERVICE_ACCOUNT (JSON) o el trío FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY + FIREBASE_PROJECT_ID.');
   }
 
   const header = { alg: 'RS256', typ: 'JWT' };
@@ -140,21 +163,41 @@ export async function isAdmin(uid) {
   }
 }
 
-// ¿Este usuario puede usar la práctica solo (que consume tokens de la API)?
-// Se decide SOLO por uid (no por email del cliente → no se puede spoofear):
-//   • es admin (admin/admins/{uid}), o
-//   • tiene el flag users/{uid}/soloApproved === true, o
-//   • tiene suscripción activa (users/{uid}/subscriptionStatus === 'active').
-// Los correos que el admin agrega a admin/authorizedEmails se convierten en
-// 'active' por el flujo verificado de verify-authorized-email al iniciar sesión,
-// así que agregar un email a esa lista habilita también la práctica solo.
+// Proveedores que significan que ALGUIEN PAGÓ de verdad. Los otorgamientos
+// internos (whitelist de emails, panel de admin, bypass por ADMIN_EMAILS)
+// también dejan `subscriptionStatus: 'active'`, así que el estado por sí solo
+// no distingue a un cliente de alguien que agregaste a una lista.
+const PROVEEDORES_DE_PAGO = ['stripe', 'mercadopago', 'nowpayments'];
+
+// ¿Este usuario puede usar la PRÁCTICA INDIVIDUAL (que consume muchos tokens)?
+// Se decide SOLO por uid, nunca por el email que manda el cliente.
+//
+// Antes bastaba `subscriptionStatus === 'active'`, y eso resultó demasiado
+// amplio: la whitelist `admin/authorizedEmails` otorga ese mismo estado, así
+// que CUALQUIERA agregado a esa lista —aunque fuera para darle acceso general
+// a la app o a la práctica en equipo— quedaba habilitado también para la
+// individual. En la práctica, una cuenta cualquiera entraba al Entrenamiento
+// Closer sin que nadie lo hubiera decidido.
+//
+// Ahora son tres caminos EXPLÍCITOS:
+//   1. es admin (admin/admins/{uid})
+//   2. tiene users/{uid}/soloApproved === true — el visto bueno del admin,
+//      que es una decisión aparte de estar en la whitelist
+//   3. pagó de verdad: suscripción activa CON un proveedor de pago real
+//
+// Estar en la whitelist ya no alcanza por sí solo. Eso es a propósito: la
+// whitelist es acceso general a la app; la práctica individual es otra cosa y
+// se aprueba por separado.
 export async function isSoloAuthorized(uid) {
   if (!uid) return false;
   if (await isAdmin(uid)) return true;
   try {
     const u = await getUserData(uid);
     if (u?.soloApproved === true) return true;
-    if (u?.subscriptionStatus === 'active') return true;
+    if (u?.subscriptionStatus === 'active'
+        && PROVEEDORES_DE_PAGO.includes(String(u?.subscriptionProvider || '').toLowerCase())) {
+      return true;
+    }
   } catch { /* sin datos → no autorizado */ }
   return false;
 }

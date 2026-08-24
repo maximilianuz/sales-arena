@@ -12,7 +12,7 @@ export default function UpgradeModal({ feature, requiredPlan = 'closer', onClose
     <div style={{
       position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: '1rem'
+      zIndex: 'var(--z-modal)', padding: '1rem'
     }}>
       <div className="glass-panel" style={{ maxWidth: '400px', width: '100%', position: 'relative' }}>
         <button
@@ -31,14 +31,14 @@ export default function UpgradeModal({ feature, requiredPlan = 'closer', onClose
           </h3>
           <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>
             <strong style={{ color: 'white' }}>{feature}</strong> {t('upgrade.availableIn')}{' '}
-            <strong style={{ color: 'var(--primary)' }}>Plan {planLabel}</strong>
+            <strong style={{ color: 'var(--primary-text)' }}>Plan {planLabel}</strong>
           </p>
         </div>
 
         <div style={{ background: 'rgba(79,70,229,0.1)', borderRadius: '0.75rem', padding: '1rem', marginBottom: '1.5rem', border: '1px solid rgba(79,70,229,0.2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
             <Zap size={16} color="var(--primary)" />
-            <span style={{ fontWeight: '700', color: 'var(--primary)' }}>Plan {planLabel} — {planPrice}</span>
+            <span style={{ fontWeight: '700', color: 'var(--primary-text)' }}>Plan {planLabel} — {planPrice}</span>
           </div>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             {t('upgrade.planDescription')}

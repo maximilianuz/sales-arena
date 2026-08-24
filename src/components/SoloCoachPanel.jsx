@@ -4,6 +4,7 @@ import { X, UserCheck, ListChecks, ChevronDown, ChevronUp, Lightbulb } from 'luc
 import { getDefaultStages } from '../utils/defaultStages';
 import { getStageCoaching } from '../utils/coachingKnowledge';
 import { LEAD_PERSONALITIES, personalityView } from '../utils/leadPersonalities';
+import { useCerrarConEscape } from '../hooks/useCerrarConEscape';
 
 // Guía del closer para el modo práctica solo: qué producto vende, la chuleta de
 // los 4 perfiles DISC (SIN revelar cuál es este lead — eso lo descubre
@@ -15,10 +16,12 @@ function StageRow({ stage, isEn }) {
   const coach = getStageCoaching(stage.id, isEn ? 'en' : 'es');
   return (
     <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '0.6rem 0' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setOpen(o => !o)}>
+      <button type="button" onClick={() => setOpen(o => !o)} aria-expanded={open}
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', width: '100%',
+                 minHeight: '44px', background: 'none', border: 'none', font: 'inherit', color: 'inherit', textAlign: 'left', padding: 0 }}>
         <span style={{ fontWeight: '700', fontSize: '0.88rem', flex: 1 }}>{stage.label}</span>
         {open ? <ChevronUp size={15} color="var(--text-muted)" /> : <ChevronDown size={15} color="var(--text-muted)" />}
-      </div>
+      </button>
       <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{stage.objective}</div>
       {open && coach && (
         <div style={{ marginTop: '0.6rem', paddingLeft: '0.5rem', borderLeft: '2px solid rgba(139,92,246,0.4)' }}>
@@ -57,7 +60,7 @@ function StageRow({ stage, isEn }) {
 function Section({ icon, title, children }) {
   return (
     <div style={{ marginBottom: '1.25rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary)', fontWeight: '600', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--primary-text)', fontWeight: '600', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
         {icon} {title}
       </div>
       {children}
@@ -66,19 +69,20 @@ function Section({ icon, title, children }) {
 }
 
 export default function SoloCoachPanel({ onClose }) {
+  useCerrarConEscape(onClose);
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
   const stages = getDefaultStages(i18n.language);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', justifyContent: 'flex-end' }} onClick={onClose}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 'var(--z-overlay)', display: 'flex', justifyContent: 'flex-end' }} onClick={onClose}>
       <div
         className="glass-panel"
         onClick={e => e.stopPropagation()}
         style={{ width: '100%', maxWidth: '420px', height: '100%', overflowY: 'auto', borderRadius: 0, padding: '1.5rem 1.25rem' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600', flex: 1 }}>{isEn ? '📋 Closer coach' : '📋 Coach del closer'}</h2>
+          <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600', flex: 1 }}>{isEn ? 'Closer coach' : 'Coach del closer'}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
         </div>
 

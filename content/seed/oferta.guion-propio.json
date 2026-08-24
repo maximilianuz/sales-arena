@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "descripcion": "Tu guion de venta high ticket, en 7 fases. Los campos de la oferta quedan como plantilla para que los completes con lo que estés vendiendo; el guion en cambio está completo y es lo que el simulador y las flashcards usan. Cada fase incluye su transicion, que es lo que engancha la fase siguiente y lo que hay que memorizar literal.",
+  "oferta": {
+    "id": "of-propia",
+    "nombre": "Mi oferta",
+    "tagline": "COMPLETAR: una línea con el resultado y el plazo",
+    "avatarCliente": "COMPLETAR: a quién le vendés. Edad, ocupación, situación, qué ya probó y por qué falló, capacidad de inversión.",
+    "problema": "COMPLETAR: el problema concreto que resolvés y por qué lo que probaron antes no funcionó.",
+    "mecanismo": {
+      "nombre": "COMPLETAR: nombre del método",
+      "fases": [
+        "COMPLETAR: fase 1 del método, con qué pasa y en qué plazo",
+        "COMPLETAR: fase 2",
+        "COMPLETAR: fase 3"
+      ],
+      "diferencial": "COMPLETAR: por qué esto es distinto de lo que ya probó. No es información: es estructura, acompañamiento y medición."
+    },
+    "entregables": [
+      "COMPLETAR: qué recibe concretamente"
+    ],
+    "precio": {
+      "moneda": "USD",
+      "contado": 0,
+      "cuotas": { "cantidad": 0, "monto": 0 },
+      "politica": "El precio es el mismo para todos. La flexibilidad es en la forma de pago, nunca en el precio."
+    },
+    "garantia": "COMPLETAR: condicional y con exigencia de participación, o ninguna.",
+    "pruebaSocial": [
+      { "nombre": "COMPLETAR: nombre, edad, ocupación", "caso": "De dónde partió, qué pasó, en cuánto tiempo. Con números." }
+    ],
+    "descalificadores": [
+      "No puede decidir solo y se niega a incluir a quien decide",
+      "Busca información gratis, no acompañamiento",
+      "El problema que trae no es el que vos resolvés",
+      "No hay urgencia real ni costo de seguir igual",
+      "Espera resultados sin hacer el trabajo"
+    ]
+  },
+  "guion": {
+    "ofertaId": "of-propia",
+    "duracionTotalMin": 45,
+    "notaGeneral": "Las preguntas son la estructura, no un libreto: el orden importa, las palabras exactas se adaptan a lo que el prospecto va dando. Lo que SÍ va literal son las transiciones, los tres acuerdos del Marco, la pregunta de cierre y las líneas de aislar. Regla transversal: anotar frases textuales del prospecto en cada fase, en papel y no tecleando, porque el teclado se escucha y incomoda.",
+    "fases": [
+      {
+        "id": "fase-quimica",
+        "orden": 1,
+        "nombre": "Química",
+        "duracionMin": "3-5",
+        "objetivo": "Romper el hielo y salir de la categoría 'vendedor'. Tomar la temperatura del lead, detectar su perfil dominante y conseguir el disparador: qué pasó que lo hizo agendar justo ahora.",
+        "preguntas": [
+          "«Hola [nombre], soy [tu nombre]. ¿Cómo estás? ¿Estás cómodo ahí? ¿Tenés tiempo para tomar la llamada?»",
+          "«¿Necesitás que haya alguien más?» — esta previene la objeción del socio o la pareja antes de que exista",
+          "«¿Dónde te encontrás?»",
+          "«¿Cómo llegaste a nosotros? ¿Hace cuánto que nos conocés?»",
+          "«¿Qué te llamó la atención, o qué hizo que quisieras agendar esta llamada?» — escuchá especialmente el 'justo ahora'"
+        ],
+        "queDar": "Calidez genuina, energía espejada a su estilo, algún comentario humano propio. Presencia real: si te cuenta algo, respondé a eso antes de avanzar a tu próxima pregunta.",
+        "queReservar": "Todo lo demás: producto, precio, método, promesas. Si pregunta precio acá, rango o redirección y permiso para preguntar primero.",
+        "erroresTipicos": [
+          "Small talk de manual, sobre todo hablar del clima",
+          "Estar pensando la próxima pregunta mientras el otro habla: la conversación se vuelve formulario",
+          "Meter energía que no tiene nada que ver con su estado, y sobrecargarlo",
+          "Emitir un juicio o diagnóstico temprano, que activa la defensa y corta el acceso al dato real"
+        ],
+        "transicion": "Cuando responde el «¿qué te motivó justo ahora?», escuchás, validás, y encadenás directo al Marco: «Buenísimo que lo cuentes. Mirá, te propongo algo para aprovechar la llamada…»"
+      },
+      {
+        "id": "fase-marco",
+        "orden": 2,
+        "nombre": "Marco",
+        "duracionMin": "2-3",
+        "objetivo": "Establecer las reglas de la conversación y tomar el control. Cerrar tres acuerdos: el orden de la llamada, el permiso del 'no' de ambos lados, y quién toma la decisión. Todo lo que acuerdes acá lo vas a cobrar en el Cierre.",
+        "preguntas": [
+          "«Esta llamada es bastante simple: quiero entender qué estás haciendo ahora, qué resultados estás teniendo, y qué resultados aspirás a tener.» — crear la brecha con la mano",
+          "«Preguntame todo lo que necesites; el objetivo es que tengas claridad total.»",
+          "«También voy a hacerte una serie de preguntas para entender tu situación y saber si esto siquiera se alinea con lo que querés lograr.»",
+          "«Y también para ver si sos el tipo de cliente con el que trabajamos, porque hay muchos con los que decidimos no trabajar. Si veo que es tu caso, te lo voy a decir y listo.» — descualificación preventiva",
+          "«Si veo que te puedo ayudar, te muestro una estrategia y, si te parece, conversamos los próximos pasos. ¿Te parece bien?» — esperar el sí"
+        ],
+        "queDar": "El proceso completo y transparente de la llamada. La posibilidad real del 'no', incluido el tuyo.",
+        "queReservar": "Precio y contenido del programa. Si empuja, rango y vuelta al orden acordado.",
+        "erroresTipicos": [
+          "Saltearlo por ansiedad de agradar: se paga con evasivas en el minuto cuarenta",
+          "No tenerlo ensayado, con lo cual suena robótico y forzado",
+          "Mantener el tono liviano del rapport: acá hay que bajar una marcha un minuto para marcar autoridad"
+        ],
+        "transicion": "Con los acuerdos cerrados: «Genial. Entonces contame: esto que me decías de [disparador que dio en Química]…»"
+      },
+      {
+        "id": "fase-descubrimiento",
+        "orden": 3,
+        "nombre": "Descubrimiento",
+        "duracionMin": "15-20",
+        "objetivo": "El corazón de la llamada. Construir el punto A en escenas concretas, cuantificar el costo del problema en números dichos por él, mapear intentos fallidos y su porqué, y llegar al punto B con su carga emocional. Diagnosticar primero el tipo de cliente: con necesidad y urgencia, o motivado por oportunidad.",
+        "preguntas": [
+          "Contexto: «¿A qué te dedicás? ¿Te gusta?» / «¿Cuánto tiempo llevás haciendo esto?»",
+          "Disparador: «Después de todo ese tiempo, ¿cuál fue la gota que rebalsó el vaso?»",
+          "Problema: «¿Cuál es tu mayor problema o desafío en este momento?» → «¿A qué te referís con esto?»",
+          "Impacto: «¿Cómo te está afectando? ¿Qué impacto tiene?» — granular hasta números concretos",
+          "Urgencia: «¿Por qué ahora y no hace un mes o dentro de un mes? ¿Por qué no seguirlo procrastinando?»",
+          "Esfuerzo: «¿Qué intentaste para solucionarlo? ¿Te funcionó?» → si no: «¿por qué creés que no funcionó?»",
+          "Duda: «¿Por qué sentís que no lograste resolver esto por tu cuenta hasta ahora?»",
+          "Costo: «¿Te puedo hacer una pregunta personal? ¿Qué ocurriría si pasa un año y nada cambió?»",
+          "Apoyo: «¿Cómo tomás decisiones normalmente? ¿Necesitás hablarlo con alguien?»",
+          "Objetivos: «Ahora que tengo más claro tu contexto, ¿cuál es tu objetivo en última instancia?» → «¿y qué más?» hasta tener tres o cuatro",
+          "Cierre de fase: «¿Hay algún otro dato relevante que no hayamos hablado?»"
+        ],
+        "queDar": "Escucha total: acuse de recibo, silencios respetados, sus palabras reflejadas. Validación emocional cuando toca algo hondo. Bajar una octava la voz al indagar en el dolor. Nada más.",
+        "queReservar": "Todo el programa. Cada vez que un dolor te tiente a adelantar solución, mordete la lengua: es la fase donde el pitch ansioso mata más llamadas.",
+        "erroresTipicos": [
+          "Pitch ansioso: responder cada dolor con un adelanto de solución",
+          "Quedarse en el dolor superficial: nunca te dan el real de entrada",
+          "Hablar más que el prospecto: la proporción sana es 70/30 a favor de escuchar",
+          "No poner números al costo, con lo cual el precio después no tiene contra qué compararse",
+          "Dar por supuesto cuál es el problema real en vez de sacárselo con preguntas"
+        ],
+        "transicion": "Checklist antes de cruzar: ① problema con sus palabras ② costo cuantificado ③ intentos fallidos y su porqué ④ punto B con su importancia. ¿Están los cuatro? → Transición. ¿Falta uno? → seguís acá."
+      },
+      {
+        "id": "fase-transicion",
+        "orden": 4,
+        "nombre": "Transición",
+        "duracionMin": "3-5",
+        "objetivo": "La bisagra. Devolverle su historia ordenada, obtener el 'sí, es así' y conseguir permiso para presentar. Acá el prospecto pasa de contar su problema a escuchar tu solución, y no aporta información nueva: reorganiza la que ya está.",
+        "preguntas": [
+          "Permiso: «Entiendo… a ver si te parece bien que ponga todo esto en limpio, así confirmamos si entendí bien desde dónde partimos, ¿sí?»",
+          "① Contexto: «Vos hoy estás en [sector], hacés [actividad] hace [tiempo], y hasta ahora lograste [resultado parcial].»",
+          "② Detonante: «Agendaste esta sesión porque pasó [evento], y eso te hizo ver que no podías seguir igual.»",
+          "③ Cuellos de botella: «Lo que hoy te traba, si lo pongo en claro, son tres cosas: [una], [dos], [tres].»",
+          "④ Qué le falta: «Y lo que te falta no es actitud ni ganas. Es [estructura/estrategia/dirección]. Y si esto sigue igual, lo que va a pasar es [escenario realista].»",
+          "⑤ Situación soñada: «Lo que vos querés lograr no es solo [meta]. Es [estado deseado], y poder sostenerlo sin depender de la suerte.»",
+          "Confirmación: «¿Estoy en lo correcto? ¿Me equivoco?»",
+          "«Según lo que me acabás de decir, definitivamente podemos ayudarte.» + caso de éxito conectado a su situación puntual",
+          "«¿Querés que te cuente cuál sería la mejor estrategia para [lo que dijo]?»"
+        ],
+        "queDar": "Su verdad, ordenada, con sus palabras. Claridad y dirección. El reconocimiento de que fue escuchado.",
+        "queReservar": "Todavía nada del programa. Esto no es el pitch: es la puerta al pitch.",
+        "erroresTipicos": [
+          "Saltearla por apuro para llegar al pitch: es el momento que más autoridad te da",
+          "Recapitular con tu jerga en vez de sus palabras",
+          "No pedir permiso antes, con lo cual suena a resumen de vendedor y no a comprensión",
+          "Avanzar sin el 'sí, es así' explícito"
+        ],
+        "transicion": "Su «sí, contame» es la puerta. Entrás al Pitch con el puente: «Bien. Vos hoy estás en [A] y querés llegar a [B]. Dejame mostrarte cómo te llevo de A a B.»"
+      },
+      {
+        "id": "fase-pitch",
+        "orden": 5,
+        "nombre": "Pitch de ventas",
+        "duracionMin": "5-8",
+        "objetivo": "Presentar el programa como el puente entre su A y su B, con su vocabulario, en pocos minutos. No es mostrar lo que tenés: es ponerle coordenadas concretas a su deseo abstracto. Chequear temperatura cada 60-90 segundos.",
+        "preguntas": [
+          "Pre-pitch, permiso: «¿Te puedo dar mi punto de vista?»",
+          "Pre-pitch, credibilidad con SUS números: «Tu objetivo es [X]. Si armamos [Y], necesitás [Z] por mes. No es algo súper complejo.»",
+          "Pre-pitch, atar: «¿Esto te hace sentido? ¿Estás de acuerdo?»",
+          "Promesa de alto valor: «Estos van a ser los [X] pilares para llevarte de [actual] a [deseada] en [tiempo].»",
+          "Pilares, fórmula con su lenguaje: «Como me dijiste [dolor lógico]… y te está haciendo sentir [dolor emocional]… lo que hacemos acá es [entregable]… para que puedas tener [beneficio lógico]… lo que te va a permitir [beneficio emocional]. ¿Tiene sentido?»",
+          "Pilares, fórmula de contraste: «La mayor parte del mercado hace [error]… el problema es [consecuencia]… entonces lo que hacemos en cambio es [característica]… para que puedas [beneficio inverso].»",
+          "Entrega: el cómo, breve y rico en beneficios, no en logística",
+          "Chequeos de temperatura: «¿Cómo lo ves hasta acá?» / «¿Esto es lo que buscabas?»"
+        ],
+        "queDar": "Estructura y personalización. El paso a paso aplicado a su caso. Historias reales y analogías que conecten con su experiencia.",
+        "queReservar": "El precio. Se dice en Compromiso, no acá.",
+        "erroresTipicos": [
+          "Presentar antes de tiempo: si no recapitulaste o él no pidió ayuda, no presentes",
+          "Sonar guionizado: la fórmula se escribe y después se adapta hasta que salga natural",
+          "Complicarlo: si el prospecto no puede repetir tu plan después, no lo entendió, y si no lo entendió no compra",
+          "Hablar de características en vez de emociones",
+          "Forzar nombres de pilares: si suenan armados, resultan contraproducentes"
+        ],
+        "transicion": "Después de atar la entrega, se pasa a Compromiso con la comprobación de temperatura: «Solo por curiosidad, ¿qué te parece este servicio? ¿Es lo que estás buscando?»"
+      },
+      {
+        "id": "fase-compromiso",
+        "orden": 6,
+        "nombre": "Compromiso",
+        "duracionMin": "3-5",
+        "objetivo": "Confirmar que quiere antes de hablar de plata. Va después de explicar la entrega y antes del precio. Tres partes: comprobación de temperatura, próximos pasos, e inversión.",
+        "preguntas": [
+          "Temperatura: «Solo por curiosidad, ¿qué te parece este servicio? ¿Es lo que estás buscando?»",
+          "Doble confirmación: «¿Y te sentís capaz de conseguir tus objetivos con esto?»",
+          "Si el tono es incierto — Alineación: «Lo más importante para mí es que estemos alineados. En una escala del 1 al 10, donde 1 es terminar la conversación y 10 es hacerlo ahora, ¿dónde estás?»",
+          "Si responde 9 o menos: «Te agradezco la sinceridad. ¿Qué necesitarías para estar en un 10?»",
+          "Descualificación: «No puedo trabajar con alguien que esté en un 9. Tiene que ser un 10.»",
+          "Próximos pasos: explicar el onboarding → «¿te parece bien?»",
+          "Tres chequeos antes del precio: «¿Te hace sentido?» / «¿Qué es lo que más te gustó?» / «¿Tenés alguna preocupación en la que te veas siguiendo el paso a paso y NO consiguiendo resultados?»",
+          "Inversión: el precio, simple y claro. Y callarse."
+        ],
+        "queDar": "Claridad sobre qué pasa después de decir que sí. La sensación de que la decisión es suya.",
+        "queReservar": "Cualquier justificación del precio. Se dice y se sostiene el silencio.",
+        "erroresTipicos": [
+          "Decir el precio antes de confirmar que lo quiere",
+          "Adornar el número o hablar rápido después de decirlo",
+          "Llamarle 'valor' al precio para suavizarlo: transmite inseguridad",
+          "Romper el silencio con opciones de pago o descuentos"
+        ],
+        "transicion": "El silencio post-precio SE SOSTIENE. Su primera frase define la entrada al Cierre: sí directo → logística de pago; objeción → clasificar y trabajar; silencio muy largo → «¿qué estás pensando?», una sola vez y con calma."
+      },
+      {
+        "id": "fase-cierre",
+        "orden": 7,
+        "nombre": "Cierre",
+        "duracionMin": "5-10",
+        "objetivo": "Convertir la temperatura en decisión limpia. Clasificar y trabajar las objeciones que aparezcan, y si el sí no llega hoy con motivo real, dejar un próximo paso con fecha y hora concretas.",
+        "preguntas": [
+          "Pregunta de cierre: «¿Querés que lo arranquemos?» → silencio",
+          "Doble alternativa de pago: «¿Por dónde te queda más cómodo: tarjeta, transferencia o crypto?»",
+          "Aislar cualquier objeción: «Te entiendo. Si resolvemos eso, ¿hay algo más que te frene, o avanzamos?»",
+          "Ir a la raíz: «¿A qué te referís exactamente con eso?»",
+          "Escenario binario: «Hay dos caminos: seguir igual, o cambiar. ¿Cuál elegís vos?»",
+          "Que cierre solo: «¿Cuál creés entonces que es la acción que tenés que tomar para conseguir eso que dijiste que querés?» → y te callás",
+          "Confirmación final: «¿Habría alguna razón por la que finalmente no lo harías?»",
+          "Si no cierra hoy: «¿Te queda más cómodo el martes a las 14 o a las 16?» — agendar en la misma llamada, dentro de 24 a 48 horas"
+        ],
+        "queDar": "Dirección y calma. La certeza de que la decisión es suya y que vos podés acompañarlo a cruzar.",
+        "queReservar": "La ansiedad. Si necesitás el sí, se nota y lo perdés.",
+        "erroresTipicos": [
+          "Rebatir la frase declarada sin clasificar primero qué tipo de objeción es",
+          "Justificar el precio, que es entrar al trapo y perder",
+          "Terminar mal: nunca, es alguien que se va con la impresión de que le querían sacar la plata",
+          "Aceptar un 'te aviso' de quien fue esquivo toda la llamada",
+          "Dejar el seguimiento sin fecha ni hora"
+        ],
+        "transicion": "Con el sí: pago o seña en la llamada si es posible, primera sesión agendada, y un cierre humano. Sin el sí pero con congruencia: próximo paso agendado con día y hora, y un Loom con su plan de acción."
+      }
+    ]
+  }
+}

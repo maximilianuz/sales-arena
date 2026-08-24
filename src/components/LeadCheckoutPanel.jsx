@@ -23,7 +23,7 @@ function FlowConvinced({ scenario, onClose, onResult }) {
             {isEn ? `Investment: $X — Shall we move forward?` : `Inversión: $X — ¿Avanzamos?`}
           </p>
           <button className="btn btn-primary btn-large" onClick={handleBuy} style={{ width: '100%' }}>
-            {isEn ? '✅ Yes, let\'s do it!' : '✅ ¡Sí, lo hacemos!'}
+            {isEn ? 'Yes, let\'s do it!' : '¡Sí, lo hacemos!'}
           </button>
           <button className="btn btn-outline" onClick={onClose} style={{ width: '100%', marginTop: '0.5rem', fontSize: '0.85rem' }}>
             {isEn ? 'Not now' : 'Ahora no'}
@@ -32,7 +32,7 @@ function FlowConvinced({ scenario, onClose, onResult }) {
       ) : (
         <div>
           <CheckCircle size={48} color="var(--success)" style={{ margin: '0 auto 1rem' }} />
-          <h3 style={{ color: 'var(--success)' }}>{isEn ? '🎉 Deal closed!' : '🎉 ¡Trato cerrado!'}</h3>
+          <h3 style={{ color: 'var(--success)' }}>{isEn ? 'Deal closed!' : '¡Trato cerrado!'}</h3>
         </div>
       )}
     </div>
@@ -52,7 +52,7 @@ function FlowHesitant({ scenario, onClose, onResult }) {
   const isEn = i18n.language?.startsWith('en');
 
   const handleCoupon = () => {
-    setCouponError(isEn ? '❌ Invalid code. Code expired or already used.' : '❌ Código inválido. El cupón venció o ya fue usado.');
+    setCouponError(isEn ? 'Invalid code. Code expired or already used.' : 'Código inválido. El cupón venció o ya fue usado.');
   };
 
   const handleTermsScroll = (e) => {
@@ -68,7 +68,7 @@ function FlowHesitant({ scenario, onClose, onResult }) {
   if (done) return (
     <div style={{ textAlign: 'center' }}>
       <CheckCircle size={48} color="var(--success)" style={{ margin: '0 auto 1rem' }} />
-      <h3 style={{ color: 'var(--success)' }}>{isEn ? '🎉 Deal closed!' : '🎉 ¡Trato cerrado!'}</h3>
+      <h3 style={{ color: 'var(--success)' }}>{isEn ? 'Deal closed!' : '¡Trato cerrado!'}</h3>
     </div>
   );
 
@@ -136,7 +136,7 @@ function FlowHesitant({ scenario, onClose, onResult }) {
             <p>{isEn ? 'By proceeding with this purchase you agree to the following terms: The service begins immediately upon payment confirmation. No refunds after 7 days of service activation. The client accepts to use the platform exclusively for training purposes.' : 'Al proceder con esta compra aceptás los siguientes términos: El servicio comienza inmediatamente tras la confirmación del pago. No se realizarán reembolsos luego de 7 días de activado el servicio. El cliente acepta utilizar la plataforma exclusivamente con fines de entrenamiento.'}</p>
             <p>{isEn ? 'The provider reserves the right to modify the service features with 30 days notice. Session data is stored securely and is not shared with third parties without express consent.' : 'El proveedor se reserva el derecho de modificar las características del servicio con 30 días de aviso previo. Los datos de las sesiones se almacenan de forma segura y no se comparten con terceros sin consentimiento expreso.'}</p>
             <p style={{ color: 'var(--success)', fontWeight: 'bold', marginTop: '1rem' }}>
-              {isEn ? '✓ You have reached the end of the terms.' : '✓ Llegaste al final de los términos.'}
+              {isEn ? 'You have reached the end of the terms.' : 'Llegaste al final de los términos.'}
             </p>
           </div>
           <button
@@ -145,7 +145,7 @@ function FlowHesitant({ scenario, onClose, onResult }) {
             disabled={!termsScrolled}
             style={{ width: '100%', opacity: termsScrolled ? 1 : 0.5 }}
           >
-            {termsScrolled ? (isEn ? '✅ I accept and confirm' : '✅ Acepto y confirmo') : (isEn ? 'Scroll to continue...' : 'Desplazate para continuar...')}
+            {termsScrolled ? (isEn ? 'I accept and confirm' : 'Acepto y confirmo') : (isEn ? 'Scroll to continue...' : 'Desplazate para continuar...')}
           </button>
         </div>
       )}
@@ -179,7 +179,7 @@ function FlowReluctant({ scenario, onClose, onResult }) {
     <div style={{ textAlign: 'center' }}>
       <AlertCircle size={48} color="var(--danger)" style={{ margin: '0 auto 1rem' }} />
       <h3 style={{ color: 'var(--danger)', marginBottom: '0.5rem' }}>
-        {isEn ? '❌ Card declined' : '❌ Tarjeta rechazada'}
+        {isEn ? 'Card declined' : 'Tarjeta rechazada'}
       </h3>
       <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
         {isEn ? 'There was a problem processing your payment. Please check your card details or try with another card.' : 'Hubo un problema al procesar tu pago. Revisá los datos de tu tarjeta o intentá con otra.'}
@@ -234,13 +234,13 @@ function CheckoutModal({ frictionLevel, scenario, onClose, onResult }) {
   const isEn = i18n.language?.startsWith('en');
 
   const titles = {
-    convinced: isEn ? '✅ Ready to buy' : '✅ Listo para comprar',
-    hesitant:  isEn ? '🤔 Thinking about it...' : '🤔 Lo estoy pensando...',
-    reluctant: isEn ? '😬 Not so sure...' : '😬 No estoy tan seguro...'
+    convinced: isEn ? 'Ready to buy' : 'Listo para comprar',
+    hesitant:  isEn ? 'Thinking about it...' : 'Lo estoy pensando...',
+    reluctant: isEn ? 'Not so sure...' : 'No estoy tan seguro...'
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '1rem' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 'var(--z-modal-alto)', padding: '1rem' }}>
       <div className="glass-panel" style={{ maxWidth: '420px', width: '100%', position: 'relative' }}>
         <button onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
           <X size={20} />
@@ -321,7 +321,7 @@ export default function LeadCheckoutPanel({ checkout, scenario, updateCheckoutPh
       <div className="glass-panel" style={{ border: '1px solid rgba(79,70,229,0.4)', background: 'rgba(79,70,229,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
           <ShoppingCart size={18} color="var(--primary)" />
-          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--primary)' }}>
+          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: 'var(--primary-text)' }}>
             {isEn ? 'Your Friction Level (private)' : 'Tu Nivel de Fricción (privado)'}
           </h3>
         </div>
@@ -382,7 +382,7 @@ export default function LeadCheckoutPanel({ checkout, scenario, updateCheckoutPh
 
         {phase === 'active' && (
           <div style={{ textAlign: 'center', color: 'var(--accent)', fontSize: '0.85rem' }}>
-            {isEn ? '⚡ Checkout in progress...' : '⚡ Checkout en progreso...'}
+            {isEn ? 'Checkout in progress...' : 'Checkout en progreso...'}
           </div>
         )}
       </div>

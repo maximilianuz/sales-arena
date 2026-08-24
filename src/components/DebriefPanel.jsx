@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, CheckSquare, Target, RotateCcw, Activity, ShieldAlert } from 'lucide-react';
+import { MessageSquare, CheckSquare, Target, RotateCcw, Activity, ShieldAlert, CircleCheck, CircleAlert, CircleX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const MARKERS = [
-  { type: 'good',        emoji: '🟢', color: '48,209,88',  label: { es: 'Brillante',   en: 'Brilliant' } },
-  { type: 'opportunity', emoji: '🟡', color: '255,159,10',  label: { es: 'Oportunidad', en: 'Opportunity' } },
-  { type: 'error',       emoji: '🔴', color: '255,69,58',   label: { es: 'Error',        en: 'Error' } }
+  // Cada marcador se distingue por ICONO además de por color. Con tres círculos
+  // del mismo tamaño, un daltónico ve tres marcadores idénticos y la sesión
+  // queda sin leer — y es 1 de cada 12 hombres.
+  { type: 'good',        Icono: CircleCheck, color: '48,209,88',  label: { es: 'Brillante',   en: 'Brilliant' } },
+  { type: 'opportunity', Icono: CircleAlert, color: '255,159,10',  label: { es: 'Oportunidad', en: 'Opportunity' } },
+  { type: 'error',       Icono: CircleX,     color: '255,69,58',   label: { es: 'Error',        en: 'Error' } }
 ];
 
 export default function DebriefPanel({ activeStageIndex, stages, roomNotes, updateNotes, isFacilitator }) {
@@ -118,7 +121,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', paddingBottom: '0.65rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <MessageSquare size={14} color="rgba(139,92,246,0.8)" />
-          <span style={{ fontSize: '0.7rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>
             {isEn ? 'Evaluation' : 'Evaluación'}
           </span>
         </div>
@@ -132,7 +135,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
       {/* Tab bar */}
       <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '0.625rem', padding: '0.2rem' }}>
         {[
-          { id: 'live', label: isEn ? '⚡ Live' : '⚡ En Vivo' },
+          { id: 'live', label: isEn ? 'Live' : 'En Vivo' },
           { id: 'analysis', label: isEn ? 'Analysis' : 'Análisis' },
           { id: 'retro', label: isEn ? 'Retro' : 'Retro' }
         ].map(tab => (
@@ -150,7 +153,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
         {/* Live moment markers */}
         {updateNotes && (
           <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '0.875rem', padding: '0.875rem', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '0.6rem' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '0.6rem' }}>
               ⚡ {isEn ? 'Live moment markers' : 'Marcadores en vivo'}
             </div>
             <input
@@ -162,7 +165,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               {MARKERS.map(m => (
                 <button key={m.type} onClick={() => addMoment(m.type)} style={{ flex: 1, padding: '0.5rem 0.4rem', borderRadius: '0.625rem', border: `1px solid rgba(${m.color},0.3)`, background: `rgba(${m.color},0.08)`, color: `rgb(${m.color})`, cursor: 'pointer', fontSize: '0.78rem', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', transition: 'all 0.15s' }}>
-                  {m.emoji} {isEn ? m.label.en : m.label.es}
+                  <m.Icono size={14} strokeWidth={2.4} style={{ verticalAlign: '-2px', marginRight: '0.3rem' }} />{isEn ? m.label.en : m.label.es}
                 </button>
               ))}
             </div>
@@ -172,7 +175,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
         {/* Moments timeline */}
         {(roomNotes?.moments || []).length > 0 && (
           <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: '0.75rem', padding: '0.75rem', border: '1px solid rgba(255,255,255,0.05)', maxHeight: '140px', overflowY: 'auto' }}>
-            <div style={{ fontSize: '0.65rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.58)', marginBottom: '0.5rem' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.58)', marginBottom: '0.5rem' }}>
               {isEn ? 'Timeline' : 'Línea de tiempo'}
             </div>
             {(roomNotes.moments || []).slice().reverse().map((m, i) => {
@@ -180,7 +183,7 @@ export default function DebriefPanel({ activeStageIndex, stages, roomNotes, upda
               const mins = Math.floor((Date.now() - m.time) / 60000);
               return (
                 <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', marginBottom: '0.35rem', fontSize: '0.78rem' }}>
-                  <span>{marker.emoji}</span>
+                  <span style={{ display: 'flex', alignItems: 'center' }}><marker.Icono size={14} strokeWidth={2.4} color={`rgb(${marker.color})`} /></span>
                   <span style={{ color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>{mins === 0 ? (isEn ? 'Just now' : 'Ahora') : `${mins}m`}{m.stage ? ` · ${m.stage}` : ''}</span>
                   {m.note && <span style={{ color: 'rgba(255,255,255,0.88)' }}>{m.note}</span>}
                 </div>

@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "mazo": "tipos-objecion",
+  "descripcion": "Clasificar antes de responder. La misma frase —«necesito más tiempo»— puede ser un patrón de postergación, una defensa del ego o una herida vieja, y cada una se trabaja distinto. Este mazo entrena el diagnóstico; las respuestas están en el mazo de Objeciones y no conviene abrirlo hasta tener este al día.",
+  "cartas": [
+    {
+      "id": "tip-001",
+      "tipo": "clasica",
+      "frente": "¿Cuál es la diferencia entre una RAZÓN y una OBJECIÓN, y por qué decide todo lo que hacés después?",
+      "dorso": "Una razón es un limitante logístico real y verificable: tiene una hora por día, está de viaje tres meses. Una objeción es un limitante emocional o mental: cree que no va a poder sostenerlo. Con una razón se negocia, se adapta o se descualifica con honestidad. Con una objeción se trabaja.",
+      "porQue": "Confundirlas hace perder la llamada por cualquiera de los dos lados. Tratar una razón como objeción te convierte en el que presiona sobre un imposible; tratar una objeción como razón te hace soltar a alguien que solo necesitaba que le sostuvieran la mirada.",
+      "principioId": "p-razon-vs-objecion",
+      "dificultad": 2,
+      "tags": ["clasificacion", "fundamento"]
+    },
+    {
+      "id": "tip-002",
+      "tipo": "clasica",
+      "frente": "¿Qué es exactamente una objeción, según la definición del método?",
+      "dorso": "Una manifestación de resistencia, miedo o incertidumbre expresada a través de una afirmación FALSA. Una mentira que encubre la razón real, porque revelar la raíz lo dejaría vulnerable.",
+      "porQue": "El cálculo interno del prospecto es que el estrés de admitir el miedo real es mayor que el de decir una frase presentable. Si trabajás sobre la frase declarada, trabajás sobre humo: la resolvés y aparece otra.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 2,
+      "tags": ["clasificacion", "definicion"]
+    },
+    {
+      "id": "tip-003",
+      "tipo": "clasica",
+      "frente": "Los cuatro tipos de objeción. Nombralos y decí en una línea qué es cada uno.",
+      "dorso": "① ESTRUCTURAL: un patrón automático que usa siempre ante cualquier decisión incómoda. ② DEFENSIVA: reacción del ego cuando se siente invadido o sin control. ③ HERIDA: habla del pasado no resuelto, no de vos. ④ DE IDENTIDAD: no te objeta a vos, se objeta a sí mismo.",
+      "porQue": "La misma frase pertenece a tipos distintos según cómo aparece. «Necesito más tiempo» dicho sin emoción y sin que se lo pidas es estructural; dicho justo cuando ibas a cerrar y con el tono más seco es defensiva. La respuesta es opuesta.",
+      "principioId": "p-objecion-es-informacion",
+      "dificultad": 3,
+      "tags": ["clasificacion", "taxonomia"]
+    },
+    {
+      "id": "tip-004",
+      "tipo": "clasica",
+      "frente": "Objeción ESTRUCTURAL: ¿cómo la reconocés?",
+      "dorso": "Aparece muy rápido y con naturalidad, casi sin que se la pidas. No se detiene a explicarla. Suena lógica pero no tiene emoción. Es una generalización —«siempre me tomo mi tiempo»— y se activa incluso antes de hablar de precio. Se nota que no está procesando: está reproduciendo un discurso aprendido.",
+      "porQue": "La ausencia de emoción es la señal. Una objeción sentida trae carga; una frase armada sale lisa. Si sale lisa, no estás discutiendo con una duda sino con un hábito de postergación.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 3,
+      "tags": ["clasificacion", "estructural"]
+    },
+    {
+      "id": "tip-005",
+      "tipo": "clasica",
+      "frente": "Detectaste una objeción ESTRUCTURAL. ¿Cómo la trabajás?",
+      "dorso": "No confrontes: mostrale que esa frase es parte del patrón que lo tiene frenado hace años. «¿Te diste cuenta de que cada vez que estás por dar un paso, aparece esta misma frase en tu cabeza? ¿Y si eso no fuera lógica… sino miedo disfrazado?»",
+      "porQue": "Discutir la frase la refuerza, porque la ha defendido mil veces. Lo que nunca hizo es verla como patrón. En el momento en que la reconoce como algo que viene repitiendo, deja de sonarle a criterio propio.",
+      "principioId": "p-emocion-decide-logica-justifica",
+      "dificultad": 3,
+      "tags": ["clasificacion", "estructural"]
+    },
+    {
+      "id": "tip-006",
+      "tipo": "clasica",
+      "frente": "Objeción DEFENSIVA: ¿cómo la reconocés y qué la provoca?",
+      "dorso": "Aparece justo cuando estás por cerrar o por profundizar emocionalmente. El tono cambia: se enfría, se pone más seco o evasivo. La provoca sentirse invadido, sin control, o llevado a un lugar de vulnerabilidad que no quiere sostener.",
+      "porQue": "No es una estrategia de postergación: es un mecanismo de defensa del ego. Si respondés con más presión, confirmás exactamente lo que teme y se cierra del todo.",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 3,
+      "tags": ["clasificacion", "defensiva"]
+    },
+    {
+      "id": "tip-007",
+      "tipo": "clasica",
+      "frente": "Detectaste una objeción DEFENSIVA. ¿Cómo la trabajás?",
+      "dorso": "No presiones. Dale marco sin empujar y devolvele el poder con dirección: «¿Qué parte de esta conversación te hizo sentir que no tenías el control? ¿Querés que revisemos juntos qué es lo que realmente querés, y que esto sea tuyo y no mío?»",
+      "porQue": "Lo que perdió es la sensación de que decide él. Devolvérsela explícitamente desactiva la defensa sin que tengas que ceder el liderazgo: seguís dirigiendo, pero ahora hacia lo que él quiere.",
+      "principioId": "p-claridad-sobre-presion",
+      "dificultad": 3,
+      "tags": ["clasificacion", "defensiva"]
+    },
+    {
+      "id": "tip-008",
+      "tipo": "clasica",
+      "frente": "Objeción HERIDA: ¿cómo la reconocés?",
+      "dorso": "Hay emoción detrás: molestia, frustración, resignación. Habla en pasado y repite «otra vez», «me pasó», «lo intenté», «confié». Te das cuenta de que la conversación dejó de ser sobre tu programa y se convirtió en una historia que él trae puesta.",
+      "porQue": "Acá no está hablando de vos: está hablando de alguien más, o de sí mismo en otro momento. Tomarlo como un cuestionamiento a tu oferta y salir a defenderla es el error que la confirma.",
+      "principioId": "p-objecion-es-informacion",
+      "dificultad": 2,
+      "tags": ["clasificacion", "herida"]
+    },
+    {
+      "id": "tip-009",
+      "tipo": "clasica",
+      "frente": "Detectaste una objeción HERIDA. ¿Cuál es la regla y cuáles las preguntas?",
+      "dorso": "La regla: no le digas que esto es distinto — hacelo SENTIR distinto. Validá el dolor y no te pongas a la defensiva. «¿Qué aprendiste de esa experiencia? ¿Y qué podés hacer distinto esta vez para no repetirla?» / «¿No creés que postergar una decisión buena por miedo a repetir una mala es dejar que esa historia siga decidiendo por vos?»",
+      "porQue": "«Nosotros somos diferentes» es exactamente lo que le dijeron los anteriores. La única forma de diferenciarte es en cómo se siente la conversación, no en lo que afirmás sobre ella.",
+      "principioId": "p-acuerdo-antes-rebatir",
+      "dificultad": 3,
+      "tags": ["clasificacion", "herida"]
+    },
+    {
+      "id": "tip-010",
+      "tipo": "clasica",
+      "frente": "Objeción DE IDENTIDAD: ¿cómo la reconocés? Es la más silenciosa de las cuatro.",
+      "dorso": "El tono es débil, dudoso. Aparecen muchos «yo no…», «a mí me cuesta…», «soy de los que…». El foco no está en el programa sino en su capacidad de sostenerlo. Y la señal más clara: no hay quejas, hay autoexclusión.",
+      "porQue": "No objeta el precio ni el proceso ni a vos: se objeta a sí mismo. No cree estar a la altura de lo que decís que puede lograr, y en vez de decir «no creo en mí» lo dice con otras palabras.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 3,
+      "tags": ["clasificacion", "identidad"]
+    },
+    {
+      "id": "tip-011",
+      "tipo": "clasica",
+      "frente": "Detectaste una objeción DE IDENTIDAD. ¿Qué NO hacés, y qué preguntás?",
+      "dorso": "No le expliques el programa y no lo motives: las dos cosas confirman que él es el problema. Mostrale que tomar esta decisión sería el primer acto de recuperar la confianza. «¿Qué parte de vos dice que sí… y cuál te está saboteando? ¿Y quién querés que tome esta decisión: el que duda, o el que quiere empezar a creérsela?»",
+      "porQue": "Explicar mejor el programa no toca el problema, porque el problema no es el programa. Y motivarlo desde afuera dura hasta que corte la llamada: la confianza tiene que salir de una decisión suya, no de tu entusiasmo.",
+      "principioId": "p-emocion-decide-logica-justifica",
+      "dificultad": 3,
+      "tags": ["clasificacion", "identidad"]
+    },
+    {
+      "id": "tip-012",
+      "tipo": "clasica",
+      "frente": "¿Cuál es el primer movimiento ante CUALQUIERA de los cuatro tipos, antes de trabajar nada?",
+      "dorso": "Asentir. «Perfecto, yo haría lo mismo» / «Es válido lo que sentís» / «Te agradezco que lo pongas sobre la mesa». Validar la emoción, no el argumento.",
+      "porQue": "Una objeción es una forma emocionalmente segura de decir «tengo miedo». Si la atacás de frente, tiene que defender la frase para no exponer lo de abajo, y la posición se endurece. Si la aceptás sin juicio, el sistema defensivo se apaga.",
+      "principioId": "p-acuerdo-antes-rebatir",
+      "dificultad": 1,
+      "tags": ["clasificacion", "universal"]
+    },
+    {
+      "id": "tip-013",
+      "tipo": "clasica",
+      "frente": "Después de asentir, ¿cuál es el movimiento que te evita trabajar sobre humo?",
+      "dorso": "Aislar: «Si no fuera por eso, ¿ya estarías listo para avanzar?» Si dice que sí, tenés claridad. Si duda o aparece otra excusa, sabés que eso no era real: era pantalla.",
+      "porQue": "Es el filtro más barato de la llamada. Te ahorra veinte minutos de trabajar una objeción que no era la que frenaba, y te dice si estás cerca o lejos de la raíz.",
+      "principioId": "p-objecion-oculta",
+      "dificultad": 2,
+      "tags": ["clasificacion", "universal", "aislar"]
+    },
+    {
+      "id": "tip-014",
+      "tipo": "clasica",
+      "frente": "Terminaste de indagar y tenés la objeción real. ¿Cuál es el último paso antes de cerrar, y qué error tenés que evitar ahí?",
+      "dorso": "Preguntar qué acción tomaría, y CALLARTE: «¿Cuál creés entonces que es la acción que tenés que tomar para conseguir eso que dijiste que querés?». El error es hacer la pregunta y contestarla vos mismo en la misma respiración.",
+      "porQue": "La solución que sale de su boca ya viene con compromiso incluido: no puede discutir su propia respuesta. Además, vos no sos tu cliente — lo que a vos te tranquilizaría casi nunca es lo que a él.",
+      "principioId": "p-el-cliente-da-la-solucion",
+      "dificultad": 3,
+      "tags": ["clasificacion", "universal", "cierre"]
+    }
+  ]
+}

@@ -6,7 +6,11 @@ import { randomPersonality, personalityView } from './leadPersonalities';
 
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
-async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 2, maxTokens = 1500) {
+// `soloMode` viaja al servidor para que /api/generate sepa si el pedido es de
+// práctica individual —que pasa por el candado de aprobación— o de práctica en
+// equipo, que queda abierta. El endpoint es el mismo para las dos, así que el
+// criterio no puede ser la ruta.
+async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 2, maxTokens = 1500, soloMode = false) {
   // Modo experto (BYOK): el usuario cargó su propia key/URL en Ajustes y pega
   // directo al proveedor externo. Por defecto (sin key propia) usamos nuestro
   // proxy serverless, que nunca expone una key al cliente.
@@ -14,7 +18,7 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
 
   let finalUrl = "/api/generate";
   const headers = { "Content-Type": "application/json" };
-  let requestBody = { prompt, uid: auth.currentUser?.uid, email: auth.currentUser?.email, max_tokens: maxTokens };
+  let requestBody = { prompt, uid: auth.currentUser?.uid, email: auth.currentUser?.email, max_tokens: maxTokens, soloMode };
 
   if (useOwnKey) {
     requestBody.byok = true;
@@ -63,13 +67,13 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
           if (match) waitMs = Math.min(Math.ceil(parseFloat(match[1]) * 1000) + 500, 20000);
         } catch (e) { /* usar default */ }
         await sleep(waitMs);
-        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens);
+        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens, soloMode);
       }
 
       // Timeouts/errores transitorios del proveedor: reintentar antes de rendirnos.
       const isRetryable = (response.status === 504 || response.status === 502 || response.status === 503) && retriesLeft > 0;
       if (isRetryable) {
-        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens);
+        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens, soloMode);
       }
 
       let errorData;
@@ -130,7 +134,7 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
   }
 }
 
-export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language) {
+export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language, { soloMode = false } = {}) {
   const lang = language && typeof language === 'string' ? (language.startsWith('en') ? 'en' : 'es') : 'es';
   const activeStages = stages && stages.length > 0 ? stages : [
     { id: 'apertura', label: 'Apertura', baseQuestions: 'Romper hielo', baseObjections: '' }
@@ -172,7 +176,7 @@ export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stage
 
   // 3000 tokens de salida acomoda los campos nuevos (behavioralCues, decisionStyle,
   // triggerEvent, rootCauses) sin acercarse al límite de 6000 TPM.
-  const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 3000);
+  const scenario = await makeAIPromptCall(fullPrompt, apiKey, apiUrl, apiModel, 2, 3000, soloMode);
   if (scenario && typeof scenario === 'object') {
     scenario.personality = personality.id;
     // Guardamos la dificultad/temperatura elegidas: el scoring las usa para
