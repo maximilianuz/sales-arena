@@ -6,11 +6,16 @@ import { randomPersonality, personalityView } from './leadPersonalities';
 
 const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
+// UN intento completo (con sus reintentos internos por 429/5xx). No decide el
+// camino: se lo imponen — con `apiKey` va por la key propia del usuario, sin
+// ella por el proxy del servidor. La política de "si falla uno, probá el otro"
+// vive en makeAIPromptCall, más abajo.
+//
 // `soloMode` viaja al servidor para que /api/generate sepa si el pedido es de
 // práctica individual —que pasa por el candado de aprobación— o de práctica en
 // equipo, que queda abierta. El endpoint es el mismo para las dos, así que el
 // criterio no puede ser la ruta.
-async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 2, maxTokens = 1500, soloMode = false) {
+async function callAIOnce(prompt, apiKey, apiUrl, apiModel, retriesLeft = 2, maxTokens = 1500, soloMode = false) {
   // Modo experto (BYOK): el usuario cargó su propia key/URL en Ajustes y pega
   // directo al proveedor externo. Por defecto (sin key propia) usamos nuestro
   // proxy serverless, que nunca expone una key al cliente.
@@ -67,13 +72,13 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
           if (match) waitMs = Math.min(Math.ceil(parseFloat(match[1]) * 1000) + 500, 20000);
         } catch (e) { /* usar default */ }
         await sleep(waitMs);
-        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens, soloMode);
+        return callAIOnce(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens, soloMode);
       }
 
       // Timeouts/errores transitorios del proveedor: reintentar antes de rendirnos.
       const isRetryable = (response.status === 504 || response.status === 502 || response.status === 503) && retriesLeft > 0;
       if (isRetryable) {
-        return makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens, soloMode);
+        return callAIOnce(prompt, apiKey, apiUrl, apiModel, retriesLeft - 1, maxTokens, soloMode);
       }
 
       let errorData;
@@ -136,6 +141,32 @@ async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 
     }
     throw error;
   }
+}
+
+// Punto de entrada de toda llamada a la IA. Decide el camino y se auto-repara:
+//
+// El "modo experto" (una key propia cargada en Ajustes de IA) pega DIRECTO al
+// proveedor externo, salteándose el proxy del servidor — y con él la cadena de
+// proveedores, el failover y el orden por velocidad. Quedó de una época previa
+// a esa cadena, así que hoy una key propia vencida, sin cupo o apuntando a un
+// endpoint lento rompe la generación aunque el servidor estuviera perfecto.
+//
+// Ahora, si el intento con key propia falla POR LO QUE SEA, reintentamos una
+// vez por el proxy del servidor en vez de tirarle el error al usuario. El
+// fallback es en un solo sentido (key propia → servidor): el camino del
+// servidor nunca reintenta con la key propia, así que no hay bucle posible.
+async function makeAIPromptCall(prompt, apiKey, apiUrl, apiModel, retriesLeft = 2, maxTokens = 1500, soloMode = false) {
+  if (apiKey) {
+    try {
+      return await callAIOnce(prompt, apiKey, apiUrl, apiModel, retriesLeft, maxTokens, soloMode);
+    } catch (error) {
+      // No propagamos: el servidor es el plan B y suele ser más rápido y
+      // resiliente. Queda el rastro para poder diagnosticarlo.
+      console.warn('[IA] Falló la key propia de "Ajustes de IA"; reintento por el servidor:', error?.message || error);
+      logError(error, { source: 'ai_byok_fallback' });
+    }
+  }
+  return callAIOnce(prompt, null, null, null, retriesLeft, maxTokens, soloMode);
 }
 
 export async function generateAIScenario(apiKey, apiUrl, apiModel, config, stages = [], language, { soloMode = false, onProgress = () => {} } = {}) {
