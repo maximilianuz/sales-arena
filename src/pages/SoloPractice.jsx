@@ -1062,19 +1062,48 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
 
         {/* Producto a vender: le da clima al closer (qué ofrece). Empieza abierto y
             se puede colapsar. En modo lead NO se muestra: vos sos el cliente y el
-            producto te lo tiene que presentar el closer experto. */}
+            producto te lo tiene que presentar el closer experto. Si el escenario
+            trae los campos estructurados (productName/differentiator/includes/
+            outcome/price) se renderiza con jerarquía visual; si no (escenario
+            viejo de la biblioteca), cae al texto plano de productToSell. */}
         {mode !== 'lead' && scenario?.productToSell && (
           <div className="glass-panel" style={{ padding: showProduct ? '0.75rem 0.9rem' : '0.5rem 0.9rem', marginBottom: '0.75rem', border: '1px solid rgba(48,209,88,0.25)', background: 'rgba(48,209,88,0.06)' }}>
             <button onClick={() => setShowProduct(v => !v)} style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: 0, color: 'inherit' }}>
               <Package size={14} color="var(--success)" />
               <span style={{ fontSize: '0.72rem', fontWeight: '700', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--success)' }}>{isEn ? 'What you sell' : 'Qué vendés'}</span>
-              {scenario.productPrice > 0 && (
-                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--success)' }}>· USD {Number(scenario.productPrice).toLocaleString('en-US')}</span>
+              {(scenario.price || scenario.productPrice) > 0 && (
+                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--success)' }}>· USD {Number(scenario.price || scenario.productPrice).toLocaleString('en-US')}</span>
               )}
               <span style={{ marginLeft: 'auto', display: 'flex', color: 'var(--text-muted)' }}>{showProduct ? <ChevronUp size={15} /> : <ChevronDown size={15} />}</span>
             </button>
             {showProduct && (
-              <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.45 }}>{scenario.productToSell}</p>
+              scenario.productName ? (
+                <div style={{ marginTop: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
+                  <div style={{ fontSize: '1rem', fontWeight: '800', color: 'white', lineHeight: 1.3 }}>{scenario.productName}</div>
+                  {scenario.differentiator && (
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.5 }}>{scenario.differentiator}</p>
+                  )}
+                  {Array.isArray(scenario.includes) && scenario.includes.length > 0 && (
+                    <ul style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                      {scenario.includes.map((item, i) => (
+                        <li key={i} style={{ fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.4 }}>{item}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {scenario.outcome && (
+                    <div style={{ padding: '0.5rem 0.7rem', background: 'rgba(48,209,88,0.1)', borderLeft: '2px solid var(--success)', borderRadius: '0.4rem' }}>
+                      <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-main)', lineHeight: 1.4 }}>{scenario.outcome}</p>
+                    </div>
+                  )}
+                  {(scenario.price || scenario.productPrice) > 0 && (
+                    <div style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--success)' }}>
+                      {isEn ? 'Investment' : 'Inversión'}: USD {Number(scenario.price || scenario.productPrice).toLocaleString('en-US')}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.45 }}>{scenario.productToSell}</p>
+              )
             )}
           </div>
         )}
