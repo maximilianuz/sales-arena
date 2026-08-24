@@ -824,7 +824,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
               {phase === 'loading'
                 ? <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> {genPhase === 'oferta'
                     ? (isEn ? 'Designing the offer & objections...' : 'Diseñando la oferta y las objeciones...')
-                    : (isEn ? 'Building the lead profile...' : 'Generando el perfil del lead...')}</>
+                    : (mode === 'lead' ? (isEn ? 'Generating your character...' : 'Generando tu personaje...') : mode === 'observer' ? (isEn ? 'Setting up the match...' : 'Armando el partido...') : (isEn ? 'Generating buyer...' : 'Generando comprador...'))}</>
                 : <><Phone size={18} /> {mode === 'lead' ? (isEn ? 'Take the call' : 'Recibir la llamada') : mode === 'observer' ? (isEn ? 'Watch the match' : 'Ver el partido') : (isEn ? 'Start the call' : 'Iniciar la llamada')}</>}
             </button>
           </div>
