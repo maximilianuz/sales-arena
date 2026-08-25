@@ -62,11 +62,27 @@ function providerChain() {
     'meta/llama-3.2-3b-instruct', 'meta/llama-3.3-70b-instruct', false);
 
   // 3. Groq — sí soporta json_object.
+  //
+  // Modelos: los anteriores (llama-3.1-8b-instant / llama-3.3-70b-versatile)
+  // fueron deprecados por Groq el 17/06/2026 y APAGADOS el 16/08/2026, así que
+  // toda llamada a Groq venía fallando y la cadena caía a NVIDIA (el lento).
+  // Reemplazos recomendados por la propia Groq, ambos production + JSON mode:
+  //   llama-3.1-8b-instant    → openai/gpt-oss-20b
+  //   llama-3.3-70b-versatile → openai/gpt-oss-120b
+  // Ref: https://console.groq.com/docs/deprecations
+  //
+  // El override por env es GROQ_MODEL_FAST / GROQ_MODEL_SMART (ver envModel).
+  // A propósito ya NO se usan acá AI_DEFAULT_MODEL ni ROLEPLAY_MODEL: eran
+  // genéricas y traían dos problemas. Una, ROLEPLAY_MODEL la usa también
+  // training-roleplay.js con IDs de NVIDIA (meta/llama-...), incompatibles con
+  // Groq — la misma variable significaba dos cosas distintas. Y dos, si quedaron
+  // cargadas con los modelos viejos ya apagados, pisaban el default nuevo y el
+  // arreglo no surtía efecto.
   add('groq', 'GROQ',
     process.env.GROQ_URL || process.env.AI_API_URL || 'https://api.groq.com/openai/v1/chat/completions',
     process.env.GROQ_API_KEY || process.env.AI_API_KEY,
-    process.env.AI_DEFAULT_MODEL || 'llama-3.1-8b-instant',
-    process.env.ROLEPLAY_MODEL || 'llama-3.3-70b-versatile', true);
+    'openai/gpt-oss-20b',
+    'openai/gpt-oss-120b', true);
 
   // Quién va PRIMERO. Por defecto Groq: su hardware (LPU) genera mucho más
   // rápido que el free tier de NVIDIA, y como Netlify corta las funciones a
