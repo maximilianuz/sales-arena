@@ -17,7 +17,7 @@ export const GROUP_ONLY_MODE = false;
 //   Poné esto en false para volver a cobrar por los planes Pro (el gate de
 //   suscripción y la pantalla de pagos se reactivan). Ningún código de pagos se
 //   borró: solo se saltea con este flag.
-export const FREE_ACCESS_MODE = true;
+export const FREE_ACCESS_MODE = false;
 
 // TRAINING_MODULE_ENABLED = false → Oculta el botón "Entrenamiento Closer" del
 //   Lobby. El módulo Training (currículum, sesiones de adquisición, roleplay
