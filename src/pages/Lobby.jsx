@@ -254,10 +254,13 @@ export default function Lobby() {
   }, []);
 
   // Si ya había quedado guardado 'individual' como espacio (de antes de este
-  // candado, o porque el admin le retiró el acceso) y resulta que no está
-  // habilitado, se renderiza como si estuviera en Equipos — derivado, no
+  // candado, de un cambio de cuenta, o porque el admin le retiró el acceso),
+  // se renderiza como si estuviera en Equipos hasta que el servidor CONFIRME
+  // el acceso (soloAllowed === true) — mientras se está chequeando (null) se
+  // trata igual que bloqueado, así nunca hay una ventana donde "Practicar
+  // solo" quede clickeable antes de saber si corresponde. Derivado, no
   // estado, para no forzar un setState dentro de un efecto.
-  const effectiveWorkspace = (workspace === 'individual' && soloAllowed === false) ? 'team' : workspace;
+  const effectiveWorkspace = (workspace === 'individual' && soloAllowed !== true) ? 'team' : workspace;
 
   useEffect(() => {
     if (window.particlesJS) {
