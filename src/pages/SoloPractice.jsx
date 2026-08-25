@@ -1200,7 +1200,7 @@ export default function SoloPractice({ onBack, onOpenTraining }) {
         )}
       </div>
 
-      {showCoach && <SoloCoachPanel onClose={() => setShowCoach(false)} />}
+      {showCoach && <SoloCoachPanel onClose={() => setShowCoach(false)} currentScenario={scenario} />}
 
       {/* "Ser Lead": tu ficha de personaje — la MISMA vista que ve el Lead humano
           en las salas grupales (LeadActorView). Panel lateral, no tapa el chat. */}

@@ -20,10 +20,27 @@ function PillarBlock({ title, children }) {
   );
 }
 
-export default function ThreePillarsGuide({ defaultOpen = false }) {
+// Resalta lo que viene del producto real (vs. lo que sigue siendo un corchete
+// porque depende del lead de esta llamada puntual, no del producto).
+function Filled({ children }) {
+  return <strong style={{ color: '#c4b5fd' }}>{children}</strong>;
+}
+
+export default function ThreePillarsGuide({ defaultOpen = false, product }) {
   const [open, setOpen] = useState(defaultOpen);
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
+
+  // Datos del producto real que se está vendiendo en esta sesión (del
+  // escenario: estampado del producto real de la sala, o generado por IA).
+  // Con esto el framework deja de ser 100% abstracto para las partes que
+  // dependen del PRODUCTO — lo que depende del LEAD (dolor, situación actual)
+  // sigue en corchetes porque recién se sabe charlando con él.
+  const name = product?.name?.trim();
+  const deliverable = product?.differentiator?.trim() || (Array.isArray(product?.includes) && product.includes.length > 0 ? product.includes.join(', ') : '');
+  const outcome = product?.outcome?.trim();
+  const price = Number(product?.price) > 0 ? Number(product.price) : null;
+  const hasProduct = !!(name || deliverable || outcome || price);
 
   return (
     <div style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: '0.75rem', overflow: 'hidden' }}>
@@ -43,15 +60,25 @@ export default function ThreePillarsGuide({ defaultOpen = false }) {
         <div style={{ padding: '0 0.9rem 1rem', fontSize: '0.83rem', color: 'rgba(255,255,255,0.88)', lineHeight: 1.55 }}>
           <p style={{ margin: '0 0 0.9rem', fontWeight: '700', color: 'white' }}>PUENTE DE 3 PILARES PARA EL ÉXITO</p>
 
+          {hasProduct && (
+            <div style={{ margin: '0 0 1rem', padding: '0.6rem 0.75rem', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '0.5rem' }}>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: 'rgba(255,255,255,0.75)' }}>
+                {isEn ? 'Applied to what you sell in this session:' : 'Aplicado a lo que vendés en esta sesión:'}
+              </p>
+              {name && <p style={{ margin: '0.2rem 0 0', fontWeight: '800', color: 'white' }}>{name}{price ? ` — USD ${price.toLocaleString('en-US')}` : ''}</p>}
+              {deliverable && <p style={{ margin: '0.2rem 0 0', color: 'rgba(255,255,255,0.85)' }}>{deliverable}</p>}
+            </div>
+          )}
+
           <PillarBlock title="Pilar 1 — Promesa de Alto Valor">
-            <p style={{ margin: '0 0 0.4rem' }}>La promesa de alto nivel consta de 2 frases que muestran el "resultado final" que tu oferta está diseñada para proporcionar.</p>
+            <p style={{ margin: '0 0 0.4rem' }}>La promesa de alto nivel consta de 2 frases que muestran el "resultado final" que {name ? <Filled>{name}</Filled> : 'tu oferta'} está diseñada para proporcionar.</p>
             <ul style={{ margin: '0 0 0.4rem', paddingLeft: '1.1rem' }}>
               <li>Objetivo: que el cliente esté conectado con el RESULTADO (no con el proceso) → aumenta la certeza y da "tangibilidad"</li>
               <li>Debe ser específico en el resultado y en un tiempo concreto</li>
               <li>El % o métrica exacta importa poco — es valioso pero no es la fórmula central</li>
             </ul>
             <p style={{ margin: 0, fontStyle: 'italic', color: 'rgba(255,255,255,0.75)' }}>
-              Fórmula base: "Estos van a ser los [# de pilares] para llevarte de [situación actual] a [situación deseada] en [período de tiempo aprox]"
+              Fórmula base: "Estos van a ser los [# de pilares] para llevarte de [situación actual] a {outcome ? <Filled>{outcome}</Filled> : '[situación deseada]'} en [período de tiempo aprox]"
             </p>
           </PillarBlock>
 
@@ -62,7 +89,7 @@ export default function ThreePillarsGuide({ defaultOpen = false }) {
             <ol style={{ margin: '0 0 0.6rem', paddingLeft: '1.2rem' }}>
               <li>Cómo no [dolor lógico]</li>
               <li>Y te está haciendo sentir [dolor emocional]</li>
-              <li>Bueno, lo que hacemos aquí es [entregable / cómo funciona]</li>
+              <li>Bueno, lo que hacemos aquí es {deliverable ? <Filled>{deliverable}</Filled> : '[entregable / cómo funciona]'}</li>
               <li>Para que puedas tener [beneficio lógico]</li>
               <li>Lo que te permitirá [beneficio emocional]</li>
               <li>¿Cuál es el sentido? [atalo]</li>
@@ -86,7 +113,10 @@ export default function ThreePillarsGuide({ defaultOpen = false }) {
           </PillarBlock>
 
           <PillarBlock title="Pilar 3 — Entrega del Servicio">
-            <p style={{ margin: '0 0 0.4rem' }}>Después de atar todos los pilares, dar una breve explicación de CÓMO se cumplen esos pilares.</p>
+            <p style={{ margin: '0 0 0.4rem' }}>
+              Después de atar todos los pilares, dar una breve explicación de CÓMO se cumplen esos pilares
+              {deliverable ? <> — en tu caso, sobre <Filled>{deliverable}</Filled></> : ''}.
+            </p>
             <ul style={{ margin: 0, paddingLeft: '1.1rem' }}>
               <li>La mente del prospecto se desvía naturalmente del "qué" al "cómo" — hay que abordarlo antes de que se convierta en objeción</li>
               <li>Ser MUY breve: decir lo suficiente para (1) establecer expectativas realistas y (2) que tenga sentido el cómo va a ser la entrega — sin dar tanto detalle que suene "más de lo mismo" (ej: comparar llamadas grupales vs. acompañamiento 1 a 1)</li>

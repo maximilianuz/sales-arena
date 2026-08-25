@@ -69,7 +69,7 @@ function Section({ icon, title, children }) {
   );
 }
 
-export default function SoloCoachPanel({ onClose }) {
+export default function SoloCoachPanel({ onClose, currentScenario }) {
   useCerrarConEscape(onClose);
   const { i18n } = useTranslation();
   const isEn = i18n.language?.startsWith('en');
@@ -120,10 +120,16 @@ export default function SoloCoachPanel({ onClose }) {
           {stages.map(s => <StageRow key={s.id} stage={s} isEn={isEn} />)}
         </Section>
 
-        {/* Framework de pitch del dueño del producto: chuleta estática, solo
-            consulta — colapsada por defecto para no tapar el resto del coach. */}
+        {/* Framework de pitch del dueño del producto, adaptado al producto real
+            de esta llamada — colapsado por defecto para no tapar el resto del coach. */}
         <div style={{ marginBottom: '0.5rem' }}>
-          <ThreePillarsGuide />
+          <ThreePillarsGuide product={currentScenario?.productName ? {
+            name: currentScenario.productName,
+            differentiator: currentScenario.differentiator,
+            includes: currentScenario.includes,
+            outcome: currentScenario.outcome,
+            price: currentScenario.price || currentScenario.productPrice,
+          } : null} />
         </div>
       </div>
     </div>
