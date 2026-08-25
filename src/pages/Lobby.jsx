@@ -110,6 +110,14 @@ export default function Lobby() {
   const [roomId, setRoomId] = useState('');
   const [copied, setCopied] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  // Acceso a la práctica individual: se decide en el servidor (admin, visto
+  // bueno del admin, o suscripción paga con proveedor real — ver
+  // isSoloAuthorized). null = todavía no se sabe (se trata como bloqueado, no
+  // como habilitado, para no mostrar la tarjeta abierta un instante y después
+  // cerrarla). No hay ningún texto de "escribime" acá: el bloqueo es mudo,
+  // solo el admin lo destraba dándole soloApproved al usuario.
+  const [soloAllowed, setSoloAllowed] = useState(null);
+  const [hoverCard, setHoverCard] = useState(null);
   // Espacio de trabajo: '' = todavía no eligió (muestra las 2 tarjetas grandes),
   // 'individual' | 'team'. Se persiste para aterrizar siempre donde trabaja,
   // con un switcher para cambiar. Así no se ve TODO en una misma pantalla.
@@ -220,6 +228,36 @@ export default function Lobby() {
     });
     return () => { if (unsubAdmin) unsubAdmin(); unsubAuth(); };
   }, []);
+
+  // Mismo chequeo que hace SoloPractice antes de dejar entrar (isSoloAuthorized
+  // en el server: admin, soloApproved, o suscripción paga real). Acá se hace
+  // ANTES de navegar, para que la tarjeta ya se vea bloqueada en el Lobby en
+  // vez de dejar entrar y recién ahí mostrar la pantalla de acceso denegado.
+  useEffect(() => {
+    let alive = true;
+    const unsubscribe = subscribeToAuthState((user) => {
+      (async () => {
+        try {
+          const res = await fetch('/api/solo-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uid: user?.uid })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (alive) setSoloAllowed(res.ok && data.allowed === true);
+        } catch {
+          if (alive) setSoloAllowed(false);
+        }
+      })();
+    });
+    return () => { alive = false; unsubscribe(); };
+  }, []);
+
+  // Si ya había quedado guardado 'individual' como espacio (de antes de este
+  // candado, o porque el admin le retiró el acceso) y resulta que no está
+  // habilitado, se renderiza como si estuviera en Equipos — derivado, no
+  // estado, para no forzar un setState dentro de un efecto.
+  const effectiveWorkspace = (workspace === 'individual' && soloAllowed === false) ? 'team' : workspace;
 
   useEffect(() => {
     if (window.particlesJS) {
@@ -381,23 +419,41 @@ export default function Lobby() {
             {[
               { id: 'individual', icon: <TargetIcon size={26} />, accent: '48,209,88', title: isEn ? 'Individual Work' : 'Trabajo Individual', desc: isEn ? 'Practice against the AI buyer at your own pace: as closer, lead or observer.' : 'Practicá contra el comprador IA a tu ritmo: como closer, lead u observador.' },
               { id: 'team', icon: <Users size={26} />, accent: '139,92,246', title: isEn ? 'Team Work' : 'Trabajo en Equipos', desc: isEn ? 'Live multiplayer role-plays with your team: Closer, Lead, Observer and Facilitator.' : 'Role-plays multijugador en vivo con tu equipo: Closer, Lead, Observador y Facilitador.' },
-            ].map(c => (
-              <button key={c.id} onClick={() => chooseWorkspace(c.id)} style={{
-                textAlign: 'left', cursor: 'pointer', padding: '1.5rem 1.4rem', borderRadius: '1.1rem',
-                background: `linear-gradient(160deg, rgba(${c.accent},0.13), rgba(15,15,30,0.6))`,
-                border: `1px solid rgba(${c.accent},0.35)`, color: 'white', font: 'inherit',
-                boxShadow: '0 8px 28px rgba(0,0,0,0.35)',
-              }}>
-                <div style={{ width: '46px', height: '46px', borderRadius: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, rgb(${c.accent}), rgba(${c.accent},0.55))`, marginBottom: '0.8rem', boxShadow: `0 4px 14px rgba(${c.accent},0.4)`, color: 'white' }}>
-                  {c.icon}
-                </div>
-                <div style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.3rem' }}>{c.title}</div>
-                <div style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>{c.desc}</div>
-                <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: `rgb(${c.accent})` }}>
-                  {isEn ? 'Enter' : 'Entrar'} <ArrowRight size={14} />
-                </div>
-              </button>
-            ))}
+            ].map(c => {
+              // Bloqueo mudo: sin autorización confirmada la tarjeta no navega y
+              // se pone roja al pasar el mouse. Ningún texto de contacto — el
+              // único destrabe es que el admin marque soloApproved en el usuario.
+              const locked = c.id === 'individual' && soloAllowed !== true;
+              const isHover = hoverCard === c.id;
+              const accent = locked && isHover ? '255,69,58' : c.accent;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => { if (!locked) chooseWorkspace(c.id); }}
+                  onMouseEnter={() => setHoverCard(c.id)}
+                  onMouseLeave={() => setHoverCard(null)}
+                  aria-disabled={locked}
+                  style={{
+                    textAlign: 'left', cursor: locked ? 'not-allowed' : 'pointer', padding: '1.5rem 1.4rem', borderRadius: '1.1rem',
+                    background: `linear-gradient(160deg, rgba(${accent},0.13), rgba(15,15,30,0.6))`,
+                    border: `1px solid rgba(${accent},0.35)`, color: 'white', font: 'inherit',
+                    boxShadow: '0 8px 28px rgba(0,0,0,0.35)',
+                    opacity: locked && !isHover ? 0.75 : 1,
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <div style={{ width: '46px', height: '46px', borderRadius: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, rgb(${accent}), rgba(${accent},0.55))`, marginBottom: '0.8rem', boxShadow: `0 4px 14px rgba(${accent},0.4)`, color: 'white' }}>
+                    {locked && isHover ? <Lock size={26} /> : c.icon}
+                  </div>
+                  <div style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.3rem' }}>{c.title}</div>
+                  <div style={{ fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>{c.desc}</div>
+                  <div style={{ marginTop: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: `rgb(${accent})` }}>
+                    {locked ? (isHover ? (isEn ? 'Locked' : 'Bloqueado') : (isEn ? 'Enter' : 'Entrar')) : (isEn ? 'Enter' : 'Entrar')}
+                    {!(locked && isHover) && <ArrowRight size={14} />}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         ) : (
           <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(0,0,0,0.25)', borderRadius: '0.9rem', padding: '0.3rem', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -405,16 +461,26 @@ export default function Lobby() {
               { id: 'individual', icon: <User size={15} />, l: isEn ? 'Individual Work' : 'Trabajo Individual' },
               { id: 'team', icon: <Users size={15} />, l: isEn ? 'Team Work' : 'Trabajo en Equipos' },
             ].map(tab => {
-              const active = workspace === tab.id;
+              const active = effectiveWorkspace === tab.id;
+              const locked = tab.id === 'individual' && soloAllowed !== true;
+              const isHover = hoverCard === `tab-${tab.id}`;
               return (
-                <button key={tab.id} onClick={() => chooseWorkspace(tab.id)} style={{
-                  flex: 1, padding: '0.6rem 0.5rem', borderRadius: '0.65rem', cursor: 'pointer', font: 'inherit',
-                  fontSize: '0.88rem', fontWeight: 700, border: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem',
-                  background: active ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'transparent',
-                  color: active ? 'white' : 'var(--text-muted)',
-                }}>
-                  {tab.icon} {tab.l}
+                <button
+                  key={tab.id}
+                  onClick={() => { if (!locked) chooseWorkspace(tab.id); }}
+                  onMouseEnter={() => setHoverCard(`tab-${tab.id}`)}
+                  onMouseLeave={() => setHoverCard(null)}
+                  aria-disabled={locked}
+                  style={{
+                    flex: 1, padding: '0.6rem 0.5rem', borderRadius: '0.65rem', cursor: locked ? 'not-allowed' : 'pointer', font: 'inherit',
+                    fontSize: '0.88rem', fontWeight: 700, border: locked && isHover ? '1px solid rgba(255,69,58,0.5)' : 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem',
+                    background: locked && isHover ? 'rgba(255,69,58,0.15)' : active ? 'linear-gradient(135deg,#6366f1,#8b5cf6)' : 'transparent',
+                    color: locked && isHover ? 'var(--danger)' : active ? 'white' : 'var(--text-muted)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {locked && isHover ? <Lock size={15} /> : tab.icon} {tab.l}
                 </button>
               );
             })}
@@ -423,7 +489,7 @@ export default function Lobby() {
       </div>
       )}
 
-      {!GROUP_ONLY_MODE && workspace === 'individual' && (<>
+      {!GROUP_ONLY_MODE && effectiveWorkspace === 'individual' && (<>
       {/* ── Sección: Práctica individual ───────────────────── */}
       <div style={{ position: 'relative', zIndex: 1, marginTop: '2rem', width: '100%', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', padding: '0 1rem', boxSizing: 'border-box' }}>
         <SectionLabel badge={isEn ? '1 player' : '1 jugador'} badgeAccent="48,209,88">
@@ -512,7 +578,7 @@ export default function Lobby() {
       <ProgressPath />
       </>)}
 
-      {workspace === 'team' && (<>
+      {effectiveWorkspace === 'team' && (<>
       {/* ── Sección: Sesión en equipo ──────────────────────── */}
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '720px', margin: '2rem auto 0', padding: '0 1rem', boxSizing: 'border-box' }}>
         <SectionLabel badge={isEn ? 'Multiplayer' : 'Multijugador'} badgeAccent="139,92,246">
