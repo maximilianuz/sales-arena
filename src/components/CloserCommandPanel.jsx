@@ -174,9 +174,16 @@ export default function CloserCommandPanel({ currentScenario, activeStage, pipel
         )}
       </div>
 
-      {/* Framework de pitch del dueño del producto: chuleta estática, solo
-          consulta para el Closer — colapsada por defecto. */}
-      <ThreePillarsGuide />
+      {/* Framework de pitch del dueño del producto, adaptado al producto real
+          de esta sesión (nombre/diferencial/entregables/precio del escenario)
+          — colapsado por defecto, solo consulta para el Closer. */}
+      <ThreePillarsGuide product={currentScenario?.productName ? {
+        name: currentScenario.productName,
+        differentiator: currentScenario.differentiator,
+        includes: currentScenario.includes,
+        outcome: currentScenario.outcome,
+        price: currentScenario.price || currentScenario.productPrice,
+      } : null} />
 
       {/* Product — collapsible. Si el escenario trae los campos estructurados
           (productName/differentiator/includes/outcome/price, generados por IA
