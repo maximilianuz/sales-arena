@@ -12,8 +12,8 @@ function isAdminEmail(email) {
 }
 
 // El modelo y la URL viven en lib/llm.js (cadena de proveedores con respaldo).
-// El default sigue siendo Groq llama-3.1-8b-instant (rápido, entra en el límite
-// de ~10s de Netlify Functions).
+// El default es Groq openai/gpt-oss-120b para 'smart' (rápido, entra en el
+// límite de ~10s de Netlify Functions).
 
 export const handler = async (event) => {
   const headers = {

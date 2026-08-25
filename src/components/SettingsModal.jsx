@@ -33,7 +33,8 @@ export default function SettingsModal({ apiKey, apiUrl, apiModel, stages, onSave
         break;
       case 'groq':
         setUrlInput('https://api.groq.com/openai/v1/chat/completions');
-        setModelInput('llama-3.3-70b-versatile');
+        // llama-3.3-70b-versatile fue apagado por Groq el 16/08/2026.
+        setModelInput('openai/gpt-oss-120b');
         break;
       case 'openrouter':
         setUrlInput('https://openrouter.ai/api/v1/chat/completions');
